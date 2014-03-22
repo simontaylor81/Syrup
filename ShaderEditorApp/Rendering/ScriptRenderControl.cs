@@ -94,9 +94,16 @@ namespace ShaderEditorApp.Rendering
 			return new ShaderHandle(shaders.Count - 1);
 		}
 
+		// Lookup a shader filename in the project to retrieve the full path.
 		private string FindShader(string name)
 		{
-			return workspace.Project.AllItems.First(item => item.Name == name).AbsolutePath;
+			var shaderFileItem = workspace.Project.AllItems.FirstOrDefault(item => item.Name == name);
+			if (shaderFileItem == null)
+			{
+				throw new ScriptException("Could not find shader file: " + name);
+			}
+
+			return shaderFileItem.AbsolutePath;
 		}
 
 		public object CreateRenderTarget()
