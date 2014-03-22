@@ -1,0 +1,181 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns:avalondock="http://avalondock.codeplex.com"
+        xmlns:winforms="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+        xmlns:srp="clr-namespace:ShaderEditorApp"
+        xmlns:srpprojects="clr-namespace:ShaderEditorApp.Projects"
+        xmlns:srpview="clr-namespace:ShaderEditorApp.View"
+        xmlns:mvvm="clr-namespace:ShaderEditorApp.MVVMUtil"
+        mc:Ignorable="d"
+        x:Class="ShaderEditorApp.MainWindow"
+        Name="mainWindow"
+        Title="SRP" Width="1200" Height="800" Initialized="Window_Initialized_1">
+    
+    <Window.Resources>
+        <!-- Style for document containers in the main dock control. -->
+        <Style x:Key="DocumentPaneStyle" TargetType="{x:Type avalondock:LayoutDocumentItem}">
+            <Setter Property="Title" Value="{Binding Model.DisplayName}"/>
+            <Setter Property="ToolTip" Value="{Binding Model.FilePath}"/>
+            <Setter Property="CloseCommand" Value="{Binding Model.CloseCmd}"/>
+        </Style>
+
+        <!-- Data template to use for document panes. -->
+        <DataTemplate x:Key="DocumentPaneTemplate">
+            <avalonedit:TextEditor FontFamily="Consolas" FontSize="10pt" ShowLineNumbers="True"
+                                   Document="{Binding Document}"
+                                   Initialized="TextEditor_Initialized"/>
+        </DataTemplate>
+
+        <!-- Style to use for the various tools windows. -->
+        <Style x:Key="ToolPaneStyle" TargetType="{x:Type avalondock:LayoutAnchorableItem}"/>
+
+        <!-- Selector that picks a style for the various elements in the dock layout. -->
+        <srp:PaneStyleSelector x:Key="PaneStyleSelector"
+                               DocumentStyle="{StaticResource DocumentPaneStyle}"
+                               ToolStyle="{StaticResource ToolPaneStyle}"/>
+
+        <!-- Selector that picks the data template for docked elements. -->
+        <srp:PaneTemplateSelector x:Key="PaneTemplateSelector"
+                                  DocumentTemplate="{StaticResource DocumentPaneTemplate}"/>
+
+    </Window.Resources>
+    
+    <!-- Keyboard shortcuts. TODO: these should be configurable somehow. -->
+    <Window.InputBindings>
+        <KeyBinding Key="F5" Command="{Binding RunActiveScriptCmd}"/>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenDocumentCmd}"/>
+        <KeyBinding Key="O" Modifiers="Control+Shift" Command="{Binding OpenProjectCmd}"/>
+        <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewDocumentCmd}"/>
+        <KeyBinding Key="N" Modifiers="Control+Shift" Command="{Binding NewProjectCmd}"/>
+        <KeyBinding Key="F4" Modifiers="Control" Command="{Binding CloseActiveDocumentCmd}"/>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveActiveDocumentCmd}"/>
+    </Window.InputBindings>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="File">
+                <MenuItem Header="New">
+                    <MenuItem Command="{Binding NewProjectCmd}" Header="Project" InputGestureText="Ctrl+Shift+N"/>
+                    <MenuItem Command="{Binding NewDocumentCmd}" Header="Document" InputGestureText="Ctrl+N"/>
+                </MenuItem>
+                <MenuItem Header="Open">
+                    <MenuItem Command="{Binding OpenProjectCmd}" Header="Project" InputGestureText="Ctrl+Shift+O"/>
+                    <MenuItem Command="{Binding OpenDocumentCmd}" Header="Document" InputGestureText="Ctrl+O"/>
+                </MenuItem>
+                <MenuItem Command="{Binding SaveActiveDocumentCmd}" Header="{Binding SaveActiveDocumentCmd.Name}" InputGestureText="Ctrl+S"/>
+                <MenuItem Command="{Binding SaveActiveDocumentAsCmd}" Header="{Binding SaveActiveDocumentAsCmd.Name}"/>
+                <MenuItem Command="{Binding CloseActiveDocumentCmd}" Header="{Binding CloseActiveDocumentCmd.Name}" InputGestureText="Ctrl+F4"/>     <!-- TODO: Make InputGestureText generic. -->
+                <MenuItem Header="Exit"/>
+            </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Command="Undo"/>
+                <MenuItem Command="Redo"/>
+                <MenuItem Command="Cut"/>
+                <MenuItem Command="Copy"/>
+                <MenuItem Command="Paste"/>
+            </MenuItem>
+            <MenuItem Header="View">
+                <MenuItem Header="Real-Time Mode" IsCheckable="True" IsChecked="{Binding ElementName=mainWindow, Path=RealTimeMode}"/>
+            </MenuItem>
+            <MenuItem Header="Run">
+                <MenuItem Command="{Binding RunActiveScriptCmd}" Header="{Binding RunActiveScriptCmd.Name}" InputGestureText="F5"/>     <!-- TODO: Make InputGestureTest generic. -->
+            </MenuItem>
+        </Menu>
+
+        <avalondock:DockingManager x:Name="dockManager" Grid.Row="1"
+                                   LayoutItemContainerStyleSelector="{StaticResource PaneStyleSelector}"
+                                   LayoutItemTemplateSelector="{StaticResource PaneTemplateSelector}"
+                                   DocumentsSource="{Binding Documents}"
+                                   ActiveContent="{Binding ActiveWindow, Mode=TwoWay}">
+            <!--<avalondock:DockingManager.Theme>
+                <avalondock:VS2010Theme/>
+            </avalondock:DockingManager.Theme>-->
+            <avalondock:LayoutRoot>
+                <avalondock:LayoutPanel Orientation="Horizontal">
+                    <!-- Left-anchored elements -->
+                    <avalondock:LayoutAnchorablePane DockWidth="200">
+                        <!-- Project Browser panel -->
+                        <avalondock:LayoutAnchorable ContentId="ProjectBrowser" Title="Project">
+                            <srpprojects:ProjectBrowser x:Name="projectBrowser" DataContext="{Binding ProjectViewModel}"/>
+                        </avalondock:LayoutAnchorable>
+                    </avalondock:LayoutAnchorablePane>
+                    
+                    <avalondock:LayoutPanel Orientation="Vertical">
+                        <avalondock:LayoutPanel Orientation="Horizontal">
+                            
+                            <!-- Main Document group -->
+                            <avalondock:LayoutDocumentPaneGroup>
+                                <avalondock:LayoutDocumentPane>
+                                </avalondock:LayoutDocumentPane>
+                            </avalondock:LayoutDocumentPaneGroup>
+                        
+                            <!-- Right-anchored elements -->
+                            <avalondock:LayoutPanel Orientation="Vertical" DockWidth="300">
+                                
+                                <avalondock:LayoutAnchorablePane>
+                                    <!-- Render viewport -->
+                                    <avalondock:LayoutAnchorable ContentId="RenderOutput" Title="Render">
+                                        <srpview:ViewportFrame x:Name="viewportFrame"/>
+                                    </avalondock:LayoutAnchorable>
+                                </avalondock:LayoutAnchorablePane>
+                                
+                                <avalondock:LayoutAnchorablePane>
+                                    <!-- Properties window -->
+                                    <avalondock:LayoutAnchorable ContentId="PropertiesWindow" Title="Properties">
+                                        <srpview:PropertiesWindow x:Name="propertiesWindow" DataContext="{Binding}"/>   <!-- Bind to Workspace itself. -->
+                                    </avalondock:LayoutAnchorable>
+                                </avalondock:LayoutAnchorablePane>
+                                
+                            </avalondock:LayoutPanel>
+                            
+                        </avalondock:LayoutPanel>
+                    
+                        <!-- Bottom-anchored elements -->
+                        <avalondock:LayoutAnchorablePane DockHeight="200">
+                            <!-- Script/compilation output window -->
+                            <avalondock:LayoutAnchorable ContentId="Output" Title="Output">
+                                <srp:OutputWindow x:Name="outputWindow"/>
+                            </avalondock:LayoutAnchorable>
+                        </avalondock:LayoutAnchorablePane>
+                    </avalondock:LayoutPanel>
+                </avalondock:LayoutPanel>
+            </avalondock:LayoutRoot>
+        </avalondock:DockingManager>
+
+        <StatusBar Grid.Row="2">
+            <StatusBarItem Content="Shader Prototyping Tool"/>
+
+            <StatusBarItem HorizontalAlignment="Right">
+                <ProgressBar Name="workingProgressBar" Width="100" Height="15">
+                    <ProgressBar.Triggers>
+
+                        <!-- Continually animate the progress bar to demonstrate responsiveness. -->
+                        <EventTrigger RoutedEvent="ProgressBar.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                        Storyboard.TargetName="workingProgressBar"
+                                        Storyboard.TargetProperty="Value"
+                                        From="0.0" To="100.0"
+                                        Duration="0:0:1"
+                                        RepeatBehavior="Forever" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                                            
+                    </ProgressBar.Triggers>
+                </ProgressBar>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

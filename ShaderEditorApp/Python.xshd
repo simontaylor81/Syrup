@@ -1,0 +1,140 @@
+<SyntaxDefinition name="Python"
+				  extensions=".py"
+				  xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+
+	<Color name="Comment" foreground="Green" exampleText="// comment" />
+	<Color name="Literal" foreground="#A31515" exampleText="string text = &quot;Hello, World!&quot;"/>
+	<Color name="Operator" foreground="#FF0000"/>
+	<Color name="Keyword" foreground="#0000FF"/>
+	<Color name="Type" foreground="#2B91AF"/>
+	<Color name="Function" foreground="MidnightBlue"/>
+
+	<RuleSet ignoreCase="false">
+
+		<!-- Digits -->
+		<Rule color="Literal">
+			\b0[xX][0-9a-fA-F]+		# hex number
+			|
+			(	\b\d+(\.[0-9]+)?	# number with optional floating point
+			|	\.[0-9]+			# or just starting with floating point
+			)
+			([eE][+-]?[0-9]+)?		# optional exponent
+		</Rule>
+
+		<!--<Rule color="Operator">
+			[()\[\]{}@,:.`=;+\-*/% &amp;|^&gt;&lt;]+
+		</Rule>-->
+
+		<!-- DocComment -->
+		<Span color="Comment">
+			<Begin>"""</Begin>
+			<End>"""</End>
+		</Span>
+
+		<!-- LineComment -->
+		<Span color="Comment">
+			<Begin>\#</Begin>
+		</Span>
+
+		<!-- String -->
+		<Span color="Literal">
+			<Begin>"</Begin>
+			<End>"</End>
+			<RuleSet>
+				<!-- span for escape sequences -->
+				<Span begin="\\" end="."/>
+			</RuleSet>
+		</Span>
+
+		<!-- String2 -->
+		<Span color="Literal">
+			<Begin>'</Begin>
+			<End>'</End>
+			<RuleSet>
+				<!-- span for escape sequences -->
+				<Span begin="\\" end="."/>
+			</RuleSet>
+		</Span>
+
+		<!--<MarkPrevious color="Function">(</MarkPrevious>-->
+		<!-- Highlight identifier before open paren. -->
+		<Rule color="Function">
+			[a-zA-Z0-9_]+(?=\()
+		</Rule>
+
+		<!-- BuiltInStatements -->
+		<Keywords color="Keyword">
+			<Word>assert</Word>
+			<Word>del</Word>
+			<Word>exec</Word>
+			<Word>global</Word>
+			<Word>lambda</Word>
+			<Word>print</Word>
+		</Keywords>
+
+		<!-- ClassStatement -->
+		<Keywords color="Keyword">
+			<Word>class</Word>
+		</Keywords>
+
+		<!-- ExceptionHandlingStatements -->
+		<Keywords color="Keyword">
+			<Word>except</Word>
+			<Word>finally</Word>
+			<Word>raise</Word>
+			<Word>try</Word>
+		</Keywords>
+
+		<!-- FunctionDefinition -->
+		<Keywords color="Keyword">
+			<Word>def</Word>
+		</Keywords>
+
+		<!-- Imports -->
+		<Keywords color="Keyword">
+			<Word>import</Word>
+			<Word>from</Word>
+		</Keywords>
+
+		<!-- IterationStatements -->
+		<Keywords color="Keyword">
+			<Word>for</Word>
+			<Word>in</Word>
+			<Word>while</Word>
+		</Keywords>
+
+		<!-- JumpStatements -->
+		<Keywords color="Keyword">
+			<Word>break</Word>
+			<Word>continue</Word>
+			<Word>yield</Word>
+			<Word>return</Word>
+		</Keywords>
+
+		<!-- OperatorStatements -->
+		<Keywords color="Keyword">
+			<Word>and</Word>
+			<Word>as</Word>
+			<Word>is</Word>
+			<Word>not</Word>
+			<Word>or</Word>
+		</Keywords>
+
+		<!-- PassStatement -->
+		<Keywords color="Keyword">
+			<Word>pass</Word>
+		</Keywords>
+
+		<!-- SelectionStatements -->
+		<Keywords color="Keyword">
+			<Word>elif</Word>
+			<Word>else</Word>
+			<Word>if</Word>
+		</Keywords>
+
+		<!-- WithStatement -->
+		<Keywords color="Keyword">
+			<Word>with</Word>
+		</Keywords>
+	</RuleSet>
+</SyntaxDefinition>

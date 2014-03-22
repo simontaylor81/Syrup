@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <folder name="shaders">
+    <include filename="BasicShaders.hlsl" runAtStartup="false" />
+    <include filename="Lights.hlsl" runAtStartup="false" />
+    <include filename="CopyTex.hlsl" runAtStartup="false" />
+    <include filename="DeferredShading.hlsl" runAtStartup="false" />
+  </folder>
+  <folder name="Scripts">
+    <include filename="scripttest.py" runAtStartup="false" />
+    <include filename="lights.py" runAtStartup="false" />
+    <include filename="DeferredShading.py" runAtStartup="true" />
+  </folder>
+  <OpenDocuments>
+    <OpenDocument path="C:\bitbucket\personal-projects\ShaderEditor\testproject\lights.py" />
+    <OpenDocument path="C:\bitbucket\personal-projects\ShaderEditor\testproject\DeferredShading.py" />
+    <OpenDocument path="C:\bitbucket\personal-projects\ShaderEditor\testproject\DeferredShading.hlsl" />
+  </OpenDocuments>
+</project>

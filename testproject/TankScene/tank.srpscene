@@ -1,0 +1,82 @@
+<scene>
+	<meshes>
+		<mesh name="ground_planeShape_subset0_ground" filename="ground_planeShape_subset0_ground.obj" />
+		<mesh name="polySurfaceShape371_subset0_left_engine_phong" filename="polySurfaceShape371_subset0_left_engine_phong.obj" />
+		<mesh name="polySurfaceShape376_subset0_left_engine_phong" filename="polySurfaceShape376_subset0_left_engine_phong.obj" />
+		<mesh name="polySurfaceShape380_subset0_left_engine_phong" filename="polySurfaceShape380_subset0_left_engine_phong.obj" />
+		<mesh name="polySurfaceShape381_subset0_left_engine_phong" filename="polySurfaceShape381_subset0_left_engine_phong.obj" />
+		<mesh name="polySurfaceShape382_subset0_left_engine_phong" filename="polySurfaceShape382_subset0_left_engine_phong.obj" />
+		<mesh name="tank_geoShape_subset0_left_engine_phong" filename="tank_geoShape_subset0_left_engine_phong.obj" />
+		<mesh name="tank_geoShape_subset1_right_engine_phong" filename="tank_geoShape_subset1_right_engine_phong.obj" />
+		<mesh name="tank_geoShape_subset2_turret_phong" filename="tank_geoShape_subset2_turret_phong.obj" />
+		<mesh name="barricade_geoShape_subset0_barricade_phong" filename="barricade_geoShape_subset0_barricade_phong.obj" />
+	</meshes>
+	<materials>
+		<material name="ground">
+			<texture name="DiffuseTexture" filename="ground_diff.dds" />
+			<texture name="NormalTexture" filename="ground_norm.dds" />
+			<vectorParam name="Diffuse" value="1.000000 1.000000 1.000000 1.000000" />
+			<vectorParam name="Ambient" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Specular" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Emissive" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Power" value="1.000000 0.000000 0.000000 0.000000" />
+		</material>
+		<material name="left_engine_phong">
+			<texture name="DiffuseTexture" filename="left_engine_diff.dds" />
+			<texture name="NormalTexture" filename="left_engine_norm.dds" />
+			<vectorParam name="Diffuse" value="1.000000 1.000000 1.000000 1.000000" />
+			<vectorParam name="Ambient" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Specular" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Emissive" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Power" value="1.000000 0.000000 0.000000 0.000000" />
+		</material>
+		<material name="right_engine_phong">
+			<texture name="DiffuseTexture" filename="left_engine_diff.dds" />
+			<texture name="NormalTexture" filename="left_engine_norm.dds" />
+			<vectorParam name="Diffuse" value="1.000000 1.000000 1.000000 1.000000" />
+			<vectorParam name="Ambient" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Specular" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Emissive" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Power" value="1.000000 0.000000 0.000000 0.000000" />
+		</material>
+		<material name="turret_phong">
+			<texture name="DiffuseTexture" filename="turret_diff.dds" />
+			<texture name="NormalTexture" filename="turret_norm.dds" />
+			<vectorParam name="Diffuse" value="1.000000 1.000000 1.000000 1.000000" />
+			<vectorParam name="Ambient" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Specular" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Emissive" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Power" value="1.000000 0.000000 0.000000 0.000000" />
+		</material>
+		<material name="lambert1">
+			<texture name="DiffuseTexture" filename="default.dds" />
+			<texture name="NormalTexture" filename="default-normalmap.dds" />
+			<vectorParam name="Diffuse" value="1.000000 1.000000 1.000000 1.000000" />
+			<vectorParam name="Ambient" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Specular" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Emissive" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Power" value="1.000000 0.000000 0.000000 0.000000" />
+		</material>
+		<material name="barricade_phong">
+			<texture name="DiffuseTexture" filename="turret_diff.dds" />
+			<texture name="NormalTexture" filename="turret_norm.dds" />
+			<vectorParam name="Diffuse" value="1.000000 1.000000 1.000000 1.000000" />
+			<vectorParam name="Ambient" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Specular" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Emissive" value="0.000000 0.000000 0.000000 0.000000" />
+			<vectorParam name="Power" value="1.000000 0.000000 0.000000 0.000000" />
+		</material>
+	</materials>
+	<primitives>
+		<meshInstance mesh="ground_planeShape_subset0_ground" material="ground" />
+		<meshInstance mesh="polySurfaceShape371_subset0_left_engine_phong" material="left_engine_phong" />
+		<meshInstance mesh="polySurfaceShape376_subset0_left_engine_phong" material="left_engine_phong" />
+		<meshInstance mesh="polySurfaceShape380_subset0_left_engine_phong" material="left_engine_phong" />
+		<meshInstance mesh="polySurfaceShape381_subset0_left_engine_phong" material="left_engine_phong" />
+		<meshInstance mesh="polySurfaceShape382_subset0_left_engine_phong" material="left_engine_phong" />
+		<meshInstance mesh="tank_geoShape_subset0_left_engine_phong" material="left_engine_phong" />
+		<meshInstance mesh="tank_geoShape_subset1_right_engine_phong" material="right_engine_phong" />
+		<meshInstance mesh="tank_geoShape_subset2_turret_phong" material="turret_phong" />
+		<meshInstance mesh="barricade_geoShape_subset0_barricade_phong" material="barricade_phong" />
+	</primitives>
+</scene>

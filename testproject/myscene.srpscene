@@ -1,0 +1,21 @@
+<scene>
+	<meshes>
+		<mesh name="Duck" filename="C:\bitbucket\personal-projects\ShaderEditor\packages\AssimpNet-2.1.2 Refresh\Samples\duck.dae" />
+	</meshes>
+
+	<materials>
+		<material name="DuckMat">
+			<vectorParam name="DiffuseColour" value="1 0 0 0" />
+			<texture name="DiffuseTexture" filename="C:\bitbucket\personal-projects\ShaderEditor\packages\AssimpNet-2.1.2 Refresh\Samples\duckCM.bmp" />
+		</material>
+		<material name="SphereMat">
+			<vectorParam name="DiffuseColour" value="0 1 0 0" />
+		</material>
+	</materials>
+
+	<primitives>
+		<sphere position="-1 0 0" stacks="6" slices="12" material="SphereMat" />
+		<sphere position="1 0 0" stacks="8" slices="12" />
+		<meshInstance position="0 0 0" scale="0.01 0.01 0.01" mesh="Duck" material="DuckMat" />
+	</primitives>
+</scene>

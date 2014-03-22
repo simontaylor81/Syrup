@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderEditorApp", "ShaderEditorApp\ShaderEditorApp.csproj", "{3F041CC2-36F4-468B-BE78-AB6B28BC7FFA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0EE5C742-04DA-4D53-BB7C-2E21481E790D} = {0EE5C742-04DA-4D53-BB7C-2E21481E790D}
+		{695C8AB2-0E79-4BFE-9A7C-BC490F518533} = {695C8AB2-0E79-4BFE-9A7C-BC490F518533}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRPScripting", "SRPScripting\SRPScripting.csproj", "{0EE5C742-04DA-4D53-BB7C-2E21481E790D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTexSlim", "DirectXTexSlim\DirectXTexSlim.vcxproj", "{695C8AB2-0E79-4BFE-9A7C-BC490F518533}"
+	ProjectSection(ProjectDependencies) = postProject
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77} = {371B9FA9-4C90-4AC6-A123-ACED756D6C77}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTex", "DirectXTex\DirectXTex_Desktop_2012.vcxproj", "{371B9FA9-4C90-4AC6-A123-ACED756D6C77}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0EE5C742-04DA-4D53-BB7C-2E21481E790D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0EE5C742-04DA-4D53-BB7C-2E21481E790D}.Debug|x86.Build.0 = Debug|Any CPU
+		{0EE5C742-04DA-4D53-BB7C-2E21481E790D}.Release|x86.ActiveCfg = Release|Any CPU
+		{0EE5C742-04DA-4D53-BB7C-2E21481E790D}.Release|x86.Build.0 = Release|Any CPU
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Debug|x86.ActiveCfg = Debug|Win32
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Debug|x86.Build.0 = Debug|Win32
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x86.ActiveCfg = Release|Win32
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x86.Build.0 = Release|Win32
+		{3F041CC2-36F4-468B-BE78-AB6B28BC7FFA}.Debug|x86.ActiveCfg = Debug|x86
+		{3F041CC2-36F4-468B-BE78-AB6B28BC7FFA}.Debug|x86.Build.0 = Debug|x86
+		{3F041CC2-36F4-468B-BE78-AB6B28BC7FFA}.Release|x86.ActiveCfg = Release|x86
+		{3F041CC2-36F4-468B-BE78-AB6B28BC7FFA}.Release|x86.Build.0 = Release|x86
+		{695C8AB2-0E79-4BFE-9A7C-BC490F518533}.Debug|x86.ActiveCfg = Debug|Win32
+		{695C8AB2-0E79-4BFE-9A7C-BC490F518533}.Debug|x86.Build.0 = Debug|Win32
+		{695C8AB2-0E79-4BFE-9A7C-BC490F518533}.Release|x86.ActiveCfg = Release|Win32
+		{695C8AB2-0E79-4BFE-9A7C-BC490F518533}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+EndGlobal
