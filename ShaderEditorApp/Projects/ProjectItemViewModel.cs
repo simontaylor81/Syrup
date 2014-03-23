@@ -30,6 +30,10 @@ namespace ShaderEditorApp.Projects
 			{
 				commands.Add(RunCmd);
 			}
+			else if (item.Type == ProjectItemType.Scene)
+			{
+				commands.Add(SetDefaultCmd);
+			}
 
 			Commands = commands;
 		}
@@ -108,6 +112,18 @@ namespace ShaderEditorApp.Projects
 			{
 				return NamedCommand.LazyInit(ref removeCmd, "Remove",
 					(param) => RemoveFromProject());
+			}
+		}
+
+		// Set the project item as the default of its type (scene's only, currently).
+		private NamedCommand setDefaultCmd;
+		public NamedCommand SetDefaultCmd
+		{
+			get
+			{
+				return NamedCommand.LazyInit(ref setDefaultCmd, "Set as default",
+					(param) => item.SetAsDefault(),
+					(param) => item.Type == ProjectItemType.Scene);
 			}
 		}
 

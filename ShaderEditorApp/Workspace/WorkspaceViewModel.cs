@@ -308,6 +308,12 @@ namespace ShaderEditorApp.Workspace
 				project_ = value;
 				ProjectViewModel = new ProjectViewModel(project_, this);
 
+				// Load default scene, if present.
+				if (Project.DefaultScene != null)
+				{
+					SetCurrentScene(Project.DefaultScene.AbsolutePath);
+				}
+
 				// Run startup scripts.
 				foreach (var script in value.StartupScripts)
 					RunScriptFile(script);

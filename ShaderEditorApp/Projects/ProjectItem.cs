@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Xml.Linq;
 
@@ -27,7 +28,15 @@ namespace ShaderEditorApp.Projects
 		public string Extension { get { return Path.GetExtension(path); } }
 
 		public bool RunAtStartup { get; set; }
-		public bool IsDefault { get; set; }
+
+		// Is this item the default of its type?
+		public bool IsDefault
+		{
+			get { return (Type == ProjectItemType.Scene) ? (parent.Project.DefaultScene == this) : false; }
+		}
+
+		// The path within the projects internal folder structure (not related to the file path).
+		public object InternalPath { get { return parent.InternalPath + "/" + Name; } }
 
 		// Get the type of file this item represents.
 		public ProjectItemType Type
@@ -73,6 +82,14 @@ namespace ShaderEditorApp.Projects
 				throw new InvalidOperationException("Cannot remove the root node.");
 
 			parent.RemoveItem(this);
+		}
+
+		// Set this item as the 'default' of its type.
+		public void SetAsDefault()
+		{
+			// Only scenes can be default, currently.
+			Debug.Assert(Type == ProjectItemType.Scene);
+			parent.Project.DefaultScene = this;
 		}
 
 		// Get the path to the underlying file relative to the given base.

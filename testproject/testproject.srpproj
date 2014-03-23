@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<project>
+<project DefaultScene="/tank.srpscene">
   <folder>
     <folder name="shaders">
       <include filename="BasicShaders.hlsl" runAtStartup="false" />

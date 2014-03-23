@@ -85,6 +85,12 @@ namespace ShaderEditorApp.Projects
 
 		public string Name { get; set; }
 
+		// The path within the projects internal folder structure.
+		public object InternalPath
+		{
+			get { return parent != null ? (parent.InternalPath + "/" + Name) : ""; }
+		}
+
 		// All items in this folder, including those in sub-folders.
 		public IEnumerable<ProjectItem> AllItems
 		{

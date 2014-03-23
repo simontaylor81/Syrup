@@ -36,6 +36,13 @@ namespace ShaderEditorApp.Projects
 				result.savedOpenDocuments = (from doc in openDocsElement.Elements("OpenDocument")
 											 select doc.Attribute("path").Value).ToArray();
 
+			// Try to get the default scene.
+			var defaultSceneAttr = xdoc.Root.Attribute("DefaultScene");
+			if (defaultSceneAttr != null)
+			{
+				result.DefaultScene = result.FindByInternalPath(defaultSceneAttr.Value);
+			}
+
 			return result;
 		}
 
@@ -65,6 +72,12 @@ namespace ShaderEditorApp.Projects
 
 			// Add open documents.
 			rootElement.Add(new XElement("OpenDocuments", from doc in savedOpenDocuments select GetOpenDocumentElement(doc)));
+
+			// Add the default scene.
+			if (DefaultScene != null)
+			{
+				rootElement.Add(new XAttribute("DefaultScene", DefaultScene.InternalPath));
+			}
 
 			// Create XDocument and save to disk.
 			var xdoc = new XDocument(rootElement);
@@ -108,6 +121,33 @@ namespace ShaderEditorApp.Projects
 
 		public IEnumerable<ProjectItem> AllItems { get { return RootFolder.AllItems; } }
 
+		// Find a project item based on an internal path.
+		public ProjectItem FindByInternalPath(string path)
+		{
+			var parts = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+			if (parts.Length == 0)
+			{
+				// Must have at least a filename.
+				return null;
+			}
+
+			var folder = RootFolder;
+
+			// Descend through folder structure (last part is the item name).
+			for (int i = 0; i < parts.Length - 1; i++)
+			{
+				folder = folder.SubFolders.FirstOrDefault(sub => sub.Name == parts[i]);
+				if (folder == null)
+				{
+					// Sub-folder not found.
+					return null;
+				}
+			}
+
+			// Find the item in the folder.
+			return folder.Items.FirstOrDefault(item => item.Name == parts.Last());
+		}
+
 		// List of scripts to be executed at startup.
 		public IEnumerable<string> StartupScripts
 		{
@@ -118,6 +158,9 @@ namespace ShaderEditorApp.Projects
 					   select item.AbsolutePath;
 			}
 		}
+
+		// ProjectItem for the default scene.
+		public ProjectItem DefaultScene { get; internal set; }
 
 		// Saved set of paths to open documents. Don't have to be in the project itself.
 		// Does not actively track open documents in workspace. Should be set before saving.
