@@ -91,6 +91,10 @@ namespace ShaderEditorApp.Rendering
 
 			var shader = shaderCache.GetShader(path, entryPoint, profile, FindShader);
 			shaders.Add(shader);
+
+			// Set up auto variable binds for this shader.
+			BindAutoShaderVariables(shader);
+
 			return new ShaderHandle(shaders.Count - 1);
 		}
 
@@ -106,10 +110,21 @@ namespace ShaderEditorApp.Rendering
 			return shaderFileItem.AbsolutePath;
 		}
 
-		public object CreateRenderTarget()
+		// Set up auto variable binds for a shader
+		private void BindAutoShaderVariables(Shader shader)
 		{
-			renderTargets.Add(new RenderTargetDescriptor(new Rational(1, 1), new Rational(1, 1), true));
-			return new RenderTargetHandle(renderTargets.Count - 1);
+			foreach (var variable in shader.Variables)
+			{
+				// We auto bind variable with the same name as a bind source.
+				ShaderVariableBindSource source;
+				if (Enum.TryParse(variable.Name, out source))
+				{
+					// Nothing should be bound yet.
+					System.Diagnostics.Debug.Assert(variable.Bind == null);
+					variable.Bind = new SimpleShaderVariableBind(variable, source);
+					variable.IsAutoBound = true;
+				}
+			}
 		}
 
 		public void BindShaderVariable(dynamic shaderHandle, string varName, ShaderVariableBindSource source)
@@ -117,16 +132,8 @@ namespace ShaderEditorApp.Rendering
 			if (!IsValidShader(shaderHandle))
 				throw new ScriptException("Invalid shader.");
 
-			var variable = shaders[shaderHandle.index].FindVariable(varName);
-			if (variable != null)
-			{
-				if (variable.Bind != null)
-				{
-					throw new ScriptException("Attempting to bind already bound shader variable: " + varName);
-				}
-
-				variable.Bind = new SimpleShaderVariableBind(variable, source);
-			}
+			IShaderVariable variable = shaders[shaderHandle.index].FindVariable(varName);
+			SetShaderBind(variable, () => new SimpleShaderVariableBind(variable, source));
 		}
 
 		public void BindShaderVariableToMaterial(dynamic shaderHandle, string varName, string paramName)
@@ -134,16 +141,8 @@ namespace ShaderEditorApp.Rendering
 			if (!IsValidShader(shaderHandle))
 				throw new ScriptException("Invalid shader.");
 
-			var variable = shaders[shaderHandle.index].FindVariable(varName);
-			if (variable != null)
-			{
-				if (variable.Bind != null)
-				{
-					throw new ScriptException("Attempting to bind already bound shader variable: " + varName);
-				}
-
-				variable.Bind = new MaterialShaderVariableBind(variable, paramName);
-			}
+			IShaderVariable variable = shaders[shaderHandle.index].FindVariable(varName);
+			SetShaderBind(variable, () => new MaterialShaderVariableBind(variable, paramName));
 		}
 
 		public void SetShaderVariable(dynamic shaderHandle, string varName, dynamic value)
@@ -151,17 +150,8 @@ namespace ShaderEditorApp.Rendering
 			if (!IsValidShader(shaderHandle))
 				throw new ScriptException("Invalid shader.");
 
-			var variable = shaders[shaderHandle.index].FindVariable(varName);
-			if (variable != null)
-			{
-				if (variable.Bind != null)
-				{
-					throw new ScriptException("Attempting to bind already bound shader variable: " + varName);
-				}
-
-				// Bind the variable's value to the script value.
-				variable.Bind = new ScriptShaderVariableBind(variable, value, ScriptHelper);
-			}
+			IShaderVariable variable = shaders[shaderHandle.index].FindVariable(varName);
+			SetShaderBind(variable, () => new ScriptShaderVariableBind(variable, value, ScriptHelper));
 		}
 
 		public void ShaderVariableIsScriptOverride(dynamic shaderHandle, string varName)
@@ -170,15 +160,26 @@ namespace ShaderEditorApp.Rendering
 				throw new ScriptException("Invalid shader.");
 
 			IShaderVariable variable = shaders[shaderHandle.index].FindVariable(varName);
+			SetShaderBind(variable, () => new ScriptOverrideShaderVariableBind(variable));
+		}
+
+		// Simple helper to avoid duplication.
+		// If the passed in variable is valid, and it is not already bound, sets its
+		// bind to the result of the given function.
+		private void SetShaderBind(IShaderVariable variable, Func<IShaderVariableBind> createBind)
+		{
+			// Silently fail on null (not-found) variable, as they can be removed by optimisation.
 			if (variable != null)
 			{
-				if (variable.Bind != null)
+				// Allow manual override of auto-binds
+				if (variable.Bind != null && !variable.IsAutoBound)
 				{
-					throw new ScriptException("Attempting to bind already bound shader variable: " + varName);
+					throw new ScriptException("Attempting to bind already bound shader variable: " + variable.Name);
 				}
 
 				// Bind the variable's value to the script value.
-				variable.Bind = new ScriptOverrideShaderVariableBind(variable);
+				variable.Bind = createBind();
+				variable.IsAutoBound = false;
 			}
 		}
 
@@ -242,6 +243,12 @@ namespace ShaderEditorApp.Rendering
 			var userVar = UserVariable.Create(name, type, defaultValue);
 			userVariables.Add(userVar);
 			return userVar.GetFunction();
+		}
+
+		public object CreateRenderTarget()
+		{
+			renderTargets.Add(new RenderTargetDescriptor(new Rational(1, 1), new Rational(1, 1), true));
+			return new RenderTargetHandle(renderTargets.Count - 1);
 		}
 
 		public void Dispose()

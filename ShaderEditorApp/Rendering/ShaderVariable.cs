@@ -28,6 +28,9 @@ namespace ShaderEditorApp.Rendering
 		}
 	}
 
+	/// <summary>
+	/// A single constant (non-resource) shader input.
+	/// </summary>
 	interface IShaderVariable
 	{
 		/// <summary>
@@ -44,6 +47,11 @@ namespace ShaderEditorApp.Rendering
 		/// Optional bind to automatically set the variable to a certain value.
 		/// </summary>
 		IShaderVariableBind Bind { get; set; }
+
+		/// <summary>
+		/// If true, Bind was set automatically (and therefore can be overridden by the user manually).
+		/// </summary>
+		bool IsAutoBound { get; set; }
 
 		/// <summary>
 		/// Event that is triggered when the variable's value is changed.
@@ -64,12 +72,16 @@ namespace ShaderEditorApp.Rendering
 		void SetDefault();
 	}
 
+	/// <summary>
+	/// Concrete implementation of IShaderVariable
+	/// </summary>
 	class ShaderVariable : IShaderVariable
 	{
 		// IShaderVariable interface.
 		public string Name { get; private set; }
 		public ShaderVariableTypeDesc VariableType { get; private set; }
 		public IShaderVariableBind Bind { get; set; }
+		public bool IsAutoBound { get; set; }
 
 		public event Action ValueChanged;
 
@@ -145,6 +157,7 @@ namespace ShaderEditorApp.Rendering
 		{
 			Name = shaderVariable.Description.Name;
 			VariableType = new ShaderVariableTypeDesc(shaderVariable.GetVariableType());
+			IsAutoBound = false;
 
 			offset = shaderVariable.Description.StartOffset;
 			data = new DataStream(shaderVariable.Description.Size, true, true);
