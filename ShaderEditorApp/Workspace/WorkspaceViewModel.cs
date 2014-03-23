@@ -37,26 +37,6 @@ namespace ShaderEditorApp.Workspace
 			Application.Current.Deactivated += (o, _e) => isAppForeground = false;
 
 
-			var stopwatch = new System.Diagnostics.Stopwatch();
-
-			// TEMP!
-			stopwatch.Restart();
-			currentScene = Scene.Scene.LoadFromFile(@"C:\bitbucket\personal-projects\ShaderEditor\testproject\TankScene\tank.srpscene");
-			//currentScene = Scene.Scene.LoadFromFile(@"C:\bitbucket\personal-projects\ShaderEditor\testproject\myscene.srpscene");
-			stopwatch.Stop();
-			var sceneLoadTime = stopwatch.Elapsed;
-
-			// TODO: This does not belong here!
-			stopwatch.Restart();
-			renderScene = new RenderScene(currentScene, renderWindow.Device);
-			stopwatch.Stop();
-			var renderSceneCreationTime = stopwatch.Elapsed;
-
-
-			Console.WriteLine("Loading scene took {0} ms.", sceneLoadTime.TotalMilliseconds);
-			Console.WriteLine("Render scene creation took {0} ms.", renderSceneCreationTime.TotalMilliseconds);
-
-
 			// Load a file specified on the commandline.
 			var commandlineParams = Environment.GetCommandLineArgs();
 			if (commandlineParams.Length > 1)
@@ -250,6 +230,13 @@ namespace ShaderEditorApp.Workspace
 			return ActiveDocument != null;
 		}
 
+		// Load the scene with the given filename and set it as the current one.
+		public void SetCurrentScene(string path)
+		{
+			currentScene = Scene.Scene.LoadFromFile(path);
+			scriptRenderControl.SetScene(currentScene);
+		}
+
 		public bool IgnoreRedrawRequests { get; set; }
 		public void RedrawViewports()
 		{
@@ -387,10 +374,6 @@ namespace ShaderEditorApp.Workspace
 		private RenderWindow renderWindow;
 
 		private Scene.Scene currentScene;
-		private RenderScene renderScene;
-
-		// TODO?
-		internal RenderScene RenderScene { get { return renderScene; } }
 
 		// TODO: Multiple viewports.
 		// TODO: Move info needed?

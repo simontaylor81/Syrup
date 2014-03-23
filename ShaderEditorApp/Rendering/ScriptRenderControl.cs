@@ -50,7 +50,7 @@ namespace ShaderEditorApp.Rendering
 
 		internal void ExecutionComplete(bool bSuccess)
 		{
-			bScriptError = !bSuccess;
+			bScriptExecutionError = !bSuccess;
 
 			// Add shader variables to the properties list.
 			foreach (var shader in shaders)
@@ -73,6 +73,19 @@ namespace ShaderEditorApp.Rendering
 			// When a property changes, redraw the viewports.
 			foreach (var property in properties)
 				property.PropertyChanged += (o, e) => workspace.RedrawViewports();
+		}
+
+		internal void SetScene(Scene.Scene newScene)
+		{
+			// Dispose of the old scene.
+			RenderUtils.SafeDispose(scene);
+
+			// Create new one.
+			scene = new RenderScene(newScene, device);
+
+			// Missing scene can cause rendering to fail -- give it another try with the new one.
+			bScriptRenderError = false;
+			workspace.RedrawViewports();
 		}
 
 		// Set the master per-frame callback that lets the script control rendering.
@@ -261,11 +274,9 @@ namespace ShaderEditorApp.Rendering
 			inputLayoutCache.Dispose();
 			shaderCache.Dispose();
 			shaders.Clear();
+			RenderUtils.SafeDispose(scene);
 
 			RenderUtils.DisposeList(renderTargets);
-
-			// HACK
-			workspace.RenderScene.Dispose();
 
 			device = null;
 		}
@@ -291,7 +302,7 @@ namespace ShaderEditorApp.Rendering
 				var renderContext = new ScriptRenderContext(
 					context,
 					viewInfo,
-					workspace.RenderScene,
+					scene,
 					shaders,
 					(from desc in renderTargets select desc.renderTarget).ToArray(),
 					inputLayoutCache,
@@ -309,7 +320,7 @@ namespace ShaderEditorApp.Rendering
 				ScriptHelper.LogScriptError(ex);
 
 				// Remember that the script fails so we don't just fail over and over.
-				bScriptError = true;
+				bScriptRenderError = true;
 			}
 
 			workspace.IgnoreRedrawRequests = bPrevIgnoreRedrawRequests;
@@ -335,7 +346,7 @@ namespace ShaderEditorApp.Rendering
 			return handle is ShaderHandle && handle.index >= 0 && handle.index < shaders.Count;
 		}
 
-		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.s
+		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
 		internal ScriptRenderInterface ScriptInterface { get; private set; }
 
 		private ObservableCollection<PropertyViewModel> properties = new ObservableCollection<PropertyViewModel>();
@@ -365,8 +376,11 @@ namespace ShaderEditorApp.Rendering
 		// Cache for compiled shaders.
 		private ShaderCache shaderCache;
 
+		private bool bScriptExecutionError = false;		// True if there was a problem executing the script
+		private bool bScriptRenderError = false;		// True if there was a script error while rendering
+
 		// If true, previous rendering failed with a script problem, so we don't keep re-running until the script is fixed & re-run.
-		private bool bScriptError = false;
+		private bool bScriptError { get { return bScriptExecutionError || bScriptRenderError; } }
 
 		internal ScriptHelper ScriptHelper { get; set; }
 
@@ -375,6 +389,9 @@ namespace ShaderEditorApp.Rendering
 
 		// Basic shader types.
 		private BasicShaders basicShaders;
+
+		// Scene we're currently rendering
+		private RenderScene scene;
 
 		// List of things to dispose.
 		private List<IDisposable> disposables = new List<IDisposable>();

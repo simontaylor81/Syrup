@@ -29,9 +29,9 @@ namespace ShaderEditorApp.Projects
 		private void OnItemDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			var projectItem = projectTree.SelectedItem as ProjectItemViewModel;
-			if (projectItem != null && projectItem.OpenCmd.CanExecute(null))
+			if (projectItem != null && projectItem.DefaultCmd.CanExecute(null))
 			{
-				projectItem.OpenCmd.Execute(null);
+				projectItem.DefaultCmd.Execute(null);
 			}
 		}
 

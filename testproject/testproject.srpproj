@@ -5,15 +5,18 @@
     <include filename="Lights.hlsl" runAtStartup="false" />
     <include filename="CopyTex.hlsl" runAtStartup="false" />
     <include filename="DeferredShading.hlsl" runAtStartup="false" />
+    <include filename="includetest.hlsl" runAtStartup="false" />
   </folder>
   <folder name="Scripts">
     <include filename="scripttest.py" runAtStartup="false" />
     <include filename="lights.py" runAtStartup="false" />
     <include filename="DeferredShading.py" runAtStartup="true" />
   </folder>
+  <include filename="TankScene/tank.srpscene" runAtStartup="false" />
+  <include filename="myscene.srpscene" runAtStartup="false" />
   <OpenDocuments>
-    <OpenDocument path="C:\bitbucket\personal-projects\ShaderEditor\testproject\lights.py" />
-    <OpenDocument path="C:\bitbucket\personal-projects\ShaderEditor\testproject\DeferredShading.py" />
-    <OpenDocument path="C:\bitbucket\personal-projects\ShaderEditor\testproject\DeferredShading.hlsl" />
+    <OpenDocument path="C:\github\Syrup\testproject\DeferredShading.py" />
+    <OpenDocument path="C:\github\Syrup\testproject\DeferredShading.hlsl" />
+    <OpenDocument path="C:\github\Syrup\testproject\includetest.hlsl" />
   </OpenDocuments>
 </project>

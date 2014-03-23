@@ -102,7 +102,9 @@ namespace ShaderEditorApp.Projects
 		{
 			get
 			{
-				return from item in AllItems where item.RunAtStartup && item.IsScript select item.AbsolutePath;
+				return from item in AllItems
+					   where item.RunAtStartup && item.Type == ProjectItemType.Script
+					   select item.AbsolutePath;
 			}
 		}
 

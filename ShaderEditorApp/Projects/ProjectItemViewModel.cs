@@ -17,13 +17,16 @@ namespace ShaderEditorApp.Projects
 			this.project = project;
 			this.workspace = workspace;
 
+			// Scenes are set as current, everything else is opened.
+			DefaultCmd = (item.Type != ProjectItemType.Scene) ? OpenCmd : SetCurrentSceneCmd;
+
 			var commands = new List<NamedCommand>
 				{
-					OpenCmd,
+					DefaultCmd,
 					RemoveCmd,
 				};
 
-			if (item.IsScript)
+			if (item.Type == ProjectItemType.Script)
 			{
 				commands.Add(RunCmd);
 			}
@@ -43,7 +46,7 @@ namespace ShaderEditorApp.Projects
 
 				IEnumerable<PropertyViewModel> result = new[] { filenameProp, pathProp, typeProp };
 
-				if (item.IsScript)
+				if (item.Type == ProjectItemType.Script)
 				{
 					// Add a 'run on start-up' property for script items.
 					var runOnStartupProp = new SimpleScalarProperty<bool>("Run at Startup", item.RunAtStartup, b => item.RunAtStartup = b);
@@ -55,24 +58,13 @@ namespace ShaderEditorApp.Projects
 			}
 		}
 
-		public string ItemTypeString
-		{
-			get
-			{
-				switch (item.Extension)
-				{
-					case ".py":
-						return "Script";
-					case ".hlsl":
-					case ".fx":
-						return "Shader";
-					default:
-						return "Other";
-				}
-			}
-		}
+		// Get type of item as a string.
+		public string ItemTypeString { get { return Enum.GetName(typeof(ProjectItemType), item.Type); } }
 
 		#region Commands
+
+		// 'Default' command -- i.e. the one to execute when double clicking on the item.
+		public NamedCommand DefaultCmd { get; private set; }
 
 		// Command to open the project item into the workspace.
 		private NamedCommand openCmd;
@@ -85,6 +77,17 @@ namespace ShaderEditorApp.Projects
 			}
 		}
 
+		// Command to open a scene and make it the current scene for the workspace.
+		private NamedCommand setCurrentSceneCmd;
+		public NamedCommand SetCurrentSceneCmd
+		{
+			get
+			{
+				return NamedCommand.LazyInit(ref setCurrentSceneCmd, "Set as Current",
+					(param) => workspace.SetCurrentScene(item.AbsolutePath));
+			}
+		}
+
 		// Command to execute the script file the project item represents.
 		private NamedCommand runCmd;
 		public NamedCommand RunCmd
@@ -93,7 +96,7 @@ namespace ShaderEditorApp.Projects
 			{
 				return NamedCommand.LazyInit(ref runCmd, "Run",
 					(param) => workspace.RunScriptFile(item.AbsolutePath),
-					(param) => item.IsScript);
+					(param) => item.Type == ProjectItemType.Script);
 			}
 		}
 

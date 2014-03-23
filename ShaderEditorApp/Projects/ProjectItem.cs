@@ -4,6 +4,15 @@ using System.Xml.Linq;
 
 namespace ShaderEditorApp.Projects
 {
+	// Types of file that can be included in the project.
+	public enum ProjectItemType
+	{
+		Other,
+		Script,
+		Shader,
+		Scene,
+	}
+
 	// A file entry in a project.
 	public class ProjectItem
 	{
@@ -18,14 +27,25 @@ namespace ShaderEditorApp.Projects
 		public string Extension { get { return Path.GetExtension(path); } }
 
 		public bool RunAtStartup { get; set; }
+		public bool IsDefault { get; set; }
 
-		// Is the file represented by this item a script file?
-		public bool IsScript
+		// Get the type of file this item represents.
+		public ProjectItemType Type
 		{
 			get
 			{
-				// Just python for now.
-				return Path.GetExtension(path) == ".py";
+				switch (Extension)
+				{
+					case ".py":
+						return ProjectItemType.Script;
+					case ".hlsl":
+					case ".fx":
+						return ProjectItemType.Shader;
+					case ".srpscene":
+						return ProjectItemType.Scene;
+					default:
+						return ProjectItemType.Other;
+				}
 			}
 		}
 

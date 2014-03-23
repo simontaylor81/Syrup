@@ -114,9 +114,10 @@ namespace ShaderEditorApp.Projects
 			get
 			{
 				return
-					"Supported file types|*.hlsl;*.fx;*.py" +
+					"Supported file types|*.hlsl;*.fx;*.py;*.srpscene" +
 					"|Shader files|*.hlsl;*.fx" +
 					"|Python files|*.py" +
+					"|Scene files|*.srpscene" +
 					"|All Files|*.*";
 			}
 		}
