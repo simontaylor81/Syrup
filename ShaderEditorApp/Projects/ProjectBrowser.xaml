@@ -13,6 +13,8 @@
         <DataTemplate x:Key="CommandMenuItemTemplate" DataType="{x:Type mvvm:NamedCommand}">
             <TextBlock Text="{Binding Name}"/>
         </DataTemplate>
+
+        <mvvm:BoolToBoldConverter x:Key="BoolToBoldConverter"/>
         
         <!-- Style to apply to the nodes. -->
         <Style x:Key="NodeStyle" TargetType="TreeViewItem">
@@ -31,7 +33,8 @@
             <TextBlock Text="{Binding DisplayName}"/>
         </HierarchicalDataTemplate>
         <HierarchicalDataTemplate DataType="{x:Type srpprojects:ProjectItemViewModel}">
-            <TextBlock Text="{Binding DisplayName}"/>
+            <TextBlock Text="{Binding DisplayName}"
+                       FontWeight="{Binding IsDefault, Converter={StaticResource BoolToBoldConverter}}"/>
         </HierarchicalDataTemplate>
             
     </UserControl.Resources>

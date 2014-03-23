@@ -43,23 +43,4 @@ namespace ShaderEditorApp.Projects
 			viewModel.ActiveItem = (ProjectViewModelBase)projectTree.SelectedItem;
 		}
 	}
-
-	class ActiveItemConverter : IValueConverter
-	{
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			if (value is ProjectViewModelBase)
-				return value;
-
-			return Binding.DoNothing;
-		}
-
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			if (value is ProjectViewModelBase)
-				return value;
-
-			return Binding.DoNothing;
-		}
-	}
 }

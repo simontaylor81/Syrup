@@ -17,6 +17,9 @@ namespace ShaderEditorApp.Projects
 			this.project = project;
 			this.workspace = workspace;
 
+			// Register for changes to the default scene.
+			project.DefaultSceneChanged += OnDefaultSceneChanged;
+
 			// Scenes are set as current, everything else is opened.
 			DefaultCmd = (item.Type != ProjectItemType.Scene) ? OpenCmd : SetCurrentSceneCmd;
 
@@ -36,6 +39,12 @@ namespace ShaderEditorApp.Projects
 			}
 
 			Commands = commands;
+		}
+
+		protected override void OnDispose()
+		{
+			project.DefaultSceneChanged -= OnDefaultSceneChanged;
+			base.OnDispose();
 		}
 
 		// Properties to display for the item.
@@ -64,6 +73,15 @@ namespace ShaderEditorApp.Projects
 
 		// Get type of item as a string.
 		public string ItemTypeString { get { return Enum.GetName(typeof(ProjectItemType), item.Type); } }
+
+		// Is this item the defaut of its type?
+		public bool IsDefault { get { return item.IsDefault; } }
+
+		private void OnDefaultSceneChanged()
+		{
+			// Notifty that the default property may have changed.
+			OnPropertyChanged("IsDefault");
+		}
 
 		#region Commands
 

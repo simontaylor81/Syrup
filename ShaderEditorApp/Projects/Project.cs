@@ -160,7 +160,24 @@ namespace ShaderEditorApp.Projects
 		}
 
 		// ProjectItem for the default scene.
-		public ProjectItem DefaultScene { get; internal set; }
+		public ProjectItem DefaultScene
+		{
+			get { return _defaultScene; }
+			internal set
+			{
+				if (value != _defaultScene)
+				{
+					_defaultScene = value;
+					if (null != DefaultSceneChanged)
+						DefaultSceneChanged();
+				}
+			}
+		}
+
+		// event fired when the default scene changes.
+		public event Action DefaultSceneChanged;
+
+		private ProjectItem _defaultScene;
 
 		// Saved set of paths to open documents. Don't have to be in the project itself.
 		// Does not actively track open documents in workspace. Should be set before saving.

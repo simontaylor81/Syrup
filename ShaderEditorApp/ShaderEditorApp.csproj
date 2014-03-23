@@ -104,6 +104,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MVVMUtil\Converters.cs" />
     <Compile Include="MVVMUtil\RelayCommand.cs" />
     <Compile Include="OutputLogger.cs" />
     <Compile Include="OutputWindow.xaml.cs">
