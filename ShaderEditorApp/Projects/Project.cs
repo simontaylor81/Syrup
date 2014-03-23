@@ -19,12 +19,21 @@ namespace ShaderEditorApp.Projects
 			var xdoc = XDocument.Load(filename);
 
 			// Load the root folder.
-			result.RootFolder = ProjectFolder.LoadFromElement(xdoc.Root, null, result);
+			var rootFolderElement = xdoc.Root.Elements("folder").FirstOrDefault();
+			if (rootFolderElement != null)
+			{
+				result.RootFolder = new ProjectFolder(rootFolderElement, null, result);
+			}
+			else
+			{
+				// Root folder node missing -- create empty one.
+				result.RootFolder = new ProjectFolder(null, result);
+			}
 
 			// Read list of open documents, if present.
-			var openDocsElement = xdoc.Descendants("OpenDocuments").FirstOrDefault();
+			var openDocsElement = xdoc.Root.Elements("OpenDocuments").FirstOrDefault();
 			if (openDocsElement != null)
-				result.savedOpenDocuments = (from doc in openDocsElement.Descendants("OpenDocument")
+				result.savedOpenDocuments = (from doc in openDocsElement.Elements("OpenDocument")
 											 select doc.Attribute("path").Value).ToArray();
 
 			return result;
@@ -48,9 +57,11 @@ namespace ShaderEditorApp.Projects
 
 		public void Save()
 		{
-			// Root element *is* the root folder.
-			var rootElement = RootFolder.Save();
-			rootElement.Name = "project";
+			// Create root element to contain everything.
+			var rootElement = new XElement("project");
+
+			// Add the root folder.
+			rootElement.Add(RootFolder.Save());
 
 			// Add open documents.
 			rootElement.Add(new XElement("OpenDocuments", from doc in savedOpenDocuments select GetOpenDocumentElement(doc)));

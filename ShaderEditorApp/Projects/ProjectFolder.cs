@@ -10,34 +10,36 @@ namespace ShaderEditorApp.Projects
 	// A sub-folder in a project tree.
 	public class ProjectFolder
 	{
-		// Internal-only constructor.
-		internal ProjectFolder(ProjectFolder parent, Project project)
+		// Create a new empty folder.
+		public ProjectFolder(ProjectFolder parent, Project project)
 		{
 			this.parent = parent;
 			this.Project = project;
+
+			folders = new ObservableCollection<ProjectFolder>();
+			items = new ObservableCollection<ProjectItem>();
 		}
 
-		// Load the contents of the folder from disk.
-		public static ProjectFolder LoadFromElement(XElement element, ProjectFolder parent, Project project)
+		// Create a new folder form the contents of an xml element.
+		public ProjectFolder(XElement element, ProjectFolder parent, Project project)
 		{
-			ProjectFolder result = new ProjectFolder(parent, project);
+			this.parent = parent;
+			this.Project = project;
 
 			// Get name.
-			SerialisationUtils.ParseAttribute(element, "name", str => result.Name = str);
+			SerialisationUtils.ParseAttribute(element, "name", str => Name = str);
 
 			// Create sub-folder items.
-			result.folders = new ObservableCollection<ProjectFolder>(
+			folders = new ObservableCollection<ProjectFolder>(
 				from subfolder in element.Elements("folder")
-				select ProjectFolder.LoadFromElement(subfolder, result, project)
+				select new ProjectFolder(subfolder, this, project)
 				);
 
 			// Create included items.
-			result.items = new ObservableCollection<ProjectItem>(
+			items = new ObservableCollection<ProjectItem>(
 				from item in element.Elements("include")
-				select ProjectItem.LoadFromElement(item, result)
+				select ProjectItem.LoadFromElement(item, this)
 				);
-
-			return result;
 		}
 
 		// Save the folder to an XElement.
