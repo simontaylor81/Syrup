@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.IO;
 
 using SlimDX;
 using SlimDX.D3DCompiler;
@@ -20,13 +21,18 @@ namespace ShaderEditorApp.Rendering
 
 	class Shader : IDisposable
 	{
-		public Shader(Device device, string filename, string entryPoint, string profile)
+		public Shader(Device device, string filename, string entryPoint, string profile, Func<string, string> includeLookup)
 		{
 			try
 			{
+				var includeHandler = includeLookup != null ? new IncludeLookup(includeLookup) : null;
+
 				// Compile the shader to bytecode.
-				using (var bytecode = ShaderBytecode.CompileFromFile(filename, entryPoint, profile, ShaderFlags.None, EffectFlags.None))
+				using (var bytecode = ShaderBytecode.CompileFromFile(filename, entryPoint,
+					profile, ShaderFlags.None, EffectFlags.None, null, includeHandler))
 				{
+					IncludedFiles = includeHandler != null ? includeHandler.IncludedFiles : Enumerable.Empty<string>();
+
 					// Create the shader object of the appropriate type.
 					switch (profile.Substring(0, 2))
 					{
@@ -208,12 +214,47 @@ namespace ShaderEditorApp.Rendering
 		private readonly ShaderFrequency frequency;
 		public ShaderFrequency Frequency { get { return frequency; } }
 
+		// List of files that were included by this shader.
+		public IEnumerable<string> IncludedFiles { get; private set; }
+
 		// Constant buffer info.
-		ConstantBuffer[] cbuffers;
-		Buffer[] cbuffers_buffers;
+		private ConstantBuffer[] cbuffers;
+		private Buffer[] cbuffers_buffers;
 
 		// Resource variable info.
-		ShaderResourceVariable[] resourceVariables;
+		private ShaderResourceVariable[] resourceVariables;
+
+		// Class for handling include file lookups.
+		private class IncludeLookup : Include
+		{
+			private Func<string, string> includeLookup;
+
+			private List<string> _includedFiles = new List<string>();
+			public IEnumerable<string> IncludedFiles { get { return _includedFiles; } }
+
+			public IncludeLookup(Func<string, string> includeLookup)
+			{
+				this.includeLookup = includeLookup;
+			}
+
+			// Include interface.
+			public void Open(IncludeType type, string filename, Stream parentStream, out Stream stream)
+			{
+				// Find full path.
+				var path = includeLookup(filename);
+
+				// Open file stream.
+				stream = new FileStream(path, FileMode.Open);
+
+				// Remember that we included this file.
+				_includedFiles.Add(path);
+			}
+
+			public void Close(Stream stream)
+			{
+				stream.Dispose();
+			}
+		}
 	}
 
 	class ConstantBuffer : IDisposable

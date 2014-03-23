@@ -44,7 +44,7 @@ namespace ShaderEditorApp.Rendering
 			var filename = RenderUtils.GetShaderFilename("BasicShaders.hlsl");
 
 			// Compile basic scene vertex shader.
-			BasicSceneVS = new Shader(device, filename, "BasicSceneVS", "vs_4_0"); ;
+			BasicSceneVS = new Shader(device, filename, "BasicSceneVS", "vs_4_0", null); ;
 			disposables.Add(BasicSceneVS);
 
 			// Bind the required shader variables.
@@ -52,7 +52,7 @@ namespace ShaderEditorApp.Rendering
 			BindShaderVariable(BasicSceneVS, "WorldToProjectionMatrix", ShaderVariableBindSource.WorldToProjectionMatrix);
 
 			// Compile the solid colour pixel shader.
-			SolidColourPS = new Shader(device, filename, "SolidColourPS", "ps_4_0");
+			SolidColourPS = new Shader(device, filename, "SolidColourPS", "ps_4_0", null);
 			disposables.Add(SolidColourPS);
 
 			// Cache reference to the solid colour variable.

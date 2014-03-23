@@ -27,16 +27,23 @@ namespace ShaderEditorApp.Rendering
 			cache.Clear();
 		}
 
-		public Shader GetShader(string filename, string entryPoint, string profile)
+		public Shader GetShader(string filename, string entryPoint, string profile, Func<string, string> includeLookup)
 		{
 			// Read the file and compute its hash.
-			var hash = ComputeHash(filename);
+			// TODO: Hash include files as well
+			//var hash = ComputeHash(filename);
 
 			// Look in the dictionary to see if we already have this file.
 			var key = new ShaderCacheKey(filename, entryPoint, profile);
 			ShaderCacheEntry existingEntry;
 			if (cache.TryGetValue(key, out existingEntry))
 			{
+				// We compute the hash of the include files from the previous compilation.
+				// Whilst this isn't the same as the current set, at least one of them
+				// must have changed in order for the set to change, so this is sufficient
+				// to detect changes.
+				var hash = ComputeHash(existingEntry.shader.IncludedFiles.StartWith(filename));
+
 				// Compare the hashes.
 				if (existingEntry.hash.SequenceEqual(hash))
 				{
@@ -54,21 +61,38 @@ namespace ShaderEditorApp.Rendering
 
 			// If we go this far, either the shader is not present or had a hash mismatch,
 			// so, we compile a new shader.
-			var shader = new Shader(device, filename, entryPoint, profile);
-			cache[key] = new ShaderCacheEntry(shader, hash);
+			var shader = new Shader(device, filename, entryPoint, profile, includeLookup);
+			cache[key] = new ShaderCacheEntry(shader, ComputeHash(shader.IncludedFiles.StartWith(filename)));
 
 			return shader;
 		}
 
-		private byte[] ComputeHash(string filename)
+		// Compute combined hash for a set of files.
+		private byte[] ComputeHash(IEnumerable<string> filenames)
 		{
-			// Open the file to be hashed.
-			using (var stream = File.OpenRead(filename))
+			// Hash using MD5.
+			var algorithm = MD5.Create();
+			algorithm.Initialize();
+
+			var buffer = new byte[64 * 1024];
+
+			// Hash each file
+			foreach (var filename in filenames)
 			{
-				// Hash it using the default has algorithm.
-				var algorithm = HashAlgorithm.Create();
-				return algorithm.ComputeHash(stream);
+				using (var stream = File.OpenRead(filename))
+				{
+					// Stream through file building up hash.
+					int bytesRead;
+					while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+					{
+						algorithm.TransformBlock(buffer, 0, bytesRead, null, 0);
+					}
+				}
 			}
+
+			// Finalise hash.
+			algorithm.TransformFinalBlock(new byte[0], 0, 0);
+			return algorithm.Hash;
 		}
 
 		private Device device;

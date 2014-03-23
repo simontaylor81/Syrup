@@ -89,7 +89,7 @@ namespace ShaderEditorApp.Rendering
 			if (!File.Exists(path))
 				throw new ScriptException("Shader file " + filename + " not found in project.");
 
-			var shader = shaderCache.GetShader(path, entryPoint, profile);
+			var shader = shaderCache.GetShader(path, entryPoint, profile, FindShader);
 			shaders.Add(shader);
 			return new ShaderHandle(shaders.Count - 1);
 		}
