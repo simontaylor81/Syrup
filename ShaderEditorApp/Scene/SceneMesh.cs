@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Assimp;
 using SlimDX;
 using Newtonsoft.Json.Linq;
@@ -38,21 +37,6 @@ namespace ShaderEditorApp.Scene
 			else
 			{
 				OutputLogger.Instance.LogLine(LogCategory.Log, "Mesh not found: {0}", result.Filename);
-			}
-
-			return result;
-		}
-
-		public static SceneMesh Load(XElement element)
-		{
-			SceneMesh result = new SceneMesh();
-
-			SerialisationUtils.ParseAttribute(element, "name", str => result.Name = str);
-			SerialisationUtils.ParseAttribute(element, "filename", str => result.Filename = str);
-			
-			if (File.Exists(result.Filename))
-			{
-				result.Import();
 			}
 
 			return result;

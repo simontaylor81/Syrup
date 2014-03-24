@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using SlimDX;
 using Newtonsoft.Json.Linq;
 
@@ -19,29 +18,6 @@ namespace ShaderEditorApp.Scene
 		public Primitive()
 		{
 			Scale = new Vector3(1.0f, 1.0f, 1.0f);
-		}
-
-		internal virtual void Load(XElement element, Scene scene)
-		{
-			SerialisationUtils.ParseAttribute(element, "position", str => { Position = SerialisationUtils.ParseVector3(str); });
-			SerialisationUtils.ParseAttribute(element, "scale", str => { Scale = SerialisationUtils.ParseVector3(str); });
-			SerialisationUtils.ParseAttribute(element, "rotation", str => { Rotation = SerialisationUtils.ParseVector3(str); });
-
-			// Get material name.
-			var matAttr = element.Attribute("material");
-			if (matAttr != null)
-			{
-				// Look up mesh in the scene's collection.
-				Material mat;
-				if (scene.Materials.TryGetValue(matAttr.Value, out mat))
-				{
-					Material = mat;
-				}
-				else
-				{
-					OutputLogger.Instance.LogLine(LogCategory.Log, "Material not found: " + matAttr.Value);
-				}
-			}
 		}
 
 		internal virtual void Load(JToken obj, Scene scene)
@@ -69,7 +45,7 @@ namespace ShaderEditorApp.Scene
 
 		public Matrix GetLocalToWorld()
 		{
-			// TODO: Scaling and rotation!
+			// TODO: rotation!
 			return Matrix.Scaling(Scale) * Matrix.Translation(Position);
 		}
 	}

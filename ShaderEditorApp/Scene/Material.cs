@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Xml.Linq;
 using SlimDX;
 using Newtonsoft.Json.Linq;
 using ShaderEditorApp.Util;
@@ -19,25 +18,6 @@ namespace ShaderEditorApp.Scene
 
 		private Dictionary<string, Vector4> vectorParameters;
 		private Dictionary<string, string> textures;
-
-		public static Material Load(XElement element)
-		{
-			Debug.Assert(element.Name == "material");
-
-			var result = new Material();
-
-			SerialisationUtils.ParseAttribute(element, "name", str => result.Name = str);
-
-			// Load vector params.
-			var vecParams = from paramElem in element.Descendants("vectorParam") select LoadVectorParam(paramElem);
-			result.vectorParameters = (from param in vecParams where param != null select param).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
-
-			// Load texture references.
-			var textures = from texElem in element.Descendants("texture") select LoadTexture(texElem);
-			result.textures = (from texture in textures where texture != null select texture).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
-
-			return result;
-		}
 
 		public static Material Load(JToken obj)
 		{
@@ -65,49 +45,14 @@ namespace ShaderEditorApp.Scene
 		{
 			var name = (string)obj["name"];
 			var value = SerialisationUtils.ParseVector4(obj["value"]);
-			return Tuple.Create(name, value);
-		}
-
-		private static Tuple<string, Vector4> LoadVectorParam(XElement element)
-		{
-			var nameAttr = element.Attribute("name");
-			var valueAttr = element.Attribute("value");
-
-			if (nameAttr != null && valueAttr != null)
-			{
-				try
-				{
-					var value = SerialisationUtils.ParseVector4(valueAttr.Value);
-					return Tuple.Create(nameAttr.Value, value);
-				}
-				catch (FormatException)
-				{
-					// Do nothing, just fall through and return null.
-					// TODO: Log error.
-				}
-			}
-
-			return null;
+			return (name != null && value != null) ? Tuple.Create(name, value) : null;
 		}
 
 		private static Tuple<string, string> LoadTexture(JToken obj)
 		{
 			var name = (string)obj["name"];
 			var value = (string)obj["filename"];
-			return Tuple.Create(name, value);
-		}
-
-		private static Tuple<string, string> LoadTexture(XElement element)
-		{
-			var nameAttr = element.Attribute("name");
-			var filenameAttr = element.Attribute("filename");
-
-			if (nameAttr != null && filenameAttr != null)
-			{
-				return Tuple.Create(nameAttr.Value, filenameAttr.Value);
-			}
-
-			return null;
+			return (name != null && value != null) ? Tuple.Create(name, value) : null;
 		}
 	}
 }
