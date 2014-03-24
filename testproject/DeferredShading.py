@@ -11,18 +11,8 @@ deferredPS = ri.LoadShader("DeferredShading.hlsl", "DeferredPass_PS", "ps_4_0")
 albedoRT = ri.CreateRenderTarget()
 normalRT = ri.CreateRenderTarget()
 
-# Bind basic shader variables for rendering the scene.
-ri.BindShaderVariable(basepassVS, "WorldToProjectionMatrix", ShaderVariableBindSource.WorldToProjectionMatrix)
-ri.BindShaderVariable(basepassVS, "LocalToWorldMatrix", ShaderVariableBindSource.LocalToWorldMatrix)
-
 # Bind material textures.
 ri.BindShaderResourceToMaterial(basepassPS, "DiffuseTex", "DiffuseTexture")
-
-# Bind variables for the deferred pass.
-ri.BindShaderVariable(deferredVS, "WorldToProjectionMatrix", ShaderVariableBindSource.WorldToProjectionMatrix)
-ri.BindShaderVariable(deferredVS, "LocalToWorldMatrix", ShaderVariableBindSource.LocalToWorldMatrix)
-ri.BindShaderVariable(deferredPS, "CameraPos", ShaderVariableBindSource.CameraPosition);
-ri.BindShaderVariable(deferredPS, "ProjectionToWorldMatrix", ShaderVariableBindSource.ProjectionToWorldMatrix)
 
 ri.ShaderVariableIsScriptOverride(deferredPS, "LightColour")
 ri.ShaderVariableIsScriptOverride(deferredPS, "LightPos")
@@ -41,12 +31,6 @@ def InvSqrRadius():
 ri.SetShaderVariable(deferredPS, "LightInvSqrRadius", InvSqrRadius)
 ri.SetShaderVariable(deferredVS, "vsLightRadius", radius)
 
-# Expose light position once.
-#lightpos = ri.AddUserVar("Light Position", UserVariableType.Float3, (0, 2, 0))
-#ri.SetShaderVariable(deferredPS, "LightPos", lightpos)
-#ri.SetShaderVariable(deferredVS, "vsLightPos", lightpos)
-
-wireframe = ri.AddUserVar("Wireframe?", UserVariableType.Bool, False)
 showlights = ri.AddUserVar("Show lights?", UserVariableType.Bool, False)
 
 

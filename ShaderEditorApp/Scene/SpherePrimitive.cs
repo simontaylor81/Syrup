@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -24,6 +25,15 @@ namespace ShaderEditorApp.Scene
 
 			SerialisationUtils.ParseAttribute(element, "stacks", str => { Stacks = int.Parse(str); });
 			SerialisationUtils.ParseAttribute(element, "slices", str => { Slices = int.Parse(str); });
+		}
+
+		// Load the primitive from a JSON object.
+		internal override void Load(JToken obj, Scene scene)
+		{
+			base.Load(obj, scene);
+
+			Stacks = (int)obj["stacks"];
+			Slices = (int)obj["slices"];
 		}
 	}
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Assimp;
 using SlimDX;
+using Newtonsoft.Json.Linq;
 
 namespace ShaderEditorApp.Scene
 {
@@ -21,6 +22,26 @@ namespace ShaderEditorApp.Scene
 
 		public DataStream Vertices { get; private set; }
 		public DataStream Indices { get; private set; }
+
+		public static SceneMesh Load(JToken obj)
+		{
+			SceneMesh result = new SceneMesh();
+
+			result.Name = (string)obj["name"];
+			result.Filename = (string)obj["filename"];
+
+			// Load the file if it exists.
+			if (File.Exists(result.Filename))
+			{
+				result.Import();
+			}
+			else
+			{
+				OutputLogger.Instance.LogLine(LogCategory.Log, "Mesh not found: {0}", result.Filename);
+			}
+
+			return result;
+		}
 
 		public static SceneMesh Load(XElement element)
 		{

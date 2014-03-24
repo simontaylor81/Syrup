@@ -14,7 +14,7 @@ cbuffer cbBasePassPS
 cbuffer cbDeferredPassPS
 {
 	float4x4	ProjectionToWorldMatrix;	// Inverse view-projection matrix.
-	float3 CameraPos;
+	float3 CameraPosition;
 }
 
 cbuffer vsPerLight
@@ -176,7 +176,7 @@ float4 DeferredPass_PS(PSDeferredIn In) : SV_Target
 	float3 DiffuseLighting = saturate( dot(Normal, NormalisedLightVec) ) * Albedo.rgb;
 
 	// Specular lighting.
-	float3 ViewVec = normalize(CameraPos - WorldPos);
+	float3 ViewVec = normalize(CameraPosition - WorldPos);
 	float3 HalfAngle = normalize(ViewVec + NormalisedLightVec);
 	float3 SpecLighting = pow( saturate(dot(HalfAngle, Normal)), 32 ) * Albedo.a;
 

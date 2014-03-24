@@ -233,8 +233,13 @@ namespace ShaderEditorApp.Workspace
 		// Load the scene with the given filename and set it as the current one.
 		public void SetCurrentScene(string path)
 		{
-			currentScene = Scene.Scene.LoadFromFile(path);
-			scriptRenderControl.SetScene(currentScene);
+			// Attempt to load the scene.
+			var newScene = Scene.Scene.LoadFromFile(path);
+			if (newScene != null)
+			{
+				currentScene = newScene;
+				scriptRenderControl.SetScene(currentScene);
+			}
 		}
 
 		public bool IgnoreRedrawRequests { get; set; }

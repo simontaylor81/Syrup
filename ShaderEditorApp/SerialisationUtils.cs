@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using SlimDX;
+using Newtonsoft.Json.Linq;
 
 namespace ShaderEditorApp
 {
@@ -35,6 +36,35 @@ namespace ShaderEditorApp
 					float.Parse(components[3]));
 			}
 			throw new FormatException("Incorrect number of components for Vector3");
+		}
+
+		// Parse a JSON-encoded vector-3
+		public static Vector3 ParseVector3(JToken obj, Vector3 defaultVal = new Vector3())
+		{
+			if (obj != null)
+			{
+				return new Vector3(
+					(float)obj["x"],
+					(float)obj["y"],
+					(float)obj["z"]
+				);
+			}
+			return defaultVal;
+		}
+
+		// Parse a JSON-encoded vector-4
+		public static Vector4 ParseVector4(JToken obj, Vector4 defaultVal = new Vector4())
+		{
+			if (obj != null)
+			{
+				return new Vector4(
+					(float)obj["x"],
+					(float)obj["y"],
+					(float)obj["z"],
+					(float)obj["w"]
+				);
+			}
+			return defaultVal;
 		}
 
 		public static void ParseAttribute(XElement element, string attribute, Action<string> parseAction)

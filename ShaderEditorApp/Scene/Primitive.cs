@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using SlimDX;
+using Newtonsoft.Json.Linq;
 
 namespace ShaderEditorApp.Scene
 {
@@ -39,6 +40,29 @@ namespace ShaderEditorApp.Scene
 				else
 				{
 					OutputLogger.Instance.LogLine(LogCategory.Log, "Material not found: " + matAttr.Value);
+				}
+			}
+		}
+
+		internal virtual void Load(JToken obj, Scene scene)
+		{
+			Position = SerialisationUtils.ParseVector3(obj["position"]);
+			Scale = SerialisationUtils.ParseVector3(obj["scale"], new Vector3(1.0f, 1.0f, 1.0f));
+			Rotation = SerialisationUtils.ParseVector3(obj["rotation"]);
+
+			// Get material name.
+			var matName = (string)obj["material"];
+			if (matName != null)
+			{
+				// Look up mesh in the scene's collection.
+				Material mat;
+				if (scene.Materials.TryGetValue(matName, out mat))
+				{
+					Material = mat;
+				}
+				else
+				{
+					OutputLogger.Instance.LogLine(LogCategory.Log, "Material not found: " + matName);
 				}
 			}
 		}
