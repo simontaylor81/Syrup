@@ -1,6 +1,3 @@
-## Exclude python standard library (from nuget)
-/ShaderEditorApp/Lib/
-
 #################
 ## Eclipse
 #################
@@ -61,7 +58,10 @@ build/
 *_p.c
 *.ilk
 *.meta
-*.obj
+
+## Don't exclude .obj files -- they're meshes! Should be excluded by directory anyway
+#*.obj
+
 *.pch
 *.pdb
 *.pgc
