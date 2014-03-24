@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AssimpNet">
-      <HintPath>..\packages\AssimpNet-2.1.2 Refresh\x86\AssimpNet.dll</HintPath>
+      <HintPath>..\ThirdParty\AssimpNet-2.1.2 Refresh\x86\AssimpNet.dll</HintPath>
     </Reference>
     <Reference Include="AvalonDock">
       <HintPath>..\packages\AvalonDock.2.0.1061\lib\net40\AvalonDock.dll</HintPath>

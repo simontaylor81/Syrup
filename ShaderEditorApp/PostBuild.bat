@@ -18,7 +18,7 @@ IF [%3] == [x64] (
 
 SET AssimpVer=AssimpNet-2.1.2 Refresh
 
-robocopy "%~dp0\..\packages\%AssimpVer%\%3" %1 %AssimpDll% >>PostBuild.log
+robocopy "%~dp0\..\ThirdParty\%AssimpVer%\%3" %1 %AssimpDll% >>PostBuild.log
 
 :: robocopy return codes are a bit funny...
 IF ERRORLEVEL 8 EXIT /B 1
