@@ -75,17 +75,26 @@ namespace ShaderEditorApp.Rendering
 				property.PropertyChanged += (o, e) => workspace.RedrawViewports();
 		}
 
-		internal void SetScene(Scene.Scene newScene)
+		internal Scene.Scene Scene
 		{
-			// Dispose of the old scene.
-			RenderUtils.SafeDispose(scene);
+			get { return baseScene; }
+			set
+			{
+				if (baseScene != value)
+				{
+					baseScene = value;
 
-			// Create new one.
-			scene = new RenderScene(newScene, device);
+					// Dispose of the old scene.
+					RenderUtils.SafeDispose(scene);
 
-			// Missing scene can cause rendering to fail -- give it another try with the new one.
-			bScriptRenderError = false;
-			workspace.RedrawViewports();
+					// Create new one.
+					scene = new RenderScene(baseScene, device);
+
+					// Missing scene can cause rendering to fail -- give it another try with the new one.
+					bScriptRenderError = false;
+					workspace.RedrawViewports();
+				}
+			}
 		}
 
 		// Set the master per-frame callback that lets the script control rendering.
@@ -390,8 +399,11 @@ namespace ShaderEditorApp.Rendering
 		// Basic shader types.
 		private BasicShaders basicShaders;
 
-		// Scene we're currently rendering
+		// Renderer representation of the scene we're currently rendering
 		private RenderScene scene;
+
+		// Original scene data the above was created from.
+		private Scene.Scene baseScene;
 
 		// List of things to dispose.
 		private List<IDisposable> disposables = new List<IDisposable>();

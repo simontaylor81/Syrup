@@ -58,6 +58,11 @@ namespace ShaderEditorApp.Rendering
 			src.SetFrameCallback(callback);
 		}
 
+		public dynamic GetScene()
+		{
+			return src.Scene;
+		}
+
 		// Handles to special resources.
 		//public object BackBuffer { get { return RenderTargetHandle.BackBuffer; } }
 		public object DepthBuffer { get { return DepthBufferHandle.Default; } }

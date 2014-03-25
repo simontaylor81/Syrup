@@ -52,6 +52,12 @@ namespace ShaderEditorApp.Scene
 					.Where(prim => prim != null)
 					.ToList();
 
+				// Load lights.
+				result.lights = root["lights"]
+					.EmptyIfNull()
+					.Select(obj => SceneLight.Load(obj))
+					.ToList();
+
 				Environment.CurrentDirectory = prevCurrentDir;
 				return result;
 			}
@@ -102,10 +108,12 @@ namespace ShaderEditorApp.Scene
 		public IEnumerable<Primitive> Primitives { get { return primitives; } }
 		public IDictionary<string, SceneMesh> Meshes { get { return meshes; } }
 		public IDictionary<string, Material> Materials { get { return materials; } }
+		public IEnumerable<SceneLight> Lights { get { return lights; } }
 
 		private string filename;
 		private List<Primitive> primitives;
 		private Dictionary<string, SceneMesh> meshes;
 		private Dictionary<string, Material> materials;
+		private List<SceneLight> lights;
 	}
 }

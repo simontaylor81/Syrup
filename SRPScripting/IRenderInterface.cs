@@ -49,6 +49,9 @@ namespace SRPScripting
 		// Still unsure if this is the best way to go.
 		void SetFrameCallback(FrameCallback callback);
 
+		// Get access to the scene.
+		dynamic GetScene();
+
 		// Handles to special resources.
 		//object BackBuffer { get; }
 		object DepthBuffer { get; }

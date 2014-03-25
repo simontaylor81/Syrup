@@ -140,6 +140,7 @@
     <Compile Include="Rendering\ViewInfo.cs" />
     <Compile Include="Scene\Material.cs" />
     <Compile Include="Scene\MeshInstancePrimitive.cs" />
+    <Compile Include="Scene\SceneLight.cs" />
     <Compile Include="Scene\SceneMesh.cs" />
     <Compile Include="Scene\SceneVertex.cs" />
     <Compile Include="Scene\Texture.cs" />

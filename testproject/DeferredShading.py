@@ -17,19 +17,18 @@ ri.BindShaderResourceToMaterial(basepassPS, "DiffuseTex", "DiffuseTexture")
 ri.ShaderVariableIsScriptOverride(deferredPS, "LightColour")
 ri.ShaderVariableIsScriptOverride(deferredPS, "LightPos")
 ri.ShaderVariableIsScriptOverride(deferredVS, "vsLightPos")
+ri.ShaderVariableIsScriptOverride(deferredPS, "LightInvSqrRadius")
+ri.ShaderVariableIsScriptOverride(deferredVS, "vsLightRadius")
 
 # Bind g-buffer render targets to variables for the deferred pass.
 ri.SetShaderResourceVariable(deferredPS, "GBuffer_Albedo", albedoRT)
 ri.SetShaderResourceVariable(deferredPS, "GBuffer_Normal", normalRT)
 ri.SetShaderResourceVariable(deferredPS, "GBuffer_Depth", ri.DepthBuffer)
 
-# Expose radius rather than inverse-square-radius.
-radius = ri.AddUserVar("Radius", UserVariableType.Float, 20)
-def InvSqrRadius():
-	r = max(0.0001, radius())
+# Little helper to convert radius to inverse-square-radius.
+def InvSqrRadius(radius):
+	r = max(0.0001, radius)
 	return 1.0 / (r*r)
-ri.SetShaderVariable(deferredPS, "LightInvSqrRadius", InvSqrRadius)
-ri.SetShaderVariable(deferredVS, "vsLightRadius", radius)
 
 showlights = ri.AddUserVar("Show lights?", UserVariableType.Bool, False)
 
@@ -41,6 +40,10 @@ for z in xrange(0, 4):
 	for x in xrange(0, 4):
 		lightPositions.append((5.0 * x - 10.0, 1.0, 5.0 * z - 10.0))
 		lightColours.append((random.random(), random.random(), random.random()))
+		
+
+# Get lights from scene
+lights = ri.GetScene().Lights
 
 
 def RenderFrame(context):
@@ -54,11 +57,13 @@ def RenderFrame(context):
 		renderTargets = [None, normalRT, albedoRT])
 
 	# Now each light.
-	for pos, col in zip(lightPositions, lightColours):
+	for light in ri.GetScene().Lights:
 		varOverrides = {
-			"LightPos": pos,
-			"vsLightPos": pos,
-			"LightColour": col
+			"LightPos": light.Position,
+			"vsLightPos": light.Position,
+			"LightColour": light.Colour,
+			"LightInvSqrRadius": InvSqrRadius(light.Radius),
+			"vsLightRadius": light.Radius
 			}
 			
 		context.DrawSphere(
@@ -73,12 +78,11 @@ def RenderFrame(context):
 			
 	# Visualise light positions with wireframe spheres.
 	if showlights():
-		for pos, col in zip(lightPositions, lightColours):
+		for light in ri.GetScene().Lights:
 			context.DrawWireSphere(
-				pos,
-				radius(),
-				col
-				)
+				light.Position,
+				light.Radius,
+				light.Colour)
 
 
 ri.SetFrameCallback(RenderFrame)

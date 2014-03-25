@@ -238,7 +238,7 @@ namespace ShaderEditorApp.Workspace
 			if (newScene != null)
 			{
 				currentScene = newScene;
-				scriptRenderControl.SetScene(currentScene);
+				scriptRenderControl.Scene = currentScene;
 			}
 		}
 
