@@ -52,10 +52,11 @@ namespace ShaderEditorApp.Scene
 					.Where(prim => prim != null)
 					.ToList();
 
-				// Load lights.
+				// Load lights. Lights are completely semantic free to the app, they're just there
+				// so the script can access them. Do we just convert the JSON directly to dynamic objects.
 				result.lights = root["lights"]
 					.EmptyIfNull()
-					.Select(obj => SceneLight.Load(obj))
+					.Select(obj => DynamicHelpers.CreateDynamicObject(obj))
 					.ToList();
 
 				Environment.CurrentDirectory = prevCurrentDir;
@@ -108,12 +109,14 @@ namespace ShaderEditorApp.Scene
 		public IEnumerable<Primitive> Primitives { get { return primitives; } }
 		public IDictionary<string, SceneMesh> Meshes { get { return meshes; } }
 		public IDictionary<string, Material> Materials { get { return materials; } }
-		public IEnumerable<SceneLight> Lights { get { return lights; } }
 
 		private string filename;
 		private List<Primitive> primitives;
 		private Dictionary<string, SceneMesh> meshes;
 		private Dictionary<string, Material> materials;
-		private List<SceneLight> lights;
+
+		// Array of lights. Purely for access by script, so just dynamic objects.
+		public IEnumerable<dynamic> Lights { get { return lights; } }
+		private List<dynamic> lights;
 	}
 }

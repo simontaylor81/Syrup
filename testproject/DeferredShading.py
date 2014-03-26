@@ -59,11 +59,11 @@ def RenderFrame(context):
 	# Now each light.
 	for light in ri.GetScene().Lights:
 		varOverrides = {
-			"LightPos": light.Position,
-			"vsLightPos": light.Position,
-			"LightColour": light.Colour,
-			"LightInvSqrRadius": InvSqrRadius(light.Radius),
-			"vsLightRadius": light.Radius
+			"LightPos": light.position,
+			"vsLightPos": light.position,
+			"LightColour": light.colour,
+			"LightInvSqrRadius": InvSqrRadius(light.radius),
+			"vsLightRadius": light.radius
 			}
 			
 		context.DrawSphere(
@@ -80,9 +80,9 @@ def RenderFrame(context):
 	if showlights():
 		for light in ri.GetScene().Lights:
 			context.DrawWireSphere(
-				light.Position,
-				light.Radius,
-				light.Colour)
+				light.position,
+				light.radius,
+				light.colour)
 
 
 ri.SetFrameCallback(RenderFrame)

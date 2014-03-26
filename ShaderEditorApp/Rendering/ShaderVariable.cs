@@ -138,10 +138,20 @@ namespace ShaderEditorApp.Rendering
 		// Set the value of the variable from a dynamic object.
 		public void SetFromDynamic(dynamic value)
 		{
-			// Set each component.
 			int numComponents = VariableType.Columns * VariableType.Rows;
-			for (int i = 0; i < numComponents; i++)
-				SetComponent<float>(i, (float)(numComponents == 1 ? value : value[i]));
+			if (numComponents == 1)
+			{
+				// Treat as scalar for single component.
+				SetComponent<float>(0, (float)value);
+			}
+			else
+			{
+				// Treat value as vector, setting each component.
+				for (int i = 0; i < numComponents; i++)
+				{
+					SetComponent<float>(i, (float)value[i]);
+				}
+			}
 		}
 
 		// Reset to initial state.

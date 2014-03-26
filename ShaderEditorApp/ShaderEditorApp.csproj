@@ -140,7 +140,6 @@
     <Compile Include="Rendering\ViewInfo.cs" />
     <Compile Include="Scene\Material.cs" />
     <Compile Include="Scene\MeshInstancePrimitive.cs" />
-    <Compile Include="Scene\SceneLight.cs" />
     <Compile Include="Scene\SceneMesh.cs" />
     <Compile Include="Scene\SceneVertex.cs" />
     <Compile Include="Scene\Texture.cs" />
@@ -168,6 +167,7 @@
     <Compile Include="Rendering\ScriptRenderControl.cs" />
     <Compile Include="MVVMUtil\ViewModelBase.cs" />
     <Compile Include="Selectors.cs" />
+    <Compile Include="Util\DynamicHelpers.cs" />
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="ViewModel\IPropertySource.cs" />
     <Compile Include="ViewModel\PropertyViewModel.cs" />
