@@ -51,6 +51,7 @@ namespace ShaderEditorApp.Rendering
 		internal void ExecutionComplete(bool bSuccess)
 		{
 			bScriptExecutionError = !bSuccess;
+			bScriptRenderError = false;
 
 			// Add shader variables to the properties list.
 			foreach (var shader in shaders)
