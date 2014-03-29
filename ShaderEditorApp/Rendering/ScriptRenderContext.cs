@@ -21,7 +21,6 @@ namespace ShaderEditorApp.Rendering
 								   InputLayoutCache inputLayoutCache,
 								   Mesh sphereMesh,
 								   FullscreenQuad fullscreenQuad,
-								   ScriptHelper scriptHelper,
 								   BasicShaders basicShaders)
 		{
 			this.deviceContext = deviceContext;
@@ -32,7 +31,6 @@ namespace ShaderEditorApp.Rendering
 			this.inputLayoutCache = inputLayoutCache;
 			this.sphereMesh = sphereMesh;
 			this.fullscreenQuad = fullscreenQuad;
-			this.scriptHelper = scriptHelper;
 			this.basicShaders = basicShaders;
 		}
 
@@ -336,7 +334,6 @@ namespace ShaderEditorApp.Rendering
 		private ViewInfo viewInfo;
 		private Mesh sphereMesh;
 		private FullscreenQuad fullscreenQuad;
-		private ScriptHelper scriptHelper;
 		private BasicShaders basicShaders;
 	}
 }

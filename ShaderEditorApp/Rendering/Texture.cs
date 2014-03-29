@@ -105,26 +105,50 @@ namespace ShaderEditorApp.Rendering
 			return new Texture(texture2D, srv);
 		}
 
+		private delegate dynamic TexelCallback(int x, int y);
+
 		// Create a SlimDX raw data stream based on the given dynamic object.
 		private static DataStream GetStreamFromDynamic(dynamic contents, int width, int height, Format format)
 		{
 			var stream = new DataStream(width * height * format.Size(), true, true);
 
-			// Try cast to enumerable.
-			var enumerable = contents as IEnumerable<dynamic>;
-			if (enumerable != null)
+			// For some reason it won't dynamically overload on the delegate type,
+			// so we have to convert it by hand.
+			TexelCallback callback;
+			if (ScriptHelper.Instance.Operations.TryConvertTo<TexelCallback>(contents, out callback))
 			{
-				foreach (var element in enumerable.Take(width * height))
-				{
-					WriteDynamic(stream, element, format);
-				}
-
-				// Reset position
-				stream.Position = 0;
-				return stream;
+				FillStream(callback, stream, width, height, format);
+			}
+			else
+			{
+				FillStream(contents, stream, width, height, format);
 			}
 
-			throw new ScriptException("Could not extract texture contents");
+			// Reset position
+			stream.Position = 0;
+			return stream;
+		}
+
+		// Fill a data stream from a dynamic enumerable.
+		private static void FillStream(IEnumerable<dynamic> enumerable, DataStream stream, int width, int height, Format format)
+		{
+			foreach (var element in enumerable.Take(width * height))
+			{
+				WriteDynamic(stream, element, format);
+			}
+		}
+
+		// Fill a data stream from a function taking x & y coordinates.
+		private static void FillStream(TexelCallback fn, DataStream stream, int width, int height, Format format)
+		{
+			for (int y = 0; y < height; y++)
+			{
+				for (int x = 0; x < width; x++)
+				{
+					var element = fn(x, y);
+					WriteDynamic(stream, element, format);
+				}
+			}
 		}
 
 		private static void WriteDynamic(DataStream stream, dynamic element, Format format)

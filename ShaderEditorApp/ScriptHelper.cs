@@ -13,10 +13,10 @@ namespace ShaderEditorApp
 {
 	public class ScriptHelper
 	{
-		public ScriptHelper(ScriptEngine engine)
-		{
-			this.engine = engine;
-		}
+		public static ScriptHelper Instance { get { return instance; } }
+
+		public ScriptEngine Engine { get; set; }
+		public ObjectOperations Operations { get { return Engine.Operations; } }
 
 		// If x is a function, execute it and return the result. Otherwise just return x.
 		public dynamic ResolveFunction(dynamic x)
@@ -149,7 +149,7 @@ namespace ShaderEditorApp
 		{
 			OutputLogger.Instance.LogLine(LogCategory.Script, "Script execution failed.");
 
-			var eo = engine.GetService<ExceptionOperations>();
+			var eo = Engine.GetService<ExceptionOperations>();
 
 			if (ex.InnerException != null)
 			{
@@ -164,7 +164,6 @@ namespace ShaderEditorApp
 			}
 		}
 
-		private ScriptEngine engine;
-		private ObjectOperations Operations { get { return engine.Operations; } }
+		private static ScriptHelper instance = new ScriptHelper();
 	}
 }

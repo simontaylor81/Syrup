@@ -74,18 +74,17 @@ namespace ShaderEditorApp.Rendering
 
 	class ScriptShaderVariableBind : IShaderVariableBind
 	{
-		public ScriptShaderVariableBind(IShaderVariable variable, dynamic value, ScriptHelper scriptHelper)
+		public ScriptShaderVariableBind(IShaderVariable variable, dynamic value)
 		{
 			this.variable = variable;
 			this.value = value;
-			this.scriptHelper = scriptHelper;
 
 			// Check type of the variable.
 			if (variable.VariableType.Type == ShaderVariableType.Float)
 			{
 				// Check that the script gave us the correct type.
 				int numComponents = variable.VariableType.Columns * variable.VariableType.Rows;
-				scriptHelper.CheckConvertibleFloatList(value, numComponents,
+				ScriptHelper.Instance.CheckConvertibleFloatList(value, numComponents,
 					String.Format("Value for shader variable '{0}'", variable.Name));
 			}
 			else
@@ -100,7 +99,7 @@ namespace ShaderEditorApp.Rendering
 			try
 			{
 				// If the script gave us a function, call it.
-				dynamic val = scriptHelper.ResolveFunction(value);
+				dynamic val = ScriptHelper.Instance.ResolveFunction(value);
 				variable.SetFromDynamic(val);
 			}
 			catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
@@ -113,7 +112,6 @@ namespace ShaderEditorApp.Rendering
 
 		private IShaderVariable variable;
 		private dynamic value;
-		private ScriptHelper scriptHelper;
 	}
 
 	class MaterialShaderVariableBind : IShaderVariableBind

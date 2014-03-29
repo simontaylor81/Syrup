@@ -40,7 +40,7 @@ namespace ShaderEditorApp
 			pythonEngine.Runtime.IO.SetOutput(writer.BaseStream, writer);
 			pythonEngine.Runtime.IO.SetErrorOutput(writer.BaseStream, writer);
 
-			renderControl.ScriptHelper = new ScriptHelper(pythonEngine);
+			ScriptHelper.Instance.Engine = pythonEngine;
 		}
 
 		public Task RunScriptFromFile(string filename)

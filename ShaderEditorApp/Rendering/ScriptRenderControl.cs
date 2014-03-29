@@ -175,7 +175,7 @@ namespace ShaderEditorApp.Rendering
 				throw new ScriptException("Invalid shader.");
 
 			IShaderVariable variable = shaders[shaderHandle.index].FindVariable(varName);
-			SetShaderBind(variable, () => new ScriptShaderVariableBind(variable, value, ScriptHelper));
+			SetShaderBind(variable, () => new ScriptShaderVariableBind(variable, value));
 		}
 
 		public void ShaderVariableIsScriptOverride(dynamic shaderHandle, string varName)
@@ -335,7 +335,6 @@ namespace ShaderEditorApp.Rendering
 					inputLayoutCache,
 					sphereMesh,
 					fullscreenQuad,
-					ScriptHelper,
 					basicShaders);
 
 				// Let the script do its thing.
@@ -344,7 +343,7 @@ namespace ShaderEditorApp.Rendering
 			}
 			catch (Exception ex)
 			{
-				ScriptHelper.LogScriptError(ex);
+				ScriptHelper.Instance.LogScriptError(ex);
 
 				// Remember that the script fails so we don't just fail over and over.
 				bScriptRenderError = true;
@@ -411,8 +410,6 @@ namespace ShaderEditorApp.Rendering
 
 		// If true, previous rendering failed with a script problem, so we don't keep re-running until the script is fixed & re-run.
 		private bool bScriptError { get { return bScriptExecutionError || bScriptRenderError; } }
-
-		internal ScriptHelper ScriptHelper { get; set; }
 
 		// User properties.
 		private List<UserVariable> userVariables = new List<UserVariable>();
