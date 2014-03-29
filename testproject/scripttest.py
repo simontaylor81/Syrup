@@ -8,7 +8,8 @@ psTex = ri.LoadShader("BasicShaders.hlsl", "TexturedPS", "ps_4_0")
 #Test: create a checkerboard texture
 checker = [(x%2 + (x/16)%2)%2 for x in xrange(0, 16*16)]
 texContents = [(1, x, 0, 1) for x in checker]
-tex = ri.CreateTexture2D(16, 16, Format.R8G8B8A8_UNorm, texContents)
+ramp = [((i % 16) / 15.0, (i / 16) / 15.0, 0, 1) for i in xrange(0, 16*16)]
+tex = ri.CreateTexture2D(16, 16, Format.R8G8B8A8_UNorm, ramp)
 
 ri.SetShaderResourceVariable(psTex, "DiffuseTex", tex)
 

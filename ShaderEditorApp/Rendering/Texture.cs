@@ -134,12 +134,12 @@ namespace ShaderEditorApp.Rendering
 				case Format.R32G32B32A32_Float:
 				case Format.R32G32B32_Float:
 					for (int i = 0; i < format.NumComponents(); i++)
-						stream.Write<float>(element[i]);
+						stream.Write((float)element[i]);
 					break;
 
 				case Format.R16G16B16A16_Float:
 					for (int i = 0; i < format.NumComponents(); i++)
-						stream.Write<Half>(new Half(element[i]));
+						stream.Write<Half>(new Half((float)element[i]));
 					break;
 
 				case Format.R16G16B16A16_UNorm:
@@ -150,7 +150,7 @@ namespace ShaderEditorApp.Rendering
 				case Format.R8G8B8A8_UNorm:
 				case Format.R8G8B8A8_UNorm_SRGB:
 					for (int i = 0; i < format.NumComponents(); i++)
-						stream.Write((byte)ToUNorm(element[i], 255.0f));
+						stream.Write((byte)ToUNorm((float)element[i], 255.0f));
 					break;
 
 				case Format.R8G8B8A8_UInt:
@@ -167,15 +167,15 @@ namespace ShaderEditorApp.Rendering
 					break;
 
 				case Format.R32_Float:
-					stream.Write<float>(element);
+					stream.Write((float)element);
 					break;
 
 				case Format.R16_Float:
-					stream.Write<Half>(new Half(element));
+					stream.Write<Half>(new Half((float)element));
 					break;
 
 				case Format.R8_UNorm:
-					stream.Write((byte)ToUNorm(element, 255.0f));
+					stream.Write((byte)ToUNorm((float)element, 255.0f));
 					break;
 
 				case Format.R8_UInt:
