@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SlimDX.Direct3D11;
+using SlimDX.DXGI;
 
 namespace ShaderEditorApp.Rendering
 {
@@ -214,6 +215,19 @@ namespace ShaderEditorApp.Rendering
 				default:
 					throw new ArgumentException("Invalid texture addressing mode.");
 			}
+		}
+
+		// Convert a script format to a DXGI one.
+		public static Format ToDXGI(this SRPScripting.Format format)
+		{
+			// This is rather dirty -- the formats are just copies of the SlimDX ones, currently.
+			Format result;
+			if (Enum.TryParse(format.ToString(), out result))
+			{
+				return result;
+			}
+
+			throw new ArgumentException("Invalid DXGI format: " + format.ToString());
 		}
 	}
 }

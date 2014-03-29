@@ -36,6 +36,9 @@ namespace SRPScripting
 		// Create a render target of dimensions equal to the viewport.
 		object CreateRenderTarget();
 
+		// Create a 2D texture of the given size and format, and fill it with the given data.
+		object CreateTexture2D(int width, int height, Format format, dynamic contents);
+
 		void BindShaderVariable(dynamic shader, string var, ShaderVariableBindSource source);
 		void BindShaderVariableToMaterial(dynamic shader, string var, string param);
 		void SetShaderVariable(dynamic shader, string var, dynamic value);

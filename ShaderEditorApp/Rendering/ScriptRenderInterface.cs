@@ -22,6 +22,11 @@ namespace ShaderEditorApp.Rendering
 			return src.CreateRenderTarget();
 		}
 
+		public object CreateTexture2D(int width, int height, Format format, dynamic contents)
+		{
+			return src.CreateTexture2D(width, height, format, contents);
+		}
+
 		public void BindShaderVariable(dynamic shader, string var, ShaderVariableBindSource source)
 		{
 			src.BindShaderVariable(shader, var, source);

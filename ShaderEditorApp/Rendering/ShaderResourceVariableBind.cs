@@ -43,6 +43,23 @@ namespace ShaderEditorApp.Rendering
 		private string paramName;
 	}
 
+	class TextureShaderResourceVariableBind : IShaderResourceVariableBind
+	{
+		public TextureShaderResourceVariableBind(Texture texture)
+		{
+			this.texture = texture;
+		}
+
+		public void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable)
+		{
+			// TODO: user set sampler state somehow.
+			variable.Sampler = GlobalResources.Instance.SamplerStateCache.Get(SRPScripting.SamplerState.PointClamp.ToD3D11());
+			variable.Resource = texture.SRV;
+		}
+
+		private Texture texture;
+	}
+
 	class RenderTargetShaderResourceVariableBind : IShaderResourceVariableBind
 	{
 		public RenderTargetShaderResourceVariableBind(RenderTargetDescriptor descriptor)

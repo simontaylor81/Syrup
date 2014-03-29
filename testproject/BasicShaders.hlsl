@@ -34,8 +34,8 @@ struct PSIn
 	float4 Pos : SV_Position;
 };
 
-// Vertex & pixel shaders for very simple solid colour rendering.
-PSIn SolidColourVS(VSIn In)
+// Very basic vertex shader.
+PSIn BasicVS(VSIn In)
 {
 	PSIn Out;
 
@@ -50,15 +50,17 @@ PSIn SolidColourVS(VSIn In)
 	return Out;
 }
 
+// Pixel shader for very simple solid colour rendering.
 float4 SolidColourPS(PSIn In) : SV_Target
 {
 	float3 colour = SolidColour * (dot(In.Normal, float3(0,1,0)) * 0.5 + 0.5);
 	return float4(colour, Alpha);
 }
 
+// Pixel shader for simple textured rendering
 float4 TexturedPS(PSIn In) : SV_Target
 {
-	float3 colour = DiffuseTex.Sample(mySampler, In.UVs[0]);
+	float3 colour = DiffuseTex.Sample(mySampler, In.UVs[0]) + 0.1f;
 	colour *= dot(In.Normal, float3(0,1,0)) * 0.5 + 0.5;
 	return float4(colour, 1.0f);
 }

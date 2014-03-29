@@ -43,6 +43,7 @@ namespace ShaderEditorApp.Rendering
 
 			// Clear render target descriptors and dispose the actual render targets.
 			RenderUtils.DisposeList(renderTargets);
+			RenderUtils.DisposeList(textures);
 
 			// Reset output logger so warnings are written again.
 			OutputLogger.Instance.ResetLogOnce();
@@ -236,7 +237,15 @@ namespace ShaderEditorApp.Rendering
 					throw new ScriptException("Attempting to bind already bound shader variable: " + varName);
 				}
 
-				if (value is RenderTargetHandle)
+				if (value is TextureHandle)
+				{
+					// Bind the variable to a texture's SRV.
+					int texIndex = ((TextureHandle)value).index;
+					System.Diagnostics.Debug.Assert(texIndex >= 0 && texIndex < textures.Count);
+
+					variable.Bind = new TextureShaderResourceVariableBind(textures[texIndex]);
+				}
+				else if (value is RenderTargetHandle)
 				{
 					// Bind the variable to a render target's SRV.
 					int rtIndex = ((RenderTargetHandle)value).index;
@@ -268,10 +277,18 @@ namespace ShaderEditorApp.Rendering
 			return userVar.GetFunction();
 		}
 
+		// Create a render target of dimensions equal to the viewport.
 		public object CreateRenderTarget()
 		{
 			renderTargets.Add(new RenderTargetDescriptor(new Rational(1, 1), new Rational(1, 1), true));
 			return new RenderTargetHandle(renderTargets.Count - 1);
+		}
+
+		// Create a 2D texture of the given size and format, and fill it with the given data.
+		public object CreateTexture2D(int width, int height, Format format, dynamic contents)
+		{
+			textures.Add(Texture.CreateFromScript(device, width, height, format, contents));
+			return new TextureHandle(textures.Count - 1);
 		}
 
 		public void Dispose()
@@ -367,6 +384,9 @@ namespace ShaderEditorApp.Rendering
 
 		// Resource arrays.
 		private List<Shader> shaders = new List<Shader>();
+
+		// Script-generated resources.
+		private List<Texture> textures = new List<Texture>();
 
 		// List of render targets and their descritors.
 		private List<RenderTargetDescriptor> renderTargets = new List<RenderTargetDescriptor>();

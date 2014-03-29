@@ -1,12 +1,16 @@
 from SRPScripting import *
 import random
 
-vs = ri.LoadShader("BasicShaders.hlsl", "SolidColourVS", "vs_4_0")
+vs = ri.LoadShader("BasicShaders.hlsl", "BasicVS", "vs_4_0")
 ps = ri.LoadShader("BasicShaders.hlsl", "SolidColourPS", "ps_4_0")
 psTex = ri.LoadShader("BasicShaders.hlsl", "TexturedPS", "ps_4_0")
 
-ri.BindShaderVariable(vs, "WorldToProjectionMatrix", ShaderVariableBindSource.WorldToProjectionMatrix)
-ri.BindShaderVariable(vs, "LocalToWorldMatrix", ShaderVariableBindSource.LocalToWorldMatrix)
+#Test: create a checkerboard texture
+checker = [(x%2 + (x/16)%2)%2 for x in xrange(0, 16*16)]
+texContents = [(1, x, 0, 1) for x in checker]
+tex = ri.CreateTexture2D(16, 16, Format.R8G8B8A8_UNorm, texContents)
+
+ri.SetShaderResourceVariable(psTex, "DiffuseTex", tex)
 
 def func():
 	return (random.random(), random.random(), random.random())
@@ -20,26 +24,15 @@ def funcWithArgs(x, y):
 	return x + y
 	
 def GetFillMode():
-	return FillMode.Wireframe
-
-#ri.SetFillMode(GetFillMode)
+	return FillMode.Solid
 
 #ri.SetShaderVariable(ps, "SolidColour", func)
 ri.BindShaderVariableToMaterial(ps, "SolidColour", "DiffuseColour")
-ri.BindShaderResourceToMaterial(psTex, "DiffuseTex", "DiffuseTexture")
-
-#ri.SetShader(vs)
-
-#ri.SetShader(psTex)
-#ri.DrawScene()
-
-#ri.SetShader(ps)
-#ri.SetFillMode(FillMode.Wireframe)
-#ri.DrawSphere()
 
 def RenderFrame(context):
 	rastState = RastState(fillMode = GetFillMode(), cullMode = CullMode.None)
-	context.DrawSphere(vs, psTex, rastState)
+	#context.DrawSphere(vs, psTex, rastState)
+	context.DrawScene(vs, psTex, rastState)
 
 ri.SetFrameCallback(RenderFrame)
 

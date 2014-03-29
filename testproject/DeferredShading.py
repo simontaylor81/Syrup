@@ -40,7 +40,7 @@ for z in xrange(0, 4):
 	for x in xrange(0, 4):
 		lightPositions.append((5.0 * x - 10.0, 1.0, 5.0 * z - 10.0))
 		lightColours.append((random.random(), random.random(), random.random()))
-		
+
 
 # Get lights from scene
 lights = ri.GetScene().Lights

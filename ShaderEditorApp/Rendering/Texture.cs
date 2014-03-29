@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using DirectXTexSlim;
 using SlimDX.Direct3D11;
+using SlimDX;
+using SRPScripting;
 
 namespace ShaderEditorApp.Rendering
 {
@@ -74,6 +76,127 @@ namespace ShaderEditorApp.Rendering
 				// Attempt to load all other images using WIC.
 				return DirectXTex.LoadFromWICFile(filename);
 			}
+		}
+
+		// Create a texture with data from script.
+		public static Texture CreateFromScript(Device device, int width, int height, Format format, dynamic contents)
+		{
+			// Build texture descriptor.
+			var desc = new Texture2DDescription()
+				{
+					Width = width,
+					Height = height,
+					Format = format.ToDXGI(),
+					MipLevels = 1,		// TODO: generate mips?
+					ArraySize = 1,
+					BindFlags = BindFlags.ShaderResource,
+					SampleDescription = new SlimDX.DXGI.SampleDescription(1, 0)
+				};
+
+			// Construct data stream from script data.
+			var initialData = new DataRectangle(width * format.Size(), GetStreamFromDynamic(contents, width, height, format));
+
+			// Create the actual texture resource.
+			var texture2D = new Texture2D(device, desc, initialData);
+
+			// Create the SRV.
+			var srv = new ShaderResourceView(device, texture2D);
+
+			return new Texture(texture2D, srv);
+		}
+
+		// Create a SlimDX raw data stream based on the given dynamic object.
+		private static DataStream GetStreamFromDynamic(dynamic contents, int width, int height, Format format)
+		{
+			var stream = new DataStream(width * height * format.Size(), true, true);
+
+			// Try cast to enumerable.
+			var enumerable = contents as IEnumerable<dynamic>;
+			if (enumerable != null)
+			{
+				foreach (var element in enumerable.Take(width * height))
+				{
+					WriteDynamic(stream, element, format);
+				}
+
+				// Reset position
+				stream.Position = 0;
+				return stream;
+			}
+
+			throw new ScriptException("Could not extract texture contents");
+		}
+
+		private static void WriteDynamic(DataStream stream, dynamic element, Format format)
+		{
+			switch (format)
+			{
+				case Format.R32G32B32A32_Float:
+				case Format.R32G32B32_Float:
+					for (int i = 0; i < format.NumComponents(); i++)
+						stream.Write<float>(element[i]);
+					break;
+
+				case Format.R16G16B16A16_Float:
+					for (int i = 0; i < format.NumComponents(); i++)
+						stream.Write<Half>(new Half(element[i]));
+					break;
+
+				case Format.R16G16B16A16_UNorm:
+					for (int i = 0; i < format.NumComponents(); i++)
+						stream.Write((ushort)ToUNorm(element[i], 65535.0f));
+					break;
+
+				case Format.R8G8B8A8_UNorm:
+				case Format.R8G8B8A8_UNorm_SRGB:
+					for (int i = 0; i < format.NumComponents(); i++)
+						stream.Write((byte)ToUNorm(element[i], 255.0f));
+					break;
+
+				case Format.R8G8B8A8_UInt:
+					for (int i = 0; i < format.NumComponents(); i++)
+						stream.Write<byte>(element[i]);
+					break;
+
+				//case Format.R8G8B8A8_SNorm:
+				//	break;
+
+				case Format.R8G8B8A8_SInt:
+					for (int i = 0; i < format.NumComponents(); i++)
+						stream.Write<sbyte>(element[i]);
+					break;
+
+				case Format.R32_Float:
+					stream.Write<float>(element);
+					break;
+
+				case Format.R16_Float:
+					stream.Write<Half>(new Half(element));
+					break;
+
+				case Format.R8_UNorm:
+					stream.Write((byte)ToUNorm(element, 255.0f));
+					break;
+
+				case Format.R8_UInt:
+					stream.Write<byte>(element);
+					break;
+
+				//case Format.R8_SNorm:
+				//	break;
+
+				case Format.R8_SInt:
+					stream.Write<sbyte>(element);
+					break;
+
+				default:
+					throw new ScriptException("Unsuported format: " + format.ToString());
+			}
+		}
+
+		private static uint ToUNorm(float value, float max)
+		{
+			return (uint)(Math.Max(0.0f, Math.Min(1.0f, value)) * max);
 		}
 	}
 }
