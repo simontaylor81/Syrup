@@ -4,11 +4,13 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Windows;
 using Microsoft.Win32;
 using ShaderEditorApp.MVVMUtil;
 using ShaderEditorApp.Workspace;
 using ShaderEditorApp.ViewModel;
+using SRPCommon.UserProperties;
 
 namespace ShaderEditorApp.Projects
 {
@@ -29,6 +31,10 @@ namespace ShaderEditorApp.Projects
 
 			// Add commands.
 			Commands = new NamedCommand[] { AddExistingCmd, AddNewCmd, RemoveCmd };
+
+			// User-facing properties.
+			var nameProp = new MutableScalarProperty<string>("Folder Name", folder.Name);
+			nameProp.Subscribe(_ => DisplayName = nameProp.Value);
 		}
 
 		private void RegenerateChildren()
@@ -50,18 +56,6 @@ namespace ShaderEditorApp.Projects
 					folder.Name = value;
 					OnPropertyChanged();
 				}
-			}
-		}
-
-		// Properties to display for the folder.
-		public override IEnumerable<PropertyViewModel> ItemProperties
-		{
-			get
-			{
-				// Property for the name of the folder.
-				var nameProp = new SimpleScalarProperty<string>("Folder Name", folder.Name, s => DisplayName = s);
-
-				return new[] { nameProp };
 			}
 		}
 

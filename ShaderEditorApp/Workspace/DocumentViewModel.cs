@@ -123,7 +123,10 @@ namespace ShaderEditorApp.Workspace
 					filePath_ = value;
 
 					// (Re-)create the file watcher.
-					ShaderEditorApp.Rendering.RenderUtils.SafeDispose(watcher);
+					if (watcher != null)
+					{
+						watcher.Dispose();
+					}
 
 					watcher = new FileSystemWatcher(Path.GetDirectoryName(filePath_), Path.GetFileName(filePath_));
 					watcher.NotifyFilter = NotifyFilters.LastWrite;

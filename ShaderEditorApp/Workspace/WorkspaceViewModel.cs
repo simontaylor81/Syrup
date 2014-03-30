@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using ShaderEditorApp.MVVMUtil;
-using System.Windows.Input;
-using ShaderEditorApp.Projects;
-using ShaderEditorApp.Rendering;
-using Microsoft.Win32;
 using System.IO;
-using ShaderEditorApp.ViewModel;
+using System.Linq;
 using System.Windows;
+using System.Windows.Input;
+using Microsoft.Win32;
+using ShaderEditorApp.MVVMUtil;
+using ShaderEditorApp.Projects;
+using ShaderEditorApp.View;
+using ShaderEditorApp.ViewModel;
+using SRPCommon.Interfaces;
+using SRPCommon.Scene;
+using SRPCommon.Scripting;
+using SRPCommon.UserProperties;
+using SRPCommon.Util;
+using SRPRendering;
 
 namespace ShaderEditorApp.Workspace
 {
 	// ViewModel for the application workspace, containing documents, docking windows, etc.
-	public class WorkspaceViewModel : ViewModelBase, IPropertySource
+	public class WorkspaceViewModel : ViewModelBase, IWorkspace
 	{
 		public WorkspaceViewModel(RenderWindow renderWindow)
 		{
@@ -25,8 +31,9 @@ namespace ShaderEditorApp.Workspace
 			Documents = new ReadOnlyObservableCollection<DocumentViewModel>(documents);
 
 			// Create classes that handle scripting.
-			scriptRenderControl = new ScriptRenderControl(this, renderWindow.Device);
-			scripting = new Scripting(scriptRenderControl);
+			scripting = new Scripting();
+			scriptRenderControl = new ScriptRenderControl(this, renderWindow.Device, scripting);
+			scripting.RenderInterface = scriptRenderControl.ScriptInterface;
 
 			renderWindow.ScriptControl = scriptRenderControl;
 			renderWindow.ViewportViewModel = ViewportViewModel;
@@ -56,6 +63,8 @@ namespace ShaderEditorApp.Workspace
 					}
 				}
 			}
+
+			RecreatePropertiesList();
 		}
 
 		public void Tick()
@@ -234,7 +243,7 @@ namespace ShaderEditorApp.Workspace
 		public void SetCurrentScene(string path)
 		{
 			// Attempt to load the scene.
-			var newScene = Scene.Scene.LoadFromFile(path);
+			var newScene = Scene.LoadFromFile(path);
 			if (newScene != null)
 			{
 				currentScene = newScene;
@@ -242,11 +251,18 @@ namespace ShaderEditorApp.Workspace
 			}
 		}
 
-		public bool IgnoreRedrawRequests { get; set; }
 		public void RedrawViewports()
 		{
-			if (!IgnoreRedrawRequests)
+			if (!scriptRenderControl.IgnoreRedrawRequests)
+			{
 				ViewportsDirtied();
+			}
+		}
+
+		public string FindProjectFile(string name)
+		{
+			var shaderFileItem = Project.AllItems.FirstOrDefault(item => item.Name == name);
+			return shaderFileItem != null ? shaderFileItem.AbsolutePath : null;
 		}
 
 		private ObservableCollection<DocumentViewModel> documents;
@@ -308,7 +324,7 @@ namespace ShaderEditorApp.Workspace
 			{
 				// Close existing documents when opening a new project.
 				// TODO: Prompt to save.
-				RenderUtils.DisposeList(documents);
+				DisposableUtil.DisposeList(documents);
 
 				project_ = value;
 				ProjectViewModel = new ProjectViewModel(project_, this);
@@ -357,22 +373,22 @@ namespace ShaderEditorApp.Workspace
 				if (value != focusPropertySource)
 				{
 					focusPropertySource = value;
+					RecreatePropertiesList();
 					OnPropertyChanged("Properties");
 				}
 			}
 		}
 
-		public IEnumerable<PropertyViewModel> Properties
-		{
-			get
-			{
-				// Is the focussed window a property source?
-				if (FocusPropertySource != null)
-					return FocusPropertySource.Properties;
+		public IEnumerable<PropertyViewModel> Properties { get; private set; }
 
-				// Fallback on the render properties (i.e. shader and user variables).
-				return scriptRenderControl.Properties;
-			}
+		private void RecreatePropertiesList()
+		{
+			// Use focussed window if it's a property source, otherwise
+			// fallback on the render properties (i.e. shader and user variables).
+			var source = FocusPropertySource != null ? FocusPropertySource.Properties : scriptRenderControl.Properties;
+
+			// Create viewmodels for each property.
+			//Properties = source.Select(prop => new Prop
 		}
 
 		// Viewport view model that contains settings for the viewport (e.g. camera mode).
@@ -384,7 +400,7 @@ namespace ShaderEditorApp.Workspace
 		private Scripting scripting;
 		private RenderWindow renderWindow;
 
-		private Scene.Scene currentScene;
+		private Scene currentScene;
 
 		// TODO: Multiple viewports.
 		// TODO: Move info needed?

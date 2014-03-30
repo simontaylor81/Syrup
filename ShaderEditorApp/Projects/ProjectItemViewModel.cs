@@ -5,6 +5,7 @@ using System.Linq;
 using ShaderEditorApp.MVVMUtil;
 using ShaderEditorApp.ViewModel;
 using ShaderEditorApp.Workspace;
+using SRPCommon.UserProperties;
 
 namespace ShaderEditorApp.Projects
 {
@@ -47,28 +48,25 @@ namespace ShaderEditorApp.Projects
 			base.OnDispose();
 		}
 
-		// Properties to display for the item.
-		public override IEnumerable<PropertyViewModel> ItemProperties
+		// Create the user properties to display for the item.
+		private void CreateUserProperties()
 		{
-			get
+			var properties = new List<IUserProperty>();
+
+			// Add some read-only properties.
+			properties.Add(new ReadOnlyScalarProperty<string>("Filename", DisplayName));
+			properties.Add(new ReadOnlyScalarProperty<string>("Full path", item.AbsolutePath));
+			properties.Add(new ReadOnlyScalarProperty<string>("Type", ItemTypeString));
+
+			if (item.Type == ProjectItemType.Script)
 			{
-				// Add some read-only properties.
-				var filenameProp = new SimpleScalarProperty<string>("Filename", DisplayName, true);
-				var pathProp = new SimpleScalarProperty<string>("Full path", item.AbsolutePath, true);
-				var typeProp = new SimpleScalarProperty<string>("Type", ItemTypeString, true);
-
-				IEnumerable<PropertyViewModel> result = new[] { filenameProp, pathProp, typeProp };
-
-				if (item.Type == ProjectItemType.Script)
-				{
-					// Add a 'run on start-up' property for script items.
-					var runOnStartupProp = new SimpleScalarProperty<bool>("Run at Startup", item.RunAtStartup, b => item.RunAtStartup = b);
-
-					result = result.Concat(new[] { runOnStartupProp });
-				}
-
-				return result;
+				// Add a 'run on start-up' property for script items.
+				var runOnStartupProp = new MutableScalarProperty<bool>("Run at Startup", item.RunAtStartup);
+				runOnStartupProp.Subscribe(_ => item.RunAtStartup = runOnStartupProp.Value);
+				properties.Add(runOnStartupProp);
 			}
+
+			ItemProperties = properties;
 		}
 
 		// Get type of item as a string.

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
+using SRPCommon.Util;
 
 namespace ShaderEditorApp.Projects
 {

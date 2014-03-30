@@ -1,12 +1,14 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 
 using ShaderEditorApp.Workspace;
+using ShaderEditorApp.View;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
-using System.IO;
+using SRPCommon.Util;
 
 namespace ShaderEditorApp
 {

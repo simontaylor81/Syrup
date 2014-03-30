@@ -4,6 +4,7 @@ using System.Linq;
 using ShaderEditorApp.Workspace;
 using ShaderEditorApp.MVVMUtil;
 using ShaderEditorApp.ViewModel;
+using SRPCommon.UserProperties;
 
 namespace ShaderEditorApp.Projects
 {
@@ -17,6 +18,9 @@ namespace ShaderEditorApp.Projects
 			Commands = new [] { SaveCmd, AddExistingCmd, AddNewCmd };
 
 			Project.DirtyChanged += OnDirtyChanged;
+
+			// We don't have any properties of our own.
+			ItemProperties = null;
 		}
 
 		protected override void OnDispose()
@@ -37,7 +41,7 @@ namespace ShaderEditorApp.Projects
 		}
 
 		// Properties to display for the currently selected property item.
-		public IEnumerable<PropertyViewModel> Properties
+		public IEnumerable<IUserProperty> Properties
 		{
 			get
 			{
@@ -45,16 +49,6 @@ namespace ShaderEditorApp.Projects
 					return ActiveItem.ItemProperties;
 				else
 					return ItemProperties;
-			}
-		}
-
-		// Properties for the project node itself.
-		public override IEnumerable<PropertyViewModel> ItemProperties
-		{
-			get
-			{
-				// TEMP: return a dummy property.
-				return new[] { new SimpleScalarProperty<float>("test", 0.5f, false) };
 			}
 		}
 

@@ -35,9 +35,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AssimpNet">
-      <HintPath>..\ThirdParty\AssimpNet-2.1.2 Refresh\x86\AssimpNet.dll</HintPath>
-    </Reference>
     <Reference Include="AvalonDock">
       <HintPath>..\packages\AvalonDock.2.0.1061\lib\net40\AvalonDock.dll</HintPath>
     </Reference>
@@ -88,6 +85,18 @@
     <Reference Include="System.Interactive">
       <HintPath>..\packages\Ix-Main.1.2.2\lib\net45\System.Interactive.dll</HintPath>
     </Reference>
+    <Reference Include="System.Reactive.Core">
+      <HintPath>..\packages\Rx-Core.2.2.2\lib\net45\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces">
+      <HintPath>..\packages\Rx-Interfaces.2.2.2\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq">
+      <HintPath>..\packages\Rx-Linq.2.2.2\lib\net45\System.Reactive.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices">
+      <HintPath>..\packages\Rx-PlatformServices.2.2.2\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -109,7 +118,6 @@
     </ApplicationDefinition>
     <Compile Include="MVVMUtil\Converters.cs" />
     <Compile Include="MVVMUtil\RelayCommand.cs" />
-    <Compile Include="OutputLogger.cs" />
     <Compile Include="OutputWindow.xaml.cs">
       <DependentUpon>OutputWindow.xaml</DependentUpon>
     </Compile>
@@ -118,66 +126,23 @@
     <Compile Include="Projects\ProjectItem.cs" />
     <Compile Include="Projects\ProjectItemViewModel.cs" />
     <Compile Include="Projects\ProjectViewModelBase.cs" />
-    <Compile Include="Rendering\GlobalResources.cs" />
-    <Compile Include="Rendering\BasicShaders.cs" />
-    <Compile Include="Rendering\DepthBuffer.cs" />
-    <Compile Include="Rendering\FullscreenQuad.cs" />
-    <Compile Include="Rendering\InputLayoutCache.cs" />
-    <Compile Include="Rendering\PrimitiveProxy.cs" />
-    <Compile Include="Rendering\RenderScene.cs" />
-    <Compile Include="Rendering\RenderTarget.cs" />
-    <Compile Include="Rendering\RenderTargetDescriptor.cs" />
-    <Compile Include="Rendering\ResourceHandles.cs" />
-    <Compile Include="Rendering\ScriptInterfaceExtensions.cs" />
-    <Compile Include="Rendering\ScriptRenderContext.cs" />
-    <Compile Include="Rendering\ScriptRenderInterface.cs" />
-    <Compile Include="Rendering\ShaderResourceVariable.cs" />
-    <Compile Include="Rendering\ShaderResourceVariableBind.cs" />
-    <Compile Include="Rendering\ShaderVariableBind.cs" />
-    <Compile Include="Rendering\StateObjectCache.cs" />
-    <Compile Include="Rendering\Texture.cs" />
-    <Compile Include="Rendering\UserVariable.cs" />
-    <Compile Include="Rendering\ViewInfo.cs" />
-    <Compile Include="Scene\Material.cs" />
-    <Compile Include="Scene\MeshInstancePrimitive.cs" />
-    <Compile Include="Scene\SceneMesh.cs" />
-    <Compile Include="Scene\SceneVertex.cs" />
-    <Compile Include="Scene\Texture.cs" />
-    <Compile Include="SerialisationUtils.cs" />
     <Compile Include="Projects\Project.cs" />
     <Compile Include="Projects\ProjectBrowser.xaml.cs">
       <DependentUpon>ProjectBrowser.xaml</DependentUpon>
     </Compile>
     <Compile Include="Projects\ProjectViewModel.cs" />
-    <Compile Include="Rendering\BasicMesh.cs" />
-    <Compile Include="Rendering\Camera.cs" />
-    <Compile Include="Rendering\Mesh.cs" />
-    <Compile Include="Rendering\RenderUtils.cs" />
-    <Compile Include="Rendering\RenderWindow.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Rendering\Shader.cs" />
-    <Compile Include="Rendering\ShaderCache.cs" />
-    <Compile Include="Rendering\ShaderVariable.cs" />
-    <Compile Include="Scene\Primitive.cs" />
-    <Compile Include="Scene\Scene.cs" />
-    <Compile Include="Scene\SpherePrimitive.cs" />
-    <Compile Include="ScriptHelper.cs" />
-    <Compile Include="Scripting.cs" />
-    <Compile Include="Rendering\ScriptRenderControl.cs" />
     <Compile Include="MVVMUtil\ViewModelBase.cs" />
     <Compile Include="Selectors.cs" />
-    <Compile Include="Util\DynamicHelpers.cs" />
-    <Compile Include="Util\Extensions.cs" />
-    <Compile Include="ViewModel\IPropertySource.cs" />
     <Compile Include="ViewModel\PropertyViewModel.cs" />
     <Compile Include="ViewModel\ScalarProperty.cs" />
-    <Compile Include="ViewModel\ShaderVariableViewModel.cs" />
-    <Compile Include="ViewModel\UserVariableViewModel.cs" />
     <Compile Include="ViewModel\VectorProperty.cs" />
     <Compile Include="ViewModel\ViewportViewModel.cs" />
+    <Compile Include="View\Camera.cs" />
     <Compile Include="View\PropertiesWindow.xaml.cs">
       <DependentUpon>PropertiesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\RenderWindow.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="View\ViewportFrame.xaml.cs">
       <DependentUpon>ViewportFrame.xaml</DependentUpon>
@@ -246,9 +211,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DirectXTexSlim\DirectXTexSlim.vcxproj">
-      <Project>{695c8ab2-0e79-4bfe-9a7c-bc490f518533}</Project>
-      <Name>DirectXTexSlim</Name>
+    <ProjectReference Include="..\SRPCommon\SRPCommon.csproj">
+      <Project>{ae1f21f0-3ddd-4f3f-9633-72cee5848f14}</Project>
+      <Name>SRPCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SRPRendering\SRPRendering.csproj">
+      <Project>{f1456ac2-0d17-4950-a985-8966b24a4cb8}</Project>
+      <Name>SRPRendering</Name>
     </ProjectReference>
     <ProjectReference Include="..\SRPScripting\SRPScripting.csproj">
       <Project>{0ee5c742-04da-4d53-bb7c-2e21481e790d}</Project>
@@ -260,7 +229,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Shaders\BasicShaders.hlsl" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
