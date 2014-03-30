@@ -93,16 +93,16 @@ namespace SRPScripting
 		public RastState(FillMode fillMode = FillMode.Solid,
 						 CullMode cullMode = CullMode.Back,
 						 int depthBias = 0,
-						 float depthBiasClamp = 0.0f,
 						 float slopeScaleDepthBias = 0.0f,
+						 float depthBiasClamp = 0.0f,
 						 bool enableScissor = false,
 						 bool enableDepthClip = true)
 		{
 			this.fillMode = fillMode;
 			this.cullMode = cullMode;
 			this.depthBias = depthBias;
-			this.depthBiasClamp = depthBiasClamp;
 			this.slopeScaleDepthBias = slopeScaleDepthBias;
+			this.depthBiasClamp = depthBiasClamp;
 			this.enableScissor = enableScissor;
 			this.enableDepthClip = enableDepthClip;
 		}
@@ -114,8 +114,8 @@ namespace SRPScripting
 		public readonly FillMode fillMode;
 		public readonly CullMode cullMode;
 		public readonly int depthBias;
-		public readonly float depthBiasClamp;
 		public readonly float slopeScaleDepthBias;
+		public readonly float depthBiasClamp;
 		public readonly bool enableScissor;
 		public readonly bool enableDepthClip;
 	}

@@ -95,10 +95,6 @@ public class RenderWindow : Control
 		using (var factory = swapChain.GetParent<Factory>())
 			factory.SetWindowAssociation(Handle, WindowAssociationFlags.IgnoreAltEnter);
 
-		// Initialise basic resources.
-		GlobalResources.Instance.Init(device);
-		resources.Add(GlobalResources.Instance);
-
 		this.SizeChanged += OnResize;
 	}
 
@@ -161,7 +157,7 @@ public class RenderWindow : Control
 			);
 
 		if (scriptControl != null)
-			scriptControl.Render(context, renderTarget, viewInfo);
+			scriptControl.Render(context, viewInfo);
 
 		swapChain.Present(0, PresentFlags.None);
 	}

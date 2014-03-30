@@ -35,9 +35,15 @@ namespace SRPRendering
 			basicShaders = new BasicShaders(device);
 			disposables.Add(basicShaders);
 
+			// Initialise basic resources.
+			GlobalResources.Instance.Init(device);
+			disposables.Add(GlobalResources.Instance);
+
 			// Reset before script execution.
 			disposables.Add(scripting.PreExecute.Subscribe(_ => Reset()));
 			disposables.Add(scripting.ExecutionComplete.Subscribe(ExecutionComplete));
+
+			overlayRenderer = new OverlayRenderer(basicShaders);
 		}
 
 		private void Reset()
@@ -320,7 +326,7 @@ namespace SRPRendering
 			device = null;
 		}
 
-		public void Render(DeviceContext context, RenderTargetView renderTarget, ViewInfo viewInfo)
+		public void Render(DeviceContext deviceContext, ViewInfo viewInfo)
 		{
 			// Bail if there was a problem with the scripts.
 			if (bScriptError)
@@ -335,22 +341,23 @@ namespace SRPRendering
 			try
 			{
 				// Always clear the back buffer to black to avoid the script having to do so for trivial stuff.
-				context.ClearRenderTargetView(renderTarget, new Color4(0));
-
-				var renderContext = new ScriptRenderContext(
-					context,
-					viewInfo,
-					scene,
-					shaders,
-					(from desc in renderTargets select desc.renderTarget).ToArray(),
-					inputLayoutCache,
-					sphereMesh,
-					fullscreenQuad,
-					basicShaders);
+				deviceContext.ClearRenderTargetView(viewInfo.BackBuffer, new Color4(0));
 
 				// Let the script do its thing.
 				if (frameCallback != null)
+				{
+					var renderContext = new ScriptRenderContext(
+						deviceContext,
+						viewInfo,
+						scene,
+						shaders,
+						(from desc in renderTargets select desc.renderTarget).ToArray(),
+						sphereMesh,
+						fullscreenQuad,
+						basicShaders);
+
 					frameCallback(renderContext);
+				}
 			}
 			catch (Exception ex)
 			{
@@ -359,6 +366,13 @@ namespace SRPRendering
 				// Remember that the script fails so we don't just fail over and over.
 				bScriptRenderError = true;
 			}
+
+			// Make sure we're rendering to the back buffer before rendering the overlay.
+			deviceContext.OutputMerger.SetTargets(viewInfo.DepthBuffer.DSV, viewInfo.BackBuffer);
+			deviceContext.Rasterizer.SetViewports(new Viewport(0.0f, 0.0f, viewInfo.ViewportWidth, viewInfo.ViewportHeight));
+
+			// Render the overlay.
+			overlayRenderer.Draw(deviceContext, scene, viewInfo);
 
 			IgnoreRedrawRequests = false;
 		}
@@ -429,6 +443,9 @@ namespace SRPRendering
 
 		// Basic shader types.
 		private BasicShaders basicShaders;
+
+		// Object that handles rendering the viewport overlay.
+		private OverlayRenderer overlayRenderer;
 
 		// Renderer representation of the scene we're currently rendering
 		private RenderScene scene;

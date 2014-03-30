@@ -9,7 +9,7 @@ using SRPCommon.Util;
 namespace SRPRendering
 {
 	// Holder for various global D3D resources.
-	public class GlobalResources : IDisposable
+	internal class GlobalResources : IDisposable
 	{
 		// The resources themselves.
 		public Texture ErrorTexture { get; private set; }
@@ -19,6 +19,7 @@ namespace SRPRendering
 		internal StateObjectCache<DepthStencilState, DepthStencilStateDescription> DepthStencilStateCache { get; private set; }
 		internal StateObjectCache<BlendState, BlendStateDescription> BlendStateCache { get; private set; }
 		internal StateObjectCache<SamplerState, SamplerDescription> SamplerStateCache { get; private set; }
+		internal InputLayoutCache InputLayoutCache { get; private set; }
 
 		// Singleton instance.
 		private static Lazy<GlobalResources> instance = new Lazy<GlobalResources>(() => new GlobalResources());
@@ -40,6 +41,7 @@ namespace SRPRendering
 			DepthStencilStateCache = new StateObjectCache<DepthStencilState, DepthStencilStateDescription>(device, DepthStencilState.FromDescription);
 			BlendStateCache = new StateObjectCache<BlendState, BlendStateDescription>(device, BlendState.FromDescription);
 			SamplerStateCache = new StateObjectCache<SamplerState, SamplerDescription>(device, SamplerState.FromDescription);
+			InputLayoutCache = new InputLayoutCache();
 		}
 
 		// Release all resources.
@@ -52,6 +54,7 @@ namespace SRPRendering
 			DepthStencilStateCache.Dispose();
 			BlendStateCache.Dispose();
 			SamplerStateCache.Dispose();
+			InputLayoutCache.Dispose();
 		}
 
 		// Create a texture with a solid colour.

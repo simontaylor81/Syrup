@@ -20,7 +20,6 @@ namespace SRPRendering
 								   RenderScene scene,
 								   IList<Shader> shaders,
 								   IList<RenderTarget> renderTargets,
-								   InputLayoutCache inputLayoutCache,
 								   Mesh sphereMesh,
 								   FullscreenQuad fullscreenQuad,
 								   BasicShaders basicShaders)
@@ -30,7 +29,6 @@ namespace SRPRendering
 			this.scene = scene;
 			this.shaders = shaders;
 			this.renderTargetResources = renderTargets;
-			this.inputLayoutCache = inputLayoutCache;
 			this.sphereMesh = sphereMesh;
 			this.fullscreenQuad = fullscreenQuad;
 			this.basicShaders = basicShaders;
@@ -60,7 +58,8 @@ namespace SRPRendering
 				throw new ScriptException("DrawScene: No scene set.");
 
 			// Set input layout
-			deviceContext.InputAssembler.InputLayout = inputLayoutCache.GetInputLayout(deviceContext.Device, vertexShader.Signature, SceneVertex.InputElements);
+			deviceContext.InputAssembler.InputLayout = GlobalResources.Instance.InputLayoutCache.GetInputLayout(
+				deviceContext.Device, vertexShader.Signature, SceneVertex.InputElements);
 
 			// Set render state.
 			SetRenderTargets(renderTargetHandles, depthBuffer);
@@ -98,7 +97,8 @@ namespace SRPRendering
 				throw new ScriptException("DrawSphere: Cannot draw without a vertex shader.");
 
 			// Set input layout
-			deviceContext.InputAssembler.InputLayout = inputLayoutCache.GetInputLayout(deviceContext.Device, vertexShader.Signature, sphereMesh.InputElements);
+			deviceContext.InputAssembler.InputLayout = GlobalResources.Instance.InputLayoutCache.GetInputLayout(
+				deviceContext.Device, vertexShader.Signature, sphereMesh.InputElements);
 
 			// Set render state.
 			SetRenderTargets(renderTargetHandles, depthBuffer);
@@ -129,7 +129,8 @@ namespace SRPRendering
 				throw new ScriptException("DrawFullscreenQuad: Cannot draw without a vertex shader.");
 
 			// Set input layout
-			deviceContext.InputAssembler.InputLayout = inputLayoutCache.GetInputLayout(deviceContext.Device, vertexShader.Signature, FullscreenQuad.InputElements);
+			deviceContext.InputAssembler.InputLayout = GlobalResources.Instance.InputLayoutCache.GetInputLayout(
+				deviceContext.Device, vertexShader.Signature, FullscreenQuad.InputElements);
 
 			// Set render state.
 			SetRenderTargets(renderTargetHandles, DepthBufferHandle.NoDepthBuffer);
@@ -199,7 +200,8 @@ namespace SRPRendering
 				UpdateShaders(basicShaders.BasicSceneVS, basicShaders.SolidColourPS, new SimplePrimitiveProxy(transform), null);
 
 				// Set input layout
-				deviceContext.InputAssembler.InputLayout = inputLayoutCache.GetInputLayout(deviceContext.Device, basicShaders.BasicSceneVS.Signature, sphereMesh.InputElements);
+				deviceContext.InputAssembler.InputLayout = GlobalResources.Instance.InputLayoutCache.GetInputLayout(
+					deviceContext.Device, basicShaders.BasicSceneVS.Signature, sphereMesh.InputElements);
 
 				// Draw the sphere.
 				sphereMesh.Draw(deviceContext);
@@ -332,7 +334,6 @@ namespace SRPRendering
 		private RenderScene scene;
 		private IList<Shader> shaders;
 		private IList<RenderTarget> renderTargetResources;
-		private InputLayoutCache inputLayoutCache;
 		private ViewInfo viewInfo;
 		private Mesh sphereMesh;
 		private FullscreenQuad fullscreenQuad;
