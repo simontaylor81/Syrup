@@ -41,17 +41,17 @@ namespace ShaderEditorApp.View
 		public override DataTemplate SelectTemplate(object item, DependencyObject container)
 		{
 			// Anything that just wants a single text box can use the scalar template.
-			if (item is ScalarPropertyBase<float> || item is ScalarPropertyBase<string>)
+			if (item is ScalarPropertyViewModel<float> || item is ScalarPropertyViewModel<string>)
 				return ScalarTemplate;
-			else if (item is ScalarPropertyBase<bool>)
+			else if (item is ScalarPropertyViewModel<bool>)
 				return BoolTemplate;
-			else if (item is VectorPropertyBase<float>)
-				return GetVectorPropertyTemplate((VectorPropertyBase<float>)item);
+			else if (item is VectorPropertyViewModel<float>)
+				return GetVectorPropertyTemplate((VectorPropertyViewModel<float>)item);
 
 			return base.SelectTemplate(item, container);
 		}
 
-		private DataTemplate GetVectorPropertyTemplate(VectorPropertyBase<float> property)
+		private DataTemplate GetVectorPropertyTemplate(VectorPropertyViewModel<float> property)
 		{
 			// Check the cache first.
 			DataTemplate result;

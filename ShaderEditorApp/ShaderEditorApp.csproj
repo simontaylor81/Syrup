@@ -134,8 +134,9 @@
     <Compile Include="MVVMUtil\ViewModelBase.cs" />
     <Compile Include="Selectors.cs" />
     <Compile Include="ViewModel\PropertyViewModel.cs" />
-    <Compile Include="ViewModel\ScalarProperty.cs" />
-    <Compile Include="ViewModel\VectorProperty.cs" />
+    <Compile Include="ViewModel\PropertyViewModelFactory.cs" />
+    <Compile Include="ViewModel\ScalarPropertyViewModel.cs" />
+    <Compile Include="ViewModel\VectorPropertyViewModel.cs" />
     <Compile Include="ViewModel\ViewportViewModel.cs" />
     <Compile Include="View\Camera.cs" />
     <Compile Include="View\PropertiesWindow.xaml.cs">

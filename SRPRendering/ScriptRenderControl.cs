@@ -389,8 +389,8 @@ namespace SRPRendering
 		public bool IgnoreRedrawRequests { get; private set; }
 
 		private ObservableCollection<IUserProperty> properties = new ObservableCollection<IUserProperty>();
-		public IEnumerable<IUserProperty> Properties { get { return properties; } }
-
+		public ObservableCollection<IUserProperty> Properties { get { return properties; } }
+		IEnumerable<IUserProperty> IPropertySource.Properties { get { return properties; } }
 
 		private Device device;
 

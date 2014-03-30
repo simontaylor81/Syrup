@@ -64,7 +64,8 @@ namespace ShaderEditorApp.Workspace
 				}
 			}
 
-			RecreatePropertiesList();
+			// Recreate property list when the script's properties change.
+			scriptRenderControl.Properties.CollectionChanged += (o, e) => RecreatePropertiesList();
 		}
 
 		public void Tick()
@@ -357,7 +358,9 @@ namespace ShaderEditorApp.Workspace
 					projectViewModel.PropertyChanged += (o, e) =>
 						{
 							if (e.PropertyName == "Properties")
-								OnPropertyChanged("Properties");
+							{
+								RecreatePropertiesList();
+							}
 						};
 				}
 			}
@@ -374,7 +377,6 @@ namespace ShaderEditorApp.Workspace
 				{
 					focusPropertySource = value;
 					RecreatePropertiesList();
-					OnPropertyChanged("Properties");
 				}
 			}
 		}
@@ -388,7 +390,12 @@ namespace ShaderEditorApp.Workspace
 			var source = FocusPropertySource != null ? FocusPropertySource.Properties : scriptRenderControl.Properties;
 
 			// Create viewmodels for each property.
-			//Properties = source.Select(prop => new Prop
+			Properties = source
+				.EmptyIfNull()
+				.Select(prop => PropertyViewModelFactory.CreateViewModel(prop))
+				.ToArray();
+
+			OnPropertyChanged("Properties");
 		}
 
 		// Viewport view model that contains settings for the viewport (e.g. camera mode).

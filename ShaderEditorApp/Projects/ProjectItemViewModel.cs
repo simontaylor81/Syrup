@@ -40,6 +40,8 @@ namespace ShaderEditorApp.Projects
 			}
 
 			Commands = commands;
+
+			CreateUserProperties();
 		}
 
 		protected override void OnDispose()

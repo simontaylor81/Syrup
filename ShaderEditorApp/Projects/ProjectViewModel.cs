@@ -66,8 +66,6 @@ namespace ShaderEditorApp.Projects
 
 					// Properties are dependent on the active item.
 					OnPropertyChanged("Properties");
-
-					//OutputLogger.Instance.LogLine(LogCategory.Log, "ActiveItem = " + activeItem.DisplayName);
 				}
 			}
 		}

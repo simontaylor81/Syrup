@@ -6,6 +6,7 @@ using System.Text;
 using ShaderEditorApp.MVVMUtil;
 using System.Diagnostics;
 using SlimDX;
+using SRPCommon.UserProperties;
 
 namespace ShaderEditorApp.ViewModel
 {
@@ -13,11 +14,12 @@ namespace ShaderEditorApp.ViewModel
 	// Properties have a type, a name and a value.
 	public abstract class PropertyViewModel : ViewModelBase
 	{
-		public PropertyViewModel(string name)
+		public PropertyViewModel(IUserProperty property)
 		{
-			DisplayName = name;
+			DisplayName = property.Name;
+			IsReadOnly = property.IsReadOnly;
 		}
 
-		public bool IsReadOnly { get; set; }
+		public bool IsReadOnly { get; private set; }
 	}
 }
