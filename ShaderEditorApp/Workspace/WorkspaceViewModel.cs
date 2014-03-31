@@ -129,11 +129,15 @@ namespace ShaderEditorApp.Workspace
 				if (bReload)
 					document.LoadContents();
 			}
-			else
+			else if (File.Exists(path))
 			{
 				// Create a new document.
 				document = new DocumentViewModel(this, path);
 				documents.Add(document);
+			}
+			else
+			{
+				OutputLogger.Instance.LogLine(LogCategory.Log, "File not found: " + path);
 			}
 
 			// Make active document.
