@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:srpprojects="clr-namespace:ShaderEditorApp.Projects"
+             xmlns:srpvm="clr-namespace:ShaderEditorApp.ViewModel"
              xmlns:mvvm="clr-namespace:ShaderEditorApp.MVVMUtil"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="200">
@@ -28,11 +28,8 @@
             </Setter>
         </Style>
         
-        <!-- Data templates for the items in the tree. -->
-        <HierarchicalDataTemplate DataType="{x:Type srpprojects:ProjectFolderViewModel}" ItemsSource="{Binding Children}">
-            <TextBlock Text="{Binding DisplayName}"/>
-        </HierarchicalDataTemplate>
-        <HierarchicalDataTemplate DataType="{x:Type srpprojects:ProjectItemViewModel}">
+        <!-- Data template for the items in the tree. -->
+        <HierarchicalDataTemplate x:Key="NodeTemplate" ItemsSource="{Binding Children}">
             <TextBlock Text="{Binding DisplayName}"
                        FontWeight="{Binding IsDefault, Converter={StaticResource BoolToBoldConverter}}"/>
         </HierarchicalDataTemplate>
@@ -42,6 +39,7 @@
     <Grid>
         <TreeView x:Name="projectTree" Focusable="True" TreeViewItem.MouseDoubleClick="OnItemDoubleClick"
                   ItemsSource="{Binding RootNodes}"
+                  ItemTemplate="{StaticResource NodeTemplate}"
                   ItemContainerStyle="{StaticResource NodeStyle}"
                   SelectedItemChanged="projectTree_SelectedItemChanged"/>
     </Grid>

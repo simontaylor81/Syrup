@@ -11,10 +11,12 @@ using ShaderEditorApp.MVVMUtil;
 using ShaderEditorApp.Workspace;
 using ShaderEditorApp.ViewModel;
 using SRPCommon.UserProperties;
+using System.Windows.Input;
+using ShaderEditorApp.Projects;
 
-namespace ShaderEditorApp.Projects
+namespace ShaderEditorApp.ViewModel.Projects
 {
-	public class ProjectFolderViewModel : ProjectViewModelBase
+	public class ProjectFolderViewModel : ViewModelBase, IHierarchicalBrowserNodeViewModel
 	{
 		public ProjectFolderViewModel(ProjectFolder folder, Project project, WorkspaceViewModel workspace)
 		{
@@ -35,14 +37,16 @@ namespace ShaderEditorApp.Projects
 			// User-facing properties.
 			var nameProp = new MutableScalarProperty<string>("Folder Name", folder.Name);
 			nameProp.Subscribe(_ => DisplayName = nameProp.Value);
+
+			UserProperties = new[] { nameProp };
 		}
 
 		private void RegenerateChildren()
 		{
-			IEnumerable<ProjectViewModelBase> subfolders = from subfolder in folder.SubFolders select new ProjectFolderViewModel(subfolder, Project, Workspace);
-			IEnumerable<ProjectViewModelBase> items = from item in folder.Items select new ProjectItemViewModel(item, Project, Workspace);
-			Children = new ReadOnlyObservableCollection<ProjectViewModelBase>(
-				new ObservableCollection<ProjectViewModelBase>(subfolders.Concat(items)));
+			IEnumerable<IHierarchicalBrowserNodeViewModel> subfolders = from subfolder in folder.SubFolders select new ProjectFolderViewModel(subfolder, Project, Workspace);
+			IEnumerable<IHierarchicalBrowserNodeViewModel> items = from item in folder.Items select new ProjectItemViewModel(item, Project, Workspace);
+			ProjectChildren = new ReadOnlyObservableCollection<IHierarchicalBrowserNodeViewModel>(
+				new ObservableCollection<IHierarchicalBrowserNodeViewModel>(subfolders.Concat(items)));
 		}
 
 		// Get the name of the folder.
@@ -116,6 +120,36 @@ namespace ShaderEditorApp.Projects
 			}
 		}
 
+		#region IHierarchicalBrowserNodeViewModel interface
+
+		/// <summary>
+		/// Commnads that can be executed on this node (used for drop-down menu).
+		/// </summary>
+		public IEnumerable<ICommand> Commands { get; protected set; }
+
+		/// <summary>
+		/// Set of properties that this node exposes.
+		/// </summary>
+		public IEnumerable<IUserProperty> UserProperties { get; protected set; }
+
+		// We don't have a default command.
+		public ICommand DefaultCmd { get { return null; } }
+
+		/// <summary>
+		/// List of child nodes.
+		/// </summary>
+		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children
+		{
+			get { return ProjectChildren; }
+		}
+
+		// We don't have a default folder.
+		public bool IsDefault { get { return false; } }
+
+		#endregion
+
+		#region Commands
+
 		// Command to open the project item into the workspace.
 		private NamedCommand addExistingCmd;
 		public NamedCommand AddExistingCmd
@@ -149,12 +183,14 @@ namespace ShaderEditorApp.Projects
 			}
 		}
 
+		#endregion
+
 		protected Project Project { get; private set; }
 		protected WorkspaceViewModel Workspace { get; private set; }
 		private ProjectFolder folder;
 
-		private ReadOnlyObservableCollection<ProjectViewModelBase> children_;
-		public ReadOnlyObservableCollection<ProjectViewModelBase> Children
+		private ReadOnlyObservableCollection<IHierarchicalBrowserNodeViewModel> children_;
+		public ReadOnlyObservableCollection<IHierarchicalBrowserNodeViewModel> ProjectChildren
 		{
 			get { return children_; }
 			private set

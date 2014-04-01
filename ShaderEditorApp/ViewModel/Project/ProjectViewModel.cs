@@ -5,11 +5,12 @@ using ShaderEditorApp.Workspace;
 using ShaderEditorApp.MVVMUtil;
 using ShaderEditorApp.ViewModel;
 using SRPCommon.UserProperties;
+using ShaderEditorApp.Projects;
 
-namespace ShaderEditorApp.Projects
+namespace ShaderEditorApp.ViewModel.Projects
 {
 	// View-model class for the project itself. Derives from the folder type, which is used to display the root node.
-	public class ProjectViewModel : ProjectFolderViewModel, IPropertySource
+	public class ProjectViewModel : ProjectFolderViewModel, IPropertySource, IHierarchicalBrowserRootViewModel
 	{
 		public ProjectViewModel(Project project, WorkspaceViewModel workspace)
 			: base(project.RootFolder, project, workspace)
@@ -20,7 +21,7 @@ namespace ShaderEditorApp.Projects
 			Project.DirtyChanged += OnDirtyChanged;
 
 			// We don't have any properties of our own.
-			ItemProperties = null;
+			UserProperties = null;
 		}
 
 		protected override void OnDispose()
@@ -46,15 +47,15 @@ namespace ShaderEditorApp.Projects
 			get
 			{
 				if (ActiveItem != null)
-					return ActiveItem.ItemProperties;
+					return ActiveItem.UserProperties;
 				else
-					return ItemProperties;
+					return UserProperties;
 			}
 		}
 
 		// Currently selected node in the project.
-		private ProjectViewModelBase activeItem;
-		public ProjectViewModelBase ActiveItem
+		private IHierarchicalBrowserNodeViewModel activeItem;
+		public IHierarchicalBrowserNodeViewModel ActiveItem
 		{
 			get { return activeItem; }
 			set

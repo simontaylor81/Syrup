@@ -16,6 +16,7 @@ using SRPCommon.Scripting;
 using SRPCommon.UserProperties;
 using SRPCommon.Util;
 using SRPRendering;
+using ShaderEditorApp.ViewModel.Projects;
 
 namespace ShaderEditorApp.Workspace
 {

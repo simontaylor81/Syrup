@@ -20,7 +20,7 @@ namespace SRPCommon.UserProperties
 
 		// IUserProperty interface
 		public string Name { get; private set; }
-		public bool IsReadOnly { get { return true; } }
+		public bool IsReadOnly { get { return false; } }
 
 		// IScalarProperty interface
 		public T Value

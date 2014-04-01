@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ShaderEditorApp.ViewModel;
 
 namespace ShaderEditorApp.Projects
 {
@@ -28,10 +29,10 @@ namespace ShaderEditorApp.Projects
 
 		private void OnItemDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			var projectItem = projectTree.SelectedItem as ProjectItemViewModel;
-			if (projectItem != null && projectItem.DefaultCmd.CanExecute(null))
+			var node = (IHierarchicalBrowserNodeViewModel)projectTree.SelectedItem;
+			if (node.DefaultCmd != null && node.DefaultCmd.CanExecute(null))
 			{
-				projectItem.DefaultCmd.Execute(null);
+				node.DefaultCmd.Execute(null);
 			}
 		}
 
@@ -39,8 +40,8 @@ namespace ShaderEditorApp.Projects
 		{
 			// Update the view-model's active item when the selection changes.
 			// Can't use a binding for this, annoyingly, as SelectedItem is read-only.
-			var viewModel = (ProjectViewModel)DataContext;
-			viewModel.ActiveItem = (ProjectViewModelBase)projectTree.SelectedItem;
+			var viewModel = (IHierarchicalBrowserRootViewModel)DataContext;
+			viewModel.ActiveItem = (IHierarchicalBrowserNodeViewModel)projectTree.SelectedItem;
 		}
 	}
 }

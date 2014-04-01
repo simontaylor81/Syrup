@@ -7,10 +7,11 @@ using ShaderEditorApp.ViewModel;
 using ShaderEditorApp.Workspace;
 using SRPCommon.UserProperties;
 
-namespace ShaderEditorApp.Projects
+namespace ShaderEditorApp.ViewModel.Scene
 {
-	public class ProjectItemViewModel : ProjectViewModelBase
+	public class SceneItemViewModel //: ViewModelBase, IHierarchicalBrowserNodeViewModel
 	{
+		/*
 		public ProjectItemViewModel(ProjectItem item, Project project, WorkspaceViewModel workspace)
 		{
 			this.item = item;
@@ -160,5 +161,6 @@ namespace ShaderEditorApp.Projects
 		private ProjectItem item;
 		private Project project;
 		private WorkspaceViewModel workspace;
+		*/
 	}
 }

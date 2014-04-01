@@ -125,20 +125,23 @@
       <DependentUpon>OutputWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Projects\ProjectFolder.cs" />
-    <Compile Include="Projects\ProjectFolderViewModel.cs" />
+    <Compile Include="ViewModel\IHierarchicalBrowserRootViewModel.cs" />
+    <Compile Include="ViewModel\Project\ProjectFolderViewModel.cs" />
     <Compile Include="Projects\ProjectItem.cs" />
-    <Compile Include="Projects\ProjectItemViewModel.cs" />
-    <Compile Include="Projects\ProjectViewModelBase.cs" />
+    <Compile Include="ViewModel\Project\ProjectItemViewModel.cs" />
     <Compile Include="Projects\Project.cs" />
     <Compile Include="Projects\ProjectBrowser.xaml.cs">
       <DependentUpon>ProjectBrowser.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Projects\ProjectViewModel.cs" />
+    <Compile Include="ViewModel\Project\ProjectViewModel.cs" />
     <Compile Include="MVVMUtil\ViewModelBase.cs" />
     <Compile Include="Selectors.cs" />
+    <Compile Include="ViewModel\IHierarchicalBrowserNodeViewModel.cs" />
     <Compile Include="ViewModel\PropertyViewModel.cs" />
     <Compile Include="ViewModel\PropertyViewModelFactory.cs" />
     <Compile Include="ViewModel\ScalarPropertyViewModel.cs" />
+    <Compile Include="ViewModel\Scene\SceneItemViewModel.cs" />
+    <Compile Include="ViewModel\Scene\SceneViewModel.cs" />
     <Compile Include="ViewModel\VectorPropertyViewModel.cs" />
     <Compile Include="ViewModel\ViewportViewModel.cs" />
     <Compile Include="View\Camera.cs" />

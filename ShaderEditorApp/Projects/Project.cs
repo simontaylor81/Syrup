@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using System.IO;
+using System.Reactive.Subjects;
 
 namespace ShaderEditorApp.Projects
 {
@@ -168,14 +169,14 @@ namespace ShaderEditorApp.Projects
 				if (value != _defaultScene)
 				{
 					_defaultScene = value;
-					if (null != DefaultSceneChanged)
-						DefaultSceneChanged();
+					_defaultSceneChanged.OnNext(value);
 				}
 			}
 		}
 
 		// event fired when the default scene changes.
-		public event Action DefaultSceneChanged;
+		public IObservable<ProjectItem> DefaultSceneChanged { get { return _defaultSceneChanged; } }
+		private Subject<ProjectItem> _defaultSceneChanged = new Subject<ProjectItem>();
 
 		private ProjectItem _defaultScene;
 
