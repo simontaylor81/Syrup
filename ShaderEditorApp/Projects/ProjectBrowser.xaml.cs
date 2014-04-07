@@ -30,7 +30,7 @@ namespace ShaderEditorApp.Projects
 		private void OnItemDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			var node = (IHierarchicalBrowserNodeViewModel)projectTree.SelectedItem;
-			if (node.DefaultCmd != null && node.DefaultCmd.CanExecute(null))
+			if (node != null && node.DefaultCmd != null && node.DefaultCmd.CanExecute(null))
 			{
 				node.DefaultCmd.Execute(null);
 			}

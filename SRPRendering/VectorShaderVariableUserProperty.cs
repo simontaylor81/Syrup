@@ -42,7 +42,7 @@ namespace SRPRendering
 			}
 		}
 
-		public IDisposable Subscribe(IObserver<System.Reactive.Unit> observer)
+		public IDisposable Subscribe(IObserver<Unit> observer)
 		{
 			// We change when the underlying variable changes.
 			return _variable.Subscribe(observer);

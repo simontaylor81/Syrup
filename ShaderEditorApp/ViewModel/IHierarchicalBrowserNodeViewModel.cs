@@ -12,6 +12,11 @@ namespace ShaderEditorApp.ViewModel
 	public interface IHierarchicalBrowserNodeViewModel
 	{
 		/// <summary>
+		/// Name of the node to show to the user.
+		/// </summary>
+		string DisplayName { get; }
+
+		/// <summary>
 		/// Commnads that can be executed on this node (used for drop-down menu).
 		/// </summary>
 		IEnumerable<ICommand> Commands { get; }

@@ -5,105 +5,48 @@ using ShaderEditorApp.Workspace;
 using ShaderEditorApp.MVVMUtil;
 using ShaderEditorApp.ViewModel;
 using SRPCommon.UserProperties;
+using ReactiveUI;
+using System.Windows.Input;
+using SRPCommon.Scene;
+using System.Reactive.Linq;
 
 namespace ShaderEditorApp.ViewModel.Scene
 {
-	public class SceneViewModel //: ViewModelBase, IPropertySource
+	public class SceneViewModel : ReactiveObject, IPropertySource, IHierarchicalBrowserRootViewModel
 	{
-/*
-		public ProjectViewModel(Project project, WorkspaceViewModel workspace)
-			: base(project.RootFolder, project, workspace)
-		{
-			// Can't remove the project itself, but you can save it.
-			Commands = new [] { SaveCmd, AddExistingCmd, AddNewCmd };
+		#region IPropertySource interface
 
-			Project.DirtyChanged += OnDirtyChanged;
-
-			// We don't have any properties of our own.
-			ItemProperties = null;
-		}
-
-		protected override void OnDispose()
-		{
-			Project.DirtyChanged -= OnDirtyChanged;
-			base.OnDispose();
-		}
-
-		public override string DisplayName
-		{
-			get
-			{
-				var result = Project.Name;
-				if (Project.IsDirty)
-					result += "*";
-				return result;
-			}
-		}
-
-		// Properties to display for the currently selected property item.
+		private ObservableAsPropertyHelper<IEnumerable<IUserProperty>> _properties;
 		public IEnumerable<IUserProperty> Properties
 		{
-			get
-			{
-				if (ActiveItem != null)
-					return ActiveItem.ItemProperties;
-				else
-					return ItemProperties;
-			}
+			get { return _properties.Value; }
 		}
 
-		// Currently selected node in the project.
-		private IHierarchicalBrowserNodeViewModel activeItem;
+		#endregion
+
+		#region IHierarchicalBrowserRootViewModel interface
+
+		private IHierarchicalBrowserNodeViewModel[] _rootNodes;
+		public IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes { get { return _rootNodes; } }
+
+		private IHierarchicalBrowserNodeViewModel _activeItem;
 		public IHierarchicalBrowserNodeViewModel ActiveItem
 		{
-			get { return activeItem; }
-			set
-			{
-				if (value != activeItem)
-				{
-					activeItem = value;
-					OnPropertyChanged();
-
-					// Properties are dependent on the active item.
-					OnPropertyChanged("Properties");
-				}
-			}
+			get { return _activeItem; }
+			set { this.RaiseAndSetIfChanged(ref _activeItem, value); }
 		}
 
-		private void Save()
+		#endregion
+
+		public SceneViewModel(SRPCommon.Scene.Scene scene)
 		{
-			// Set list of open documents so they can be restored next time.
-			Project.SavedOpenDocuments = from doc in Workspace.Documents select doc.FilePath;
+			_rootNodes = new[] { new ScenePrimitivesViewModel(scene.Primitives) };
 
-			Project.Save();
+			var nodePropertiesObsv = this.WhenAny(x => x.ActiveItem, change => change.Value)
+				.Where(node => node != null)
+				.Select(node => node.UserProperties);
+
+			_properties = new ObservableAsPropertyHelper<IEnumerable<IUserProperty>>(nodePropertiesObsv, x => raisePropertyChanged("Properties"));
 		}
-
-		// Allow this object to be used as a single root node of the tree (since the tree control needs a list of items).
-		public IEnumerable<ProjectFolderViewModel> RootNodes { get { return new [] { this }; } }
-
-		// Called when the project's dirty state changes.
-		void OnDirtyChanged()
-		{
-			// Display name has an asterisk after it if the project is dirty.
-			OnPropertyChanged("DisplayName");
-		}
-
-		// Command to save the project.
-		private NamedCommand saveCmd;
-		public NamedCommand SaveCmd
-		{
-			get
-			{
-				if (saveCmd == null)
-				{
-					saveCmd = new NamedCommand("Save", new RelayCommand(
-						(param) => Save()
-						//(param) => Project.IsDirty
-						));
-				}
-				return saveCmd;
-			}
-		}
-*/
 	}
 }

@@ -80,7 +80,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 		}
 
 		// Allow this object to be used as a single root node of the tree (since the tree control needs a list of items).
-		public IEnumerable<ProjectFolderViewModel> RootNodes { get { return new [] { this }; } }
+		public IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes { get { return new [] { this }; } }
 
 		// Called when the project's dirty state changes.
 		void OnDirtyChanged()

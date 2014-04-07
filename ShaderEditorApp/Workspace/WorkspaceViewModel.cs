@@ -17,6 +17,7 @@ using SRPCommon.UserProperties;
 using SRPCommon.Util;
 using SRPRendering;
 using ShaderEditorApp.ViewModel.Projects;
+using ShaderEditorApp.ViewModel.Scene;
 
 namespace ShaderEditorApp.Workspace
 {
@@ -254,6 +255,8 @@ namespace ShaderEditorApp.Workspace
 			{
 				currentScene = newScene;
 				scriptRenderControl.Scene = currentScene;
+
+				SceneViewModel = new SceneViewModel(newScene);
 			}
 		}
 
@@ -309,14 +312,19 @@ namespace ShaderEditorApp.Workspace
 						ActiveDocument = (DocumentViewModel)value;
 
 					// Update property source window too.
-					// Don't use property windows as the properties source, otherwise you can't edit anything!
-					// TODO: Make this more generic?
+					// Don't change property source if when focusing on the properties window, otherwise you can't edit anything!
 					if (!(value is View.PropertiesWindow))
 					{
-						if (value is ProjectBrowser)
-							FocusPropertySource = ProjectViewModel;
+						// Use data context of focused window if it's a property source.
+						var frameworkElement = value as FrameworkElement;
+						if (frameworkElement != null)
+						{
+							FocusPropertySource = frameworkElement.DataContext as IPropertySource;
+						}
 						else
+						{
 							FocusPropertySource = null;
+						}
 					}
 				}
 			}
@@ -361,6 +369,31 @@ namespace ShaderEditorApp.Workspace
 
 					// When the project's exposed properties change, so might ours.
 					projectViewModel.PropertyChanged += (o, e) =>
+						{
+							if (e.PropertyName == "Properties")
+							{
+								RecreatePropertiesList();
+							}
+						};
+				}
+			}
+		}
+
+		private SceneViewModel _sceneViewModel;
+		public SceneViewModel SceneViewModel
+		{
+			get { return _sceneViewModel; }
+			set
+			{
+				if (value != _sceneViewModel)
+				{
+					_sceneViewModel = value;
+					OnPropertyChanged();
+					OnPropertyChanged("Properties");
+
+					// When the project's exposed properties change, so might ours.
+					// TODO: Rx-ify?
+					_sceneViewModel.PropertyChanged += (o, e) =>
 						{
 							if (e.PropertyName == "Properties")
 							{

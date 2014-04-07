@@ -12,6 +12,11 @@ namespace ShaderEditorApp.ViewModel
 	public interface IHierarchicalBrowserRootViewModel
 	{
 		/// <summary>
+		/// The root nodes of the tree.
+		/// </summary>
+		IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes { get; }
+
+		/// <summary>
 		/// The currently active node in the tree (i.e. the one the user has clicked on).
 		/// </summary>
 		IHierarchicalBrowserNodeViewModel ActiveItem { get; set; }

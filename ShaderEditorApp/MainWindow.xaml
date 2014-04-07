@@ -103,13 +103,22 @@
             <avalondock:LayoutRoot>
                 <avalondock:LayoutPanel Orientation="Horizontal">
                     <!-- Left-anchored elements -->
-                    <avalondock:LayoutAnchorablePane DockWidth="200">
-                        <!-- Project Browser panel -->
-                        <avalondock:LayoutAnchorable ContentId="ProjectBrowser" Title="Project">
-                            <srpprojects:ProjectBrowser x:Name="projectBrowser" DataContext="{Binding ProjectViewModel}"/>
-                        </avalondock:LayoutAnchorable>
-                    </avalondock:LayoutAnchorablePane>
-                    
+                    <avalondock:LayoutPanel Orientation="Vertical" DockWidth="200">
+                        <avalondock:LayoutAnchorablePane>
+                            <!-- Project Browser panel -->
+                            <avalondock:LayoutAnchorable ContentId="ProjectBrowser" Title="Project">
+                                <srpprojects:ProjectBrowser x:Name="projectBrowser" DataContext="{Binding ProjectViewModel}"/>
+                            </avalondock:LayoutAnchorable>
+                        </avalondock:LayoutAnchorablePane>
+                        
+                        <avalondock:LayoutAnchorablePane>
+                            <!-- Scene Browser panel -->
+                            <avalondock:LayoutAnchorable ContentId="ProjectBrowser" Title="Scene">
+                                <srpprojects:ProjectBrowser x:Name="sceneBrowser" DataContext="{Binding SceneViewModel}"/>
+                            </avalondock:LayoutAnchorable>
+                        </avalondock:LayoutAnchorablePane>
+                    </avalondock:LayoutPanel>
+
                     <avalondock:LayoutPanel Orientation="Vertical">
                         <avalondock:LayoutPanel Orientation="Horizontal">
                             
