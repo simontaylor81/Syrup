@@ -9,7 +9,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
 
     <UserControl.Resources>
-        
+
         <!-- Style for property value text boxes. -->
         <Style TargetType="TextBox">
             <Style.Triggers>
@@ -21,7 +21,7 @@
         </Style>
 
         <!-- Template for the different property types. -->
-        <DataTemplate x:Key="ScalarPropertyValueTemplate">
+        <DataTemplate x:Key="ScalarPropertyRowTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -32,8 +32,8 @@
                 <TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}"/>
             </Grid>
         </DataTemplate>
-        
-        <DataTemplate x:Key="BoolPropertyValueTemplate">
+
+        <DataTemplate x:Key="BoolPropertyRowTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -45,26 +45,53 @@
             </Grid>
         </DataTemplate>
 
-                
+
+        <!-- Template for the different property types. -->
+        <DataTemplate x:Key="ScalarPropertyValueTemplate">
+            <TextBox Text="{Binding Value, Mode=TwoWay}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="CompositePropertyValueTemplate">
+            <ItemsControl ItemsSource="{Binding SubProperties}"
+                          ItemTemplate="{StaticResource ScalarPropertyValueTemplate}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </DataTemplate>
+
         <local:PropertyValueTemplateSelector x:Key="PropertyValueTemplateSelector"
                                              ScalarTemplate="{StaticResource ScalarPropertyValueTemplate}"
-                                             BoolTemplate="{StaticResource BoolPropertyValueTemplate}"/>
+                                             BoolTemplate="{StaticResource BoolPropertyRowTemplate}"
+                                             CompositeTemplate="{StaticResource CompositePropertyValueTemplate}"/>
 
-        <!-- Data template for displaying properties. -->
-        <DataTemplate x:Key="PropertyNameTemplate" DataType="{x:Type viewmodel:PropertyViewModel}">
-            <TextBlock Text="{Binding Name}"/>
-        </DataTemplate>
+        <!-- Make items in GridView fill the entire column. -->
+        <Style TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
 
     </UserControl.Resources>
 
     <!--<Grid d:DataContext="{StaticResource DesignBinding}">-->
-    <Grid>
-        <!--<Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>-->
+    <Grid d:DataContext="{d:DesignData Source=../SampleData/PropertySampleData.xaml}">
+        <!--<Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         
-        <!--<ItemsControl ItemsSource="{Binding Properties}" Grid.Column="0" ItemTemplate="{StaticResource PropertyNameTemplate}"/>-->
-        <ItemsControl ItemsSource="{Binding Properties}" Grid.Column="0" ItemTemplateSelector="{StaticResource PropertyValueTemplateSelector}"/>
+        <ItemsControl ItemsSource="{Binding Properties}"
+                      ItemTemplateSelector="{StaticResource PropertyValueTemplateSelector}" Grid.RowSpan="2"
+                      />-->
+        
+        <ListView Grid.Row="1" ItemsSource="{Binding Properties}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Property" DisplayMemberBinding="{Binding DisplayName}"/>
+                    <GridViewColumn Header="Value" Width="200" CellTemplateSelector="{StaticResource PropertyValueTemplateSelector}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </UserControl>

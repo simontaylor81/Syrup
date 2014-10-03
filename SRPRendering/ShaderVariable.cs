@@ -81,6 +81,12 @@ namespace SRPRendering
 		public IShaderVariableBind Bind { get; set; }
 		public bool IsAutoBound { get; set; }
 
+		// For debugger prettiness.
+		public override string ToString()
+		{
+			return Name;
+		}
+
 		// Get the current value of the variable.
 		public T Get<T>() where T : struct
 		{

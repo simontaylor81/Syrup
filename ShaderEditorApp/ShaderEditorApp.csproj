@@ -137,6 +137,7 @@
       <DependentUpon>OutputWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Projects\ProjectFolder.cs" />
+    <Compile Include="SampleData\DummyViewModels.cs" />
     <Compile Include="ViewModel\IHierarchicalBrowserRootViewModel.cs" />
     <Compile Include="ViewModel\Project\ProjectFolderViewModel.cs" />
     <Compile Include="Projects\ProjectItem.cs" />
@@ -189,6 +190,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Projects\ProjectBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SampleData\PropertySampleData.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -253,6 +258,7 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>$(ProjectDir)PostBuild.bat $(TargetDir) $(ConfigurationName) $(PlatformName)</PostBuildEvent>

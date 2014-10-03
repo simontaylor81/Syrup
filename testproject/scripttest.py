@@ -16,6 +16,10 @@ tex = ri.CreateTexture2D(16, 16, Format.R8G8B8A8_UNorm, ramp)
 
 ri.SetShaderResourceVariable(psTex, "DiffuseTex", tex)
 
+
+dummyVar = ri.AddUserVar("FloatUserVar", UserVariableType.Float4, (0,1,2,45))
+
+
 def errorfunc():
 	x = 10
 	x.Method()
