@@ -89,6 +89,9 @@ ipch/
 *.sdf
 *.cachefile
 
+# Roslyn cache directories
+*.ide/
+
 # Visual Studio profiler
 *.psess
 *.vsp
