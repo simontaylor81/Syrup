@@ -11,14 +11,15 @@ using System.Reactive.Subjects;
 
 namespace SRPRendering
 {
-	class VectorShaderVariableUserProperty : IVectorProperty
+	class MatrixShaderVariableUserProperty : IMatrixProperty
 	{
-		public VectorShaderVariableUserProperty(IShaderVariable variable, IUserProperty[] components)
+		public MatrixShaderVariableUserProperty(IShaderVariable variable, IUserProperty[,] components)
 		{
-			Debug.Assert(variable.VariableType.Class == ShaderVariableClass.Vector ||
-						 variable.VariableType.Class == ShaderVariableClass.MatrixColumns);
+			// TODO: Row-major?
+			Debug.Assert(variable.VariableType.Class == ShaderVariableClass.MatrixColumns);
 
-			Debug.Assert(components.Length == variable.VariableType.Columns * variable.VariableType.Rows);
+			Debug.Assert(components.GetLength(0) == variable.VariableType.Columns);
+			Debug.Assert(components.GetLength(1) == variable.VariableType.Rows);
 
 			this._components = components;
 			this._variable = variable;
@@ -26,11 +27,12 @@ namespace SRPRendering
 
 		public string Name { get { return _variable.Name; } }
 		public bool IsReadOnly { get { return false; } }
-		public int NumComponents { get { return _components.Length; } }
+		public int NumColumns { get { return _components.GetLength(0); } }
+		public int NumRows { get { return _components.GetLength(1); } }
 
-		public IUserProperty GetComponent(int index)
+		public IUserProperty GetComponent(int row, int col)
 		{
-			return _components[index];
+			return _components[col, row];
 		}
 
 		public IDisposable Subscribe(IObserver<Unit> observer)
@@ -39,7 +41,7 @@ namespace SRPRendering
 			return _variable.Subscribe(observer);
 		}
 
-		private IUserProperty[] _components;
+		private IUserProperty[,] _components;
 		private IShaderVariable _variable;
 	}
 }

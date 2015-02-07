@@ -13,13 +13,11 @@ namespace ShaderEditorApp.ViewModel
 		public VectorPropertyViewModel(IVectorProperty property)
 			: base(property)
 		{
-			_property = property;
 			SubProperties = Enumerable.Range(0, property.NumComponents)
 				.Select(i => PropertyViewModelFactory.CreateViewModel(property.GetComponent(i)))
 				.ToArray();
 		}
 
 		public PropertyViewModel[] SubProperties { get; private set; }
-		private IVectorProperty _property;
 	}
 }

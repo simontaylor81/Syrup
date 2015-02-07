@@ -28,9 +28,18 @@ namespace ShaderEditorApp.SampleData
 		public bool Value { get; set; }
 		//public bool IsComposite { get { return false; } }	// TEMP?
 	}
-	public class DummyCompositeProperty : DummyPropertyBase
+	public class DummyVectorProperty : DummyPropertyBase
 	{
 		public List<DummyPropertyBase> SubProperties { get; set; }
+		//public bool IsComposite { get { return true; } }	// TEMP?
+	}
+
+	public class DummyPropertyList : List<DummyPropertyBase>
+	{ }
+
+	public class DummyMatrixProperty : DummyPropertyBase
+	{
+		public List<DummyPropertyList> Rows { get; set; }
 		//public bool IsComposite { get { return true; } }	// TEMP?
 	}
 }

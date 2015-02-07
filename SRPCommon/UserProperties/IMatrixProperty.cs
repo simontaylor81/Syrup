@@ -8,9 +8,9 @@ namespace SRPCommon.UserProperties
 {
 	public interface IMatrixProperty : IUserProperty
 	{
-		IUserProperty GetComponent(int x, int y);
+		IUserProperty GetComponent(int row, int col);
 
-		int NumComponentsX { get; }
-		int NumComponentsY { get; }
+		int NumColumns { get; }
+		int NumRows { get; }
 	}
 }

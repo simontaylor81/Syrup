@@ -18,6 +18,7 @@ using ShaderEditorApp.ViewModel;
 using System.Globalization;
 using System.IO;
 using System.Windows.Markup;
+using ShaderEditorApp.SampleData;
 
 namespace ShaderEditorApp.View
 {
@@ -37,31 +38,22 @@ namespace ShaderEditorApp.View
 		// Templates to use for the various types.
 		public DataTemplate ScalarTemplate { get; set; }
 		public DataTemplate BoolTemplate { get; set; }
-		public DataTemplate CompositeTemplate { get; set; }
+		public DataTemplate VectorTemplate { get; set; }
+		public DataTemplate MatrixTemplate { get; set; }
 
 		public override DataTemplate SelectTemplate(object item, DependencyObject container)
 		{
 			// TODO: Can this be handled more generically?
-			if (item is ShaderEditorApp.SampleData.DummyPropertyFloat)
-			{
-				return ScalarTemplate;
-			}
-			else if (item is ShaderEditorApp.SampleData.DummyPropertyBool)
-			{
-				return BoolTemplate;
-			}
-			else if (item is ShaderEditorApp.SampleData.DummyCompositeProperty)
-			{
-				return CompositeTemplate;
-			}
 
 			// Anything that just wants a single text box can use the scalar template.
-			if (item is ScalarPropertyViewModel<float> || item is ScalarPropertyViewModel<string>)
+			if (item is ScalarPropertyViewModel<float> || item is ScalarPropertyViewModel<string> || item is DummyPropertyFloat)
 				return ScalarTemplate;
-			else if (item is ScalarPropertyViewModel<bool>)
+			else if (item is ScalarPropertyViewModel<bool> || item is DummyPropertyBool)
 				return BoolTemplate;
-			else if (item is VectorPropertyViewModel)
-				return CompositeTemplate;
+			else if (item is VectorPropertyViewModel || item is DummyVectorProperty)
+				return VectorTemplate;
+			else if (item is MatrixPropertyViewModel || item is DummyMatrixProperty)
+				return MatrixTemplate;
 
 			return base.SelectTemplate(item, container);
 		}

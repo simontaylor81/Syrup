@@ -40,7 +40,6 @@ namespace SRPRendering
 
 		public IDisposable Subscribe(IObserver<Unit> observer)
 		{
-			// TODO: Subscribe to sub-component only?
 			return _variable.Subscribe(observer);
 		}
 	}

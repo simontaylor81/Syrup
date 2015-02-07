@@ -5,13 +5,25 @@
         <vm:DummyPropertyFloat DisplayName="Property 1" IsReadOnly="False" Value="12.0"/>
         <vm:DummyPropertyFloat DisplayName="Property 2" IsReadOnly="True" Value="-7.0"/>
         <vm:DummyPropertyBool DisplayName="Bool prop" IsReadOnly="False" Value="True"/>
-        <vm:DummyCompositeProperty DisplayName="Property 2" IsReadOnly="True">
-            <vm:DummyCompositeProperty.SubProperties>
+        <vm:DummyVectorProperty DisplayName="Vec prop" IsReadOnly="True">
+            <vm:DummyVectorProperty.SubProperties>
                 <vm:DummyPropertyFloat DisplayName="X" IsReadOnly="False" Value="1.00001"/>
                 <vm:DummyPropertyFloat DisplayName="Y" IsReadOnly="False" Value="2.0"/>
                 <vm:DummyPropertyFloat DisplayName="Z" IsReadOnly="False" Value="3.0"/>
                 <vm:DummyPropertyFloat DisplayName="W" IsReadOnly="False" Value="4.0"/>
-            </vm:DummyCompositeProperty.SubProperties>
-        </vm:DummyCompositeProperty>
+            </vm:DummyVectorProperty.SubProperties>
+        </vm:DummyVectorProperty>
+        <vm:DummyMatrixProperty DisplayName="Mat prop" IsReadOnly="True">
+            <vm:DummyMatrixProperty.Rows>
+                <vm:DummyPropertyList>
+                    <vm:DummyPropertyFloat DisplayName="X" IsReadOnly="False" Value="1.00001"/>
+                    <vm:DummyPropertyFloat DisplayName="Y" IsReadOnly="False" Value="2.0"/>
+                </vm:DummyPropertyList>
+                <vm:DummyPropertyList>
+                    <vm:DummyPropertyFloat DisplayName="Z" IsReadOnly="False" Value="3.0"/>
+                    <vm:DummyPropertyFloat DisplayName="W" IsReadOnly="False" Value="4.0"/>
+                </vm:DummyPropertyList>
+            </vm:DummyMatrixProperty.Rows>
+        </vm:DummyMatrixProperty>
     </vm:DummyWorkspace.Properties>
 </vm:DummyWorkspace>

@@ -223,13 +223,32 @@ namespace SRPRendering
 			{
 				// Treat matrices as many-component vectors, for now.
 				case ShaderVariableClass.Vector:
-				case ShaderVariableClass.MatrixColumns:
 					{
 						int numComponents = variable.VariableType.Rows * variable.VariableType.Columns;
 						var components = Enumerable.Range(0, numComponents)
 							.Select(i => CreateScalar(variable, i))
 							.ToArray();
 						return new VectorShaderVariableUserProperty(variable, components);
+					}
+
+				case ShaderVariableClass.MatrixColumns:
+					{
+						// Save typing
+						var numCols = variable.VariableType.Columns;
+						var numRows = variable.VariableType.Rows;
+
+						// Create a scalar property for each element in the matrix.
+						var components = new IUserProperty[numCols, numRows];
+						for (int col = 0; col < numCols; col++)
+						{
+							for (int row = 0; row < numRows; row++)
+							{
+								components[col, row] = CreateScalar(variable, row + col * numRows);
+							}
+						}
+
+						// Create matrix property.
+						return new MatrixShaderVariableUserProperty(variable, components);
 					}
 
 				case ShaderVariableClass.Scalar:

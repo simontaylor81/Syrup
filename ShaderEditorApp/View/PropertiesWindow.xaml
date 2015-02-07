@@ -54,7 +54,7 @@
             <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"/>
         </DataTemplate>
 
-        <DataTemplate x:Key="CompositePropertyValueTemplate">
+        <DataTemplate x:Key="VectorPropertyValueTemplate">
             <ItemsControl ItemsSource="{Binding SubProperties}"
                           ItemTemplate="{StaticResource ScalarPropertyValueTemplate}">
                 <ItemsControl.ItemsPanel>
@@ -65,10 +65,28 @@
             </ItemsControl>
         </DataTemplate>
 
+        <DataTemplate x:Key="MatrixPropertyValueTemplate">
+            <ItemsControl ItemsSource="{Binding Rows}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ItemsControl ItemsSource="{Binding}"
+                                      ItemTemplate="{StaticResource ScalarPropertyValueTemplate}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="1" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </DataTemplate>
+
         <local:PropertyValueTemplateSelector x:Key="PropertyValueTemplateSelector"
                                              ScalarTemplate="{StaticResource ScalarPropertyValueTemplate}"
                                              BoolTemplate="{StaticResource BoolPropertyValueTemplate}"
-                                             CompositeTemplate="{StaticResource CompositePropertyValueTemplate}"/>
+                                             VectorTemplate="{StaticResource VectorPropertyValueTemplate}"
+                                             MatrixTemplate="{StaticResource MatrixPropertyValueTemplate}"/>
 
         <!-- Make items in GridView fill the entire column. -->
         <Style TargetType="ListViewItem">
