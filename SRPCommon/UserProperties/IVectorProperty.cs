@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace SRPCommon.UserProperties
 {
-	public interface IVectorProperty<T> : IUserProperty
+	public interface IVectorProperty : IUserProperty
 	{
 		// The value of a component in the vector.
-		T this[int index] { get; set; }
+		IUserProperty GetComponent(int index);
 
 		// The number of components in the vector.
 		int NumComponents { get; }

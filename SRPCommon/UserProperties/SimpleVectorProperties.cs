@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace SRPCommon.UserProperties
 {
+	/*
 	public class Vector3Property : IVectorProperty<float>
 	{
 		private Vector3 _value;
@@ -42,4 +43,5 @@ namespace SRPCommon.UserProperties
 			_value = value;
 		}
 	}
+	*/
 }

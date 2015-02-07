@@ -19,8 +19,8 @@ namespace ShaderEditorApp.ViewModel
 				return new ScalarPropertyViewModel<bool>((IScalarProperty<bool>)property);
 			if (property is IScalarProperty<string>)
 				return new ScalarPropertyViewModel<string>((IScalarProperty<string>)property);
-			if (property is IVectorProperty<float>)
-				return new VectorPropertyViewModel<float>((IVectorProperty<float>)property);
+			if (property is IVectorProperty)
+				return new VectorPropertyViewModel((IVectorProperty)property);
 
 			throw new ArgumentException("Unsupported property type");
 		}

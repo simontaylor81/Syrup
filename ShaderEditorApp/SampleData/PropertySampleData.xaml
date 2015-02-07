@@ -4,6 +4,7 @@
     <vm:DummyWorkspace.Properties>
         <vm:DummyPropertyFloat DisplayName="Property 1" IsReadOnly="False" Value="12.0"/>
         <vm:DummyPropertyFloat DisplayName="Property 2" IsReadOnly="True" Value="-7.0"/>
+        <vm:DummyPropertyBool DisplayName="Bool prop" IsReadOnly="False" Value="True"/>
         <vm:DummyCompositeProperty DisplayName="Property 2" IsReadOnly="True">
             <vm:DummyCompositeProperty.SubProperties>
                 <vm:DummyPropertyFloat DisplayName="X" IsReadOnly="False" Value="1.00001"/>

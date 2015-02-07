@@ -11,43 +11,37 @@ using System.Reactive.Subjects;
 
 namespace SRPRendering
 {
-	class VectorShaderVariableUserProperty<T> : IVectorProperty<T> where T : struct
+	class VectorShaderVariableUserProperty : IVectorProperty
 	{
-		public VectorShaderVariableUserProperty(IShaderVariable variable)
+		public VectorShaderVariableUserProperty(IShaderVariable variable, IUserProperty[] components)
 		{
 			Debug.Assert(variable.VariableType.Class == ShaderVariableClass.Vector ||
-						 variable.VariableType.Class == ShaderVariableClass.Scalar ||
 						 variable.VariableType.Class == ShaderVariableClass.MatrixColumns);
-			Debug.Assert(variable.VariableType.Type == ShaderVariableType.Float);
+			//Debug.Assert(variable.VariableType.Type == ShaderVariableType.Float);
 
+			Debug.Assert(components.Length == variable.VariableType.Columns * variable.VariableType.Rows);
+
+			this._components = components;
 			this._variable = variable;
 		}
 
 		public string Name { get { return _variable.Name; } }
 		public bool IsReadOnly { get { return false; } }
-		public int NumComponents { get { return _variable.VariableType.Columns * _variable.VariableType.Rows; } }
+		public int NumComponents { get { return _components.Length; } }
 
-		public T this[int index]
+		public IUserProperty GetComponent(int index)
 		{
-			get
-			{
-				return _variable.GetComponent<T>(index);
-			}
-			set
-			{
-				if (!value.Equals(this[index]))
-				{
-					_variable.SetComponent(index, value);
-				}
-			}
+			return _components[index];
 		}
 
 		public IDisposable Subscribe(IObserver<Unit> observer)
 		{
 			// We change when the underlying variable changes.
+			// TODO: Subscribe to merged sub-components?
 			return _variable.Subscribe(observer);
 		}
 
+		private IUserProperty[] _components;
 		private IShaderVariable _variable;
 	}
 }

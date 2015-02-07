@@ -89,6 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UserProperties\IMatrixProperty.cs" />
     <Compile Include="UserProperties\IPropertySource.cs" />
     <Compile Include="Interfaces\IWorkspace.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

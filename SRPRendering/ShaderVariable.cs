@@ -219,19 +219,38 @@ namespace SRPRendering
 
 		internal static IUserProperty CreateUserProperty(IShaderVariable variable)
 		{
-			var Class = variable.VariableType.Class;
-			var Type = variable.VariableType.Type;
-
-			// Treat scalar as a single-component vector (at least for now).
-			// And treat matrices as many-component vectors.
-			if (Class == ShaderVariableClass.Vector || Class == ShaderVariableClass.Scalar || Class == ShaderVariableClass.MatrixColumns)
+			switch (variable.VariableType.Class)
 			{
-				if (Type == ShaderVariableType.Float)
-					return new VectorShaderVariableUserProperty<float>(variable);
+				// Treat matrices as many-component vectors, for now.
+				case ShaderVariableClass.Vector:
+				case ShaderVariableClass.MatrixColumns:
+					{
+						int numComponents = variable.VariableType.Rows * variable.VariableType.Columns;
+						var components = Enumerable.Range(0, numComponents)
+							.Select(i => CreateScalar(variable, i))
+							.ToArray();
+						return new VectorShaderVariableUserProperty(variable, components);
+					}
+
+				case ShaderVariableClass.Scalar:
+					return CreateScalar(variable, 0);
 			}
 
 			// TEMP fallback.
 			return new MutableScalarProperty<float>(variable.Name, 0.0f);
+		}
+
+		private static IUserProperty CreateScalar(IShaderVariable variable, int componentIndex)
+		{
+			switch (variable.VariableType.Type)
+			{
+				case ShaderVariableType.Float:
+					return new FloatShaderVariableUserProperty(variable, componentIndex);
+
+				default:
+					// TEMP fallback.
+					return new MutableScalarProperty<float>(variable.Name, 0.0f);
+			}
 		}
 	}
 }

@@ -90,6 +90,7 @@
     <Compile Include="BasicMesh.cs" />
     <Compile Include="BasicShaders.cs" />
     <Compile Include="DepthBuffer.cs" />
+    <Compile Include="FloatShaderVariableUserProperty.cs" />
     <Compile Include="FullscreenQuad.cs" />
     <Compile Include="GlobalResources.cs" />
     <Compile Include="InputLayoutCache.cs" />
