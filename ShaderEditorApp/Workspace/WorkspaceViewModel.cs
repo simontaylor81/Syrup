@@ -256,6 +256,15 @@ namespace ShaderEditorApp.Workspace
 				currentScene = newScene;
 				scriptRenderControl.Scene = currentScene;
 
+				// Unsubscribe from previous scene.
+				if (sceneChangeSubscription != null)
+				{
+					sceneChangeSubscription.Dispose();
+                }
+
+				// Redraw the scene when the scene changes.
+				sceneChangeSubscription = currentScene.OnChanged.Subscribe(_ => RedrawViewports());
+
 				SceneViewModel = new SceneViewModel(newScene);
 			}
 		}
@@ -446,6 +455,7 @@ namespace ShaderEditorApp.Workspace
 		private RenderWindow renderWindow;
 
 		private Scene currentScene;
+		private IDisposable sceneChangeSubscription;
 
 		// TODO: Multiple viewports.
 		// TODO: Move info needed?

@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SRPCommon.Util;
+using System.Reactive;
+using System.Reactive.Linq;
 
 namespace SRPCommon.Scene
 {
@@ -59,6 +61,9 @@ namespace SRPCommon.Scene
 					.Select(obj => DynamicHelpers.CreateDynamicObject(obj))
 					.ToList();
 
+				// We change when any of our primitives change.
+				result.OnChanged = Observable.Merge(result.Primitives.Select(p => p.OnChanged));
+
 				Environment.CurrentDirectory = prevCurrentDir;
 				return result;
 			}
@@ -109,6 +114,9 @@ namespace SRPCommon.Scene
 		public IEnumerable<Primitive> Primitives { get { return primitives; } }
 		public IDictionary<string, SceneMesh> Meshes { get { return meshes; } }
 		public IDictionary<string, Material> Materials { get { return materials; } }
+
+		// Observable that fires when something important changes in the scene.
+		public IObservable<Unit> OnChanged { get; private set; }
 
 		private string filename;
 		private List<Primitive> primitives;
