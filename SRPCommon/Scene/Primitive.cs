@@ -19,7 +19,8 @@ namespace SRPCommon.Scene
 		public Vector3 Rotation { get; set; }
 		public Material Material { get; private set; }
 
-		public IUserProperty[] UserProperties { get; private set; }
+		protected List<IUserProperty> _userProperties = new List<IUserProperty>();
+		public IEnumerable<IUserProperty> UserProperties { get { return _userProperties; } }
 
 		// Observable that fires when something important changes in the primitive.
 		public IObservable<Unit> OnChanged { get; private set; }
@@ -28,12 +29,9 @@ namespace SRPCommon.Scene
 		{
 			Scale = new Vector3(1.0f, 1.0f, 1.0f);
 
-			UserProperties = new[]
-			{
-				new StructUserProperty("Position", () => Position, o => Position = (Vector3)o),
-				new StructUserProperty("Scale", () => Scale, o => Scale = (Vector3)o),
-				new StructUserProperty("Rotation", () => Rotation, o => Rotation = (Vector3)o),
-			};
+			_userProperties.Add(new StructUserProperty("Position", () => Position, o => Position = (Vector3)o));
+			_userProperties.Add(new StructUserProperty("Scale", () => Scale, o => Scale = (Vector3)o));
+			_userProperties.Add(new StructUserProperty("Rotation", () => Rotation, o => Rotation = (Vector3)o));
 
 			// We change whenever our properties change.
 			OnChanged = Observable.Merge(UserProperties);

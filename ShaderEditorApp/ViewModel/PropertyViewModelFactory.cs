@@ -19,6 +19,8 @@ namespace ShaderEditorApp.ViewModel
 				return new ScalarPropertyViewModel<bool>((IScalarProperty<bool>)property);
 			if (property is IScalarProperty<string>)
 				return new ScalarPropertyViewModel<string>((IScalarProperty<string>)property);
+			if (property is IScalarProperty<int>)
+				return new ScalarPropertyViewModel<int>((IScalarProperty<int>)property);
 			if (property is IVectorProperty)
 				return new VectorPropertyViewModel((IVectorProperty)property);
 			if (property is IMatrixProperty)

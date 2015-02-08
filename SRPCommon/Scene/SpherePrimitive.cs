@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using SRPCommon.UserProperties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,9 @@ namespace SRPCommon.Scene
 
 			Stacks = (int)obj["stacks"];
 			Slices = (int)obj["slices"];
+
+			_userProperties.Add(new ObjectPropertyUserProperty<int>(GetType().GetProperty("Stacks"), this));
+			_userProperties.Add(new ObjectPropertyUserProperty<int>(GetType().GetProperty("Slices"), this));
 		}
 	}
 }

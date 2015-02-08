@@ -46,7 +46,7 @@ namespace ShaderEditorApp.View
 			// TODO: Can this be handled more generically?
 
 			// Anything that just wants a single text box can use the scalar template.
-			if (item is ScalarPropertyViewModel<float> || item is ScalarPropertyViewModel<string> || item is DummyPropertyFloat)
+			if (item is ScalarPropertyViewModel<float> || item is ScalarPropertyViewModel<string> || item is ScalarPropertyViewModel<int> || item is DummyPropertyFloat)
 				return ScalarTemplate;
 			else if (item is ScalarPropertyViewModel<bool> || item is DummyPropertyBool)
 				return BoolTemplate;
