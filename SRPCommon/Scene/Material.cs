@@ -44,8 +44,12 @@ namespace SRPCommon.Scene
 		private static Tuple<string, Vector4> LoadVectorParam(JToken obj)
 		{
 			var name = (string)obj["name"];
-			var value = SerialisationUtils.ParseVector4(obj["value"]);
-			return (name != null && value != null) ? Tuple.Create(name, value) : null;
+			var value = obj["value"];
+			if (name != null && value != null)
+			{
+				return Tuple.Create(name, SerialisationUtils.ParseVector4(value));
+			}
+			return null;
 		}
 
 		private static Tuple<string, string> LoadTexture(JToken obj)
