@@ -13,6 +13,11 @@ namespace SRPCommon.Util
 	{
 		public static Vector3 ParseVector3(string str)
 		{
+			if (str == null)
+			{
+				throw new ArgumentNullException("str");
+			}
+
 			var components = str.Split(null);
 			if (components.Length == 3)
 			{
@@ -26,6 +31,11 @@ namespace SRPCommon.Util
 
 		public static Vector4 ParseVector4(string str)
 		{
+			if (str == null)
+			{
+				throw new ArgumentNullException("str");
+			}
+
 			var components = str.Split(null);
 			if (components.Length == 4)
 			{
@@ -43,11 +53,17 @@ namespace SRPCommon.Util
 		{
 			if (obj != null)
 			{
-				return new Vector3(
-					(float)obj["x"],
-					(float)obj["y"],
-					(float)obj["z"]
-				);
+				if (obj.Type != JTokenType.Object) throw new ArgumentException("Must be JSON object", "obj");
+
+				var x = obj["x"];
+				var y = obj["y"];
+				var z = obj["z"];
+
+				if (x == null) throw new ArgumentException("Missing x component", "obj");
+				if (y == null) throw new ArgumentException("Missing y component", "obj");
+				if (z == null) throw new ArgumentException("Missing z component", "obj");
+
+				return new Vector3((float)x, (float)y, (float)z);
 			}
 			return defaultVal;
 		}
@@ -57,18 +73,29 @@ namespace SRPCommon.Util
 		{
 			if (obj != null)
 			{
-				return new Vector4(
-					(float)obj["x"],
-					(float)obj["y"],
-					(float)obj["z"],
-					(float)obj["w"]
-				);
+				if (obj.Type != JTokenType.Object) throw new ArgumentException("Must be JSON object", "obj");
+
+				var x = obj["x"];
+				var y = obj["y"];
+				var z = obj["z"];
+				var w = obj["w"];
+
+				if (x == null) throw new ArgumentException("Missing x component", "obj");
+				if (y == null) throw new ArgumentException("Missing y component", "obj");
+				if (z == null) throw new ArgumentException("Missing z component", "obj");
+				if (w == null) throw new ArgumentException("Missing w component", "obj");
+
+				return new Vector4((float)x, (float)y, (float)z, (float)w);
 			}
 			return defaultVal;
 		}
 
 		public static void ParseAttribute(XElement element, string attribute, Action<string> parseAction)
 		{
+			if (element == null) throw new ArgumentNullException("element");
+			if (attribute == null) throw new ArgumentNullException("attribute");
+			if (parseAction == null) throw new ArgumentNullException("parseAction");
+
 			var attr = element.Attribute(attribute);
 			if (attr != null)
 			{
