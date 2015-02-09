@@ -18,6 +18,11 @@ namespace SRPCommon.Util
 		/// </summary>
 		public static dynamic CreateDynamicObject(JToken token)
 		{
+			if (token == null)
+			{
+				throw new ArgumentNullException("token");
+			}
+
 			switch (token.Type)
 			{
 				case JTokenType.Object:
