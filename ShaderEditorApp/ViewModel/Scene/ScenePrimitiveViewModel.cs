@@ -24,7 +24,6 @@ namespace ShaderEditorApp.ViewModel.Scene
 			get { return Enumerable.Empty<ICommand>(); }
 		}
 
-		private IEnumerable<IUserProperty> _userProperties;
 		public IEnumerable<IUserProperty> UserProperties
 		{
 			get { return _primitive.UserProperties; }
