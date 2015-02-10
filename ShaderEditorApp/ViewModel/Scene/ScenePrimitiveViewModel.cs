@@ -14,7 +14,6 @@ namespace ShaderEditorApp.ViewModel.Scene
 	abstract class ScenePrimitiveViewModel : ReactiveObject, IHierarchicalBrowserNodeViewModel
 	{
 		private Primitive _primitive;
-		private CompositeDisposable _disposables;
 
 		#region IHierarchicalBrowserNodeViewModel interface
 
@@ -62,16 +61,6 @@ namespace ShaderEditorApp.ViewModel.Scene
 		protected ScenePrimitiveViewModel(Primitive primitive)
 		{
 			_primitive = primitive;
-
-			//_userProperties = new[] {
-			//	new Vector3Property(
-			//};
 		}
-
-		//protected IUserProperty CreateVectorProperty(string name, Vector3 value, Action<Vector3> setter)
-		//{
-		//	var property = new Vector3Property(name, value);
-		//	_disposables.Add(property.Subscribe(_ => setter(property
-		//}
 	}
 }
