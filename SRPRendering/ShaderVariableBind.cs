@@ -103,7 +103,7 @@ namespace SRPRendering
 				dynamic val = ScriptHelper.Instance.ResolveFunction(value);
 				variable.SetFromDynamic(val);
 			}
-			catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
+			catch (ScriptException ex)
 			{
 				throw new ScriptException("Incorrect type for bound shader variable:" + variable.Name, ex);
 			}
@@ -172,7 +172,7 @@ namespace SRPRendering
 				{
 					variable.SetFromDynamic(overriddenValue);
 				}
-				catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
+				catch (ScriptException ex)
 				{
 					throw new ScriptException("Incorrect type for shader variable override: " + variable.Name, ex);
 				}

@@ -20,6 +20,9 @@ namespace SRPCommon.Scripting
 	{
 		public IRenderInterface RenderInterface { get; set; }
 
+		// Allow access to underlying Python engine for custom use (i.e. unit tests).
+		public ScriptEngine PythonEngine { get { return pythonEngine; } }
+
 		private ScriptEngine pythonEngine;
 		private bool bInProgress;
 

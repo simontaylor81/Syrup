@@ -162,7 +162,7 @@ namespace SRPRendering
 					deviceContext.ClearRenderTargetView(rtv, col);
 				}
 			}
-			catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
+			catch (ScriptException ex)
 			{
 				throw new ScriptException("Clear: Invalid colour.", ex);
 			}
@@ -206,7 +206,7 @@ namespace SRPRendering
 				// Draw the sphere.
 				sphereMesh.Draw(deviceContext);
 			}
-			catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
+			catch (ScriptException ex)
 			{
 				throw new ScriptException("Invalid parameters to DrawWireSphere.", ex);
 			}

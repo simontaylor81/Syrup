@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using SlimDX;
 using SlimDX.D3DCompiler;
 using SRPCommon.UserProperties;
+using SRPCommon.Scripting;
 
 namespace SRPRendering
 {
@@ -142,7 +143,7 @@ namespace SRPRendering
 			if (numComponents == 1)
 			{
 				// Treat as scalar for single component.
-				SetComponent<float>(0, (float)value);
+				SetComponent<float>(0, ScriptHelper.GuardedCast<float>(value));
 			}
 			else
 			{

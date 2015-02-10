@@ -9,6 +9,7 @@ using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 using SlimDX;
 using SRPCommon.Util;
+using Microsoft.CSharp.RuntimeBinder;
 
 namespace SRPCommon.Scripting
 {
@@ -22,8 +23,7 @@ namespace SRPCommon.Scripting
 		// If x is a function, execute it and return the result. Otherwise just return x.
 		public dynamic ResolveFunction(dynamic x)
 		{
-			// TODO: What if it is a function taking parameters?
-			if (Operations.IsCallable(x))
+			if (x != null && Operations.IsCallable(x))
 			{
 				// Catch exceptions caused by the function not taking zero arguments.
 				try
@@ -38,38 +38,42 @@ namespace SRPCommon.Scripting
 			return x;
 		}
 
-		// Helper functions that convert a dynamic object into different types.
-		public static float ConvertToFloat(dynamic x)
+		// Helper function for casting to a concrete type, wrapped in try/catch to convert the
+		// weird script engine exceptions into a nicer ScriptException.
+		public static T GuardedCast<T>(dynamic x)
 		{
 			// Python floats are actually doubles, so we need a cast.
-			return (float)x;
+			return RunGuarded(() => (T)x);
 		}
+
+		// Helper functions that convert a dynamic object into various vector/colour types.
 		public static Vector2 ConvertToVector2(dynamic x)
 		{
 			// Scripts pass vectors as tuples, so we extract the values to form the vector.
-			return new Vector2((float)x[0], (float)x[1]);
+			return RunGuarded(() => new Vector2((float)x[0], (float)x[1]));
 		}
 		public static Vector3 ConvertToVector3(dynamic x)
 		{
 			// Scripts pass vectors as tuples, so we extract the values to form the vector.
-			return new Vector3((float)x[0], (float)x[1], (float)x[2]);
+			return RunGuarded(() => new Vector3((float)x[0], (float)x[1], (float)x[2]));
 		}
 		public static Vector4 ConvertToVector4(dynamic x)
 		{
 			// Scripts pass vectors as tuples, so we extract the values to form the vector.
-			return new Vector4((float) x[0], (float) x[1], (float) x[2], (float) x[3]);
+			return RunGuarded(() => new Vector4((float) x[0], (float) x[1], (float) x[2], (float) x[3]));
 		}
 		public static Color3 ConvertToColor3(dynamic x)
 		{
-			return new Color3((float)x[0], (float)x[1], (float)x[2]);
+			return RunGuarded(() => new Color3((float)x[0], (float)x[1], (float)x[2]));
 		}
 		public static Color4 ConvertToColor4(dynamic x)
 		{
 			// Color4 constructor takes A, R, G, B.
-			return new Color4((float)x[3], (float)x[0], (float)x[1], (float)x[2]);
+			return RunGuarded(() => new Color4((float)x[3], (float)x[0], (float)x[1], (float)x[2]));
 		}
 
-		public static T CheckedCall<T>(Func<T> func, [CallerMemberName] string context = null)
+		// Helper method for running potentially throwy code, throwing a ScriptException if something bad happen.
+		private static T RunGuarded<T>(Func<T> func, [CallerMemberName] string context = null)
 		{
 			Debug.Assert(context != null);
 
@@ -77,30 +81,30 @@ namespace SRPCommon.Scripting
 			{
 				return func();
 			}
-			catch (IronPython.Runtime.Exceptions.TypeErrorException ex)
+			catch (Exception ex)
 			{
-				throw new ScriptException(context + ": Given function returns the wrong type: " + ex.Message, ex);
-			}
-			catch (ArgumentTypeException ex)
-			{
-				throw new ScriptException(context + ": Given function does not take zero arguments.", ex);
+				throw new ScriptException("Invalid parameters for " + context, ex);
 			}
 		}
 
 		// Helper functions that determine if the given dynamic can be converted to a specific type.
 		public void CheckConvertibleFloat(dynamic x, string description)
 		{
-			// Is the value directly convertible to a float?
-			float dummy;
-			if (Operations.TryConvertTo<float>(x, out dummy))
-				return;
+			if (x != null)
+			{
+				// Is the value directly convertible to a float?
+				float dummy;
+				if (Operations.TryConvertTo<float>(x, out dummy))
+					return;
 
-			// If not a float, is it a function (can't tell more than this unfortunately).
-			if (Operations.IsCallable(x))
-				return;
+				// If not a float, is it a function (can't tell more than this unfortunately).
+				if (Operations.IsCallable(x))
+					return;
+			}
 
 			// Not convertible, so throw exception so the user will get an error message.
-			throw new ScriptException(String.Format("{0} must be a float, or a zero-argument function returning float. Got '{1}'.", description, x.ToString()));
+			throw new ScriptException(String.Format("{0} must be a float, or a zero-argument function returning float. Got '{1}'.",
+				description, x != null ? x.ToString() : "null"));
 		}
 
 		public void CheckConvertibleFloatList(dynamic x, int numComponents, string description)
@@ -111,38 +115,41 @@ namespace SRPCommon.Scripting
 			}
 			else
 			{
-				// Is the value convertible to a list?
-				IEnumerable<dynamic> list;
-				if (Operations.TryConvertTo<IEnumerable<object>>(x, out list))
+				if (x != null)
 				{
-					// Check it has at least enough components.
-					if (list.Count() >= numComponents)
+					// Is the value convertible to a list?
+					IEnumerable<dynamic> list;
+					if (Operations.TryConvertTo<IEnumerable<object>>(x, out list))
 					{
-						// Try to convert each element to float.
-						bool allFloat = true;
-						foreach (dynamic entry in list)
+						// Check it has at least enough components.
+						if (list.Count() >= numComponents)
 						{
-							float dummyFloat;
-							if (!Operations.TryConvertTo<float>(entry, out dummyFloat))
+							// Try to convert each element to float.
+							bool allFloat = true;
+							foreach (dynamic entry in list)
 							{
-								allFloat = false;
-								break;
+								float dummyFloat;
+								if (!Operations.TryConvertTo<float>(entry, out dummyFloat))
+								{
+									allFloat = false;
+									break;
+								}
 							}
+
+							if (allFloat)
+								return;
 						}
-
-						if (allFloat)
-							return;
 					}
-				}
 
-				// Is it a function (can't tell more than this unfortunately).
-				if (Operations.IsCallable(x))
-					return;
+					// Is it a function (can't tell more than this unfortunately).
+					if (Operations.IsCallable(x))
+						return;
+				}
 
 				// Not convertible, so report error to user.
 				throw new ScriptException(
 					String.Format("{0} must be a tuple of floats, or a zero-argument function returning a tuple of floats, of at least {1} elements. Got '{2}'.",
-					description, numComponents, x.ToString()));
+					description, numComponents, x != null ? x.ToString() : "null"));
 			}
 		}
 
