@@ -74,15 +74,11 @@ namespace SRPCommon.Scripting
 			{
 				bInProgress = true;
 
-				// Reset the render controller.
-//				renderControl.Reset();
-
 				_preExecute.OnNext(Unit.Default);
 
 				// Execute script on thread pool.
 				bool bSuccess = await Task.Run(() => RunSource(sourceFunc()));
 
-				//renderControl.ExecutionComplete(bSuccess);
 				_executionComplete.OnNext(bSuccess);
 				bInProgress = false;
 			}
