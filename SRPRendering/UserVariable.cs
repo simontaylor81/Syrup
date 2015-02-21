@@ -30,8 +30,12 @@ namespace SRPRendering
 					// Scalar types.
 					case UserVariableType.Float:
 						return new UserVariableScalar<float>(name, defaultValue);
+					case UserVariableType.Int:
+						return new UserVariableScalar<int>(name, defaultValue);
 					case UserVariableType.Bool:
 						return new UserVariableScalar<bool>(name, defaultValue);
+					case UserVariableType.String:
+						return new UserVariableScalar<string>(name, defaultValue);
 
 					// Vector types
 					case UserVariableType.Float2:
@@ -40,6 +44,13 @@ namespace SRPRendering
 						return CreateVector<float>(3, name, defaultValue);
 					case UserVariableType.Float4:
 						return CreateVector<float>(4, name, defaultValue);
+
+					case UserVariableType.Int2:
+						return CreateVector<int>(2, name, defaultValue);
+					case UserVariableType.Int3:
+						return CreateVector<int>(3, name, defaultValue);
+					case UserVariableType.Int4:
+						return CreateVector<int>(4, name, defaultValue);
 
 					default:
 						throw new ArgumentException("Invalid user variable type.");

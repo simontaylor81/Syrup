@@ -16,6 +16,8 @@ namespace SRPTests
 		[Theory]
 		[InlineData(UserVariableType.Float, 3.142f, 2.718f)]
 		[InlineData(UserVariableType.Bool, true, false)]
+		[InlineData(UserVariableType.Int, 12, 42)]
+		[InlineData(UserVariableType.String, "hi", "bye")]
 		public void ScalarVariable<T>(UserVariableType type, T defaultValue, T otherValue)
 		{
 			var uv = UserVariable.Create("myvar", type, defaultValue);
@@ -48,6 +50,9 @@ namespace SRPTests
 		[InlineData(UserVariableType.Float2, 0.0f, new[] { 1.0f, 2.0f }, new[] { 100.0f, 200.0f })]
 		[InlineData(UserVariableType.Float3, 0.0f, new[] { 1.0f, 2.0f, 3.0f }, new[] { 100.0f, 200.0f, 300.0f })]
 		[InlineData(UserVariableType.Float4, 0.0f, new[] { 1.0f, 2.0f, 3.0f, 4.0f }, new[] { 100.0f, 200.0f, 300.0f, 400.0f })]
+		[InlineData(UserVariableType.Int2, 0, new[] { 1, 2 }, new[] { 100, 200 })]
+		[InlineData(UserVariableType.Int3, 0, new[] { 1, 2, 3 }, new[] { 100, 200, 300 })]
+		[InlineData(UserVariableType.Int4, 0, new[] { 1, 2, 3, 4 }, new[] { 100, 200, 300, 400 })]
 		public void VectorVariable<T>(UserVariableType type, T dummy, T[] defaultValue, T[] otherValue)
 		{
 			var uv = UserVariable.Create("myvar", type, defaultValue);

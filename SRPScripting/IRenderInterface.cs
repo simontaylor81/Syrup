@@ -21,8 +21,12 @@ namespace SRPScripting
 		Float2,		// Floating point vector types.
 		Float3,
 		Float4,
+		Int,
+		Int2,
+		Int3,
+		Int4,
 		Bool,		// Boolean value.
-		//TODO
+		String,
 	}
 
 	// Delegate type for the per-frame callback. Cannot be inside the interface cos C# is silly.
