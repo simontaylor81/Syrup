@@ -27,18 +27,19 @@ namespace SRPRendering
 			{
 				switch (type)
 				{
-					// Float scalar & vectors.
+					// Scalar types.
 					case UserVariableType.Float:
-						return new UserVariableFloat(name, defaultValue);
-					case UserVariableType.Float2:
-						return CreateVectorFloat(2, name, defaultValue);
-					case UserVariableType.Float3:
-						return CreateVectorFloat(3, name, defaultValue);
-					case UserVariableType.Float4:
-						return CreateVectorFloat(4, name, defaultValue);
-
+						return new UserVariableScalar<float>(name, defaultValue);
 					case UserVariableType.Bool:
-						return new UserVariableBool(name, defaultValue);
+						return new UserVariableScalar<bool>(name, defaultValue);
+
+					// Vector types
+					case UserVariableType.Float2:
+						return CreateVector<float>(2, name, defaultValue);
+					case UserVariableType.Float3:
+						return CreateVector<float>(3, name, defaultValue);
+					case UserVariableType.Float4:
+						return CreateVector<float>(4, name, defaultValue);
 
 					default:
 						throw new ArgumentException("Invalid user variable type.");
@@ -50,10 +51,10 @@ namespace SRPRendering
 			}
 		}
 
-		private static UserVariable CreateVectorFloat(int numComponents, string name, dynamic defaultValue)
+		private static UserVariable CreateVector<T>(int numComponents, string name, dynamic defaultValue)
 		{
 			var components = Enumerable.Range(0, numComponents)
-				.Select(i => new UserVariableFloat(i.ToString(), defaultValue[i]))
+				.Select(i => new UserVariableScalar<T>(i.ToString(), defaultValue[i]))
 				.ToArray();
 			return new UserVariableVector(name, components);
 		}
@@ -64,28 +65,28 @@ namespace SRPRendering
 		}
 	}
 
-	// User variable representing a floating point vector or scalar with a variable number of components.
-	class UserVariableFloat : UserVariable, IScalarProperty<float>
+	// User variable representing a single value of the given type.
+	class UserVariableScalar<T> : UserVariable, IScalarProperty<T>
 	{
 		public override dynamic GetFunction()
 		{
-			Func<float> func = () => value;
+			Func<T> func = () => value;
 			return func;
 		}
 
-		public UserVariableFloat(string name, dynamic defaultValue)
+		public UserVariableScalar(string name, dynamic defaultValue)
 			: base(name)
 		{
-			// Use explicit cast to convert from ints/doubles.
-			value = (float)defaultValue;
+			// Use explicit cast to convert from similar types (e.g. ints/doubles -> float).
+			value = (T)defaultValue;
 		}
 
-		public float Value
+		public T Value
 		{
 			get { return value; }
 			set
 			{
-				if (this.value != value)
+				if (!EqualityComparer<T>.Default.Equals(this.value, value))
 				{
 					this.value = value;
 					_subject.OnNext(Unit.Default);
@@ -100,48 +101,12 @@ namespace SRPRendering
 		}
 
 		// The storage of the actual value.
-		private float value;
+		private T value;
 
 		private Subject<Unit> _subject = new Subject<Unit>();
 	}
 
-	class UserVariableBool : UserVariable, IScalarProperty<bool>
-	{
-		public override dynamic GetFunction()
-		{
-			Func<bool> func = () => Value;
-			return func;
-		}
-
-		public UserVariableBool(string name, bool defaultValue)
-			: base(name)
-		{
-			Value = defaultValue;
-		}
-
-		public bool Value
-		{
-			get { return _value; }
-			set
-			{
-				if (_value != value)
-				{
-					_value = value;
-					_subject.OnNext(Unit.Default);
-				}
-			}
-		}
-
-		// IObservable interface
-		public override IDisposable Subscribe(IObserver<Unit> observer)
-		{
-			return _subject.Subscribe(observer);
-		}
-
-		private bool _value;
-		private Subject<Unit> _subject = new Subject<Unit>();
-	}
-
+	// User variable representing a vector of values.
 	class UserVariableVector : UserVariable, IVectorProperty
 	{
 		private UserVariable[] components;
