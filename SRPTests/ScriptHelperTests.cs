@@ -23,19 +23,21 @@ namespace SRPTests
 			scripting = new Scripting();
 		}
 
-	    [Fact]
-		public void TestResolveFunction()
+		[Theory]
+		[InlineData(12, "12")]
+		[InlineData("str", "'str'")]
+		[InlineData(null, "None")]
+		[InlineData(12, "lambda: 12")]
+		public void ResolveFunctionValid(object expected, string expression)
 		{
-			// Basic values should be returned directly.
-			Assert.Equal(12, ScriptHelper.Instance.ResolveFunction(GetPythonValue("12")));
-			Assert.Equal("str", ScriptHelper.Instance.ResolveFunction(GetPythonValue("'str'")));
-			Assert.Equal(null, ScriptHelper.Instance.ResolveFunction(null));
+			Assert.Equal(expected, ScriptHelper.Instance.ResolveFunction(GetPythonValue(expression)));
+		}
 
-			// Functions return their result.
-			Assert.Equal(12, ScriptHelper.Instance.ResolveFunction(GetPythonValue("lambda: 12")));
-
-			// Functions must have zero arguments.
-			Assert.Throws<ScriptException>(() => ScriptHelper.Instance.ResolveFunction(GetPythonValue("lambda x: x")));
+	    [Theory]
+		[InlineData("lambda x: x")]		// Functions must have zero arguments.
+		public void ResolveFunctionInvalid(string expression)
+		{
+			Assert.Throws<ScriptException>(() => ScriptHelper.Instance.ResolveFunction(GetPythonValue(expression)));
 		}
 
 		[Fact]
@@ -71,36 +73,59 @@ namespace SRPTests
 			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToColor4(null));
 		}
 
-		[Fact]
-		public void TestCheckConvertible()
+		[Theory]
+		[InlineData("3.142")]
+		[InlineData("3")]
+		[InlineData("lambda: 3.142")]
+		public void CheckConvertibleFloatValid(string expression)
+		{
+			// Valid calls complete silently without an exception.
+			ScriptHelper.Instance.CheckConvertibleFloat(GetPythonValue(expression), "");
+		}
+
+		[Theory]
+		[InlineData("3.142", 1)]
+		[InlineData("[1, 2, 3]", 3)]
+		[InlineData("(1, 2, 3)", 3)]
+		[InlineData("lambda: (1,2,3)", 3)]
+		public void CheckConvertibleFloatListValid(string expression, int numComponents)
+		{
+			// Valid calls complete silently without an exception.
+			ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue(expression), numComponents, "");
+		}
+
+		[Theory]
+		[InlineData("'str'")]
+		[InlineData("(1,2)")]
+		[InlineData("None")]
+		public void CheckConvertibleFloatInvalid(string expression)
 		{
 			var desc = "testdescription";
 
-			// Valid calls complete silently without an exception.
-			ScriptHelper.Instance.CheckConvertibleFloat(GetPythonValue("3.142"), desc);
-			ScriptHelper.Instance.CheckConvertibleFloat(GetPythonValue("3"), desc);
-			ScriptHelper.Instance.CheckConvertibleFloat(GetPythonValue("lambda: 3.142"), desc);
+			// Invalid calls should throw ScriptException
+			// For some reason the compiler gets confused about these lambdas, hence the explicit cast to Action.
+			var ex = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloat(GetPythonValue(expression), desc)));
 
-			ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue("3.142"), 1, desc);
-			ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue("[1, 2, 3]"), 3, desc);
-			ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue("(1, 2, 3)"), 3, desc);
-			ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue("lambda: (1,2,3)"), 3, desc);
+			// Exception should contain the description in its message.
+			Assert.Contains(desc, ex.Message);
+		}
+
+		[Theory]
+		[InlineData("'str'", 3)]
+		[InlineData("(1,2)", 3)]
+		[InlineData("3.142", 3)]
+		[InlineData("('', '', '')", 3)]
+		[InlineData("None", 3)]
+		public void CheckConvertibleFloatListInvalid(string expression, int numComponents)
+		{
+			var desc = "testdescription";
 
 			// Invalid calls should throw ScriptException
 			// For some reason the compiler gets confused about these lambdas, hence the explicit cast to Action.
-			var floatEx = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloat(GetPythonValue("'str'"), desc)));
-			Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloat(GetPythonValue("(1, 2)"), desc)));
-			Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloat(null, desc)));
+			var ex = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue(expression), numComponents, desc)));
 
-			var listEx = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue("'str'"), 3, desc)));
-			Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue("(1,2)"), 3, desc)));
-			Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue("3.142"), 3, desc)));
-			Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue("('', '', '')"), 3, desc)));
-			Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloatList(null, 3, desc)));
-
-			// Exceptions should contain the description in their message.
-			Assert.Contains(desc, floatEx.Message);
-			Assert.Contains(desc, listEx.Message);
+			// Exception should contain the description in its message.
+			Assert.Contains(desc, ex.Message);
 		}
 
 		// Helper for getting the value of some inline python code.
