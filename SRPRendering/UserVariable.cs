@@ -6,6 +6,7 @@ using SRPCommon.Scripting;
 using SRPCommon.UserProperties;
 using SRPScripting;
 using System.Linq;
+using System.Reactive.Linq;
 
 namespace SRPRendering
 {
@@ -15,13 +16,10 @@ namespace SRPRendering
 		public string Name { get; private set; }
 		public bool IsReadOnly { get { return false; } }
 
-		// IObservable interface
-		public IDisposable Subscribe(IObserver<Unit> observer)
-		{
-			return _subject.Subscribe(observer);
-		}
-
 		public abstract dynamic GetFunction();
+
+		// IObservable interface
+		public abstract IDisposable Subscribe(IObserver<Unit> observer);
 
 		public static UserVariable Create(string name, UserVariableType type, dynamic defaultValue)
 		{
@@ -64,8 +62,6 @@ namespace SRPRendering
 		{
 			this.Name = name;
 		}
-
-		protected Subject<Unit> _subject = new Subject<Unit>();
 	}
 
 	// User variable representing a floating point vector or scalar with a variable number of components.
@@ -97,8 +93,16 @@ namespace SRPRendering
 			}
 		}
 
+		// IObservable interface
+		public override IDisposable Subscribe(IObserver<Unit> observer)
+		{
+			return _subject.Subscribe(observer);
+		}
+
 		// The storage of the actual value.
 		private float value;
+
+		private Subject<Unit> _subject = new Subject<Unit>();
 	}
 
 	class UserVariableBool : UserVariable, IScalarProperty<bool>
@@ -127,7 +131,15 @@ namespace SRPRendering
 				}
 			}
 		}
+
+		// IObservable interface
+		public override IDisposable Subscribe(IObserver<Unit> observer)
+		{
+			return _subject.Subscribe(observer);
+		}
+
 		private bool _value;
+		private Subject<Unit> _subject = new Subject<Unit>();
 	}
 
 	class UserVariableVector : UserVariable, IVectorProperty
@@ -155,5 +167,10 @@ namespace SRPRendering
 			return components[index];
 		}
 		public int NumComponents { get { return components.Length; } }
+
+		public override IDisposable Subscribe(IObserver<Unit> observer)
+		{
+			return Observable.Merge(components).Subscribe(observer);
+		}
 	}
 }

@@ -46,6 +46,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Reactive.Core, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,6 +67,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptHelperTests.cs" />
     <Compile Include="SerialisationUtilsTests.cs" />
+    <Compile Include="UserVariableTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -78,6 +80,17 @@
       <Project>{ae1f21f0-3ddd-4f3f-9633-72cee5848f14}</Project>
       <Name>SRPCommon</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SRPRendering\SRPRendering.csproj">
+      <Project>{f1456ac2-0d17-4950-a985-8966b24a4cb8}</Project>
+      <Name>SRPRendering</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SRPScripting\SRPScripting.csproj">
+      <Project>{0ee5c742-04da-4d53-bb7c-2e21481e790d}</Project>
+      <Name>SRPScripting</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestScripts\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
