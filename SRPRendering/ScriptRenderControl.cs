@@ -26,8 +26,6 @@ namespace SRPRendering
 			this.workspace = workspace;
 			this.device = device;
 
-			shaderCache = new ShaderCache(device);
-
 			ScriptInterface = new ScriptRenderInterface(this);
 
 			// Initialise basic resources.
@@ -126,7 +124,7 @@ namespace SRPRendering
 			if (!File.Exists(path))
 				throw new ScriptException("Shader file " + filename + " not found in project.");
 
-			var shader = shaderCache.GetShader(path, entryPoint, profile, FindShader);
+			var shader = _globalResources.ShaderCache.GetShader(path, entryPoint, profile, FindShader);
 			shaders.Add(shader);
 
 			// Set up auto variable binds for this shader.
@@ -309,7 +307,6 @@ namespace SRPRendering
 			disposables.Dispose();
 
 			inputLayoutCache.Dispose();
-			shaderCache.Dispose();
 			shaders.Clear();
 			DisposableUtil.SafeDispose(scene);
 
@@ -417,9 +414,6 @@ namespace SRPRendering
 
 		// Pointer back to the workspace. Needed so we can access the project to get shaders from.
 		private IWorkspace workspace;
-
-		// Cache for compiled shaders.
-		private IShaderCache shaderCache;
 
 		private bool bScriptExecutionError = false;		// True if there was a problem executing the script
 		private bool bScriptRenderError = false;		// True if there was a script error while rendering

@@ -18,6 +18,7 @@ namespace SRPRendering
 		IDrawable FullscreenQuad { get; }
 
 		IBasicShaders BasicShaders { get; }
+		IShaderCache ShaderCache { get; }
 
 		// State object caches.
 		IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; }
@@ -37,6 +38,7 @@ namespace SRPRendering
 		public IDrawable FullscreenQuad { get; private set; }
 
 		public IBasicShaders BasicShaders { get; private set; }
+		public IShaderCache ShaderCache { get; private set; }
 
 		// State object caches.
 		public IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; private set; }
@@ -65,6 +67,9 @@ namespace SRPRendering
 
 			BasicShaders = new BasicShaders(device);
 			disposables.Add(BasicShaders);
+
+			ShaderCache = new ShaderCache(device);
+			disposables.Add(ShaderCache);
 
 			// Create the state object caches.
 			RastStateCache = new StateObjectCache<RasterizerState, RasterizerStateDescription>(device, RasterizerState.FromDescription);
