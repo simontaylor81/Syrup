@@ -8,7 +8,7 @@ using SlimDX.Direct3D11;
 
 namespace SRPRendering
 {
-	interface IShaderResourceVariable
+	public interface IShaderResourceVariable
 	{
 		/// <summary>
 		/// Name of the variable.

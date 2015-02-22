@@ -8,23 +8,24 @@ using SlimDX;
 
 namespace SRPRendering
 {
-	interface IPrimitive
+	public interface IPrimitive
 	{
 		Matrix LocalToWorld { get; }
 		Material Material { get; }
-		RenderScene Scene { get; }
+		IRenderScene Scene { get; }
+		IDrawable Mesh { get; }
 	}
 
 	class PrimitiveProxy : IPrimitive
 	{
 		private Primitive primitive;
-		public Mesh Mesh { get; private set; }
-		public RenderScene Scene { get; private set; }
+		public IDrawable Mesh { get; private set; }
+		public IRenderScene Scene { get; private set; }
 
 		public Matrix LocalToWorld { get { return primitive.GetLocalToWorld(); } }
 		public Material Material { get { return primitive.Material; } }
 
-		public PrimitiveProxy(Primitive primitive, Mesh mesh, RenderScene scene)
+		public PrimitiveProxy(Primitive primitive, Mesh mesh, IRenderScene scene)
 		{
 			this.primitive = primitive;
 			this.Mesh = mesh;
@@ -37,7 +38,8 @@ namespace SRPRendering
 	{
 		public Matrix LocalToWorld { get { return localToWorld; } }
 		public Material Material { get { return null; } }
-		public RenderScene Scene { get { return null; } }
+		public IRenderScene Scene { get { return null; } }
+		public IDrawable Mesh { get { return null; } }
 
 		public SimplePrimitiveProxy(Matrix localToWorld)
 		{

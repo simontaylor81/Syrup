@@ -7,7 +7,7 @@ using SlimDX.Direct3D11;
 
 namespace SRPRendering
 {
-	interface IShaderResourceVariableBind
+	public interface IShaderResourceVariableBind
 	{
 		void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable, IGlobalResources globalResources);
 	}

@@ -13,7 +13,7 @@ using SRPCommon.Scripting;
 
 namespace SRPRendering
 {
-	enum ShaderFrequency
+	public enum ShaderFrequency
 	{
 		Vertex,
 		Pixel,
@@ -21,7 +21,36 @@ namespace SRPRendering
 		MAX
 	}
 
-	class Shader : IDisposable
+	public interface IShader : IDisposable
+	{
+		// Bind the shader to the device.
+		void Set(DeviceContext context);
+
+		// Upload constants if required.
+		void UpdateVariables(DeviceContext context, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, dynamic> overrides, IGlobalResources globalResources);
+
+		// Reset to the same state as immediately after compile.
+		void Reset();
+
+		IEnumerable<IShaderVariable> Variables { get; }
+
+		// Find a variable by name.
+		IShaderVariable FindVariable(string name);
+
+		// Find a resource variable by name.
+		IShaderResourceVariable FindResourceVariable(string name);
+
+		// Input signature. Vertex shader only.
+		ShaderSignature Signature { get; }
+
+		// Frequency (i.e. type) of shader.
+		ShaderFrequency Frequency { get; }
+
+		// List of files that were included by this shader.
+		IEnumerable<string> IncludedFiles { get; }
+	}
+
+	class Shader : IShader
 	{
 		public Shader(Device device, string filename, string entryPoint, string profile, Func<string, string> includeLookup)
 		{

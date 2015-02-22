@@ -10,7 +10,7 @@ using SRPCommon.Scripting;
 
 namespace SRPRendering
 {
-	interface IShaderVariableBind
+	public interface IShaderVariableBind
 	{
 		void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, dynamic> overrides);
 		bool AllowScriptOverride { get; }

@@ -10,30 +10,41 @@ using SRPCommon.Util;
 
 namespace SRPRendering
 {
-	// Class for managing basic application (i.e. not script) controlled shaders for basic rendering functionality.
-	class BasicShaders : IDisposable
+	public interface IBasicShaders : IDisposable
 	{
 		/// <summary>
 		/// Simple vertex shader for rendering the scene.
 		/// </summary>
-		public Shader BasicSceneVS { get; private set; }
+		IShader BasicSceneVS { get; }
 
 		/// <summary>
 		/// A simple pixel shader that simply outputs a constant colour.
 		/// </summary>
-		public Shader SolidColourPS { get; private set; }
+		IShader SolidColourPS { get; }
 
 		/// <summary>
-		/// Solid colour to use when rendering with the solid colour pixel shader.
+		/// Shader variable for setting the solid colour to use when rendering with the solid colour pixel shader.
 		/// </summary>
-		public Color4 SolidColour
-		{
-			get { return solidColourVar.Get<Color4>(); }
-			set { solidColourVar.Set(value); }
-		}
+		IShaderVariable SolidColourShaderVar { get; }
+	}
 
-		// Cached reference to the solid colour shader variable.
-		private IShaderVariable solidColourVar;
+	// Class for managing basic application (i.e. not script) controlled shaders for basic rendering functionality.
+	class BasicShaders : IBasicShaders
+	{
+		/// <summary>
+		/// Simple vertex shader for rendering the scene.
+		/// </summary>
+		public IShader BasicSceneVS { get; private set; }
+
+		/// <summary>
+		/// A simple pixel shader that simply outputs a constant colour.
+		/// </summary>
+		public IShader SolidColourPS { get; private set; }
+
+		/// <summary>
+		/// Shader variable for setting the solid colour to use when rendering with the solid colour pixel shader.
+		/// </summary>
+		public IShaderVariable SolidColourShaderVar { get; private set; }
 
 
 		// List of shader that need to be disposed.
@@ -57,8 +68,8 @@ namespace SRPRendering
 			disposables.Add(SolidColourPS);
 
 			// Cache reference to the solid colour variable.
-			solidColourVar = SolidColourPS.FindVariable("SolidColour");
-			if (solidColourVar == null)
+			SolidColourShaderVar = SolidColourPS.FindVariable("SolidColour");
+			if (SolidColourShaderVar == null)
 				throw new Exception("Could not find SolidColour variable for solid colour pixel shader.");
 		}
 
@@ -69,7 +80,7 @@ namespace SRPRendering
 		}
 
 		// Bind a shader variable unconditionally.
-		private void BindShaderVariable(Shader shader, string variableName, ShaderVariableBindSource source)
+		private void BindShaderVariable(IShader shader, string variableName, ShaderVariableBindSource source)
 		{
 			var variable = shader.FindVariable(variableName);
 			if (variable == null)

@@ -20,16 +20,14 @@ namespace SRPRendering
 								   RenderScene scene,
 								   IList<Shader> shaders,
 								   IList<RenderTarget> renderTargets,
-								   IGlobalResources globalResources,
-								   BasicShaders basicShaders)
+								   IGlobalResources globalResources)
 		{
 			this.deviceContext = deviceContext;
 			this.viewInfo = viewInfo;
 			this.scene = scene;
 			this.shaders = shaders;
 			this.renderTargetResources = renderTargets;
-			this._globalResources = globalResources;
-			this.basicShaders = basicShaders;
+			_globalResources = globalResources;
 		}
 
 		#region IRenderContext interface
@@ -67,7 +65,7 @@ namespace SRPRendering
 			SetShaders(vertexShader, pixelShader);
 
 			// Draw each mesh.
-			foreach (var proxy in scene.PrimitiveProxies)
+			foreach (var proxy in scene.Primitives)
 			{
 				UpdateShaders(vertexShader, pixelShader, proxy, shaderVariableOverrides);
 				proxy.Mesh.Draw(deviceContext);
@@ -188,18 +186,18 @@ namespace SRPRendering
 				deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(SRPScripting.BlendState.NoBlending.ToD3D11());
 
 				// Set simple shaders.
-				SetShaders(basicShaders.BasicSceneVS, basicShaders.SolidColourPS);
+				SetShaders(_globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS);
 
 				// Construct transform matrix.
 				var transform = Matrix.Scaling(radius, radius, radius) * Matrix.Translation(pos);
 
 				// Set shader constants.
-				basicShaders.SolidColour = col;
-				UpdateShaders(basicShaders.BasicSceneVS, basicShaders.SolidColourPS, new SimplePrimitiveProxy(transform), null);
+				_globalResources.BasicShaders.SolidColourShaderVar.Set(col);
+				UpdateShaders(_globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS, new SimplePrimitiveProxy(transform), null);
 
 				// Set input layout
 				deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
-					deviceContext.Device, basicShaders.BasicSceneVS.Signature, BasicMesh.InputElements);
+					deviceContext.Device, _globalResources.BasicShaders.BasicSceneVS.Signature, BasicMesh.InputElements);
 
 				// Draw the sphere.
 				_globalResources.SphereMesh.Draw(deviceContext);
@@ -244,7 +242,7 @@ namespace SRPRendering
 		}
 
 		// Set the given shaders to the device.
-		private void SetShaders(params Shader[] shaders)
+		private void SetShaders(params IShader[] shaders)
 		{
 			foreach (var shader in shaders)
 			{
@@ -254,7 +252,7 @@ namespace SRPRendering
 		}
 
 		// Update the variables of the given shaders, unless they're null.
-		private void UpdateShaders(Shader vs, Shader ps, IPrimitive primitive, IDictionary<string, dynamic> variableOverrides)
+		private void UpdateShaders(IShader vs, IShader ps, IPrimitive primitive, IDictionary<string, dynamic> variableOverrides)
 		{
 			if (vs != null)
 				vs.UpdateVariables(deviceContext, viewInfo, primitive, variableOverrides, _globalResources);
@@ -334,6 +332,5 @@ namespace SRPRendering
 		private IList<RenderTarget> renderTargetResources;
 		private ViewInfo viewInfo;
 		private IGlobalResources _globalResources;
-		private BasicShaders basicShaders;
 	}
 }

@@ -15,7 +15,7 @@ namespace SRPRendering
 {
 	// Need out own shader variable type descriptor because the SlimDX one just references a D3D
 	// object that needs to be cleaned up after compilation is complete.
-	struct ShaderVariableTypeDesc
+	public struct ShaderVariableTypeDesc
 	{
 		public ShaderVariableClass Class;
 		public ShaderVariableType Type;
@@ -35,7 +35,7 @@ namespace SRPRendering
 	/// A single constant (non-resource) shader input.
 	/// </summary>
 	/// Observable fires when the value changes.
-	interface IShaderVariable : IObservable<Unit>
+	public interface IShaderVariable : IObservable<Unit>
 	{
 		/// <summary>
 		/// Name of the variable.

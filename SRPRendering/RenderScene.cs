@@ -10,10 +10,17 @@ using Buffer = SlimDX.Direct3D11.Buffer;
 
 namespace SRPRendering
 {
-	class RenderScene : IDisposable
+	public interface IRenderScene : IDisposable
 	{
-		public IEnumerable<PrimitiveProxy> PrimitiveProxies { get { return primitiveProxies; } }
-		//public IDictionary<string, Texture> Textures { get { return textures; } }
+		IEnumerable<IPrimitive> Primitives { get; }
+
+		// Return the texture for a given filename. Always returns a valid ref.
+		Texture GetTexture(string filename);
+	}
+
+	class RenderScene : IRenderScene
+	{
+		public IEnumerable<IPrimitive> Primitives { get { return primitiveProxies; } }
 
 		// Return the texture for a given filename. Always returns a valid ref.
 		public Texture GetTexture(string filename)

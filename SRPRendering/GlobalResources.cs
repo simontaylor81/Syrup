@@ -17,6 +17,8 @@ namespace SRPRendering
 		IDrawable SphereMesh { get; }
 		IDrawable FullscreenQuad { get; }
 
+		IBasicShaders BasicShaders { get; }
+
 		// State object caches.
 		IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; }
 		IStateObjectCache<DepthStencilState, DepthStencilStateDescription> DepthStencilStateCache { get; }
@@ -33,6 +35,8 @@ namespace SRPRendering
 
 		public IDrawable SphereMesh { get; private set; }
 		public IDrawable FullscreenQuad { get; private set; }
+
+		public IBasicShaders BasicShaders { get; private set; }
 
 		// State object caches.
 		public IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; private set; }
@@ -58,6 +62,9 @@ namespace SRPRendering
 			var fullscreenQuad = new FullscreenQuad(device);
 			FullscreenQuad = fullscreenQuad;
 			disposables.Add(fullscreenQuad);
+
+			BasicShaders = new BasicShaders(device);
+			disposables.Add(BasicShaders);
 
 			// Create the state object caches.
 			RastStateCache = new StateObjectCache<RasterizerState, RasterizerStateDescription>(device, RasterizerState.FromDescription);

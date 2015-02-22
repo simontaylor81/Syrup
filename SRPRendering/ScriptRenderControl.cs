@@ -30,9 +30,6 @@ namespace SRPRendering
 
 			ScriptInterface = new ScriptRenderInterface(this);
 
-			basicShaders = new BasicShaders(device);
-			disposables.Add(basicShaders);
-
 			// Initialise basic resources.
 			_globalResources = new GlobalResources(device);
 			disposables.Add(_globalResources);
@@ -41,7 +38,7 @@ namespace SRPRendering
 			disposables.Add(scripting.PreExecute.Subscribe(_ => Reset()));
 			disposables.Add(scripting.ExecutionComplete.Subscribe(ExecutionComplete));
 
-			overlayRenderer = new OverlayRenderer(basicShaders, _globalResources);
+			overlayRenderer = new OverlayRenderer(_globalResources);
 		}
 
 		private void Reset()
@@ -347,8 +344,7 @@ namespace SRPRendering
 						scene,
 						shaders,
 						(from desc in renderTargets select desc.renderTarget).ToArray(),
-						_globalResources,
-						basicShaders);
+						_globalResources);
 
 					frameCallback(renderContext);
 				}
@@ -433,9 +429,6 @@ namespace SRPRendering
 
 		// User variables.
 		private List<UserVariable> userVariables = new List<UserVariable>();
-
-		// Basic shader types.
-		private BasicShaders basicShaders;
 
 		// Object that handles rendering the viewport overlay.
 		private OverlayRenderer overlayRenderer;
