@@ -18,6 +18,7 @@ using SRPCommon.Util;
 using SRPRendering;
 using ShaderEditorApp.ViewModel.Projects;
 using ShaderEditorApp.ViewModel.Scene;
+using System.Reactive;
 
 namespace ShaderEditorApp.Workspace
 {
@@ -36,11 +37,10 @@ namespace ShaderEditorApp.Workspace
 			scripting = new Scripting();
 			scriptRenderControl = new ScriptRenderControl(this, renderWindow.Device, scripting);
 			scripting.RenderInterface = scriptRenderControl.ScriptInterface;
+			scriptRenderControl.RedrawRequired.Subscribe(_ => RedrawViewports());
 
 			renderWindow.ScriptControl = scriptRenderControl;
 			renderWindow.ViewportViewModel = ViewportViewModel;
-
-			ViewportsDirtied += () => renderWindow.Invalidate();
 
 			Application.Current.Activated += (o, _e) => isAppForeground = true;
 			Application.Current.Deactivated += (o, _e) => isAppForeground = false;
@@ -271,11 +271,8 @@ namespace ShaderEditorApp.Workspace
 
 		public void RedrawViewports()
 		{
-			if (!scriptRenderControl.IgnoreRedrawRequests)
-			{
-				ViewportsDirtied();
-			}
-		}
+			renderWindow.Invalidate();
+        }
 
 		public string FindProjectFile(string name)
 		{
@@ -461,9 +458,6 @@ namespace ShaderEditorApp.Workspace
 		// TODO: Move info needed?
 		// TODO: Cleanup, consoliate. Interface?
 		public System.Drawing.Size ViewportSize { get { return renderWindow.Size; } }
-
-		// Event to fire when render windows need to be updated.
-		private event Action ViewportsDirtied;
 
 		// List of documents that have been externally modified.
 		private HashSet<DocumentViewModel> modifiedDocuments = new HashSet<DocumentViewModel>();

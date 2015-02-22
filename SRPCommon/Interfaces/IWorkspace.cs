@@ -15,10 +15,5 @@ namespace SRPCommon.Interfaces
 		/// <param name="name">Filename (without path) of the file to find.</param>
 		/// <returns>The absolute path of the file if found, null otherwise.</returns>
 		string FindProjectFile(string name);
-
-		/// <summary>
-		/// Request redrawing of all viewports.
-		/// </summary>
-		void RedrawViewports();
 	}
 }

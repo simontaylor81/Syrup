@@ -14,6 +14,8 @@ using SRPCommon.Scripting;
 using SRPCommon.UserProperties;
 using SRPCommon.Util;
 using SRPScripting;
+using System.Reactive;
+using System.Reactive.Subjects;
 
 namespace SRPRendering
 {
@@ -84,7 +86,19 @@ namespace SRPRendering
 			// When a property changes, redraw the viewports.
 			foreach (var property in properties)
 			{
-				disposables.Add(property.Subscribe(_ => workspace.RedrawViewports()));
+				disposables.Add(property.Subscribe(_ => FireRedrawRequired()));
+			}
+		}
+
+		public IObservable<Unit> RedrawRequired { get { return _redrawRequired; } }
+		private readonly Subject<Unit> _redrawRequired = new Subject<Unit>();
+		private bool _bIgnoreRedrawRequests;
+
+		private void FireRedrawRequired()
+		{
+			if (!this._bIgnoreRedrawRequests)
+			{
+				_redrawRequired.OnNext(Unit.Default);
 			}
 		}
 
@@ -105,7 +119,7 @@ namespace SRPRendering
 
 					// Missing scene can cause rendering to fail -- give it another try with the new one.
 					bScriptRenderError = false;
-					workspace.RedrawViewports();
+					FireRedrawRequired();
 				}
 			}
 		}
@@ -322,7 +336,7 @@ namespace SRPRendering
 				return;
 
 			// Don't redraw viewports because of internal shader variable changes (e.g. bindings).
-			IgnoreRedrawRequests = true;
+			_bIgnoreRedrawRequests = true;
 
 			// Create render targets if necessary.
 			UpdateRenderTargets(viewInfo.ViewportWidth, viewInfo.ViewportHeight);
@@ -361,7 +375,7 @@ namespace SRPRendering
 			// Render the overlay.
 			overlayRenderer.Draw(deviceContext, scene, viewInfo);
 
-			IgnoreRedrawRequests = false;
+			_bIgnoreRedrawRequests = false;
 		}
 
 		private void UpdateRenderTargets(int viewportWidth, int viewportHeight)
@@ -386,8 +400,6 @@ namespace SRPRendering
 
 		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
 		public IRenderInterface ScriptInterface { get; private set; }
-
-		public bool IgnoreRedrawRequests { get; private set; }
 
 		private ObservableCollection<IUserProperty> properties = new ObservableCollection<IUserProperty>();
 		public ObservableCollection<IUserProperty> Properties { get { return properties; } }
