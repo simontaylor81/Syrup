@@ -10,8 +10,13 @@ using System.Security.Cryptography;
 
 namespace SRPRendering
 {
+	public interface IShaderCache : IDisposable
+	{
+		IShader GetShader(string filename, string entryPoint, string profile, Func<string, string> includeLookup);
+    }
+
 	// Simple cache to avoid recompiling shaders every execution if they haven't changed.
-	class ShaderCache : IDisposable
+	class ShaderCache : IShaderCache
 	{
 		public ShaderCache(Device device)
 		{
@@ -27,7 +32,7 @@ namespace SRPRendering
 			cache.Clear();
 		}
 
-		public Shader GetShader(string filename, string entryPoint, string profile, Func<string, string> includeLookup)
+		public IShader GetShader(string filename, string entryPoint, string profile, Func<string, string> includeLookup)
 		{
 			// Read the file and compute its hash.
 			// TODO: Hash include files as well

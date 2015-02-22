@@ -18,7 +18,7 @@ namespace SRPRendering
 		public ScriptRenderContext(DeviceContext deviceContext,
 								   ViewInfo viewInfo,
 								   RenderScene scene,
-								   IList<Shader> shaders,
+								   IList<IShader> shaders,
 								   IList<RenderTarget> renderTargets,
 								   IGlobalResources globalResources)
 		{
@@ -328,7 +328,7 @@ namespace SRPRendering
 
 		private DeviceContext deviceContext;
 		private RenderScene scene;
-		private IList<Shader> shaders;
+		private IList<IShader> shaders;
 		private IList<RenderTarget> renderTargetResources;
 		private ViewInfo viewInfo;
 		private IGlobalResources _globalResources;

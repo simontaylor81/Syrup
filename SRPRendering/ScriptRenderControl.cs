@@ -148,7 +148,7 @@ namespace SRPRendering
 		}
 
 		// Set up auto variable binds for a shader
-		private void BindAutoShaderVariables(Shader shader)
+		private void BindAutoShaderVariables(IShader shader)
 		{
 			foreach (var variable in shader.Variables)
 			{
@@ -399,7 +399,7 @@ namespace SRPRendering
 		private Device device;
 
 		// Resource arrays.
-		private List<Shader> shaders = new List<Shader>();
+		private List<IShader> shaders = new List<IShader>();
 
 		// Script-generated resources.
 		private List<Texture> textures = new List<Texture>();
@@ -419,7 +419,7 @@ namespace SRPRendering
 		private IWorkspace workspace;
 
 		// Cache for compiled shaders.
-		private ShaderCache shaderCache;
+		private IShaderCache shaderCache;
 
 		private bool bScriptExecutionError = false;		// True if there was a problem executing the script
 		private bool bScriptRenderError = false;		// True if there was a script error while rendering
