@@ -5,13 +5,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using SlimDX.Direct3D11;
 using SRPCommon.Util;
+using System.Reactive.Disposables;
 
 namespace SRPRendering
 {
 	public interface IGlobalResources : IDisposable
 	{
-		// The resources themselves.
+		// Texture to use to indicate error when non is found.
 		Texture ErrorTexture { get; }
+
+		IDrawable SphereMesh { get; }
+		IDrawable FullscreenQuad { get; }
 
 		// State object caches.
 		IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; }
@@ -27,6 +31,9 @@ namespace SRPRendering
 		// The resources themselves.
 		public Texture ErrorTexture { get; private set; }
 
+		public IDrawable SphereMesh { get; private set; }
+		public IDrawable FullscreenQuad { get; private set; }
+
 		// State object caches.
 		public IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; private set; }
 		public IStateObjectCache<DepthStencilState, DepthStencilStateDescription> DepthStencilStateCache { get; private set; }
@@ -34,11 +41,23 @@ namespace SRPRendering
 		public IStateObjectCache<SamplerState, SamplerDescription> SamplerStateCache { get; private set; }
 		public IInputLayoutCache InputLayoutCache { get; private set; }
 
+		private CompositeDisposable disposables = new CompositeDisposable();
+
 		// Initialise the resources.
 		public GlobalResources(Device device)
 		{
 			// Create constant pink error texture.
 			ErrorTexture = CreateConstantColourTexture(device, Color.Magenta);
+			disposables.Add(ErrorTexture);
+
+			// Create simple utility meshes.
+			var sphereMesh = BasicMesh.CreateSphere(device, 12, 6);
+			SphereMesh = sphereMesh;
+            disposables.Add(sphereMesh);
+
+			var fullscreenQuad = new FullscreenQuad(device);
+			FullscreenQuad = fullscreenQuad;
+			disposables.Add(fullscreenQuad);
 
 			// Create the state object caches.
 			RastStateCache = new StateObjectCache<RasterizerState, RasterizerStateDescription>(device, RasterizerState.FromDescription);
@@ -46,19 +65,18 @@ namespace SRPRendering
 			BlendStateCache = new StateObjectCache<BlendState, BlendStateDescription>(device, BlendState.FromDescription);
 			SamplerStateCache = new StateObjectCache<SamplerState, SamplerDescription>(device, SamplerState.FromDescription);
 			InputLayoutCache = new InputLayoutCache();
+
+			disposables.Add(RastStateCache);
+			disposables.Add(DepthStencilStateCache);
+			disposables.Add(BlendStateCache);
+			disposables.Add(SamplerStateCache);
+			disposables.Add(InputLayoutCache);
 		}
 
 		// Release all resources.
 		public void Dispose()
 		{
-			DisposableUtil.SafeDispose(ErrorTexture);
-			ErrorTexture = null;
-
-			RastStateCache.Dispose();
-			DepthStencilStateCache.Dispose();
-			BlendStateCache.Dispose();
-			SamplerStateCache.Dispose();
-			InputLayoutCache.Dispose();
+			disposables.Dispose();
 		}
 
 		// Create a texture with a solid colour.

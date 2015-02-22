@@ -26,8 +26,6 @@ namespace SRPRendering
 			this.workspace = workspace;
 			this.device = device;
 
-			sphereMesh = BasicMesh.CreateSphere(device, 12, 6);
-			fullscreenQuad = new FullscreenQuad(device);
 			shaderCache = new ShaderCache(device);
 
 			ScriptInterface = new ScriptRenderInterface(this);
@@ -313,9 +311,6 @@ namespace SRPRendering
 		{
 			disposables.Dispose();
 
-			sphereMesh.Dispose();
-			fullscreenQuad.Dispose();
-
 			inputLayoutCache.Dispose();
 			shaderCache.Dispose();
 			shaders.Clear();
@@ -353,8 +348,6 @@ namespace SRPRendering
 						shaders,
 						(from desc in renderTargets select desc.renderTarget).ToArray(),
 						_globalResources,
-						sphereMesh,
-						fullscreenQuad,
 						basicShaders);
 
 					frameCallback(renderContext);
@@ -422,10 +415,6 @@ namespace SRPRendering
 		private FrameCallback frameCallback;
 
 		private InputLayoutCache inputLayoutCache = new InputLayoutCache();
-
-		// Mesh to use for the DrawSphere command.
-		private Mesh sphereMesh;
-		private FullscreenQuad fullscreenQuad;
 
 		// Miscellaneous shared resources.
 		private IGlobalResources _globalResources;

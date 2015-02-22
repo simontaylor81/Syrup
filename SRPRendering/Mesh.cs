@@ -9,7 +9,7 @@ using SRPCommon.Util;
 namespace SRPRendering
 {
 	// Generic mesh class, containing vertex buffer, index buffer, etc.
-	public class Mesh : IDisposable
+	public class Mesh : IDrawable, IDisposable
 	{
 		/*
 		public Mesh(Buffer vertexBuffer, Buffer indexBuffer, InputElement[] inputElements)

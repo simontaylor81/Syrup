@@ -21,8 +21,6 @@ namespace SRPRendering
 								   IList<Shader> shaders,
 								   IList<RenderTarget> renderTargets,
 								   IGlobalResources globalResources,
-								   Mesh sphereMesh,
-								   FullscreenQuad fullscreenQuad,
 								   BasicShaders basicShaders)
 		{
 			this.deviceContext = deviceContext;
@@ -31,8 +29,6 @@ namespace SRPRendering
 			this.shaders = shaders;
 			this.renderTargetResources = renderTargets;
 			this._globalResources = globalResources;
-			this.sphereMesh = sphereMesh;
-			this.fullscreenQuad = fullscreenQuad;
 			this.basicShaders = basicShaders;
 		}
 
@@ -100,7 +96,7 @@ namespace SRPRendering
 
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
-				deviceContext.Device, vertexShader.Signature, sphereMesh.InputElements);
+				deviceContext.Device, vertexShader.Signature, BasicMesh.InputElements);
 
 			// Set render state.
 			SetRenderTargets(renderTargetHandles, depthBuffer);
@@ -111,7 +107,7 @@ namespace SRPRendering
 
 			// Draw the sphere mesh.
 			UpdateShaders(vertexShader, pixelShader, null, shaderVariableOverrides);		// TODO: Pass a valid proxy here?
-			sphereMesh.Draw(deviceContext);
+			_globalResources.SphereMesh.Draw(deviceContext);
 
 			// Force all state to defaults -- we're completely stateless.
 			deviceContext.ClearState();
@@ -143,7 +139,7 @@ namespace SRPRendering
 
 			// Draw the quad.
 			UpdateShaders(vertexShader, pixelShader, null, shaderVariableOverrides);
-			fullscreenQuad.Draw(deviceContext);
+			_globalResources.FullscreenQuad.Draw(deviceContext);
 
 			// Force all state to defaults -- we're completely stateless.
 			deviceContext.ClearState();
@@ -203,10 +199,10 @@ namespace SRPRendering
 
 				// Set input layout
 				deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
-					deviceContext.Device, basicShaders.BasicSceneVS.Signature, sphereMesh.InputElements);
+					deviceContext.Device, basicShaders.BasicSceneVS.Signature, BasicMesh.InputElements);
 
 				// Draw the sphere.
-				sphereMesh.Draw(deviceContext);
+				_globalResources.SphereMesh.Draw(deviceContext);
 			}
 			catch (ScriptException ex)
 			{
@@ -338,8 +334,6 @@ namespace SRPRendering
 		private IList<RenderTarget> renderTargetResources;
 		private ViewInfo viewInfo;
 		private IGlobalResources _globalResources;
-		private Mesh sphereMesh;
-		private FullscreenQuad fullscreenQuad;
 		private BasicShaders basicShaders;
 	}
 }

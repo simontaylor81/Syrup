@@ -97,8 +97,10 @@ namespace SRPRendering
 			AddFace(indices, rowA + i, rowB, rowA);
 
 			// Wrap up in a new mesh object.
-			return new Mesh(device, vertices, SceneVertex.GetStride(), indices, SceneVertex.InputElements);
+			return new Mesh(device, vertices, SceneVertex.GetStride(), indices, InputElements);
 		}
+
+		public static InputElement[] InputElements { get { return SceneVertex.InputElements; } }
 
 		// Write a vertex for a sphere, which has a normal equal to its position.
 		private static void WriteSphereVert(DataStream stream, Vector3 position)

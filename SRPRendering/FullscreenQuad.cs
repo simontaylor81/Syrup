@@ -10,7 +10,7 @@ using Buffer = SlimDX.Direct3D11.Buffer;
 
 namespace SRPRendering
 {
-	class FullscreenQuad : IDisposable
+	class FullscreenQuad : IDrawable, IDisposable
 	{
 		public FullscreenQuad(Device device)
 		{
