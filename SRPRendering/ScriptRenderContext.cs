@@ -20,6 +20,7 @@ namespace SRPRendering
 								   RenderScene scene,
 								   IList<Shader> shaders,
 								   IList<RenderTarget> renderTargets,
+								   IGlobalResources globalResources,
 								   Mesh sphereMesh,
 								   FullscreenQuad fullscreenQuad,
 								   BasicShaders basicShaders)
@@ -29,6 +30,7 @@ namespace SRPRendering
 			this.scene = scene;
 			this.shaders = shaders;
 			this.renderTargetResources = renderTargets;
+			this._globalResources = globalResources;
 			this.sphereMesh = sphereMesh;
 			this.fullscreenQuad = fullscreenQuad;
 			this.basicShaders = basicShaders;
@@ -48,7 +50,7 @@ namespace SRPRendering
 		{
 			Shader vertexShader = GetShader(vertexShaderIndex);
 			Shader pixelShader = GetShader(pixelShaderIndex);
-			
+
 			// Vertex shader is not optional.
 			if (vertexShader == null)
 				throw new ScriptException("DrawScene: Cannot draw without a vertex shader.");
@@ -58,14 +60,14 @@ namespace SRPRendering
 				throw new ScriptException("DrawScene: No scene set.");
 
 			// Set input layout
-			deviceContext.InputAssembler.InputLayout = GlobalResources.Instance.InputLayoutCache.GetInputLayout(
+			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
 				deviceContext.Device, vertexShader.Signature, SceneVertex.InputElements);
 
 			// Set render state.
 			SetRenderTargets(renderTargetHandles, depthBuffer);
-			deviceContext.Rasterizer.State = GlobalResources.Instance.RastStateCache.Get(rastState.ToD3D11());
-			deviceContext.OutputMerger.DepthStencilState = GlobalResources.Instance.DepthStencilStateCache.Get(depthStencilState.ToD3D11());
-			deviceContext.OutputMerger.BlendState = GlobalResources.Instance.BlendStateCache.Get(blendState.ToD3D11());
+			deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(rastState.ToD3D11());
+			deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(depthStencilState.ToD3D11());
+			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(blendState.ToD3D11());
 			SetShaders(vertexShader, pixelShader);
 
 			// Draw each mesh.
@@ -97,14 +99,14 @@ namespace SRPRendering
 				throw new ScriptException("DrawSphere: Cannot draw without a vertex shader.");
 
 			// Set input layout
-			deviceContext.InputAssembler.InputLayout = GlobalResources.Instance.InputLayoutCache.GetInputLayout(
+			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
 				deviceContext.Device, vertexShader.Signature, sphereMesh.InputElements);
 
 			// Set render state.
 			SetRenderTargets(renderTargetHandles, depthBuffer);
-			deviceContext.Rasterizer.State = GlobalResources.Instance.RastStateCache.Get(rastState.ToD3D11());
-			deviceContext.OutputMerger.DepthStencilState = GlobalResources.Instance.DepthStencilStateCache.Get(depthStencilState.ToD3D11());
-			deviceContext.OutputMerger.BlendState = GlobalResources.Instance.BlendStateCache.Get(blendState.ToD3D11());
+			deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(rastState.ToD3D11());
+			deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(depthStencilState.ToD3D11());
+			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(blendState.ToD3D11());
 			SetShaders(vertexShader, pixelShader);
 
 			// Draw the sphere mesh.
@@ -129,14 +131,14 @@ namespace SRPRendering
 				throw new ScriptException("DrawFullscreenQuad: Cannot draw without a vertex shader.");
 
 			// Set input layout
-			deviceContext.InputAssembler.InputLayout = GlobalResources.Instance.InputLayoutCache.GetInputLayout(
+			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
 				deviceContext.Device, vertexShader.Signature, FullscreenQuad.InputElements);
 
 			// Set render state.
 			SetRenderTargets(renderTargetHandles, DepthBufferHandle.NoDepthBuffer);
-			deviceContext.Rasterizer.State = GlobalResources.Instance.RastStateCache.Get(RastState.Default.ToD3D11());
-			deviceContext.OutputMerger.DepthStencilState = GlobalResources.Instance.DepthStencilStateCache.Get(SRPScripting.DepthStencilState.DisableDepth.ToD3D11());
-			deviceContext.OutputMerger.BlendState = GlobalResources.Instance.BlendStateCache.Get(SRPScripting.BlendState.NoBlending.ToD3D11());
+			deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(RastState.Default.ToD3D11());
+			deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(SRPScripting.DepthStencilState.DisableDepth.ToD3D11());
+			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(SRPScripting.BlendState.NoBlending.ToD3D11());
 			SetShaders(vertexShader, pixelShader);
 
 			// Draw the quad.
@@ -185,9 +187,9 @@ namespace SRPRendering
 
 				// Set wireframe render state.
 				var rastState = new RastState(SRPScripting.FillMode.Wireframe);
-				deviceContext.Rasterizer.State = GlobalResources.Instance.RastStateCache.Get(rastState.ToD3D11());
-				deviceContext.OutputMerger.DepthStencilState = GlobalResources.Instance.DepthStencilStateCache.Get(SRPScripting.DepthStencilState.DisableDepthWrite.ToD3D11());
-				deviceContext.OutputMerger.BlendState = GlobalResources.Instance.BlendStateCache.Get(SRPScripting.BlendState.NoBlending.ToD3D11());
+				deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(rastState.ToD3D11());
+				deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(SRPScripting.DepthStencilState.DisableDepthWrite.ToD3D11());
+				deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(SRPScripting.BlendState.NoBlending.ToD3D11());
 
 				// Set simple shaders.
 				SetShaders(basicShaders.BasicSceneVS, basicShaders.SolidColourPS);
@@ -200,7 +202,7 @@ namespace SRPRendering
 				UpdateShaders(basicShaders.BasicSceneVS, basicShaders.SolidColourPS, new SimplePrimitiveProxy(transform), null);
 
 				// Set input layout
-				deviceContext.InputAssembler.InputLayout = GlobalResources.Instance.InputLayoutCache.GetInputLayout(
+				deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
 					deviceContext.Device, basicShaders.BasicSceneVS.Signature, sphereMesh.InputElements);
 
 				// Draw the sphere.
@@ -259,12 +261,12 @@ namespace SRPRendering
 		private void UpdateShaders(Shader vs, Shader ps, IPrimitive primitive, IDictionary<string, dynamic> variableOverrides)
 		{
 			if (vs != null)
-				vs.UpdateVariables(deviceContext, viewInfo, primitive, variableOverrides);
+				vs.UpdateVariables(deviceContext, viewInfo, primitive, variableOverrides, _globalResources);
 			else
 				deviceContext.VertexShader.Set(null);
 
 			if (ps != null)
-				ps.UpdateVariables(deviceContext, viewInfo, primitive, variableOverrides);
+				ps.UpdateVariables(deviceContext, viewInfo, primitive, variableOverrides, _globalResources);
 			else
 				deviceContext.PixelShader.Set(null);
 		}
@@ -335,6 +337,7 @@ namespace SRPRendering
 		private IList<Shader> shaders;
 		private IList<RenderTarget> renderTargetResources;
 		private ViewInfo viewInfo;
+		private IGlobalResources _globalResources;
 		private Mesh sphereMesh;
 		private FullscreenQuad fullscreenQuad;
 		private BasicShaders basicShaders;

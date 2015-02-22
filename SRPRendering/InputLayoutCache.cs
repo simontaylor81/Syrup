@@ -9,7 +9,12 @@ using SRPCommon.Scripting;
 
 namespace SRPRendering
 {
-	class InputLayoutCache : IDisposable
+	public interface IInputLayoutCache : IDisposable
+	{
+		InputLayout GetInputLayout(Device device, ShaderSignature shaderSignature, InputElement[] inputElements);
+    }
+
+	class InputLayoutCache : IInputLayoutCache
 	{
 		public InputLayout GetInputLayout(Device device, ShaderSignature shaderSignature, InputElement[] inputElements)
 		{

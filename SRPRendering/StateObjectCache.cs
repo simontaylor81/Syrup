@@ -7,8 +7,15 @@ using SlimDX.Direct3D11;
 
 namespace SRPRendering
 {
+	public interface IStateObjectCache<StateType, StateDescriptorType> : IDisposable
+		where StateDescriptorType : struct
+		where StateType : IDisposable
+	{
+		StateType Get(StateDescriptorType desc);
+	}
+
 	// A cache for D3D state objects.
-	class StateObjectCache<StateType, StateDescriptorType> : IDisposable
+	class StateObjectCache<StateType, StateDescriptorType> : IStateObjectCache<StateType, StateDescriptorType>
 		where StateDescriptorType : struct
 		where StateType : IDisposable
 	{

@@ -8,30 +8,34 @@ using SRPCommon.Util;
 
 namespace SRPRendering
 {
+	public interface IGlobalResources : IDisposable
+	{
+		// The resources themselves.
+		Texture ErrorTexture { get; }
+
+		// State object caches.
+		IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; }
+		IStateObjectCache<DepthStencilState, DepthStencilStateDescription> DepthStencilStateCache { get; }
+		IStateObjectCache<BlendState, BlendStateDescription> BlendStateCache { get; }
+		IStateObjectCache<SamplerState, SamplerDescription> SamplerStateCache { get; }
+		IInputLayoutCache InputLayoutCache { get; }
+	}
+
 	// Holder for various global D3D resources.
-	internal class GlobalResources : IDisposable
+	internal class GlobalResources : IGlobalResources
 	{
 		// The resources themselves.
 		public Texture ErrorTexture { get; private set; }
 
 		// State object caches.
-		internal StateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; private set; }
-		internal StateObjectCache<DepthStencilState, DepthStencilStateDescription> DepthStencilStateCache { get; private set; }
-		internal StateObjectCache<BlendState, BlendStateDescription> BlendStateCache { get; private set; }
-		internal StateObjectCache<SamplerState, SamplerDescription> SamplerStateCache { get; private set; }
-		internal InputLayoutCache InputLayoutCache { get; private set; }
-
-		// Singleton instance.
-		private static Lazy<GlobalResources> instance = new Lazy<GlobalResources>(() => new GlobalResources());
-		public static GlobalResources Instance { get { return instance.Value; } }
-
-		// Private constructor to inforce singleton.
-		private GlobalResources()
-		{
-		}
+		public IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; private set; }
+		public IStateObjectCache<DepthStencilState, DepthStencilStateDescription> DepthStencilStateCache { get; private set; }
+		public IStateObjectCache<BlendState, BlendStateDescription> BlendStateCache { get; private set; }
+		public IStateObjectCache<SamplerState, SamplerDescription> SamplerStateCache { get; private set; }
+		public IInputLayoutCache InputLayoutCache { get; private set; }
 
 		// Initialise the resources.
-		public void Init(Device device)
+		public GlobalResources(Device device)
 		{
 			// Create constant pink error texture.
 			ErrorTexture = CreateConstantColourTexture(device, Color.Magenta);

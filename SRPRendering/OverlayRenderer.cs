@@ -10,11 +10,13 @@ namespace SRPRendering
 	// Class for rendering an overlay on top of the viewport.
 	internal class OverlayRenderer
 	{
-		private BasicShaders basicShaders;
+		private readonly BasicShaders _basicShaders;
+		private readonly IGlobalResources _globalResources;
 
-		public OverlayRenderer(BasicShaders basicShaders)
+		public OverlayRenderer(BasicShaders basicShaders, IGlobalResources globalResources)
 		{
-			this.basicShaders = basicShaders;
+			this._basicShaders = basicShaders;
+			_globalResources = globalResources;
 		}
 
 		// Render the overlay.
@@ -30,26 +32,26 @@ namespace SRPRendering
 			var depthState = SRPScripting.DepthStencilState.DisableDepthWrite;
 			var blendState = SRPScripting.BlendState.NoBlending;
 
-			deviceContext.Rasterizer.State = GlobalResources.Instance.RastStateCache.Get(rastState.ToD3D11());
-			deviceContext.OutputMerger.DepthStencilState = GlobalResources.Instance.DepthStencilStateCache.Get(depthState.ToD3D11());
-			deviceContext.OutputMerger.BlendState = GlobalResources.Instance.BlendStateCache.Get(blendState.ToD3D11());
+			deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(rastState.ToD3D11());
+			deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(depthState.ToD3D11());
+			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(blendState.ToD3D11());
 
 			// Set simple shaders.
-			basicShaders.BasicSceneVS.Set(deviceContext);
-			basicShaders.SolidColourPS.Set(deviceContext);
+			_basicShaders.BasicSceneVS.Set(deviceContext);
+			_basicShaders.SolidColourPS.Set(deviceContext);
 
 			// Set shader constants.
-			basicShaders.SolidColour = new Color4(1.0f, 1.0f, 0.0f);	// Yellow
+			_basicShaders.SolidColour = new Color4(1.0f, 1.0f, 0.0f);	// Yellow
 
 			// Set input layout
-			deviceContext.InputAssembler.InputLayout = GlobalResources.Instance.InputLayoutCache.GetInputLayout(
-				deviceContext.Device, basicShaders.BasicSceneVS.Signature, SceneVertex.InputElements);
+			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
+				deviceContext.Device, _basicShaders.BasicSceneVS.Signature, SceneVertex.InputElements);
 
 			// Draw the selected mesh
 			var proxy = scene.PrimitiveProxies.ElementAt(selectedMeshIndex);
 
-			basicShaders.BasicSceneVS.UpdateVariables(deviceContext, viewInfo, proxy, null);
-			basicShaders.SolidColourPS.UpdateVariables(deviceContext, viewInfo, proxy, null);
+			_basicShaders.BasicSceneVS.UpdateVariables(deviceContext, viewInfo, proxy, null, _globalResources);
+			_basicShaders.SolidColourPS.UpdateVariables(deviceContext, viewInfo, proxy, null, _globalResources);
 			proxy.Mesh.Draw(deviceContext);
 		}
 

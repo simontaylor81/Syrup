@@ -116,7 +116,7 @@ namespace SRPRendering
 		}
 
 		// Upload constants if required.
-		public void UpdateVariables(DeviceContext context, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, dynamic> overrides)
+		public void UpdateVariables(DeviceContext context, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, dynamic> overrides, IGlobalResources globalResources)
 		{
 			// First, update the value of bound and overridden variables.
 			foreach (var variable in Variables)
@@ -148,7 +148,7 @@ namespace SRPRendering
 			{
 				if (resourceVariable.Bind != null)
 				{
-					resourceVariable.Bind.Set(primitive, viewInfo, resourceVariable);
+					resourceVariable.Bind.Set(primitive, viewInfo, resourceVariable, globalResources);
 				}
 
 				resourceVariable.SetToDevice(context);

@@ -9,7 +9,7 @@ namespace SRPRendering
 {
 	interface IShaderResourceVariableBind
 	{
-		void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable);
+		void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable, IGlobalResources globalResources);
 	}
 
 	class MaterialShaderResourceVariableBind : IShaderResourceVariableBind
@@ -19,10 +19,10 @@ namespace SRPRendering
 			this.paramName = paramName;
 		}
 
-		public void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable)
+		public void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable, IGlobalResources globalResources)
 		{
 			// TODO: user set sampler state somehow.
-			variable.Sampler = GlobalResources.Instance.SamplerStateCache.Get(SRPScripting.SamplerState.LinearWrap.ToD3D11());
+			variable.Sampler = globalResources.SamplerStateCache.Get(SRPScripting.SamplerState.LinearWrap.ToD3D11());
 
 			// Look up texture filename in the material.
 			if (primitive != null && primitive.Material != null)
@@ -37,7 +37,7 @@ namespace SRPRendering
 			}
 
 			// Fall back on error texture.
-			variable.Resource = GlobalResources.Instance.ErrorTexture.SRV;
+			variable.Resource = globalResources.ErrorTexture.SRV;
 		}
 
 		private string paramName;
@@ -50,10 +50,10 @@ namespace SRPRendering
 			this.texture = texture;
 		}
 
-		public void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable)
+		public void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable, IGlobalResources globalResources)
 		{
 			// TODO: user set sampler state somehow.
-			variable.Sampler = GlobalResources.Instance.SamplerStateCache.Get(SRPScripting.SamplerState.PointClamp.ToD3D11());
+			variable.Sampler = globalResources.SamplerStateCache.Get(SRPScripting.SamplerState.PointClamp.ToD3D11());
 			variable.Resource = texture.SRV;
 		}
 
@@ -67,10 +67,10 @@ namespace SRPRendering
 			this.descriptor = descriptor;
 		}
 
-		public void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable)
+		public void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable, IGlobalResources globalResources)
 		{
 			// TODO: user set sampler state somehow.
-			variable.Sampler = GlobalResources.Instance.SamplerStateCache.Get(SRPScripting.SamplerState.PointClamp.ToD3D11());
+			variable.Sampler = globalResources.SamplerStateCache.Get(SRPScripting.SamplerState.PointClamp.ToD3D11());
 
 			System.Diagnostics.Debug.Assert(descriptor.renderTarget != null);
 			variable.Resource = descriptor.renderTarget.SRV;
@@ -81,10 +81,10 @@ namespace SRPRendering
 
 	class DefaultDepthBufferShaderResourceVariableBind : IShaderResourceVariableBind
 	{
-		public void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable)
+		public void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable, IGlobalResources globalResources)
 		{
 			// TODO: user set sampler state somehow.
-			variable.Sampler = GlobalResources.Instance.SamplerStateCache.Get(SRPScripting.SamplerState.PointClamp.ToD3D11());
+			variable.Sampler = globalResources.SamplerStateCache.Get(SRPScripting.SamplerState.PointClamp.ToD3D11());
 
 			variable.Resource = viewInfo.DepthBuffer.SRV;
 		}

@@ -36,14 +36,14 @@ namespace SRPRendering
 			disposables.Add(basicShaders);
 
 			// Initialise basic resources.
-			GlobalResources.Instance.Init(device);
-			disposables.Add(GlobalResources.Instance);
+			_globalResources = new GlobalResources(device);
+			disposables.Add(_globalResources);
 
 			// Reset before script execution.
 			disposables.Add(scripting.PreExecute.Subscribe(_ => Reset()));
 			disposables.Add(scripting.ExecutionComplete.Subscribe(ExecutionComplete));
 
-			overlayRenderer = new OverlayRenderer(basicShaders);
+			overlayRenderer = new OverlayRenderer(basicShaders, _globalResources);
 		}
 
 		private void Reset()
@@ -108,7 +108,7 @@ namespace SRPRendering
 					DisposableUtil.SafeDispose(scene);
 
 					// Create new one.
-					scene = new RenderScene(baseScene, device);
+					scene = new RenderScene(baseScene, device, _globalResources);
 
 					// Missing scene can cause rendering to fail -- give it another try with the new one.
 					bScriptRenderError = false;
@@ -352,6 +352,7 @@ namespace SRPRendering
 						scene,
 						shaders,
 						(from desc in renderTargets select desc.renderTarget).ToArray(),
+						_globalResources,
 						sphereMesh,
 						fullscreenQuad,
 						basicShaders);
@@ -425,6 +426,9 @@ namespace SRPRendering
 		// Mesh to use for the DrawSphere command.
 		private Mesh sphereMesh;
 		private FullscreenQuad fullscreenQuad;
+
+		// Miscellaneous shared resources.
+		private IGlobalResources _globalResources;
 
 		// Pointer back to the workspace. Needed so we can access the project to get shaders from.
 		private IWorkspace workspace;

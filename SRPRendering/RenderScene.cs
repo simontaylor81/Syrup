@@ -27,13 +27,15 @@ namespace SRPRendering
 			else
 			{
 				// No texture found, so return error texture.
-				System.Diagnostics.Debug.Assert(GlobalResources.Instance.ErrorTexture != null);
-				return GlobalResources.Instance.ErrorTexture;
+				System.Diagnostics.Debug.Assert(_globalResources.ErrorTexture != null);
+				return _globalResources.ErrorTexture;
 			}
 		}
 
-		public RenderScene(Scene scene, Device device)
+		public RenderScene(Scene scene, Device device, IGlobalResources globalResources)
 		{
+			_globalResources = globalResources;
+
 			var meshDict = new Dictionary<SceneMesh, Mesh>();
 
 			// Any relative (texture) paths are relative to the scene file itself.
@@ -104,5 +106,6 @@ namespace SRPRendering
 		private List<PrimitiveProxy> primitiveProxies = new List<PrimitiveProxy>();
 		private List<Mesh> meshes = new List<Mesh>();
 		private Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
+		private readonly IGlobalResources _globalResources;
 	}
 }
