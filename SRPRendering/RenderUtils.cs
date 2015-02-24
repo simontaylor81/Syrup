@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SRPCommon.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -8,8 +9,7 @@ namespace SRPRendering
 	{
 		public static string GetShaderFilename(string file)
 		{
-			return Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-				Path.Combine("..\\..\\..\\Shaders", file));
+			return Path.Combine(GlobalConfig.BaseDir, "Shaders", file);
 		}
 	}
 }
