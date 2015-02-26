@@ -34,31 +34,40 @@ namespace SRPTests.Util
 
 		private static async Task PublishArtefact_Appveyor(string path)
 		{
-			var appveyorApiUrl = Environment.GetEnvironmentVariable("APPVEYOR_API_URL");
-			var jsonRequest = JsonConvert.SerializeObject(new
+			try
 			{
-				path = Path.GetFullPath(path),
-				fileName = Path.GetFileName(path),
-				name = (string)null,
-				type = "html"
-			});
+				var appveyorApiUrl = Environment.GetEnvironmentVariable("APPVEYOR_API_URL");
+				var jsonRequest = JsonConvert.SerializeObject(new
+				{
+					path = Path.GetFullPath(path),
+					fileName = Path.GetFileName(path),
+					name = (string)null,
+					type = "html"
+				});
 
-			Console.WriteLine("APPVEYOR_API_URL = {0}", appveyorApiUrl);
-			Console.WriteLine("jsonRequest = {0}", jsonRequest);
+				Console.WriteLine("APPVEYOR_API_URL = {0}", appveyorApiUrl);
+				Console.WriteLine("jsonRequest = {0}", jsonRequest);
 
-			// PUT data to api URL to get where to upload the file to.
-			var httpClient = new HttpClient();
-			var response = await httpClient.PutAsync(appveyorApiUrl + "api/artifacts", new StringContent(jsonRequest, Encoding.UTF8, "application /json"));
-			response.EnsureSuccessStatusCode();
+				// PUT data to api URL to get where to upload the file to.
+				var httpClient = new HttpClient();
+				var response = await httpClient.PutAsync(appveyorApiUrl + "api/artifacts", new StringContent(jsonRequest, Encoding.UTF8, "application /json"));
+				response.EnsureSuccessStatusCode();
 
-			var responseString = await response.Content.ReadAsStringAsync();
-			var uploadUrl = JsonConvert.DeserializeObject<string>(responseString);
+				var responseString = await response.Content.ReadAsStringAsync();
+				var uploadUrl = JsonConvert.DeserializeObject<string>(responseString);
 
-			Console.WriteLine("responseString = {0}", responseString);
-			Console.WriteLine("uploadUrl = {0}", uploadUrl);
+				Console.WriteLine("responseString = {0}", responseString);
+				Console.WriteLine("uploadUrl = {0}", uploadUrl);
 
-			// Upload the file to the returned URL.
-			await new WebClient().UploadFileTaskAsync(new Uri(uploadUrl), path);
+				// Upload the file to the returned URL.
+				await new WebClient().UploadFileTaskAsync(new Uri(uploadUrl), path);
+
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+				throw;
+			}
 		}
 	}
 }
