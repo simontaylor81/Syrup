@@ -19,6 +19,7 @@ namespace SRPTests.Util
 
 		public static async Task PublishArtefact(string path)
 		{
+			Console.WriteLine("Publishing artefact {0}", path);
 			if (IsAppveyor)
 			{
 				// Running under Appveyor, so publish artefact using REST api.
@@ -42,6 +43,9 @@ namespace SRPTests.Util
 				type = "html"
 			});
 
+			Console.WriteLine("APPVEYOR_API_URL = {0}", appveyorApiUrl);
+			Console.WriteLine("jsonRequest = {0}", jsonRequest);
+
 			// PUT data to api URL to get where to upload the file to.
 			var httpClient = new HttpClient();
 			var response = await httpClient.PutAsync(appveyorApiUrl + "api/artifacts", new StringContent(jsonRequest, Encoding.UTF8, "application /json"));
@@ -49,6 +53,9 @@ namespace SRPTests.Util
 
 			var responseString = await response.Content.ReadAsStringAsync();
 			var uploadUrl = JsonConvert.DeserializeObject<string>(responseString);
+
+			Console.WriteLine("responseString = {0}", responseString);
+			Console.WriteLine("uploadUrl = {0}", uploadUrl);
 
 			// Upload the file to the returned URL.
 			await new WebClient().UploadFileTaskAsync(new Uri(uploadUrl), path);

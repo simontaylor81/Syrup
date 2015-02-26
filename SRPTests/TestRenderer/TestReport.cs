@@ -49,6 +49,8 @@ namespace SRPTests.TestRenderer
 				writer.WriteLine("</head>");
 			}
 
+			Console.WriteLine("Wrote test report to {0}", Path.GetFullPath(filename));
+
 			// TODO: any way to make this async?
 			CIHelper.PublishArtefact(filename).Wait();
 		}
