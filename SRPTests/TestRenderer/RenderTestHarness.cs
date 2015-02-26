@@ -13,16 +13,18 @@ using Xunit.Extensions;
 
 namespace SRPTests.TestRenderer
 {
-	public class RenderTestHarness : IDisposable
+	public class RenderTestHarness : IDisposable, IClassFixture<TestReport>
 	{
 		private readonly TestRenderer _renderer;
 		private readonly TestWorkspace _workspace;
 		private readonly ScriptRenderControl _src;
 		private readonly Scripting _scripting;
+		private readonly TestReport _testReport;
 
-		public RenderTestHarness()
+		public RenderTestHarness(TestReport testReport)
 		{
-			// Set config for test environment (is there a better place/way of doing this?)
+			_testReport = testReport;
+
 			_renderer = new TestRenderer(256, 256);
 			_workspace = new TestWorkspace();
 			_scripting = new Scripting();
@@ -47,6 +49,9 @@ namespace SRPTests.TestRenderer
 
 			// Render it.
 			var result = _renderer.Render(_src);
+
+			// Add result to test report.
+			_testReport.AddResult(result);
 
 			// Load the image to compare against.
 			var expectedImageFilename = Path.ChangeExtension(scriptFile, "png");
