@@ -50,17 +50,17 @@ namespace SRPTests.Util
 
 				// PUT data to api URL to get where to upload the file to.
 				var httpClient = new HttpClient();
-				var response = await httpClient.PutAsync(appveyorApiUrl + "api/artifacts", new StringContent(jsonRequest, Encoding.UTF8, "application/json"));
+				var response = await httpClient.PutAsync(appveyorApiUrl + "api/artifacts", new StringContent(jsonRequest, Encoding.UTF8, "application/json")).ConfigureAwait(false);
 				response.EnsureSuccessStatusCode();
 
-				var responseString = await response.Content.ReadAsStringAsync();
+				var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 				var uploadUrl = JsonConvert.DeserializeObject<string>(responseString);
 
 				Console.WriteLine("responseString = {0}", responseString);
 				Console.WriteLine("uploadUrl = {0}", uploadUrl);
 
 				// Upload the file to the returned URL.
-				await new WebClient().UploadFileTaskAsync(new Uri(uploadUrl), path);
+				await new WebClient().UploadFileTaskAsync(new Uri(uploadUrl), path).ConfigureAwait(false);
 
 			}
 			catch (Exception ex)
