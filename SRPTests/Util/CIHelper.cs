@@ -17,18 +17,19 @@ namespace SRPTests.Util
 	{
 		public static bool IsAppveyor { get { return !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPVEYOR")); } }
 
-		public static async Task PublishArtefact(string path)
+		public static Task PublishArtefact(string path)
 		{
 			Console.WriteLine("Publishing artefact {0}", path);
 			if (IsAppveyor)
 			{
 				// Running under Appveyor, so publish artefact using REST api.
-				await PublishArtefact_Appveyor(path);
+				return PublishArtefact_Appveyor(path);
 			}
 			else
 			{
 				// Running locally, so just ShellExecute the file.
 				Process.Start(path);
+				return Task.Delay(0); // this is fast tracked internally
             }
 		}
 
