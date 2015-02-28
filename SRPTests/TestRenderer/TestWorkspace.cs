@@ -1,6 +1,8 @@
 ﻿using SRPCommon.Interfaces;
+using SRPCommon.Util;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +14,8 @@ namespace SRPTests.TestRenderer
 	{
 		public string FindProjectFile(string name)
 		{
-			throw new NotImplementedException();
+			// Look in shaders directory.
+			return Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts\Shaders", name);
 		}
 	}
 }

@@ -45,7 +45,7 @@ namespace SRPTests.TestRenderer
 
 		[Theory]
 		[MemberData("ScriptFiles")]
-		public async void TestTest(string scriptFile)
+		public async void RenderScript(string scriptFile)
 		{
 			bool bSuccess = false;
 			Bitmap result = null;
@@ -88,7 +88,7 @@ namespace SRPTests.TestRenderer
 			{
 				var directory = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
 				return Directory.EnumerateFiles(directory, "*.py")
-					.Where(file => Path.GetFileName(file) != "utils.py")	// Exclude utils script
+					//.Where(file => Path.GetFileName(file) != "utils.py")	// Exclude utils script
 					.Select(file => new[] { file });
 			}
 		}
