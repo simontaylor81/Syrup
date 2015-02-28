@@ -332,7 +332,7 @@ namespace SRPRendering
 		public void Render(DeviceContext deviceContext, ViewInfo viewInfo)
 		{
 			// Bail if there was a problem with the scripts.
-			if (bScriptError)
+			if (HasScriptError)
 				return;
 
 			// Don't redraw viewports because of internal shader variable changes (e.g. bindings).
@@ -431,7 +431,7 @@ namespace SRPRendering
 		private bool bScriptRenderError = false;		// True if there was a script error while rendering
 
 		// If true, previous rendering failed with a script problem, so we don't keep re-running until the script is fixed & re-run.
-		private bool bScriptError { get { return bScriptExecutionError || bScriptRenderError; } }
+		public bool HasScriptError { get { return bScriptExecutionError || bScriptRenderError; } }
 
 		// User variables.
 		private List<UserVariable> userVariables = new List<UserVariable>();

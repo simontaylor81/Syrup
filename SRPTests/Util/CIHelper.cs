@@ -15,8 +15,13 @@ namespace SRPTests.Util
 	// Currently supports Appveyor
 	static class CIHelper
 	{
+		// Are we running under Appveyor?
 		public static bool IsAppveyor { get { return !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPVEYOR")); } }
 
+		// Are we running under a CI server?
+		public static bool IsCI { get { return IsAppveyor; } }
+
+		// Publish an artefact to the CI server.
 		public static Task PublishArtefact(string path)
 		{
 			Console.WriteLine("Publishing artefact {0}", path);

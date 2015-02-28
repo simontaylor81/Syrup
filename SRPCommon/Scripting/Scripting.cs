@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.IO;
 
@@ -45,9 +46,7 @@ namespace SRPCommon.Scripting
 			pythonEngine.Runtime.LoadAssembly(typeof(SRPScripting.IRenderInterface).Assembly);
 
 			// Add stdlib dir to the search path.
-			var searchPaths = pythonEngine.GetSearchPaths();
-			searchPaths.Add(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "IronPythonLibs"));
-			pythonEngine.SetSearchPaths(searchPaths);
+			AddSearchPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "IronPythonLibs"));
 
 			// Hook up log stream to the runtime.
 			StreamWriter writer = OutputLogger.Instance.GetStreamWriter(LogCategory.Script);
@@ -65,6 +64,14 @@ namespace SRPCommon.Scripting
 		public Task RunScript(string code)
 		{
 			return Execute(() => pythonEngine.CreateScriptSourceFromString(code, SourceCodeKind.Statements));
+		}
+
+		public void AddSearchPath(string path)
+		{
+			pythonEngine.SetSearchPaths(
+				pythonEngine.GetSearchPaths()
+				.Concat(new[] { path })
+				.ToList());
 		}
 
 		private async Task Execute(Func<ScriptSource> sourceFunc)

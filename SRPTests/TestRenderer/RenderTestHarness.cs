@@ -25,9 +25,12 @@ namespace SRPTests.TestRenderer
 		{
 			_testReport = testReport;
 
-			_renderer = new TestRenderer(256, 256);
+			_renderer = new TestRenderer(64, 64);
 			_workspace = new TestWorkspace();
 			_scripting = new Scripting();
+
+			// Add utils directory to search paths.
+			_scripting.AddSearchPath(Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts\Utils"));
 
 			// Create script render control to drive the rendering.
 			_src = new ScriptRenderControl(_workspace, _renderer.Device, _scripting);
@@ -44,22 +47,39 @@ namespace SRPTests.TestRenderer
 		[MemberData("ScriptFiles")]
 		public async void TestTest(string scriptFile)
 		{
-			// Execute the script.
-			await _scripting.RunScriptFromFile(scriptFile);
+			bool bSuccess = false;
+			Bitmap result = null;
+			try
+			{
+				// Execute the script.
+				await _scripting.RunScriptFromFile(scriptFile);
 
-			// Render it.
-			var result = _renderer.Render(_src);
+				Assert.False(_src.HasScriptError, "Error executing script");
 
-			// Add result to test report.
-			_testReport.AddResult(result);
+				// Render it.
+				result = _renderer.Render(_src);
 
-			// Load the image to compare against.
-			var expectedImageFilename = Path.ChangeExtension(scriptFile, "png");
-			Assert.True(File.Exists(expectedImageFilename), "No expected image to compare against.");
-			var expected = new Bitmap(expectedImageFilename);
+				Assert.False(_src.HasScriptError, "Error executing script render callback");
 
-			// Compare the images.
-			ImageComparison.AssertImagesEqual(expected, result);
+				// Load the image to compare against.
+				var expectedImageFilename = Path.ChangeExtension(scriptFile, "png");
+				Assert.True(File.Exists(expectedImageFilename), "No expected image to compare against.");
+				var expected = new Bitmap(expectedImageFilename);
+
+				// Compare the images.
+				ImageComparison.AssertImagesEqual(expected, result);
+				bSuccess = true;
+            }
+			finally
+			{
+				// Add result to test report.
+				_testReport.AddResult(new TestResult()
+				{
+					name = Path.GetFileNameWithoutExtension(scriptFile),
+					bSuccess = bSuccess,
+					resultImage = result
+				});
+			}
 		}
 
 		public static IEnumerable<object[]> ScriptFiles
@@ -68,6 +88,7 @@ namespace SRPTests.TestRenderer
 			{
 				var directory = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
 				return Directory.EnumerateFiles(directory, "*.py")
+					.Where(file => Path.GetFileName(file) != "utils.py")	// Exclude utils script
 					.Select(file => new[] { file });
 			}
 		}

@@ -10,19 +10,44 @@ using System.Threading.Tasks;
 
 namespace SRPTests.TestRenderer
 {
+	public struct TestResult
+	{
+		public string name;
+		public bool bSuccess;
+		public Bitmap resultImage;
+	}
+
 	public class TestReport : IDisposable
 	{
-		private List<Bitmap> results = new List<Bitmap>();
+		private List<TestResult> results = new List<TestResult>();
 
 		public void Dispose()
 		{
 			// Write the report on clean up.
 			GenerateReport();
+
+			// If we're running locally, write the result bitmaps to local directory for updating expected results.
+			if (!CIHelper.IsCI)
+			{
+				var destDir = ".\\Results";
+				if (!Directory.Exists(destDir))
+				{
+					Directory.CreateDirectory(destDir);
+				}
+
+				foreach (var result in results)
+				{
+					if (result.resultImage != null)
+					{
+						result.resultImage.Save(Path.Combine(destDir, result.name + ".png"), ImageFormat.Png);
+					}
+				}
+			}
 		}
 
-		public void AddResult(Bitmap bitmap)
+		public void AddResult(TestResult result)
 		{
-			results.Add(bitmap);
+			results.Add(result);
 		}
 
 		public void GenerateReport()
@@ -55,12 +80,20 @@ namespace SRPTests.TestRenderer
 			CIHelper.PublishArtefact(filename).Wait();
 		}
 
-		private void writeResult(Bitmap result, StreamWriter writer)
+		private void writeResult(TestResult result, StreamWriter writer)
 		{
-			writer.WriteLine("<img width=\"{0}\" height=\"{1}\" src=\"{2}\" />",
-				result.Width,
-				result.Height,
-				ToBase64(result));
+			writer.WriteLine("<div>");
+			writer.WriteLine("{0} - {1}", result.name, result.bSuccess ? "Success" : "Failure");
+
+			if (result.resultImage != null)
+			{
+				writer.WriteLine("<img width=\"{0}\" height=\"{1}\" src=\"{2}\" />",
+					result.resultImage.Width,
+					result.resultImage.Height,
+					ToBase64(result.resultImage));
+			}
+
+			writer.WriteLine("</div>");
 		}
 
 		private string ToBase64(Bitmap bitmap)
