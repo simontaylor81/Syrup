@@ -42,7 +42,7 @@ namespace SRPTests.Util
 					path = Path.GetFullPath(path),
 					fileName = Path.GetFileName(path),
 					name = (string)null,
-					type = "html"
+					//type = "html"
 				});
 
 				Console.WriteLine("APPVEYOR_API_URL = {0}", appveyorApiUrl);
@@ -68,8 +68,8 @@ namespace SRPTests.Util
 			}
 			catch (Exception ex)
 			{
+				Console.WriteLine("Error uploading artefact.");
 				Console.WriteLine(ex.Message);
-				throw;
 			}
 		}
 	}
