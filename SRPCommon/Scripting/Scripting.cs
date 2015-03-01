@@ -109,6 +109,9 @@ namespace SRPCommon.Scripting
 
 		private bool RunSource(ScriptSource source)
 		{
+			// Clear any cached modules (user may have edited them).
+			Python.GetSysModule(pythonEngine).GetVariable("modules").Clear();
+
 			// Create scope and set the render interface as a variable.
 			Debug.Assert(RenderInterface != null);
 			var pythonScope = pythonEngine.CreateScope();
