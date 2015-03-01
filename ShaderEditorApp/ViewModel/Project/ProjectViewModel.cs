@@ -18,7 +18,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 			: base(project.RootFolder, project, workspace)
 		{
 			// Can't remove the project itself, but you can save it.
-			Commands = new [] { SaveCmd, AddExistingCmd, AddNewCmd };
+			Commands = new [] { SaveCmd, AddExistingCmd, AddNewCmd, AddSubFolder };
 
 			// We don't have any properties of our own.
 			UserProperties = null;

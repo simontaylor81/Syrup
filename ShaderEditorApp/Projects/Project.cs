@@ -28,7 +28,7 @@ namespace ShaderEditorApp.Projects
 			else
 			{
 				// Root folder node missing -- create empty one.
-				result.RootFolder = new ProjectFolder(null, result);
+				result.RootFolder = new ProjectFolder(null, result, "root");
 			}
 
 			// Read list of open documents, if present.
@@ -55,7 +55,7 @@ namespace ShaderEditorApp.Projects
 			result.filename = filename;
 
 			// Create new empty root folder.
-			result.RootFolder = new ProjectFolder(null, result);
+			result.RootFolder = new ProjectFolder(null, result, "root");
 
 			// Write out to disk.
 			result.Save();

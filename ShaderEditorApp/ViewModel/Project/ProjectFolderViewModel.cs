@@ -29,8 +29,10 @@ namespace ShaderEditorApp.ViewModel.Projects
 			// Build the list of child items.
 			CreateChildrenProperty();
 
+			AddSubFolder = NamedCommand.CreateReactive("Add Folder", _ => folder.AddFolder("NewFolder"));
+
 			// Add commands.
-			Commands = new NamedCommand[] { AddExistingCmd, AddNewCmd, RemoveCmd };
+			Commands = new NamedCommand[] { AddExistingCmd, AddNewCmd, AddSubFolder, RemoveCmd };
 
 			// User-facing properties.
 			var nameProp = new MutableScalarProperty<string>("Folder Name", folder.Name);
@@ -167,6 +169,9 @@ namespace ShaderEditorApp.ViewModel.Projects
 						(param) => AddNewFile());
 			}
 		}
+
+		// Command to add a subfolder to this folder.
+		public NamedCommand AddSubFolder { get; private set; }
 
 		// Command to remove the folder from the project.
 		private NamedCommand removeCmd;
