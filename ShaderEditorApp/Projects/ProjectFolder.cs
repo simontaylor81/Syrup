@@ -95,6 +95,39 @@ namespace ShaderEditorApp.Projects
 			Project.IsDirty = true;
 		}
 
+		// Add raw item. Used for moving.
+		internal void AddItem(ProjectItem item)
+		{
+			items.Add(item);
+			Project.IsDirty = true;
+		}
+
+		// Add raw folder. Used for moving.
+		internal void AddFolder(ProjectFolder folder)
+		{
+			subfolders.Add(folder);
+			Project.IsDirty = true;
+		}
+
+		// Can this folder be moved to the given folder?
+		public bool CanMoveTo(ProjectFolder dest)
+		{
+			return !IsRoot					// Can't move the root.
+				&& this != dest				// Can't move to outselves.
+				&& parent != dest			// Can't move if we're already in it.
+				&& !dest.IsChildOf(this);	// Can't move into one of our children.
+		}
+
+		// Move the folder to the given target folder.
+		public void MoveTo(ProjectFolder dest)
+		{
+			Debug.Assert(CanMoveTo(dest));
+
+			parent.RemoveFolder(this);
+			dest.AddFolder(this);
+			parent = dest;
+		}
+
 		public string Name { get; set; }
 
 		// The path within the projects internal folder structure.
@@ -111,6 +144,24 @@ namespace ShaderEditorApp.Projects
 				var subItems = from subfolder in subfolders from item in subfolder.AllItems select item;
 				return subItems.Concat(items);
 			}
+		}
+
+		// Is this folder the root?
+		public bool IsRoot { get { return parent == null; } }
+
+		// Public is this folder a child of the given folder.
+		public bool IsChildOf(ProjectFolder other)
+		{
+			var test = parent;
+			while (test != null)
+			{
+				if (test == other)
+				{
+					return true;
+				}
+				test = test.parent;
+			}
+			return false;
 		}
 
 		// Read-only mirrors of the sub-folder and item lists.

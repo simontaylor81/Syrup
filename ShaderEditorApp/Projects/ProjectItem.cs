@@ -85,6 +85,22 @@ namespace ShaderEditorApp.Projects
 			parent.RemoveItem(this);
 		}
 
+		public bool CanMoveTo(ProjectFolder target)
+		{
+			// Can move anywhere except our own parent.
+			return target != parent;
+		}
+
+		public void MoveTo(ProjectFolder target)
+		{
+			Debug.Assert(CanMoveTo(target));
+
+			// Remove from current parent and re-add to target.
+			parent.RemoveItem(this);
+			target.AddItem(this);
+			parent = target;
+		}
+
 		// Set this item as the 'default' of its type.
 		public void SetAsDefault()
 		{

@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project>
   <folder>
+    <folder name="Utils" />
     <include filename="Clear.py" runAtStartup="false" />
     <include filename="Null.py" runAtStartup="false" />
     <include filename="CreateTexture.py" runAtStartup="false" />

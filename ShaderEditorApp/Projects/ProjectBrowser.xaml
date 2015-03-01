@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:srpvm="clr-namespace:ShaderEditorApp.ViewModel"
              xmlns:mvvm="clr-namespace:ShaderEditorApp.MVVMUtil"
+             xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="200">
 
@@ -41,6 +42,9 @@
                   ItemsSource="{Binding RootNodes}"
                   ItemTemplate="{StaticResource NodeTemplate}"
                   ItemContainerStyle="{StaticResource NodeStyle}"
-                  SelectedItemChanged="projectTree_SelectedItemChanged"/>
+                  SelectedItemChanged="projectTree_SelectedItemChanged"
+                  dd:DragDrop.IsDragSource="True"
+                  dd:DragDrop.IsDropTarget="True"
+                  dd:DragDrop.DropHandler="{Binding}"/>
     </Grid>
 </UserControl>

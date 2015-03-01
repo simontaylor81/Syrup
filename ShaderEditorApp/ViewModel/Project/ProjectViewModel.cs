@@ -8,11 +8,13 @@ using SRPCommon.UserProperties;
 using ShaderEditorApp.Projects;
 using ReactiveUI;
 using System.Reactive.Linq;
+using GongSolutions.Wpf.DragDrop;
+using System.Windows;
 
 namespace ShaderEditorApp.ViewModel.Projects
 {
 	// View-model class for the project itself. Derives from the folder type, which is used to display the root node.
-	public class ProjectViewModel : ProjectFolderViewModel, IPropertySource, IHierarchicalBrowserRootViewModel
+	public class ProjectViewModel : ProjectFolderViewModel, IPropertySource, IHierarchicalBrowserRootViewModel, IDropTarget
 	{
 		public ProjectViewModel(Project project, WorkspaceViewModel workspace)
 			: base(project.RootFolder, project, workspace)
@@ -67,6 +69,70 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 			Project.Save();
 		}
+
+		public void DragOver(IDropInfo dropInfo)
+		{
+			// Can only drag onto folders, not items.
+			var targetFolder = dropInfo.TargetItem as ProjectFolderViewModel;
+			if (targetFolder != null)
+			{
+				var draggedFolder = dropInfo.Data as ProjectFolderViewModel;
+				var draggedItem = dropInfo.Data as ProjectItemViewModel;
+				var draggedData = dropInfo.Data as IDataObject;
+
+				bool bCanDrop = false;
+
+				if (draggedItem != null)
+				{
+					// Folder items can always be dropped.
+					bCanDrop = draggedItem.CanMoveTo(targetFolder);
+				}
+				else if (draggedFolder != null)
+				{
+					// Folders are complicated.
+					bCanDrop = draggedFolder.CanMoveTo(targetFolder);
+				}
+				else if (draggedData != null)
+				{
+					// Are we dragging a file from explorer?
+					bCanDrop = draggedData.GetDataPresent(DataFormats.FileDrop);
+				}
+
+				if (bCanDrop)
+				{
+					dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+					dropInfo.Effects = DragDropEffects.Move;
+				}
+            }
+		}
+
+		public void Drop(IDropInfo dropInfo)
+		{
+			var targetFolder = (ProjectFolderViewModel)dropInfo.TargetItem;
+
+			var draggedFolder = dropInfo.Data as ProjectFolderViewModel;
+			var draggedItem = dropInfo.Data as ProjectItemViewModel;
+			var draggedData = dropInfo.Data as IDataObject;
+
+			if (draggedFolder != null)
+			{
+				draggedFolder.MoveTo(targetFolder);
+			}
+			else if (draggedItem != null)
+			{
+				draggedItem.MoveTo(targetFolder);
+			}
+			else if (draggedData != null)
+			{
+				// Add dropped file to the project.
+				var paths = (string[])draggedData.GetData(DataFormats.FileDrop);
+				foreach (var path in paths)
+				{
+					targetFolder.AddFile(path);
+				}
+			}
+		}
+
 
 		// Allow this object to be used as a single root node of the tree (since the tree control needs a list of items).
 		public IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes { get { return new [] { this }; } }

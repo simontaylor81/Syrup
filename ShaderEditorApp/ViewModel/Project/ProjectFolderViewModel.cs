@@ -22,7 +22,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 	{
 		public ProjectFolderViewModel(ProjectFolder folder, Project project, WorkspaceViewModel workspace)
 		{
-			this.folder = folder;
+			this.Folder = folder;
 			Project = project;
 			Workspace = workspace;
 
@@ -47,9 +47,9 @@ namespace ShaderEditorApp.ViewModel.Projects
 		private void CreateChildrenProperty()
 		{
 			IReactiveDerivedList<IHierarchicalBrowserNodeViewModel> subfolderViewModels
-				= folder.SubFolders.CreateDerivedCollection(subfolder => new ProjectFolderViewModel(subfolder, Project, Workspace));
+				= Folder.SubFolders.CreateDerivedCollection(subfolder => new ProjectFolderViewModel(subfolder, Project, Workspace));
 			IReactiveDerivedList<IHierarchicalBrowserNodeViewModel> itemViewModels
-				= folder.Items.CreateDerivedCollection(item => new ProjectItemViewModel(item, Project, Workspace));
+				= Folder.Items.CreateDerivedCollection(item => new ProjectItemViewModel(item, Project, Workspace));
 
 			_children = Observable.Merge(subfolderViewModels.Changed, itemViewModels.Changed)
 				.Select(_ => subfolderViewModels.Concat(itemViewModels))
@@ -70,7 +70,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 			var result = dialog.ShowDialog();
 			if (result == true)
 			{
-				folder.AddItem(dialog.FileName);
+				Folder.AddItem(dialog.FileName);
 			}
 		}
 
@@ -88,18 +88,35 @@ namespace ShaderEditorApp.ViewModel.Projects
 				File.WriteAllText(dialog.FileName, "");
 
 				// Add it to the project.
-				folder.AddItem(dialog.FileName);
+				Folder.AddItem(dialog.FileName);
 			}
+		}
+
+		// Add the given file to the project.
+		public void AddFile(string path)
+		{
+			Folder.AddItem(path);
+		}
+
+		// Can this folder be moved to the given folder?
+		public bool CanMoveTo(ProjectFolderViewModel dest)
+		{
+			return Folder.CanMoveTo(dest.Folder);
+		}
+
+		public void MoveTo(ProjectFolderViewModel dest)
+		{
+			Folder.MoveTo(dest.Folder);
 		}
 
 		// Remove the entire folder from the project.
 		private void RemoveFromProject()
 		{
 			// Ask the user if they're sure.
-			var msg = String.Format("Remove '{0}' from project, including all sub items?", folder.Name);
+			var msg = String.Format("Remove '{0}' from project, including all sub items?", Folder.Name);
 			if (MessageBoxResult.OK == MessageBox.Show(msg, "SRP", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation))
 			{
-				folder.RemoveFromProject();
+				Folder.RemoveFromProject();
 			}
 		}
 
@@ -188,6 +205,6 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 		protected Project Project { get; private set; }
 		protected WorkspaceViewModel Workspace { get; private set; }
-		private ProjectFolder folder;
+		internal ProjectFolder Folder { get; private set; }
 	}
 }

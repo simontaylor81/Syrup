@@ -73,7 +73,6 @@ namespace ShaderEditorApp.ViewModel.Projects
 			Commands = commands;
 		}
 
-
 		// Create the user properties to display for the item.
 		private void CreateUserProperties()
 		{
@@ -122,6 +121,16 @@ namespace ShaderEditorApp.ViewModel.Projects
 		public bool IsDefault { get { return _isDefault.Value; } }
 
 		#endregion
+
+		public bool CanMoveTo(ProjectFolderViewModel targetFolder)
+		{
+			return item.CanMoveTo(targetFolder.Folder);
+		}
+
+		public void MoveTo(ProjectFolderViewModel targetFolder)
+		{
+			item.MoveTo(targetFolder.Folder);
+		}
 
 		private void RemoveFromProject()
 		{
