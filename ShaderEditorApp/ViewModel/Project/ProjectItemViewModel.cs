@@ -2,56 +2,77 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Linq;
-using ShaderEditorApp.MVVMUtil;
 using ShaderEditorApp.ViewModel;
 using ShaderEditorApp.Workspace;
 using SRPCommon.UserProperties;
 using System.Windows.Input;
 using ShaderEditorApp.Projects;
-using System.Reactive.Disposables;
+using ReactiveUI;
+using System.Reactive.Linq;
+using ShaderEditorApp.MVVMUtil;
 
 namespace ShaderEditorApp.ViewModel.Projects
 {
-	public class ProjectItemViewModel : ViewModelBase, IHierarchicalBrowserNodeViewModel
+	public class ProjectItemViewModel : ReactiveObject, IHierarchicalBrowserNodeViewModel
 	{
+		public string DisplayName { get { return item.Name; } }
+
 		public ProjectItemViewModel(ProjectItem item, Project project, WorkspaceViewModel workspace)
 		{
 			this.item = item;
-			DisplayName = item.Name;
 			this.project = project;
 			this.workspace = workspace;
 
-			// Notifty that the default property may have changed when the default scene.
-			disposables.Add(project.DefaultSceneChanged.Subscribe(_ => OnPropertyChanged("IsDefault")));
+			_isDefault = project.DefaultSceneChanged
+				.Select(_ => item.IsDefault)
+				.ToProperty(this, x => x.IsDefault, item.IsDefault);
 
-			// Scenes are set as current, everything else is opened.
-			_defaultCmd = (item.Type != ProjectItemType.Scene) ? OpenCmd : SetCurrentSceneCmd;
+			CreateCommands();
+			CreateUserProperties();
+		}
 
-			var commands = new List<NamedCommand>
+		private void CreateCommands()
+		{
+			// Create appropriate default command.
+			if (item.Type == ProjectItemType.Scene)
+			{
+				// Default command for scenes is to open it and make it the current scene for the workspace.
+				_defaultCmd = NamedCommand.CreateReactive("Set as Current", _ => workspace.SetCurrentScene(item.AbsolutePath));
+			}
+			else
+			{
+				// Default for everything else is to open the item.s
+				_defaultCmd = NamedCommand.CreateReactive("Open", _ => workspace.OpenDocument(item.AbsolutePath, false));
+			}
+
+			// Command to remove the item from the scene.
+			var removeCmd = NamedCommand.CreateReactive("Remove", _ => RemoveFromProject());
+
+			// Default set of commands for an item.
+			var commands = new List<ICommand>
 				{
 					_defaultCmd,
-					RemoveCmd,
+					removeCmd,
 				};
 
 			if (item.Type == ProjectItemType.Script)
 			{
-				commands.Add(RunCmd);
+				// Scripts can be run.
+				commands.Add(NamedCommand.CreateReactive(
+					"Run",
+					_ => workspace.RunScriptFile(item.AbsolutePath)));
 			}
 			else if (item.Type == ProjectItemType.Scene)
 			{
-				commands.Add(SetDefaultCmd);
+				// Scenes can be set as the default scene.
+				commands.Add(NamedCommand.CreateReactive(
+					"Set as default",
+					_ => item.SetAsDefault()));
 			}
 
 			Commands = commands;
-
-			CreateUserProperties();
 		}
 
-		protected override void OnDispose()
-		{
-			disposables.Dispose();
-			base.OnDispose();
-		}
 
 		// Create the user properties to display for the item.
 		private void CreateUserProperties()
@@ -97,68 +118,8 @@ namespace ShaderEditorApp.ViewModel.Projects
 		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children { get { return null; } }
 
 		// Is this item the defaut of its type?
-		public bool IsDefault { get { return item.IsDefault; } }
-
-		#endregion
-
-		#region Commands
-
-		// Command to open the project item into the workspace.
-		private NamedCommand openCmd;
-		public NamedCommand OpenCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref openCmd, "Open",
-					(param) => workspace.OpenDocument(item.AbsolutePath, false));
-			}
-		}
-
-		// Command to open a scene and make it the current scene for the workspace.
-		private NamedCommand setCurrentSceneCmd;
-		public NamedCommand SetCurrentSceneCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref setCurrentSceneCmd, "Set as Current",
-					(param) => workspace.SetCurrentScene(item.AbsolutePath));
-			}
-		}
-
-		// Command to execute the script file the project item represents.
-		private NamedCommand runCmd;
-		public NamedCommand RunCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref runCmd, "Run",
-					(param) => workspace.RunScriptFile(item.AbsolutePath),
-					(param) => item.Type == ProjectItemType.Script);
-			}
-		}
-
-		// Command to remove the item from the project.
-		private NamedCommand removeCmd;
-		public NamedCommand RemoveCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref removeCmd, "Remove",
-					(param) => RemoveFromProject());
-			}
-		}
-
-		// Set the project item as the default of its type (scene's only, currently).
-		private NamedCommand setDefaultCmd;
-		public NamedCommand SetDefaultCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref setDefaultCmd, "Set as default",
-					(param) => item.SetAsDefault(),
-					(param) => item.Type == ProjectItemType.Scene);
-			}
-		}
+		private readonly ObservableAsPropertyHelper<bool> _isDefault;
+		public bool IsDefault { get { return _isDefault.Value; } }
 
 		#endregion
 
@@ -175,6 +136,5 @@ namespace ShaderEditorApp.ViewModel.Projects
 		private ProjectItem item;
 		private Project project;
 		private WorkspaceViewModel workspace;
-		private CompositeDisposable disposables = new CompositeDisposable();
 	}
 }

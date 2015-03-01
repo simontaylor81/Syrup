@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReactiveUI;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -100,6 +101,13 @@ namespace ShaderEditorApp.MVVMUtil
 				cmdVar = new NamedCommand(name, new RelayCommand(execute, canExecute));
 
 			return cmdVar;
+		}
+
+		public static NamedCommand CreateReactive(string name, Action<object> execute)
+		{
+			var reactiveCommand = ReactiveCommand.Create();
+			reactiveCommand.Subscribe(execute);
+			return new NamedCommand(name, reactiveCommand);
 		}
 	}
 }
