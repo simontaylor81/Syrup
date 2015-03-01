@@ -42,11 +42,10 @@ namespace ShaderEditorApp.ViewModel.Scene
 		{
 			_rootNodes = new[] { new ScenePrimitivesViewModel(scene.Primitives) };
 
-			var nodePropertiesObsv = this.WhenAny(x => x.ActiveItem, change => change.Value)
+			_properties = this.WhenAny(x => x.ActiveItem, change => change.Value)
 				.Where(node => node != null)
-				.Select(node => node.UserProperties);
-
-			_properties = new ObservableAsPropertyHelper<IEnumerable<IUserProperty>>(nodePropertiesObsv, x => raisePropertyChanged("Properties"));
+				.Select(node => node.UserProperties)
+				.ToProperty(this, x => x.Properties);
 		}
 	}
 }
