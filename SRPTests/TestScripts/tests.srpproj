@@ -5,6 +5,7 @@
     <include filename="Null.py" runAtStartup="false" />
     <include filename="CreateTexture.py" runAtStartup="false" />
     <include filename="Shaders/FullscreenTexture.hlsl" runAtStartup="false" />
+    <include filename="Utils/utils.py" runAtStartup="false" />
   </folder>
   <OpenDocuments>
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CreateTexture.py" />
