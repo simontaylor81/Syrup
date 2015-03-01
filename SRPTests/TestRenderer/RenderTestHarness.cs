@@ -29,9 +29,6 @@ namespace SRPTests.TestRenderer
 			_workspace = new TestWorkspace();
 			_scripting = new Scripting(_workspace);
 
-			// Add utils directory to search paths.
-			_scripting.AddSearchPath(Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts\Utils"));
-
 			// Create script render control to drive the rendering.
 			_src = new ScriptRenderControl(_workspace, _renderer.Device, _scripting);
 			_scripting.RenderInterface = _src.ScriptInterface;
@@ -88,7 +85,6 @@ namespace SRPTests.TestRenderer
 			{
 				var directory = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
 				return Directory.EnumerateFiles(directory, "*.py")
-					//.Where(file => Path.GetFileName(file) != "utils.py")	// Exclude utils script
 					.Select(file => new[] { file });
 			}
 		}

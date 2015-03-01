@@ -12,10 +12,23 @@ namespace SRPTests.TestRenderer
 	// Implementation of IWorkspace that finds test files.
 	class TestWorkspace : IWorkspace
 	{
+		private readonly Dictionary<string, string> _files;
+
+		public TestWorkspace()
+		{
+			// Find all files in the TestScripts dir.
+			_files = Directory.EnumerateFiles(Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts"), "*", SearchOption.AllDirectories)
+				.ToDictionary(path => Path.GetFileName(path));
+		}
+
 		public string FindProjectFile(string name)
 		{
-			// Look in shaders directory.
-			return Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts\Shaders", name);
+			string path;
+			if (_files.TryGetValue(name, out path))
+			{
+				return path;
+			}
+			return null;
 		}
 	}
 }
