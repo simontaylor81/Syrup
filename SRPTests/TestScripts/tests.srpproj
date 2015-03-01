@@ -1,14 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project>
   <folder>
-    <folder name="Utils" />
+    <folder name="Utils">
+      <include filename="Utils/utils.py" runAtStartup="false" />
+    </folder>
+    <folder name="Shaders">
+      <include filename="Shaders/FullscreenTexture.hlsl" runAtStartup="false" />
+      <include filename="Shaders/ConstantColour.hlsl" runAtStartup="false" />
+    </folder>
     <include filename="Clear.py" runAtStartup="false" />
     <include filename="Null.py" runAtStartup="false" />
     <include filename="CreateTexture.py" runAtStartup="false" />
-    <include filename="Shaders/FullscreenTexture.hlsl" runAtStartup="false" />
-    <include filename="Utils/utils.py" runAtStartup="false" />
     <include filename="CreateTextureCallback.py" runAtStartup="false" />
-    <include filename="Shaders/ConstantColour.hlsl" runAtStartup="false" />
     <include filename="SimplePixelShader.py" runAtStartup="false" />
   </folder>
   <OpenDocuments>
