@@ -199,6 +199,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 				{
 					children_ = value;
 					OnPropertyChanged();
+					OnPropertyChanged("Children");
 				}
 			}
 		}
