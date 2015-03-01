@@ -27,7 +27,7 @@ namespace SRPTests.TestRenderer
 
 			_renderer = new TestRenderer(64, 64);
 			_workspace = new TestWorkspace();
-			_scripting = new Scripting();
+			_scripting = new Scripting(_workspace);
 
 			// Add utils directory to search paths.
 			_scripting.AddSearchPath(Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts\Utils"));

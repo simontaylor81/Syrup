@@ -34,7 +34,7 @@ namespace ShaderEditorApp.Workspace
 			Documents = new ReadOnlyObservableCollection<DocumentViewModel>(documents);
 
 			// Create classes that handle scripting.
-			scripting = new Scripting();
+			scripting = new Scripting(this);
 			scriptRenderControl = new ScriptRenderControl(this, renderWindow.Device, scripting);
 			scripting.RenderInterface = scriptRenderControl.ScriptInterface;
 			scriptRenderControl.RedrawRequired.Subscribe(_ => RedrawViewports());

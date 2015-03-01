@@ -1,7 +1,4 @@
-﻿# Test clearing the back buffer.
-import utils
-
-utils.myprint("hello")
+# Test clearing the back buffer.
 
 def RenderFrame(context):
 	# Clear the lighting buffer (i.e. the back buffer).

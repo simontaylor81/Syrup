@@ -20,7 +20,7 @@ namespace SRPTests
 		public ScriptHelperTests()
 		{
 			// Create Scripting object, which initialises the script engine.
-			scripting = new Scripting();
+			scripting = new Scripting(null);
 		}
 
 		[Theory]
