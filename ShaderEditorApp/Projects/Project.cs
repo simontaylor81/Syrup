@@ -103,7 +103,7 @@ namespace ShaderEditorApp.Projects
 		// Public properties.
 		public string Name { get { return Path.GetFileNameWithoutExtension(filename); } }
 		public string BasePath { get { return Path.GetDirectoryName(filename); } }
-		
+
 		// Has the project changed since it was last saved?
 		public bool IsDirty
 		{
@@ -113,12 +113,12 @@ namespace ShaderEditorApp.Projects
 				if (value != bDirty)
 				{
 					bDirty = value;
-					if (null != DirtyChanged)
-						DirtyChanged();
+					_isDirtyObservable.OnNext(bDirty);
 				}
 			}
 		}
-		public event Action DirtyChanged;
+		private Subject<bool> _isDirtyObservable = new Subject<bool>();
+		public IObservable<bool> IsDirtyObservable { get { return _isDirtyObservable; } }
 
 		public IEnumerable<ProjectItem> AllItems { get { return RootFolder.AllItems; } }
 

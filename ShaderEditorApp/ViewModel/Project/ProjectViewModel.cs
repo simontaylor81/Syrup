@@ -6,6 +6,8 @@ using ShaderEditorApp.MVVMUtil;
 using ShaderEditorApp.ViewModel;
 using SRPCommon.UserProperties;
 using ShaderEditorApp.Projects;
+using ReactiveUI;
+using System.Reactive.Linq;
 
 namespace ShaderEditorApp.ViewModel.Projects
 {
@@ -18,57 +20,44 @@ namespace ShaderEditorApp.ViewModel.Projects
 			// Can't remove the project itself, but you can save it.
 			Commands = new [] { SaveCmd, AddExistingCmd, AddNewCmd };
 
-			Project.DirtyChanged += OnDirtyChanged;
-
 			// We don't have any properties of our own.
 			UserProperties = null;
+
+			_displayName = this.WhenAnyObservable(x => x.Project.IsDirtyObservable)
+				.Select(isDirty => GetDisplayName(isDirty))
+				.ToProperty(this, x => x.DisplayName, GetDisplayName(Project.IsDirty));
+
+			_properties = this.WhenAnyValue(x => x.ActiveItem)
+				.Select(activeItem => GetProperties(activeItem))
+				.ToProperty(this, x => x.Properties);
 		}
 
-		protected override void OnDispose()
+		private string GetDisplayName(bool isDirty)
 		{
-			Project.DirtyChanged -= OnDirtyChanged;
-			base.OnDispose();
+			var result = Project.Name;
+			if (isDirty)
+				result += "*";
+			return result;
 		}
 
-		public override string DisplayName
+		private IEnumerable<IUserProperty> GetProperties(IHierarchicalBrowserNodeViewModel activeItem)
 		{
-			get
-			{
-				var result = Project.Name;
-				if (Project.IsDirty)
-					result += "*";
-				return result;
-			}
+			if (ActiveItem != null)
+				return ActiveItem.UserProperties;
+			else
+				return UserProperties;
 		}
 
 		// Properties to display for the currently selected property item.
-		public IEnumerable<IUserProperty> Properties
-		{
-			get
-			{
-				if (ActiveItem != null)
-					return ActiveItem.UserProperties;
-				else
-					return UserProperties;
-			}
-		}
+		private ObservableAsPropertyHelper<IEnumerable<IUserProperty>> _properties;
+		public IEnumerable<IUserProperty> Properties { get { return _properties.Value; } }
 
 		// Currently selected node in the project.
 		private IHierarchicalBrowserNodeViewModel activeItem;
 		public IHierarchicalBrowserNodeViewModel ActiveItem
 		{
 			get { return activeItem; }
-			set
-			{
-				if (value != activeItem)
-				{
-					activeItem = value;
-					OnPropertyChanged();
-
-					// Properties are dependent on the active item.
-					OnPropertyChanged("Properties");
-				}
-			}
+			set { this.RaiseAndSetIfChanged(ref activeItem, value); }
 		}
 
 		private void Save()
@@ -81,13 +70,6 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 		// Allow this object to be used as a single root node of the tree (since the tree control needs a list of items).
 		public IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes { get { return new [] { this }; } }
-
-		// Called when the project's dirty state changes.
-		void OnDirtyChanged()
-		{
-			// Display name has an asterisk after it if the project is dirty.
-			OnPropertyChanged("DisplayName");
-		}
 
 		// Command to save the project.
 		private NamedCommand saveCmd;

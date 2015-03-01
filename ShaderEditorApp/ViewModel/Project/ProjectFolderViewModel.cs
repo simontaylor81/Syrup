@@ -13,10 +13,12 @@ using ShaderEditorApp.ViewModel;
 using SRPCommon.UserProperties;
 using System.Windows.Input;
 using ShaderEditorApp.Projects;
+using ReactiveUI;
+using System.Reactive.Linq;
 
 namespace ShaderEditorApp.ViewModel.Projects
 {
-	public class ProjectFolderViewModel : ViewModelBase, IHierarchicalBrowserNodeViewModel
+	public class ProjectFolderViewModel : ReactiveObject, IHierarchicalBrowserNodeViewModel
 	{
 		public ProjectFolderViewModel(ProjectFolder folder, Project project, WorkspaceViewModel workspace)
 		{
@@ -25,43 +27,36 @@ namespace ShaderEditorApp.ViewModel.Projects
 			Workspace = workspace;
 
 			// Build the list of child items.
-			RegenerateChildren();
-
-			// And hook up event to do so again when the underlying items change.
-			((INotifyCollectionChanged)folder.SubFolders).CollectionChanged += (o, e) => RegenerateChildren();
-			((INotifyCollectionChanged)folder.Items).CollectionChanged += (o, e) => RegenerateChildren();
+			CreateChildrenProperty();
 
 			// Add commands.
 			Commands = new NamedCommand[] { AddExistingCmd, AddNewCmd, RemoveCmd };
 
 			// User-facing properties.
 			var nameProp = new MutableScalarProperty<string>("Folder Name", folder.Name);
-			nameProp.Subscribe(_ => DisplayName = nameProp.Value);
+			nameProp.Subscribe(_ => folder.Name = nameProp.Value);
+			_displayName = nameProp
+				.Select(_ => nameProp.Value)
+				.ToProperty(this, x => x.DisplayName, folder.Name);
 
 			UserProperties = new[] { nameProp };
 		}
 
-		private void RegenerateChildren()
+		private void CreateChildrenProperty()
 		{
-			IEnumerable<IHierarchicalBrowserNodeViewModel> subfolders = from subfolder in folder.SubFolders select new ProjectFolderViewModel(subfolder, Project, Workspace);
-			IEnumerable<IHierarchicalBrowserNodeViewModel> items = from item in folder.Items select new ProjectItemViewModel(item, Project, Workspace);
-			ProjectChildren = new ReadOnlyObservableCollection<IHierarchicalBrowserNodeViewModel>(
-				new ObservableCollection<IHierarchicalBrowserNodeViewModel>(subfolders.Concat(items)));
+			IReactiveDerivedList<IHierarchicalBrowserNodeViewModel> subfolderViewModels
+				= folder.SubFolders.CreateDerivedCollection(subfolder => new ProjectFolderViewModel(subfolder, Project, Workspace));
+			IReactiveDerivedList<IHierarchicalBrowserNodeViewModel> itemViewModels
+				= folder.Items.CreateDerivedCollection(item => new ProjectItemViewModel(item, Project, Workspace));
+
+			_children = Observable.Merge(subfolderViewModels.Changed, itemViewModels.Changed)
+				.Select(_ => subfolderViewModels.Concat(itemViewModels))
+				.ToProperty(this, x => x.Children, subfolderViewModels.Concat(itemViewModels));
 		}
 
 		// Get the name of the folder.
-		public override string DisplayName
-		{
-			get { return folder.Name; }
-			protected set
-			{
-				if (value != folder.Name)
-				{
-					folder.Name = value;
-					OnPropertyChanged();
-				}
-			}
-		}
+		protected ObservableAsPropertyHelper<string> _displayName;
+		public string DisplayName { get { return _displayName.Value; } }
 
 		// Prompt the user to add select a file to add, then add it to the project.
 		private void AddExistingFile()
@@ -140,8 +135,9 @@ namespace ShaderEditorApp.ViewModel.Projects
 		/// </summary>
 		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children
 		{
-			get { return ProjectChildren; }
+			get { return _children.Value; }
 		}
+		private ObservableAsPropertyHelper<IEnumerable<IHierarchicalBrowserNodeViewModel>> _children;
 
 		// We don't have a default folder.
 		public bool IsDefault { get { return false; } }
@@ -188,20 +184,5 @@ namespace ShaderEditorApp.ViewModel.Projects
 		protected Project Project { get; private set; }
 		protected WorkspaceViewModel Workspace { get; private set; }
 		private ProjectFolder folder;
-
-		private ReadOnlyObservableCollection<IHierarchicalBrowserNodeViewModel> children_;
-		public ReadOnlyObservableCollection<IHierarchicalBrowserNodeViewModel> ProjectChildren
-		{
-			get { return children_; }
-			private set
-			{
-				if (children_ != value)
-				{
-					children_ = value;
-					OnPropertyChanged();
-					OnPropertyChanged("Children");
-				}
-			}
-		}
 	}
 }

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 using SRPCommon.Util;
+using ReactiveUI;
 
 namespace ShaderEditorApp.Projects
 {
@@ -17,8 +18,8 @@ namespace ShaderEditorApp.Projects
 			this.parent = parent;
 			this.Project = project;
 
-			folders = new ObservableCollection<ProjectFolder>();
-			items = new ObservableCollection<ProjectItem>();
+			folders = new ReactiveList<ProjectFolder>();
+			items = new ReactiveList<ProjectItem>();
 		}
 
 		// Create a new folder form the contents of an xml element.
@@ -31,13 +32,13 @@ namespace ShaderEditorApp.Projects
 			SerialisationUtils.ParseAttribute(element, "name", str => Name = str);
 
 			// Create sub-folder items.
-			folders = new ObservableCollection<ProjectFolder>(
+			folders = new ReactiveList<ProjectFolder>(
 				from subfolder in element.Elements("folder")
 				select new ProjectFolder(subfolder, this, project)
 				);
 
 			// Create included items.
-			items = new ObservableCollection<ProjectItem>(
+			items = new ReactiveList<ProjectItem>(
 				from item in element.Elements("include")
 				select ProjectItem.LoadFromElement(item, this)
 				);
@@ -103,12 +104,12 @@ namespace ShaderEditorApp.Projects
 		}
 
 		// Read-only mirrors of the sub-folder and item lists.
-		public ReadOnlyObservableCollection<ProjectFolder> SubFolders { get { return new ReadOnlyObservableCollection<ProjectFolder>(folders); } }
-		public ReadOnlyObservableCollection<ProjectItem> Items { get { return new ReadOnlyObservableCollection<ProjectItem>(items); } }
+		public IReadOnlyReactiveList<ProjectFolder> SubFolders { get { return folders; } }
+		public IReadOnlyReactiveList<ProjectItem> Items { get { return items; } }
 
 		// Lists containing our sub-folders and items.
-		private ObservableCollection<ProjectFolder> folders;
-		private ObservableCollection<ProjectItem> items;
+		private ReactiveList<ProjectFolder> folders;
+		private ReactiveList<ProjectItem> items;
 
 		internal Project Project { get; private set; }
 		private ProjectFolder parent;
