@@ -7,9 +7,12 @@
     <include filename="Shaders/FullscreenTexture.hlsl" runAtStartup="false" />
     <include filename="Utils/utils.py" runAtStartup="false" />
     <include filename="CreateTextureCallback.py" runAtStartup="false" />
+    <include filename="Shaders/ConstantColour.hlsl" runAtStartup="false" />
+    <include filename="SimplePixelShader.py" runAtStartup="false" />
   </folder>
   <OpenDocuments>
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CreateTexture.py" />
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Clear.py" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CreateTextureCallback.py" />
   </OpenDocuments>
 </project>

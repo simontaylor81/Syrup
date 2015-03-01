@@ -7,7 +7,7 @@ def TestTexture(tex, ri):
 	ri.SetShaderResourceVariable(ps, "tex", tex)
 	
 	def RenderFrame(context):
-		# Clear the lighting buffer (i.e. the back buffer).
+		# Draw the texture fullscreen.
 		context.DrawFullscreenQuad(vs, ps)
 	
 	ri.SetFrameCallback(RenderFrame)
