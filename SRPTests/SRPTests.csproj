@@ -101,7 +101,9 @@
     <Compile Include="TestRenderer\TestReport.cs" />
     <Compile Include="TestRenderer\TestWorkspace.cs" />
     <Compile Include="UserVariableTests.cs" />
+    <Compile Include="Util\AppveyorCI.cs" />
     <Compile Include="Util\CIHelper.cs" />
+    <Compile Include="Util\DummyCIProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
