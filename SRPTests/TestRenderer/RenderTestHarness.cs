@@ -59,8 +59,10 @@ namespace SRPTests.TestRenderer
 
 				Assert.False(_src.HasScriptError, "Error executing script render callback");
 
-				// Get the image to compare against from Fermium.
-				var expected = BitmapFromBytes(await _fermium.GetExpectedResult(name));
+				// Load the image to compare against.
+				var expectedImageFilename = Path.ChangeExtension(scriptFile, "png");
+				Assert.True(File.Exists(expectedImageFilename), "No expected image to compare against.");
+				var expected = new Bitmap(expectedImageFilename);
 
 				// Compare the images.
 				ImageComparison.AssertImagesEqual(expected, result);
@@ -80,15 +82,6 @@ namespace SRPTests.TestRenderer
 				var directory = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
 				return Directory.EnumerateFiles(directory, "*.py")
 					.Select(file => new[] { file });
-			}
-		}
-
-		// Simple helper to load a bitmap from an array of bytes.
-		private static Bitmap BitmapFromBytes(byte[] bytes)
-		{
-			using (var stream = new MemoryStream(bytes))
-			{
-				return new Bitmap(stream);
 			}
 		}
 

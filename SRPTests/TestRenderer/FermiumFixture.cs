@@ -19,13 +19,9 @@ namespace SRPTests.TestRenderer
 		private readonly string _fermiumProjectUrl;
 		private readonly HttpClient _httpClient;
 		private bool _isBuildSuccess = true;
-		private Dictionary<string, Task<byte[]>> _expectedResultTasks;
 
-		// Disable everything if we don't have an URL.
-		public bool IsEnabled { get { return !string.IsNullOrEmpty(_fermiumProjectUrl); } }
-
-		// Only report the build when running in CI (otherwise just retrieve expected results).
-		public bool ReportBuild { get { return IsEnabled && CIHelper.IsCI; } }
+		// Report builds to Fermium if we have a URL, and we're running in CI.
+		public bool IsEnabled { get { return CIHelper.IsCI && !string.IsNullOrEmpty(_fermiumProjectUrl); } }
 
 		public FermiumFixture()
 		{
@@ -52,57 +48,21 @@ namespace SRPTests.TestRenderer
 		public void Dispose()
 		{
 			// Test run is over, so set success/failure.
-			if (ReportBuild)
+			if (IsEnabled)
 			{
 				SetBuildStatus().Wait();
 			}
 		}
 
-		// Get the expected result of a test.
-		public Task<byte[]> GetExpectedResult(string testcaseName)
+		private Task Initialise()
 		{
-			return _expectedResultTasks[testcaseName];
-		}
-
-		private async Task Initialise()
-		{
-			// Get the list of test cases for this project so we can kick off the expected result requests.
-			var response = await _httpClient.GetStringAsync(_fermiumProjectUrl + "testcases")
-				.ConfigureAwait(false);
-			var testcases = JArray.Parse(response);
-
-			// Initiate expected result requests (so we don't have to stall when they're needed).
-			_expectedResultTasks = testcases
-				.Select(tc => Tuple.Create(tc.Value<string>("name"), GetExpectedResult_Impl(tc)))
-				.ToDictionary(tup => tup.Item1, tup => tup.Item2);
-
-			if (ReportBuild)
+			// Add the new build to Fermium.
+			return PostToFermium("builds", new
 			{
-				// Add the new build to Fermium.
-				await PostToFermium("builds", new
-				{
-					buildNumber = CIHelper.BuildNumber,
-					version = CIHelper.Version,
-					commit = CIHelper.Commit,
-				});
-			}
-		}
-
-		private async Task<byte[]> GetExpectedResult_Impl(dynamic testcaseSummary)
-		{
-			// Follow link in the summary to retrieve the full testcase object.
-			var json = await _httpClient.GetStringAsync(_fermiumBaseUrl + (string)testcaseSummary._links.self.href)
-				.ConfigureAwait(false);
-			dynamic testcaseFull = JObject.Parse(json);
-
-			// Check we have an expected result.
-			var expectedResultBase64 = (string)testcaseFull.expectedResult;
-			Assert.False(
-				string.IsNullOrEmpty(expectedResultBase64),
-				string.Format("Test case '{0}' does not have an expected result.", testcaseFull.name));
-
-			// Convert to byte array.
-			return Convert.FromBase64String(expectedResultBase64);
+				buildNumber = CIHelper.BuildNumber,
+				version = CIHelper.Version,
+				commit = CIHelper.Commit,
+			});
 		}
 
 		private Task SetBuildStatus()
@@ -117,7 +77,7 @@ namespace SRPTests.TestRenderer
 			// Build failed if any tests failed.
 			_isBuildSuccess &= isSuccess;
 
-			if (ReportBuild)
+			if (IsEnabled)
 			{
 				await PostToFermium(
 					string.Format("builds/{0}/testruns/{1}", CIHelper.BuildNumber, test),
@@ -126,7 +86,7 @@ namespace SRPTests.TestRenderer
 			}
 		}
 
-		// Send a POST to Fermium.
+		// Helper to send a POST to Fermium with optional json-encoded body object.
 		private async Task PostToFermium(string path, object body)
 		{
 			Assert.True(IsEnabled);
