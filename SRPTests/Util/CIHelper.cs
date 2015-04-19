@@ -21,6 +21,34 @@ namespace SRPTests.Util
 		// Are we running under a CI server?
 		public static bool IsCI { get { return IsAppveyor; } }
 
+		// Various properties of the build currently being built.
+		public static string BuildNumber
+		{
+			get
+			{
+				// TODO
+				return "67";
+			}
+		}
+
+		public static string Version
+		{
+			get
+			{
+				// TODO
+				return "1.0.1";
+			}
+		}
+
+		public static string Commit
+		{
+			get
+			{
+				// TODO
+				return "abcdef";
+			}
+		}
+
 		// Publish an artefact to the CI server.
 		public static Task PublishArtefact(string path)
 		{

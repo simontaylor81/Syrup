@@ -94,6 +94,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptHelperTests.cs" />
     <Compile Include="SerialisationUtilsTests.cs" />
+    <Compile Include="TestRenderer\FermiumFixture.cs" />
     <Compile Include="TestRenderer\ImageComparison.cs" />
     <Compile Include="TestRenderer\RenderTestHarness.cs" />
     <Compile Include="TestRenderer\TestRenderer.cs" />

@@ -4,26 +4,25 @@ using SRPRendering;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Extensions;
 
 namespace SRPTests.TestRenderer
 {
-	public class RenderTestHarness : IDisposable, IClassFixture<TestReport>
+	public class RenderTestHarness : IDisposable, IClassFixture<FermiumFixture>
 	{
 		private readonly TestRenderer _renderer;
 		private readonly TestWorkspace _workspace;
 		private readonly ScriptRenderControl _src;
 		private readonly Scripting _scripting;
-		private readonly TestReport _testReport;
+		private readonly FermiumFixture _fermium;
 
-		public RenderTestHarness(TestReport testReport)
+		public RenderTestHarness(FermiumFixture fermium)
 		{
-			_testReport = testReport;
+			_fermium = fermium;
 
 			_renderer = new TestRenderer(64, 64);
 			_workspace = new TestWorkspace();
@@ -42,10 +41,12 @@ namespace SRPTests.TestRenderer
 
 		[Theory]
 		[MemberData("ScriptFiles")]
-		public async void RenderScript(string scriptFile)
+		public async Task RenderScript(string scriptFile)
 		{
 			bool bSuccess = false;
 			Bitmap result = null;
+			var name = Path.GetFileNameWithoutExtension(scriptFile);
+
 			try
 			{
 				// Execute the script.
@@ -58,10 +59,8 @@ namespace SRPTests.TestRenderer
 
 				Assert.False(_src.HasScriptError, "Error executing script render callback");
 
-				// Load the image to compare against.
-				var expectedImageFilename = Path.ChangeExtension(scriptFile, "png");
-				Assert.True(File.Exists(expectedImageFilename), "No expected image to compare against.");
-				var expected = new Bitmap(expectedImageFilename);
+				// Get the image to compare against from Fermium.
+				var expected = BitmapFromBytes(await _fermium.GetExpectedResult(name));
 
 				// Compare the images.
 				ImageComparison.AssertImagesEqual(expected, result);
@@ -69,13 +68,8 @@ namespace SRPTests.TestRenderer
             }
 			finally
 			{
-				// Add result to test report.
-				_testReport.AddResult(new TestResult()
-				{
-					name = Path.GetFileNameWithoutExtension(scriptFile),
-					bSuccess = bSuccess,
-					resultImage = result
-				});
+				// Report result to Fermium.
+				await _fermium.TestComplete(name, bSuccess, BitmapToBytes(result));
 			}
 		}
 
@@ -87,6 +81,31 @@ namespace SRPTests.TestRenderer
 				return Directory.EnumerateFiles(directory, "*.py")
 					.Select(file => new[] { file });
 			}
+		}
+
+		// Simple helper to load a bitmap from an array of bytes.
+		private static Bitmap BitmapFromBytes(byte[] bytes)
+		{
+			using (var stream = new MemoryStream(bytes))
+			{
+				return new Bitmap(stream);
+			}
+		}
+
+		// Convert an image to PNG-encoded byte array.
+		private byte[] BitmapToBytes(Bitmap bitmap)
+		{
+			byte[] result = null;
+			if (bitmap != null)
+			{
+				using (var stream = new MemoryStream())
+				{
+					bitmap.Save(stream, ImageFormat.Png);
+					result = stream.ToArray();
+				}
+			}
+
+			return result;
 		}
 	}
 }
