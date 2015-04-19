@@ -12,15 +12,15 @@ using Xunit;
 
 namespace SRPTests.TestRenderer
 {
-	public class RenderTestHarness : IDisposable, IClassFixture<FermiumFixture>
+	public class RenderTestHarness : IDisposable, IClassFixture<FermiumReporter>
 	{
 		private readonly TestRenderer _renderer;
 		private readonly TestWorkspace _workspace;
 		private readonly ScriptRenderControl _src;
 		private readonly Scripting _scripting;
-		private readonly FermiumFixture _fermium;
+		private readonly FermiumReporter _fermium;
 
-		public RenderTestHarness(FermiumFixture fermium)
+		public RenderTestHarness(FermiumReporter fermium)
 		{
 			_fermium = fermium;
 

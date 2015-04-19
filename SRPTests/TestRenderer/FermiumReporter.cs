@@ -13,7 +13,7 @@ namespace SRPTests.TestRenderer
 {
 	// Fixture class for handling interaction with Fermium,
 	// including retrieving expected results and reporting results.
-	public class FermiumFixture : IDisposable
+	public class FermiumReporter : IDisposable
 	{
 		private readonly string _fermiumBaseUrl;
 		private readonly string _fermiumProjectUrl;
@@ -23,7 +23,7 @@ namespace SRPTests.TestRenderer
 		// Report builds to Fermium if we have a URL, and we're running in CI.
 		public bool IsEnabled { get { return CIHelper.IsCI && !string.IsNullOrEmpty(_fermiumProjectUrl); } }
 
-		public FermiumFixture()
+		public FermiumReporter()
 		{
 			_fermiumBaseUrl = "http://localhost:65221";
 			//var server = Environment.GetEnvironmentVariable("SRP_FERMIUM_SERVER");
