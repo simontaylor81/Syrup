@@ -14,6 +14,12 @@ namespace SRPTests.Util
 		// Are we running under a CI server?
 		public static bool IsCI { get { return Provider.IsCI; } }
 
+		// Are we running under AppVeyor?
+		public static bool IsAppVeyor { get { return Provider.IsAppVeyor; } }
+
+		// Are we running in the dummy CI environmnet?
+		public static bool IsDummy { get { return Provider.IsDummy; } }
+
 		// Various properties of the build currently being built.
 		public static string BuildNumber { get { return Provider.BuildNumber; } }
 		public static string Version { get { return Provider.Version; } }
@@ -36,6 +42,8 @@ namespace SRPTests.Util
 		private class NullCIProvider : ICIProvider
 		{
 			public bool IsCI { get { return false; } }
+			public bool IsAppVeyor { get { return false; } }
+			public bool IsDummy { get { return false; } }
 			public string BuildNumber { get { return ""; } }
 			public string Version { get { return ""; } }
 			public string Commit { get { return ""; } }
@@ -52,6 +60,9 @@ namespace SRPTests.Util
 	internal interface ICIProvider
 	{
 		bool IsCI { get; }
+		bool IsAppVeyor { get; }
+		bool IsDummy { get; }
+
 		string BuildNumber { get; }
 		string Version { get; }
 		string Commit { get; }

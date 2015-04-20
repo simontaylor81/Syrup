@@ -24,6 +24,8 @@ namespace SRPTests.Util
 		}
 
 		public bool IsCI { get { return true; } }
+		public bool IsAppVeyor { get { return true; } }
+		public bool IsDummy { get { return false; } }
 
 		public string BuildNumber
 		{

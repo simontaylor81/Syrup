@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SRPTests.Util;
 using System;
 using System.Collections.Generic;
@@ -21,7 +20,8 @@ namespace SRPTests.TestRenderer
 		private bool _isBuildSuccess = true;
 
 		// Report builds to Fermium if we have a URL, and we're running in CI.
-		public bool IsEnabled { get { return CIHelper.IsCI && !string.IsNullOrEmpty(_fermiumProjectUrl); } }
+		// For now, only enable in the dummy CI provider as we don't have a publically-accessible Fermium instance.
+		public bool IsEnabled { get { return CIHelper.IsCI && !string.IsNullOrEmpty(_fermiumProjectUrl) && CIHelper.IsDummy; } }
 
 		public FermiumReporter()
 		{

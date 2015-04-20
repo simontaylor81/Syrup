@@ -20,6 +20,8 @@ namespace SRPTests.Util
 
 		// Pretend to be CI to exercise those code paths.
 		public bool IsCI { get { return true; } }
+		public bool IsAppVeyor { get { return false; } }
+		public bool IsDummy { get { return true; } }
 
 		public string BuildNumber { get { return "1"; } }
 
