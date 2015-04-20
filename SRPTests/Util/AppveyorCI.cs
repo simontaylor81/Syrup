@@ -23,6 +23,8 @@ namespace SRPTests.Util
 			return null;
 		}
 
+		public bool IsCI { get { return true; } }
+
 		public string BuildNumber
 		{
 			get

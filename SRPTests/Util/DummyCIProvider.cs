@@ -18,6 +18,9 @@ namespace SRPTests.Util
 			return null;
 		}
 
+		// Pretend to be CI to exercise those code paths.
+		public bool IsCI { get { return true; } }
+
 		public string BuildNumber { get { return "1"; } }
 
 		public string Version { get { return "1.0.1"; } }
