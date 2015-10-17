@@ -44,7 +44,7 @@ namespace ShaderEditorApp.Projects
 		{
 			get
 			{
-				switch (Extension)
+				switch (Extension.ToLowerInvariant())
 				{
 					case ".py":
 						return ProjectItemType.Script;

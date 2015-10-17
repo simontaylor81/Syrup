@@ -56,13 +56,16 @@ namespace ShaderEditorApp.Projects
 		}
 
 		// Add an existing file to the project.
-		public void AddItem(string path)
+		public ProjectItem AddItem(string path)
 		{
 			// Create a new item object and add to the list.
-			items.Add(new ProjectItem(path, this));
+			var item = new ProjectItem(path, this);
+			items.Add(item);
 
 			// Mark the project as dirty.
 			Project.IsDirty = true;
+
+			return item;
 		}
 
 		// Add a new sub folder.

@@ -20,7 +20,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 			: base(project.RootFolder, project, workspace)
 		{
 			// Can't remove the project itself, but you can save it.
-			Commands = new [] { SaveCmd, AddExistingCmd, AddNewCmd, AddSubFolder };
+			Commands = new [] { SaveCmd, AddExistingCmd, AddNewCmd, AddNewSceneCmd, AddSubFolder };
 
 			// We don't have any properties of our own.
 			UserProperties = null;
@@ -103,7 +103,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 					dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
 					dropInfo.Effects = DragDropEffects.Move;
 				}
-            }
+			}
 		}
 
 		public void Drop(IDropInfo dropInfo)

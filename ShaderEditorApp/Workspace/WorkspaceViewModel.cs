@@ -246,6 +246,9 @@ namespace ShaderEditorApp.Workspace
 			return ActiveDocument != null;
 		}
 
+		// Do we have a scene loaded currently?
+		public bool HasCurrentScene { get { return currentScene != null; } }
+
 		// Load the scene with the given filename and set it as the current one.
 		public void SetCurrentScene(string path)
 		{
@@ -260,7 +263,7 @@ namespace ShaderEditorApp.Workspace
 				if (sceneChangeSubscription != null)
 				{
 					sceneChangeSubscription.Dispose();
-                }
+				}
 
 				// Redraw the scene when the scene changes.
 				sceneChangeSubscription = currentScene.OnChanged.Subscribe(_ => RedrawViewports());
@@ -272,7 +275,7 @@ namespace ShaderEditorApp.Workspace
 		public void RedrawViewports()
 		{
 			renderWindow.Invalidate();
-        }
+		}
 
 		public string FindProjectFile(string name)
 		{

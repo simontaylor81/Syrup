@@ -32,7 +32,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 			AddSubFolder = NamedCommand.CreateReactive("Add Folder", _ => folder.AddFolder("NewFolder"));
 
 			// Add commands.
-			Commands = new NamedCommand[] { AddExistingCmd, AddNewCmd, AddSubFolder, RemoveCmd };
+			Commands = new NamedCommand[] { AddExistingCmd, AddNewCmd, AddNewSceneCmd, AddSubFolder, RemoveCmd };
 
 			// User-facing properties.
 			var nameProp = new MutableScalarProperty<string>("Folder Name", folder.Name);
@@ -64,13 +64,13 @@ namespace ShaderEditorApp.ViewModel.Projects
 		private void AddExistingFile()
 		{
 			var dialog = new OpenFileDialog();
-			dialog.Filter = FileFilter;
+			dialog.Filter = FileFilterExisting;
 			dialog.InitialDirectory = Project.BasePath;
 
 			var result = dialog.ShowDialog();
 			if (result == true)
 			{
-				Folder.AddItem(dialog.FileName);
+				AddItem(dialog.FileName);
 			}
 		}
 
@@ -78,7 +78,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 		private void AddNewFile()
 		{
 			var dialog = new SaveFileDialog();
-			dialog.Filter = FileFilter;
+			dialog.Filter = FileFilterNew;
 			dialog.InitialDirectory = Project.BasePath;
 
 			var result = dialog.ShowDialog();
@@ -88,7 +88,46 @@ namespace ShaderEditorApp.ViewModel.Projects
 				File.WriteAllText(dialog.FileName, "");
 
 				// Add it to the project.
-				Folder.AddItem(dialog.FileName);
+				AddItem(dialog.FileName);
+			}
+		}
+
+		// Add a new scene file to the project.
+		private void AddNewScene()
+		{
+			var dialog = new SaveFileDialog();
+			dialog.Filter = "Scene files|*.srpscene";
+			dialog.InitialDirectory = Project.BasePath;
+
+			var result = dialog.ShowDialog();
+			if (result == true)
+			{
+				// Create an empty scene file.
+				File.WriteAllText(dialog.FileName, "{}");
+
+				AddItem(dialog.FileName);
+			}
+		}
+
+		private void AddItem(string filename)
+		{
+			// Add it to the project.
+			var item = Folder.AddItem(filename);
+
+			// Special handling for scene files.
+			if (item.Type == ProjectItemType.Scene)
+			{
+				// If we don't have a default scene, make this the default.
+				if (Project.DefaultScene == null)
+				{
+					Project.DefaultScene = item;
+				}
+
+				// If we don't have a scene loaded, load the new one.
+				if (!Workspace.HasCurrentScene)
+				{
+					Workspace.SetCurrentScene(filename);
+				}
 			}
 		}
 
@@ -120,8 +159,8 @@ namespace ShaderEditorApp.ViewModel.Projects
 			}
 		}
 
-		// Get the file filter to use for the open dialog, based on the item type.
-		private string FileFilter
+		// Get the file filter to use for the open dialog.
+		private static string FileFilterExisting
 		{
 			get
 			{
@@ -130,6 +169,19 @@ namespace ShaderEditorApp.ViewModel.Projects
 					"|Shader files|*.hlsl;*.fx" +
 					"|Python files|*.py" +
 					"|Scene files|*.srpscene" +
+					"|All Files|*.*";
+			}
+		}
+
+		// Get the file filter to use for the new dialog (excludes scene files).
+		private static string FileFilterNew
+		{
+			get
+			{
+				return
+					"Supported file types|*.hlsl;*.fx;*.py" +
+					"|Shader files|*.hlsl;*.fx" +
+					"|Python files|*.py" +
 					"|All Files|*.*";
 			}
 		}
@@ -165,7 +217,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 		#region Commands
 
-		// Command to open the project item into the workspace.
+		// Command to add an existing file from disk to the project.
 		private NamedCommand addExistingCmd;
 		public NamedCommand AddExistingCmd
 		{
@@ -176,7 +228,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 			}
 		}
 
-		// Command to open the project item into the workspace.
+		// Command to add a new file to the project.
 		private NamedCommand addNewCmd;
 		public NamedCommand AddNewCmd
 		{
@@ -184,6 +236,17 @@ namespace ShaderEditorApp.ViewModel.Projects
 			{
 				return NamedCommand.LazyInit(ref addNewCmd, "Add New File",
 						(param) => AddNewFile());
+			}
+		}
+
+		// Command to add a new scene to the project.
+		private NamedCommand addNewSceneCmd;
+		public NamedCommand AddNewSceneCmd
+		{
+			get
+			{
+				return NamedCommand.LazyInit(ref addNewSceneCmd, "Add New Scene",
+						(param) => AddNewScene());
 			}
 		}
 
