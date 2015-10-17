@@ -20,7 +20,7 @@ namespace SRPCommon.Util
 		{
 			if (token == null)
 			{
-				throw new ArgumentNullException("token");
+				throw new ArgumentNullException(nameof(token));
 			}
 
 			switch (token.Type)

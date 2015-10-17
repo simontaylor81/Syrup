@@ -28,7 +28,7 @@ namespace ShaderEditorApp.MVVMUtil
 		public RelayCommand(Action<object> execute, Predicate<object> canExecute)
 		{
 			if (execute == null)
-				throw new ArgumentNullException("execute");
+				throw new ArgumentNullException(nameof(execute));
 
 			_execute = execute;
 			_canExecute = canExecute;
