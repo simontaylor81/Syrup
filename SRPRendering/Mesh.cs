@@ -60,6 +60,6 @@ namespace SRPRendering
 		int numIndices;
 		int vertexStride;
 
-		public InputElement[] InputElements { get; private set; }
+		public InputElement[] InputElements { get; }
 	}
 }

@@ -17,30 +17,17 @@ namespace ShaderEditorApp.ViewModel.Scene
 	{
 		#region IHierarchicalBrowserNodeViewModel interface
 
-		public string DisplayName { get { return "Primitives"; } }
+		public string DisplayName => "Primitives";
 
-		public IEnumerable<ICommand> Commands
-		{
-			get { return Enumerable.Empty<ICommand>(); }
-		}
-
-		public IEnumerable<IUserProperty> UserProperties
-		{
-			get { return Enumerable.Empty<IUserProperty>(); }
-		}
+		public IEnumerable<ICommand> Commands => Enumerable.Empty<ICommand>();
+		public IEnumerable<IUserProperty> UserProperties => Enumerable.Empty<IUserProperty>();
 
 		private IHierarchicalBrowserNodeViewModel[] _children;
-		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children
-		{
-			get { return _children; }
-		}
+		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children => _children;
 
-		public ICommand DefaultCmd
-		{
-			get { return null; }
-		}
+		public ICommand DefaultCmd => null;
 
-		public bool IsDefault { get { return false; } }
+		public bool IsDefault => false;
 
 		#endregion
 

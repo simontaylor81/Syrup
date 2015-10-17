@@ -101,8 +101,8 @@ namespace ShaderEditorApp.Projects
 		}
 
 		// Public properties.
-		public string Name { get { return Path.GetFileNameWithoutExtension(filename); } }
-		public string BasePath { get { return Path.GetDirectoryName(filename); } }
+		public string Name => Path.GetFileNameWithoutExtension(filename);
+		public string BasePath => Path.GetDirectoryName(filename);
 
 		// Has the project changed since it was last saved?
 		public bool IsDirty
@@ -118,9 +118,9 @@ namespace ShaderEditorApp.Projects
 			}
 		}
 		private Subject<bool> _isDirtyObservable = new Subject<bool>();
-		public IObservable<bool> IsDirtyObservable { get { return _isDirtyObservable; } }
+		public IObservable<bool> IsDirtyObservable => _isDirtyObservable;
 
-		public IEnumerable<ProjectItem> AllItems { get { return RootFolder.AllItems; } }
+		public IEnumerable<ProjectItem> AllItems => RootFolder.AllItems;
 
 		// Find a project item based on an internal path.
 		public ProjectItem FindByInternalPath(string path)
@@ -175,7 +175,7 @@ namespace ShaderEditorApp.Projects
 		}
 
 		// event fired when the default scene changes.
-		public IObservable<ProjectItem> DefaultSceneChanged { get { return _defaultSceneChanged; } }
+		public IObservable<ProjectItem> DefaultSceneChanged => _defaultSceneChanged;
 		private Subject<ProjectItem> _defaultSceneChanged = new Subject<ProjectItem>();
 
 		private ProjectItem _defaultScene;

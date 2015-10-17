@@ -22,6 +22,6 @@ namespace ShaderEditorApp.ViewModel
 				.ToArray();
 		}
 
-		public PropertyViewModel[][] Rows { get; private set; }
+		public PropertyViewModel[][] Rows { get; }
 	}
 }

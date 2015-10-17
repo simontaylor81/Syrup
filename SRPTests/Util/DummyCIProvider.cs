@@ -19,15 +19,13 @@ namespace SRPTests.Util
 		}
 
 		// Pretend to be CI to exercise those code paths.
-		public bool IsCI { get { return true; } }
-		public bool IsAppVeyor { get { return false; } }
-		public bool IsDummy { get { return true; } }
+		public bool IsCI => true;
+		public bool IsAppVeyor => false;
+		public bool IsDummy => true;
 
-		public string BuildNumber { get { return "1"; } }
-
-		public string Version { get { return "1.0.1"; } }
-
-		public string Commit { get { return "abcdef"; } }
+		public string BuildNumber => "1";
+		public string Version => "1.0.1";
+		public string Commit => "abcdef";
 
 
 		// "Publish" an artefact.

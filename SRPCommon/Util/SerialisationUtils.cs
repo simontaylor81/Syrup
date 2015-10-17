@@ -15,7 +15,7 @@ namespace SRPCommon.Util
 		{
 			if (str == null)
 			{
-				throw new ArgumentNullException("str");
+				throw new ArgumentNullException(nameof(str));
 			}
 
 			var components = str.Split(null);
@@ -33,7 +33,7 @@ namespace SRPCommon.Util
 		{
 			if (str == null)
 			{
-				throw new ArgumentNullException("str");
+				throw new ArgumentNullException(nameof(str));
 			}
 
 			var components = str.Split(null);
@@ -53,15 +53,15 @@ namespace SRPCommon.Util
 		{
 			if (obj != null)
 			{
-				if (obj.Type != JTokenType.Object) throw new ArgumentException("Must be JSON object", "obj");
+				if (obj.Type != JTokenType.Object) throw new ArgumentException("Must be JSON object", nameof(obj));
 
 				var x = obj["x"];
 				var y = obj["y"];
 				var z = obj["z"];
 
-				if (x == null) throw new ArgumentException("Missing x component", "obj");
-				if (y == null) throw new ArgumentException("Missing y component", "obj");
-				if (z == null) throw new ArgumentException("Missing z component", "obj");
+				if (x == null) throw new ArgumentException("Missing x component", nameof(obj));
+				if (y == null) throw new ArgumentException("Missing y component", nameof(obj));
+				if (z == null) throw new ArgumentException("Missing z component", nameof(obj));
 
 				return new Vector3((float)x, (float)y, (float)z);
 			}
@@ -73,17 +73,17 @@ namespace SRPCommon.Util
 		{
 			if (obj != null)
 			{
-				if (obj.Type != JTokenType.Object) throw new ArgumentException("Must be JSON object", "obj");
+				if (obj.Type != JTokenType.Object) throw new ArgumentException("Must be JSON object", nameof(obj));
 
 				var x = obj["x"];
 				var y = obj["y"];
 				var z = obj["z"];
 				var w = obj["w"];
 
-				if (x == null) throw new ArgumentException("Missing x component", "obj");
-				if (y == null) throw new ArgumentException("Missing y component", "obj");
-				if (z == null) throw new ArgumentException("Missing z component", "obj");
-				if (w == null) throw new ArgumentException("Missing w component", "obj");
+				if (x == null) throw new ArgumentException("Missing x component", nameof(obj));
+				if (y == null) throw new ArgumentException("Missing y component", nameof(obj));
+				if (z == null) throw new ArgumentException("Missing z component", nameof(obj));
+				if (w == null) throw new ArgumentException("Missing w component", nameof(obj));
 
 				return new Vector4((float)x, (float)y, (float)z, (float)w);
 			}
@@ -92,9 +92,9 @@ namespace SRPCommon.Util
 
 		public static void ParseAttribute(XElement element, string attribute, Action<string> parseAction)
 		{
-			if (element == null) throw new ArgumentNullException("element");
-			if (attribute == null) throw new ArgumentNullException("attribute");
-			if (parseAction == null) throw new ArgumentNullException("parseAction");
+			if (element == null) throw new ArgumentNullException(nameof(element));
+			if (attribute == null) throw new ArgumentNullException(nameof(attribute));
+			if (parseAction == null) throw new ArgumentNullException(nameof(parseAction));
 
 			var attr = element.Attribute(attribute);
 			if (attr != null)

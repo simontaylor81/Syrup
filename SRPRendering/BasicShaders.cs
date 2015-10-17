@@ -34,17 +34,17 @@ namespace SRPRendering
 		/// <summary>
 		/// Simple vertex shader for rendering the scene.
 		/// </summary>
-		public IShader BasicSceneVS { get; private set; }
+		public IShader BasicSceneVS { get; }
 
 		/// <summary>
 		/// A simple pixel shader that simply outputs a constant colour.
 		/// </summary>
-		public IShader SolidColourPS { get; private set; }
+		public IShader SolidColourPS { get; }
 
 		/// <summary>
 		/// Shader variable for setting the solid colour to use when rendering with the solid colour pixel shader.
 		/// </summary>
-		public IShaderVariable SolidColourShaderVar { get; private set; }
+		public IShaderVariable SolidColourShaderVar { get; }
 
 
 		// List of shader that need to be disposed.

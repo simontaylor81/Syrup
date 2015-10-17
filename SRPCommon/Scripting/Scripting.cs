@@ -23,15 +23,15 @@ namespace SRPCommon.Scripting
 		public IRenderInterface RenderInterface { get; set; }
 
 		// Allow access to underlying Python engine for custom use (i.e. unit tests).
-		public ScriptEngine PythonEngine { get { return pythonEngine; } }
+		public ScriptEngine PythonEngine => pythonEngine;
 
 		private ScriptEngine pythonEngine;
 		private SRPPlatformAdaptationLayer _pal;
 		private bool bInProgress;
 
 		// Events fired before and after script execution.
-		public IObservable<Unit> PreExecute { get { return _preExecute; } }
-		public IObservable<bool> ExecutionComplete { get { return _executionComplete; } }
+		public IObservable<Unit> PreExecute => _preExecute;
+		public IObservable<bool> ExecutionComplete => _executionComplete;
 
 		// Subjects for the above.
 		private Subject<Unit> _preExecute = new Subject<Unit>();
@@ -137,7 +137,7 @@ namespace SRPCommon.Scripting
 		private class SRPScriptHost : ScriptHost
 		{
 			private PlatformAdaptationLayer _pal;
-			public override PlatformAdaptationLayer PlatformAdaptationLayer { get { return _pal; } }
+			public override PlatformAdaptationLayer PlatformAdaptationLayer => _pal;
 
 			public SRPScriptHost(PlatformAdaptationLayer pal)
 			{
@@ -165,9 +165,7 @@ namespace SRPCommon.Scripting
 			}
 
 			public override bool DirectoryExists(string path)
-			{
-				return (_workspace != null && path == _projectPathPrefix) || base.DirectoryExists(path);
-			}
+				=> (_workspace != null && path == _projectPathPrefix) || base.DirectoryExists(path);
 
 			public override string[] GetFileSystemEntries(string path, string searchPattern, bool includeFiles, bool includeDirectories)
 			{

@@ -21,7 +21,7 @@ namespace SRPTests.TestRenderer
 
 		// Report builds to Fermium if we have a URL, and we're running in CI.
 		// For now, only enable in the dummy CI provider as we don't have a publically-accessible Fermium instance.
-		public bool IsEnabled { get { return CIHelper.IsCI && !string.IsNullOrEmpty(_fermiumProjectUrl) && CIHelper.IsDummy; } }
+		public bool IsEnabled => CIHelper.IsCI && !string.IsNullOrEmpty(_fermiumProjectUrl) && CIHelper.IsDummy;
 
 		public FermiumReporter()
 		{

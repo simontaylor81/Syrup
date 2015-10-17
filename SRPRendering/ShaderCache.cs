@@ -13,7 +13,7 @@ namespace SRPRendering
 	public interface IShaderCache : IDisposable
 	{
 		IShader GetShader(string filename, string entryPoint, string profile, Func<string, string> includeLookup);
-    }
+	}
 
 	// Simple cache to avoid recompiling shaders every execution if they haven't changed.
 	class ShaderCache : IShaderCache
@@ -126,13 +126,11 @@ namespace SRPRendering
 					Path.GetFullPath(other.filename),
 					StringComparison.InvariantCultureIgnoreCase);
 		}
+
 		public override int GetHashCode()
-		{
-			return
-				entryPoint.GetHashCode() ^
+			=>	entryPoint.GetHashCode() ^
 				profile.GetHashCode() ^
 				Path.GetFullPath(filename).ToLowerInvariant().GetHashCode();
-		}
 
 		public string filename;
 		public string entryPoint;

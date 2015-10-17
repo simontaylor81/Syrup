@@ -110,10 +110,10 @@ namespace SRPCommon.Scene
 			return null;
 		}
 
-		public string Filename { get { return filename; } }
-		public IEnumerable<Primitive> Primitives { get { return primitives; } }
-		public IDictionary<string, SceneMesh> Meshes { get { return meshes; } }
-		public IDictionary<string, Material> Materials { get { return materials; } }
+		public string Filename => filename;
+		public IEnumerable<Primitive> Primitives => primitives;
+		public IDictionary<string, SceneMesh> Meshes => meshes;
+		public IDictionary<string, Material> Materials => materials;
 
 		// Observable that fires when something important changes in the scene.
 		public IObservable<Unit> OnChanged { get; private set; }
@@ -124,7 +124,7 @@ namespace SRPCommon.Scene
 		private Dictionary<string, Material> materials;
 
 		// Array of lights. Purely for access by script, so just dynamic objects.
-		public IEnumerable<dynamic> Lights { get { return lights; } }
+		public IEnumerable<dynamic> Lights => lights;
 		private List<dynamic> lights;
 	}
 }

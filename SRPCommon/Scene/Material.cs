@@ -13,8 +13,8 @@ namespace SRPCommon.Scene
 	{
 		public string Name { get; private set; }
 
-		public IDictionary<string, Vector4> Parameters { get { return vectorParameters; } }
-		public IDictionary<string, string> Textures { get { return textures; } }
+		public IDictionary<string, Vector4> Parameters => vectorParameters;
+		public IDictionary<string, string> Textures => textures;
 
 		private Dictionary<string, Vector4> vectorParameters;
 		private Dictionary<string, string> textures;

@@ -13,8 +13,8 @@ namespace SRPRendering
 	abstract class UserVariable : IUserProperty
 	{
 		// IUserProperty interface
-		public string Name { get; private set; }
-		public bool IsReadOnly { get { return false; } }
+		public string Name { get; }
+		public bool IsReadOnly => false;
 
 		public abstract dynamic GetFunction();
 
@@ -138,11 +138,8 @@ namespace SRPRendering
 			this.components = components;
 		}
 
-		public IUserProperty GetComponent(int index)
-		{
-			return components[index];
-		}
-		public int NumComponents { get { return components.Length; } }
+		public int NumComponents => components.Length;
+		public IUserProperty GetComponent(int index) => components[index];
 
 		public override IDisposable Subscribe(IObserver<Unit> observer)
 		{
