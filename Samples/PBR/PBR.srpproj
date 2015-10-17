@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project DefaultScene="/balls.srpscene">
+  <folder name="root">
+    <include filename="pbr.py" runAtStartup="false" />
+    <include filename="pbr.hlsl" runAtStartup="false" />
+    <include filename="balls.srpscene" runAtStartup="false" />
+  </folder>
+  <OpenDocuments />
+</project>
