@@ -32,20 +32,20 @@ namespace SRPRendering
 	internal class GlobalResources : IGlobalResources
 	{
 		// The resources themselves.
-		public Texture ErrorTexture { get; private set; }
+		public Texture ErrorTexture { get; }
 
-		public IDrawable SphereMesh { get; private set; }
-		public IDrawable FullscreenQuad { get; private set; }
+		public IDrawable SphereMesh { get; }
+		public IDrawable FullscreenQuad { get; }
 
-		public IBasicShaders BasicShaders { get; private set; }
-		public IShaderCache ShaderCache { get; private set; }
+		public IBasicShaders BasicShaders { get; }
+		public IShaderCache ShaderCache { get; }
 
 		// State object caches.
-		public IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; private set; }
-		public IStateObjectCache<DepthStencilState, DepthStencilStateDescription> DepthStencilStateCache { get; private set; }
-		public IStateObjectCache<BlendState, BlendStateDescription> BlendStateCache { get; private set; }
-		public IStateObjectCache<SamplerState, SamplerDescription> SamplerStateCache { get; private set; }
-		public IInputLayoutCache InputLayoutCache { get; private set; }
+		public IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; }
+		public IStateObjectCache<DepthStencilState, DepthStencilStateDescription> DepthStencilStateCache { get; }
+		public IStateObjectCache<BlendState, BlendStateDescription> BlendStateCache { get; }
+		public IStateObjectCache<SamplerState, SamplerDescription> SamplerStateCache { get; }
+		public IInputLayoutCache InputLayoutCache { get; }
 
 		private CompositeDisposable disposables = new CompositeDisposable();
 
@@ -59,7 +59,7 @@ namespace SRPRendering
 			// Create simple utility meshes.
 			var sphereMesh = BasicMesh.CreateSphere(device, 12, 6);
 			SphereMesh = sphereMesh;
-            disposables.Add(sphereMesh);
+			disposables.Add(sphereMesh);
 
 			var fullscreenQuad = new FullscreenQuad(device);
 			FullscreenQuad = fullscreenQuad;

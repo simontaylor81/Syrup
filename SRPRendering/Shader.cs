@@ -213,13 +213,8 @@ namespace SRPRendering
 		}
 
 		public IEnumerable<IShaderVariable> Variables
-		{
-			get
-			{
-				// Get all variables from all cbuffers.
-				return from cbuffer in cbuffers from variable in cbuffer.Variables select variable;
-			}
-		}
+			// Get all variables from all cbuffers.
+			=> from cbuffer in cbuffers from variable in cbuffer.Variables select variable;
 
 		// Find a variable by name.
 		public IShaderVariable FindVariable(string name)
@@ -239,14 +234,14 @@ namespace SRPRendering
 		private ComputeShader computeShader;
 
 		// Input signature. Vertex shader only.
-		public ShaderSignature Signature { get; private set; }
+		public ShaderSignature Signature { get; }
 
 		// Frequency (i.e. type) of shader.
 		private readonly ShaderFrequency frequency;
-		public ShaderFrequency Frequency { get { return frequency; } }
+		public ShaderFrequency Frequency => frequency;
 
 		// List of files that were included by this shader.
-		public IEnumerable<string> IncludedFiles { get; private set; }
+		public IEnumerable<string> IncludedFiles { get; }
 
 		// Constant buffer info.
 		private ConstantBuffer[] cbuffers;
@@ -261,7 +256,7 @@ namespace SRPRendering
 			private Func<string, string> includeLookup;
 
 			private List<string> _includedFiles = new List<string>();
-			public IEnumerable<string> IncludedFiles { get { return _includedFiles; } }
+			public IEnumerable<string> IncludedFiles => _includedFiles;
 
 			public IncludeLookup(Func<string, string> includeLookup)
 			{
@@ -337,12 +332,9 @@ namespace SRPRendering
 			}
 		}
 
-		public Buffer Buffer { get; private set; }
+		public Buffer Buffer { get; }
 
-		public IEnumerable<IShaderVariable> Variables
-		{
-			get { return variables; }
-		}
+		public IEnumerable<IShaderVariable> Variables => variables;
 
 		private ShaderVariable[] variables;
 		private DataBox contents;

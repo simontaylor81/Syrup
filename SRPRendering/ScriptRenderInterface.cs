@@ -63,15 +63,12 @@ namespace SRPRendering
 			src.SetFrameCallback(callback);
 		}
 
-		public dynamic GetScene()
-		{
-			return src.Scene;
-		}
+		public dynamic GetScene() => src.Scene;
 
 		// Handles to special resources.
-		//public object BackBuffer { get { return RenderTargetHandle.BackBuffer; } }
-		public object DepthBuffer { get { return DepthBufferHandle.Default; } }
-		public object NoDepthBuffer { get { return DepthBufferHandle.NoDepthBuffer; } }
+		//public object BackBuffer => RenderTargetHandle.BackBuffer;
+		public object DepthBuffer => DepthBufferHandle.Default;
+		public object NoDepthBuffer => DepthBufferHandle.NoDepthBuffer;
 
 		// Internal constructor, so python can't create new instances.
 		internal ScriptRenderInterface(ScriptRenderControl src)

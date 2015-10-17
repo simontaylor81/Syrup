@@ -45,17 +45,12 @@ namespace SRPRendering
 		}
 
 		// Array of input element structures that describe the layout of vertices to D3D.
-		public static InputElement[] InputElements
+		public static InputElement[] InputElements => new[]
 		{
-			get
-			{
-				return new[] {
-					new InputElement("POSITION", 0, SlimDX.DXGI.Format.R32G32B32A32_Float, 0),
-				};
-			}
-		}
+			new InputElement("POSITION", 0, SlimDX.DXGI.Format.R32G32B32A32_Float, 0),
+		};
 
-		private int VertexStride { get { return Marshal.SizeOf(typeof(Vector4)); } }
+		private int VertexStride => Marshal.SizeOf(typeof(Vector4));
 
 		private Buffer vertexBuffer;
 	}

@@ -58,7 +58,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 		// Get the name of the folder.
 		protected ObservableAsPropertyHelper<string> _displayName;
-		public string DisplayName { get { return _displayName.Value; } }
+		public string DisplayName => _displayName.Value;
 
 		// Prompt the user to add select a file to add, then add it to the project.
 		private void AddExistingFile()
@@ -99,10 +99,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 		}
 
 		// Can this folder be moved to the given folder?
-		public bool CanMoveTo(ProjectFolderViewModel dest)
-		{
-			return Folder.CanMoveTo(dest.Folder);
-		}
+		public bool CanMoveTo(ProjectFolderViewModel dest) => Folder.CanMoveTo(dest.Folder);
 
 		public void MoveTo(ProjectFolderViewModel dest)
 		{
@@ -122,17 +119,11 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 		// Get the file filter to use for the open dialog, based on the item type.
 		private string FileFilter
-		{
-			get
-			{
-				return
-					"Supported file types|*.hlsl;*.fx;*.py;*.srpscene" +
-					"|Shader files|*.hlsl;*.fx" +
-					"|Python files|*.py" +
-					"|Scene files|*.srpscene" +
-					"|All Files|*.*";
-			}
-		}
+			=> "Supported file types|*.hlsl;*.fx;*.py;*.srpscene" +
+				"|Shader files|*.hlsl;*.fx" +
+				"|Python files|*.py" +
+				"|Scene files|*.srpscene" +
+				"|All Files|*.*";
 
 		#region IHierarchicalBrowserNodeViewModel interface
 
@@ -147,19 +138,16 @@ namespace ShaderEditorApp.ViewModel.Projects
 		public IEnumerable<IUserProperty> UserProperties { get; protected set; }
 
 		// We don't have a default command.
-		public ICommand DefaultCmd { get { return null; } }
+		public ICommand DefaultCmd => null;
 
 		/// <summary>
 		/// List of child nodes.
 		/// </summary>
-		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children
-		{
-			get { return _children.Value; }
-		}
+		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children => _children.Value;
 		private ObservableAsPropertyHelper<IEnumerable<IHierarchicalBrowserNodeViewModel>> _children;
 
 		// We don't have a default folder.
-		public bool IsDefault { get { return false; } }
+		public bool IsDefault => false;
 
 		#endregion
 
@@ -168,43 +156,25 @@ namespace ShaderEditorApp.ViewModel.Projects
 		// Command to open the project item into the workspace.
 		private NamedCommand addExistingCmd;
 		public NamedCommand AddExistingCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref addExistingCmd, "Add Existing File",
-						(param) => AddExistingFile());
-			}
-		}
+			=> NamedCommand.LazyInit(ref addExistingCmd, "Add Existing File", (param) => AddExistingFile());
 
 		// Command to open the project item into the workspace.
 		private NamedCommand addNewCmd;
 		public NamedCommand AddNewCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref addNewCmd, "Add New File",
-						(param) => AddNewFile());
-			}
-		}
+			=> NamedCommand.LazyInit(ref addNewCmd, "Add New File", (param) => AddNewFile());
 
 		// Command to add a subfolder to this folder.
-		public NamedCommand AddSubFolder { get; private set; }
+		public NamedCommand AddSubFolder { get; }
 
 		// Command to remove the folder from the project.
 		private NamedCommand removeCmd;
 		public NamedCommand RemoveCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref removeCmd, "Remove",
-						(param) => RemoveFromProject());
-			}
-		}
+			=> NamedCommand.LazyInit(ref removeCmd, "Remove", (param) => RemoveFromProject());
 
 		#endregion
 
-		protected Project Project { get; private set; }
-		protected WorkspaceViewModel Workspace { get; private set; }
-		internal ProjectFolder Folder { get; private set; }
+		protected Project Project { get; }
+		protected WorkspaceViewModel Workspace { get; }
+		internal ProjectFolder Folder { get; }
 	}
 }

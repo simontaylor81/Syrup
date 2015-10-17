@@ -19,25 +19,16 @@ namespace ShaderEditorApp.ViewModel.Scene
 
 		public abstract string DisplayName { get; }
 
-		public IEnumerable<ICommand> Commands
-		{
-			get { return Enumerable.Empty<ICommand>(); }
-		}
+		public IEnumerable<ICommand> Commands => Enumerable.Empty<ICommand>();
 
-		public IEnumerable<IUserProperty> UserProperties
-		{
-			get { return _primitive.UserProperties; }
-		}
+		public IEnumerable<IUserProperty> UserProperties => _primitive.UserProperties;
 
 		// No children
-		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children { get { return null; } }
+		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children => null;
 
-		public ICommand DefaultCmd
-		{
-			get { return null; }
-		}
+		public ICommand DefaultCmd => null;
 
-		public bool IsDefault { get { return false; } }
+		public bool IsDefault => false;
 
 		#endregion
 

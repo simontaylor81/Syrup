@@ -24,14 +24,11 @@ namespace SRPRendering
 			this._variable = variable;
 		}
 
-		public string Name { get { return _variable.Name; } }
-		public bool IsReadOnly { get { return false; } }
-		public int NumComponents { get { return _components.Length; } }
+		public string Name => _variable.Name;
+		public bool IsReadOnly => false;
 
-		public IUserProperty GetComponent(int index)
-		{
-			return _components[index];
-		}
+		public int NumComponents => _components.Length;
+		public IUserProperty GetComponent(int index) => _components[index];
 
 		public IDisposable Subscribe(IObserver<Unit> observer)
 		{

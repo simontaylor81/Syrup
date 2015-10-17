@@ -25,15 +25,12 @@ namespace SRPRendering
 			this._variable = variable;
 		}
 
-		public string Name { get { return _variable.Name; } }
-		public bool IsReadOnly { get { return false; } }
-		public int NumColumns { get { return _components.GetLength(0); } }
-		public int NumRows { get { return _components.GetLength(1); } }
+		public string Name => _variable.Name;
+		public bool IsReadOnly => false;
+		public int NumColumns => _components.GetLength(0);
+		public int NumRows => _components.GetLength(1);
 
-		public IUserProperty GetComponent(int row, int col)
-		{
-			return _components[col, row];
-		}
+		public IUserProperty GetComponent(int row, int col) => _components[col, row];
 
 		public IDisposable Subscribe(IObserver<Unit> observer)
 		{

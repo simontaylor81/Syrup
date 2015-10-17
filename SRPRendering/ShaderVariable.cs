@@ -77,16 +77,13 @@ namespace SRPRendering
 	class ShaderVariable : IShaderVariable
 	{
 		// IShaderVariable interface.
-		public string Name { get; private set; }
-		public ShaderVariableTypeDesc VariableType { get; private set; }
+		public string Name { get; }
+		public ShaderVariableTypeDesc VariableType { get; }
 		public IShaderVariableBind Bind { get; set; }
 		public bool IsAutoBound { get; set; }
 
 		// For debugger prettiness.
-		public override string ToString()
-		{
-			return Name;
-		}
+		public override string ToString() => Name;
 
 		// Get the current value of the variable.
 		public T Get<T>() where T : struct

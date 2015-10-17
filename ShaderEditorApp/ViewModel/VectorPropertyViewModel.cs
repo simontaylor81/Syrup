@@ -18,6 +18,6 @@ namespace ShaderEditorApp.ViewModel
 				.ToArray();
 		}
 
-		public PropertyViewModel[] SubProperties { get; private set; }
+		public PropertyViewModel[] SubProperties { get; }
 	}
 }

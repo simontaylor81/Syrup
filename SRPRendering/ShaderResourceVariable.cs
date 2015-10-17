@@ -29,7 +29,7 @@ namespace SRPRendering
 	class ShaderResourceVariable : IShaderResourceVariable
 	{
 		// IShaderVariable interface.
-		public string Name { get; private set; }
+		public string Name { get; }
 		public ShaderResourceView Resource { get; set; }
 		public SamplerState Sampler { get; set; }
 

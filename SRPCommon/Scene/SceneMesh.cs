@@ -15,7 +15,7 @@ namespace SRPCommon.Scene
 		public string Filename { get; private set; }
 
 		private bool isValid = false;
-		public bool IsValid { get { return isValid; } }
+		public bool IsValid => isValid;
 
 		public DataStream Vertices { get; private set; }
 		public DataStream Indices { get; private set; }
@@ -104,9 +104,6 @@ namespace SRPCommon.Scene
 		}
 
 		// Convert AssImp types to SlimDX ones.
-		private static Vector3 ToVector3(Vector3D vec)
-		{
-			return new Vector3(vec.X, vec.Y, vec.Z);
-		}
+		private static Vector3 ToVector3(Vector3D vec) => new Vector3(vec.X, vec.Y, vec.Z);
 	}
 }

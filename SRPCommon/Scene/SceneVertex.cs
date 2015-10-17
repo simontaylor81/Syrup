@@ -49,25 +49,17 @@ namespace SRPCommon.Scene
 		}
 
 		// Array of input element structures that describe the layout of vertices to D3D.
-		public static InputElement[] InputElements
+		public static InputElement[] InputElements => new[]
 		{
-			get
-			{
-				return new[] {
-					new InputElement("POSITION", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
-					new InputElement("NORMAL", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
-					new InputElement("TEXCOORD", 0, SlimDX.DXGI.Format.R32G32_Float, 0),
-					new InputElement("TEXCOORD", 1, SlimDX.DXGI.Format.R32G32_Float, 0),
-					new InputElement("TEXCOORD", 2, SlimDX.DXGI.Format.R32G32_Float, 0),
-					new InputElement("TEXCOORD", 3, SlimDX.DXGI.Format.R32G32_Float, 0)
-				};
-			}
-		}
+			new InputElement("POSITION", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("NORMAL", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("TEXCOORD", 0, SlimDX.DXGI.Format.R32G32_Float, 0),
+			new InputElement("TEXCOORD", 1, SlimDX.DXGI.Format.R32G32_Float, 0),
+			new InputElement("TEXCOORD", 2, SlimDX.DXGI.Format.R32G32_Float, 0),
+			new InputElement("TEXCOORD", 3, SlimDX.DXGI.Format.R32G32_Float, 0)
+		};
 
 		// Get the size of a the vertex, to be used as the stride for vertex buffers.
-		public static int GetStride()
-		{
-			return Marshal.SizeOf(typeof(SceneVertex));
-		}
+		public static int GetStride() => Marshal.SizeOf(typeof(SceneVertex));
 	}
 }

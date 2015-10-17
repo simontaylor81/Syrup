@@ -9,8 +9,8 @@ using Xunit;
 
 namespace SRPTests
 {
-    public class DynamicJsonObjectTests
-    {
+	public class DynamicJsonObjectTests
+	{
 		// Test primitive types.
 		[Fact]
 		public void TestBasicTypes()

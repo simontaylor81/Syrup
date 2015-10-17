@@ -27,7 +27,7 @@ namespace SRPTests.TestRenderer
 		private readonly int _width = 256;
 		private readonly int _height = 256;
 
-		public Device Device { get { return device; } }
+		public Device Device => device;
 
 		public TestRenderer(int width, int height)
 		{
@@ -65,7 +65,7 @@ namespace SRPTests.TestRenderer
 			depthBuffer = new DepthBuffer(device, _width, _height);
 
 			disposables = new CompositeDisposable(device, renderTarget, renderTargetTexture, depthBuffer, stagingTexture);
-        }
+		}
 
 		public void Dispose()
 		{
@@ -110,7 +110,7 @@ namespace SRPTests.TestRenderer
 			//	System.Drawing.Imaging.ImageFormat.Png);
 
 			return bitmap;
-        }
+		}
 
 		// Read contents of backbuffer to into bitmap.
 		private System.Drawing.Bitmap ReadBackBufferBitmap()
