@@ -21,34 +21,8 @@
         </Style>
 
         <!-- Template for the different property types. -->
-        <DataTemplate x:Key="ScalarPropertyRowTemplate">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                <TextBox Grid.Column="1" Text="{Binding Value, Mode=TwoWay}"/>
-            </Grid>
-        </DataTemplate>
-
-        <DataTemplate x:Key="BoolPropertyRowTemplate">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                <CheckBox Grid.Column="1" IsChecked="{Binding Value, Mode=TwoWay}"/>
-            </Grid>
-        </DataTemplate>
-
-
-        <!-- Template for the different property types. -->
         <DataTemplate x:Key="ScalarPropertyValueTemplate">
-            <TextBox Text="{Binding Value, Mode=TwoWay}"/>
+            <TextBox Text="{Binding Value, Mode=TwoWay}" KeyDown="ScalarPropertyValue_KeyDown"/>
         </DataTemplate>
         <DataTemplate x:Key="BoolPropertyValueTemplate">
             <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"/>
@@ -95,17 +69,7 @@
 
     </UserControl.Resources>
 
-    <!--<Grid d:DataContext="{StaticResource DesignBinding}">-->
     <Grid d:DataContext="{d:DesignData Source=../SampleData/PropertySampleData.xaml}">
-        <!--<Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <ItemsControl ItemsSource="{Binding Properties}"
-                      ItemTemplateSelector="{StaticResource PropertyValueTemplateSelector}" Grid.RowSpan="2"
-                      />-->
-
         <ListView Grid.Row="1" ItemsSource="{Binding Properties}">
             <ListView.View>
                 <GridView>
