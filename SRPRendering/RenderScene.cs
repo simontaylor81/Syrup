@@ -41,6 +41,7 @@ namespace SRPRendering
 
 		public RenderScene(Scene scene, Device device, IGlobalResources globalResources)
 		{
+			_device = device;
 			_globalResources = globalResources;
 
 			var meshDict = new Dictionary<SceneMesh, Mesh>();
@@ -52,51 +53,6 @@ namespace SRPRendering
 			// Create render proxies for primitives in the scene.
 			foreach (var primitive in scene.Primitives)
 			{
-				Mesh mesh = null;
-
-				if (primitive is MeshInstancePrimitive)
-				{
-					var instance = (MeshInstancePrimitive)primitive;
-					if (!meshDict.TryGetValue(instance.Mesh, out mesh))
-					{
-						// Create the mesh and add to the lookup map.
-						mesh = new Mesh(device, instance.Mesh.Vertices, SceneVertex.GetStride(),
-							instance.Mesh.Indices, SceneVertex.InputElements);
-						meshDict.Add(instance.Mesh, mesh);
-					}
-				}
-				else if (primitive is SpherePrimitive)
-				{
-					// No instancing of spheres, just create a mesh for each one.
-					var sphere = (SpherePrimitive)primitive;
-					mesh = BasicMesh.CreateSphere(device, sphere.Slices, sphere.Stacks);
-				}
-
-				if (mesh != null)
-				{
-					// Create proxy for the instance and add to the list.
-					primitiveProxies.Add(new PrimitiveProxy(primitive, mesh, this));
-					meshes.Add(mesh);
-
-					// Create texture resource for textures used by this primitive's material.
-					if (primitive.Material != null)
-					{
-						foreach (var file in primitive.Material.Textures.Values)
-						{
-							if (!textures.ContainsKey(file))
-							{
-								try
-								{
-									textures.Add(file, Texture.LoadFromFile(device, file));
-								}
-								catch (Exception)
-								{
-									// For now, just don't add the texture.
-								}
-							}
-						}
-					}
-				}
 			}
 
 			Environment.CurrentDirectory = prevCurrentDir;
@@ -105,14 +61,68 @@ namespace SRPRendering
 		public void Dispose()
 		{
 			foreach (var mesh in meshes)
+			{
 				mesh.Dispose();
+			}
 			foreach (var texture in textures.Values)
+			{
 				texture.Dispose();
+			}
+		}
+
+		private PrimitiveProxy CreateProxy(Primitive primitive)
+		{
+			PrimitiveProxy result = null;
+			Mesh mesh = null;
+
+			if (primitive is MeshInstancePrimitive)
+			{
+				var instance = (MeshInstancePrimitive)primitive;
+				if (!meshDict.TryGetValue(instance.Mesh, out mesh))
+				{
+					// Create the mesh and add to the lookup map.
+					mesh = new Mesh(_device, instance.Mesh.Vertices, SceneVertex.GetStride(),
+						instance.Mesh.Indices, SceneVertex.InputElements);
+					meshDict.Add(instance.Mesh, mesh);
+				}
+			}
+			else if (primitive is SpherePrimitive)
+			{
+				// No instancing of spheres, just create a mesh for each one.
+				var sphere = (SpherePrimitive)primitive;
+				mesh = BasicMesh.CreateSphere(_device, sphere.Slices, sphere.Stacks);
+			}
+
+			if (mesh != null)
+			{
+				// Create proxy for the instance.
+				result = new PrimitiveProxy(primitive, mesh, this);
+
+				// Create texture resource for textures used by this primitive's material.
+				if (primitive.Material != null)
+				{
+					foreach (var file in primitive.Material.Textures.Values)
+					{
+						if (!textures.ContainsKey(file))
+						{
+							try
+							{
+								textures.Add(file, Texture.LoadFromFile(_device, file));
+							}
+							catch (Exception)
+							{
+								// For now, just don't add the texture.
+							}
+						}
+					}
+				}
+			}
 		}
 
 		private List<PrimitiveProxy> primitiveProxies = new List<PrimitiveProxy>();
-		private List<Mesh> meshes = new List<Mesh>();
+		private Dictionary<SceneMesh, Mesh> _meshes = new Dictionary<SceneMesh, Mesh>();
 		private Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
 		private readonly IGlobalResources _globalResources;
+		private readonly Device _device;
 	}
 }

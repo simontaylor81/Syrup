@@ -118,6 +118,7 @@
     <Compile Include="Util\DynamicHelpers.cs" />
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\GlobalConfig.cs" />
+    <Compile Include="Util\LazyMapping.cs" />
     <Compile Include="Util\OutputLogger.cs" />
     <Compile Include="Util\SerialisationUtils.cs" />
   </ItemGroup>

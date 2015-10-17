@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using SRPCommon.Util;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace SRPCommon.Scene
 {
@@ -61,8 +62,7 @@ namespace SRPCommon.Scene
 					.Select(obj => DynamicHelpers.CreateDynamicObject(obj))
 					.ToList();
 
-				// We change when any of our primitives change.
-				result.OnChanged = Observable.Merge(result.Primitives.Select(p => p.OnChanged));
+				result.NotifyChanged();
 
 				Environment.CurrentDirectory = prevCurrentDir;
 				return result;
@@ -116,7 +116,11 @@ namespace SRPCommon.Scene
 		public IDictionary<string, Material> Materials { get { return materials; } }
 
 		// Observable that fires when something important changes in the scene.
-		public IObservable<Unit> OnChanged { get; private set; }
+		public IObservable<Unit> OnChanged { get { return _onChanged; } }
+		private Subject<Unit> _onChanged = new Subject<Unit>();
+
+		// Subscription to primitives' OnChanged observables.
+		private IDisposable _onPrimitivesChangedSubscription;
 
 		private string filename;
 		private List<Primitive> primitives;
@@ -126,5 +130,31 @@ namespace SRPCommon.Scene
 		// Array of lights. Purely for access by script, so just dynamic objects.
 		public IEnumerable<dynamic> Lights { get { return lights; } }
 		private List<dynamic> lights;
+
+		public void AddPrimitive(Primitive primitive)
+		{
+			primitives.Add(primitive);
+			NotifyChanged();
+		}
+
+		private void NotifyChanged()
+		{
+			if (_onPrimitivesChangedSubscription != null)
+			{
+				_onPrimitivesChangedSubscription.Dispose();
+			}
+
+			var primitivesChanged = Observable.Merge(Primitives.Select(p => p.OnChanged));
+			_onPrimitivesChangedSubscription = primitivesChanged.Subscribe(_onChanged);
+
+			//primitivesChanged.Subscribe(_ => System.Diagnostics.Debug.WriteLine("Scene prims changed"));
+			//foreach (var prim in Primitives)
+			//{
+			//	prim.OnChanged.Subscribe(_ => System.Diagnostics.Debug.WriteLine("Scene prim changed"));
+			//}
+
+			// Fire an event for this change itself.
+			_onChanged.OnNext(Unit.Default);
+		}
 	}
 }

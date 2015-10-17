@@ -33,7 +33,7 @@ namespace SRPTests
 			Assert.Equal(expected, ScriptHelper.Instance.ResolveFunction(GetPythonValue(expression)));
 		}
 
-	    [Theory]
+		[Theory]
 		[InlineData("lambda x: x")]		// Functions must have zero arguments.
 		public void ResolveFunctionInvalid(string expression)
 		{
@@ -133,6 +133,6 @@ namespace SRPTests
 		{
 			var source = scripting.PythonEngine.CreateScriptSourceFromString(expression, SourceCodeKind.Expression);
 			return source.Execute();
-        }
+		}
 	}
 }

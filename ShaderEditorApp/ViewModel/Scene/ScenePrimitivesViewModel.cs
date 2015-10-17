@@ -7,6 +7,7 @@ using System.Windows.Input;
 using ReactiveUI;
 using SRPCommon.UserProperties;
 using SRPCommon.Scene;
+using ShaderEditorApp.MVVMUtil;
 
 namespace ShaderEditorApp.ViewModel.Scene
 {
@@ -19,10 +20,9 @@ namespace ShaderEditorApp.ViewModel.Scene
 
 		public string DisplayName { get { return "Primitives"; } }
 
-		public IEnumerable<ICommand> Commands
-		{
-			get { return Enumerable.Empty<ICommand>(); }
-		}
+		private SRPCommon.Scene.Scene Scene { get; set; }
+
+		public IEnumerable<ICommand> Commands { get; private set; }
 
 		public IEnumerable<IUserProperty> UserProperties
 		{
@@ -44,9 +44,22 @@ namespace ShaderEditorApp.ViewModel.Scene
 
 		#endregion
 
-		public ScenePrimitivesViewModel(IEnumerable<Primitive> primitives)
+		public ScenePrimitivesViewModel(SRPCommon.Scene.Scene scene)
 		{
-			_children = primitives.Select(prim => ScenePrimitiveViewModel.Create(prim)).ToArray();
+			Scene = scene;
+			_children = scene.Primitives.Select(prim => ScenePrimitiveViewModel.Create(prim)).ToArray();
+
+			// Create commands.
+			Commands = new[]
+			{
+				NamedCommand.CreateReactive("Add Sphere", _ => AddSphere())
+			};
+		}
+
+		private void AddSphere()
+		{
+			var sphere = new SpherePrimitive();
+			Scene.AddPrimitive(sphere);
 		}
 	}
 }

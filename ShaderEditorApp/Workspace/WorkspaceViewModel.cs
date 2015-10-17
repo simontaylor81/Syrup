@@ -268,6 +268,10 @@ namespace ShaderEditorApp.Workspace
 				// Redraw the scene when the scene changes.
 				sceneChangeSubscription = currentScene.OnChanged.Subscribe(_ => RedrawViewports());
 
+				// TEMP
+				sceneChangeSubscription = currentScene.OnChanged.Subscribe(_ =>
+					System.Diagnostics.Debug.WriteLine("Scene changed"));
+
 				SceneViewModel = new SceneViewModel(newScene);
 			}
 		}
