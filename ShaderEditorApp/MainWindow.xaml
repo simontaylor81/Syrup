@@ -163,28 +163,6 @@
 
         <StatusBar Grid.Row="2">
             <StatusBarItem Content="Shader Prototyping Tool"/>
-
-            <StatusBarItem HorizontalAlignment="Right">
-                <ProgressBar Name="workingProgressBar" Width="100" Height="15">
-                    <ProgressBar.Triggers>
-
-                        <!-- Continually animate the progress bar to demonstrate responsiveness. -->
-                        <EventTrigger RoutedEvent="ProgressBar.Loaded">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <DoubleAnimation
-                                        Storyboard.TargetName="workingProgressBar"
-                                        Storyboard.TargetProperty="Value"
-                                        From="0.0" To="100.0"
-                                        Duration="0:0:1"
-                                        RepeatBehavior="Forever" />
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                                            
-                    </ProgressBar.Triggers>
-                </ProgressBar>
-            </StatusBarItem>
         </StatusBar>
     </Grid>
 </Window>
