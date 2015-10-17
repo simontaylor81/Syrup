@@ -16,60 +16,60 @@ using SRPRendering;
 namespace ShaderEditorApp.View
 {
 
-public class RenderWindow : Control
-{
-	private List<IDisposable> resources = new List<IDisposable>();
-	private List<IDisposable> sizeDependentResources = new List<IDisposable>();
-
-	private SlimDX.Direct3D11.Device device;
-	private SlimDX.DXGI.SwapChain swapChain;
-	private RenderTargetView renderTarget;
-
-	private ScriptRenderControl scriptControl;
-	private Camera camera = new Camera();
-
-	// TODO: Refactor so the device isn't owned by the viewport.
-	public SlimDX.Direct3D11.Device Device { get { return device; } }
-
-	// Should we render every frame?
-	public bool RealTimeMode { get; set; }
-	private bool bNeedsRepaint = false;
-
-	internal ScriptRenderControl ScriptControl
+	public class RenderWindow : Control
 	{
-		get { return scriptControl; }
-		set
+		private List<IDisposable> resources = new List<IDisposable>();
+		private List<IDisposable> sizeDependentResources = new List<IDisposable>();
+
+		private SlimDX.Direct3D11.Device device;
+		private SlimDX.DXGI.SwapChain swapChain;
+		private RenderTargetView renderTarget;
+
+		private ScriptRenderControl scriptControl;
+		private Camera camera = new Camera();
+
+		// TODO: Refactor so the device isn't owned by the viewport.
+		public SlimDX.Direct3D11.Device Device => device;
+
+		// Should we render every frame?
+		public bool RealTimeMode { get; set; }
+		private bool bNeedsRepaint = false;
+
+		internal ScriptRenderControl ScriptControl
 		{
-			// Only do this once.
-			System.Diagnostics.Debug.Assert(scriptControl == null);
-			System.Diagnostics.Debug.Assert(value != null);
+			get { return scriptControl; }
+			set
+			{
+				// Only do this once.
+				System.Diagnostics.Debug.Assert(scriptControl == null);
+				System.Diagnostics.Debug.Assert(value != null);
 
-			scriptControl = value;
-			resources.Add(value);
+				scriptControl = value;
+				resources.Add(value);
+			}
 		}
-	}
 
-	private ViewModel.ViewportViewModel viewportViewModel;
-	public ViewModel.ViewportViewModel ViewportViewModel
-	{
-		get { return viewportViewModel; }
-		set
+		private ViewModel.ViewportViewModel viewportViewModel;
+		public ViewModel.ViewportViewModel ViewportViewModel
 		{
-			viewportViewModel = value;
-			if (camera != null)
-				camera.ViewportViewModel = value;
+			get { return viewportViewModel; }
+			set
+			{
+				viewportViewModel = value;
+				if (camera != null)
+					camera.ViewportViewModel = value;
+			}
 		}
-	}
 
-	public RenderWindow()
-	{
-		// Register camera.
-		camera.RegisterViewport(this);
+		public RenderWindow()
+		{
+			// Register camera.
+			camera.RegisterViewport(this);
 
-		MouseClick += RenderWindow_MouseClick;
+			MouseClick += RenderWindow_MouseClick;
 
-		// Initialise D3D11 Device & swap chain.
-		var description = new SwapChainDescription()
+			// Initialise D3D11 Device & swap chain.
+			var description = new SwapChainDescription()
 			{
 				BufferCount = 1,
 				Usage = Usage.RenderTargetOutput,
@@ -81,120 +81,117 @@ public class RenderWindow : Control
 				SwapEffect = SwapEffect.Discard
 			};
 
-		var deviceCreationFlags = DeviceCreationFlags.None;
+			var deviceCreationFlags = DeviceCreationFlags.None;
 #if DEBUG
-		deviceCreationFlags |= DeviceCreationFlags.Debug;
+			deviceCreationFlags |= DeviceCreationFlags.Debug;
 #endif
 
-		// If you get a debug-only crash here, make sure you have the debug D3D dlls installed
-		// ("Graphics Tools" under Optional Features in Windows 10).
-		SlimDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, deviceCreationFlags, description, out device, out swapChain);
+			// If you get a debug-only crash here, make sure you have the debug D3D dlls installed
+			// ("Graphics Tools" under Optional Features in Windows 10).
+			SlimDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, deviceCreationFlags, description, out device, out swapChain);
 
-		resources.Add(device);
-		resources.Add(swapChain);
+			resources.Add(device);
+			resources.Add(swapChain);
 
-		// prevent DXGI handling of alt+enter, which doesn't work properly with Winforms
-		using (var factory = swapChain.GetParent<Factory>())
-			factory.SetWindowAssociation(Handle, WindowAssociationFlags.IgnoreAltEnter);
+			// prevent DXGI handling of alt+enter, which doesn't work properly with Winforms
+			using (var factory = swapChain.GetParent<Factory>())
+				factory.SetWindowAssociation(Handle, WindowAssociationFlags.IgnoreAltEnter);
 
-		this.SizeChanged += OnResize;
-	}
+			this.SizeChanged += OnResize;
+		}
 
-	private void OnResize(object sender, EventArgs e)
-	{
-		// Release any existing resources.
-		foreach (var obj in sizeDependentResources)
-			obj.Dispose();
-		sizeDependentResources.Clear();
-
-		swapChain.ResizeBuffers(2, 0, 0, Format.R8G8B8A8_UNorm, SwapChainFlags.AllowModeSwitch);
-		using (var resource = SlimDX.Direct3D11.Resource.FromSwapChain<Texture2D>(swapChain, 0))
-			renderTarget = new RenderTargetView(device, resource);
-		sizeDependentResources.Add(renderTarget);
-
-		// Create depth/stencil buffer texture.
-		depthBuffer = new DepthBuffer(device, Width, Height);
-
-		sizeDependentResources.Add(depthBuffer);
-	}
-
-	private DepthBuffer depthBuffer;
-
-
-	protected override void Dispose(bool disposing)
-	{
-		if (disposing)
+		private void OnResize(object sender, EventArgs e)
 		{
-			// clean up all resources
-			foreach (var resource in sizeDependentResources)
-				resource.Dispose();
-			foreach (var resource in resources)
-				resource.Dispose();
-
+			// Release any existing resources.
+			foreach (var obj in sizeDependentResources)
+				obj.Dispose();
 			sizeDependentResources.Clear();
-			resources.Clear();
+
+			swapChain.ResizeBuffers(2, 0, 0, Format.R8G8B8A8_UNorm, SwapChainFlags.AllowModeSwitch);
+			using (var resource = SlimDX.Direct3D11.Resource.FromSwapChain<Texture2D>(swapChain, 0))
+				renderTarget = new RenderTargetView(device, resource);
+			sizeDependentResources.Add(renderTarget);
+
+			// Create depth/stencil buffer texture.
+			depthBuffer = new DepthBuffer(device, Width, Height);
+
+			sizeDependentResources.Add(depthBuffer);
 		}
 
-		base.Dispose(disposing);
-	}
+		private DepthBuffer depthBuffer;
 
-	private void Render()
-	{
-		var context = device.ImmediateContext;
 
-		// Clear depth buffer.
-		context.ClearDepthStencilView(depthBuffer.DSV, DepthStencilClearFlags.Depth, 1.0f, 0);
-
-		// Construct view info object.
-		ViewInfo viewInfo = new ViewInfo(
-			camera.WorldToViewMatrix,
-			camera.GetViewToProjectionMatrix(AspectRatio),
-			camera.EyePosition,
-			camera.Near,
-			camera.Far,
-			ClientSize.Width,
-			ClientSize.Height,
-			renderTarget,
-			depthBuffer
-			);
-
-		if (scriptControl != null)
-			scriptControl.Render(context, viewInfo);
-
-		swapChain.Present(0, PresentFlags.None);
-	}
-
-	public void Tick()
-	{
-		if (bNeedsRepaint || RealTimeMode)
+		protected override void Dispose(bool disposing)
 		{
-			bNeedsRepaint = false;
-			Render();
+			if (disposing)
+			{
+				// clean up all resources
+				foreach (var resource in sizeDependentResources)
+					resource.Dispose();
+				foreach (var resource in resources)
+					resource.Dispose();
+
+				sizeDependentResources.Clear();
+				resources.Clear();
+			}
+
+			base.Dispose(disposing);
+		}
+
+		private void Render()
+		{
+			var context = device.ImmediateContext;
+
+			// Clear depth buffer.
+			context.ClearDepthStencilView(depthBuffer.DSV, DepthStencilClearFlags.Depth, 1.0f, 0);
+
+			// Construct view info object.
+			ViewInfo viewInfo = new ViewInfo(
+				camera.WorldToViewMatrix,
+				camera.GetViewToProjectionMatrix(AspectRatio),
+				camera.EyePosition,
+				camera.Near,
+				camera.Far,
+				ClientSize.Width,
+				ClientSize.Height,
+				renderTarget,
+				depthBuffer
+				);
+
+			if (scriptControl != null)
+				scriptControl.Render(context, viewInfo);
+
+			swapChain.Present(0, PresentFlags.None);
+		}
+
+		public void Tick()
+		{
+			if (bNeedsRepaint || RealTimeMode)
+			{
+				bNeedsRepaint = false;
+				Render();
+			}
+		}
+
+		protected override void OnPaint(PaintEventArgs e)
+		{
+			base.OnPaint(e);
+			bNeedsRepaint = true;
+		}
+
+		// Override background paint event to prevent flickering.
+		protected override void OnPaintBackground(PaintEventArgs e)
+		{
+			// Do nothing -- Render() clears the whole window.
+		}
+
+		private float AspectRatio => (float)ClientSize.Width / (float)ClientSize.Height;
+
+		void RenderWindow_MouseClick(object sender, MouseEventArgs e)
+		{
+			// Acquire focus when we're clicked on.
+			Focus();
 		}
 	}
-
-	protected override void OnPaint(PaintEventArgs e)
-	{
-		base.OnPaint(e);
-		bNeedsRepaint = true;
-	}
-
-	// Override background paint event to prevent flickering.
-	protected override void OnPaintBackground(PaintEventArgs e)
-	{
-		// Do nothing -- Render() clears the whole window.
-	}
-
-	private float AspectRatio
-	{
-		get { return (float)ClientSize.Width / (float)ClientSize.Height; }
-	}
-
-	void RenderWindow_MouseClick(object sender, MouseEventArgs e)
-	{
-		// Acquire focus when we're clicked on.
-		Focus();
-	}
-}
 
 }

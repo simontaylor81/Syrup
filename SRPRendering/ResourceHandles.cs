@@ -25,14 +25,12 @@ namespace SRPRendering
 			var other = obj as HandleBase;
 			return other != null && Equals(other);
 		}
+
 		public bool Equals(HandleBase other)
-		{
-			return GetType() == other.GetType() && index == other.index;
-		}
+			=> GetType() == other.GetType() && index == other.index;
+
 		public override int GetHashCode()
-		{
-			return index;
-		}
+			=> index;
 	}
 
 	// Handle to a shader.
@@ -71,11 +69,11 @@ namespace SRPRendering
 		}
 
 		// Special handle to the default depth buffer.
-		internal static DepthBufferHandle Default { get { return default_; } }
+		internal static DepthBufferHandle Default => default_;
 		private static DepthBufferHandle default_ = new DepthBufferHandle(-1);
 
 		// Special handle to indicate that no depth buffer should be set.
-		internal static DepthBufferHandle NoDepthBuffer { get { return noDepthBuffer_; } }
+		internal static DepthBufferHandle NoDepthBuffer => noDepthBuffer_;
 		private static DepthBufferHandle noDepthBuffer_ = new DepthBufferHandle(-2);
 	}
 }

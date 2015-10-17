@@ -13,8 +13,6 @@ namespace SRPCommon.Util
 		/// Otherwise, returns the source unmodified.
 		/// </summary>
 		public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> source)
-		{
-			return source ?? Enumerable.Empty<T>();
-		}
+			=> source ?? Enumerable.Empty<T>();
 	}
 }

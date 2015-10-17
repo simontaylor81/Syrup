@@ -8,11 +8,11 @@ namespace SRPRendering
 	// Encapsulation of a D3D depth buffer.
 	public class DepthBuffer : IDisposable
 	{
-		public DepthStencilView DSV { get { return dsv; } }
-		public ShaderResourceView SRV { get { return srv; } }
+		public DepthStencilView DSV => dsv;
+		public ShaderResourceView SRV => srv;
 
-		public int Width { get { return texture.Description.Width; } }
-		public int Height { get { return texture.Description.Height; } }
+		public int Width => texture.Description.Width;
+		public int Height => texture.Description.Height;
 
 		public DepthBuffer(Device device, int width, int height)
 		{

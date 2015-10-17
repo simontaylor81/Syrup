@@ -12,7 +12,7 @@ namespace SRPRendering
 	public interface IInputLayoutCache : IDisposable
 	{
 		InputLayout GetInputLayout(Device device, ShaderSignature shaderSignature, InputElement[] inputElements);
-    }
+	}
 
 	class InputLayoutCache : IInputLayoutCache
 	{

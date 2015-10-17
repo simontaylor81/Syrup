@@ -67,7 +67,7 @@ namespace SRPRendering
 			variable.SetDefault();
 		}
 
-		public bool AllowScriptOverride { get { return false; } }
+		public bool AllowScriptOverride => false;
 
 		private IShaderVariable variable;
 		private ShaderVariableBindSource source;
@@ -109,7 +109,7 @@ namespace SRPRendering
 			}
 		}
 
-		public bool AllowScriptOverride { get { return false; } }
+		public bool AllowScriptOverride => false;
 
 		private IShaderVariable variable;
 		private dynamic value;
@@ -148,7 +148,7 @@ namespace SRPRendering
 			variable.SetDefault();
 		}
 
-		public bool AllowScriptOverride { get { return false; } }
+		public bool AllowScriptOverride => false;
 
 		private IShaderVariable variable;
 		private string source;
@@ -184,7 +184,7 @@ namespace SRPRendering
 			}
 		}
 
-		public bool AllowScriptOverride { get { return true; } }
+		public bool AllowScriptOverride => true;
 
 		private IShaderVariable variable;
 	}

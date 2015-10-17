@@ -153,7 +153,7 @@ namespace ShaderEditorApp.Workspace
 		}
 
 		// AvalonEdit document object.
-		public TextDocument Document { get; private set; }
+		public TextDocument Document { get; }
 
 		private bool bDirty_ = false;
 		public bool IsDirty
