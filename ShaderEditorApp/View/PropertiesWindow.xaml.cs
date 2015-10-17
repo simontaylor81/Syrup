@@ -49,6 +49,12 @@ namespace ShaderEditorApp.View
 				textBox.SelectAll();
 			}
 		}
+
+		private void ScalarPropertyValue_GotFocus(object sender, RoutedEventArgs e)
+		{
+			// Select contents of the text box when it gets focus (via keyboard).
+			((TextBox)sender).SelectAll();
+		}
 	}
 
 	class PropertyValueTemplateSelector : DataTemplateSelector

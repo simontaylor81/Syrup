@@ -22,7 +22,9 @@
 
         <!-- Template for the different property types. -->
         <DataTemplate x:Key="ScalarPropertyValueTemplate">
-            <TextBox Text="{Binding Value, Mode=TwoWay}" KeyDown="ScalarPropertyValue_KeyDown"/>
+            <TextBox Text="{Binding Value, Mode=TwoWay}"
+                     KeyDown="ScalarPropertyValue_KeyDown"
+                     GotFocus="ScalarPropertyValue_GotFocus"/>
         </DataTemplate>
         <DataTemplate x:Key="BoolPropertyValueTemplate">
             <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"/>
