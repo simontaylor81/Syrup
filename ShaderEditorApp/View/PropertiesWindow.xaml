@@ -30,7 +30,7 @@
 
         <DataTemplate x:Key="VectorPropertyValueTemplate">
             <ItemsControl ItemsSource="{Binding SubProperties}"
-                          ItemTemplate="{StaticResource ScalarPropertyValueTemplate}">
+                          ItemTemplate="{StaticResource ScalarPropertyValueTemplate}" IsTabStop="False">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Rows="1" />
@@ -70,13 +70,23 @@
     </UserControl.Resources>
 
     <Grid d:DataContext="{d:DesignData Source=../SampleData/PropertySampleData.xaml}">
-        <ListView Grid.Row="1" ItemsSource="{Binding Properties}">
+        <ListView Grid.Row="1" ItemsSource="{Binding Properties}" KeyboardNavigation.TabNavigation="Continue">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Property" DisplayMemberBinding="{Binding DisplayName}"/>
                     <GridViewColumn Header="Value" Width="200" CellTemplateSelector="{StaticResource PropertyValueTemplateSelector}"/>
                 </GridView>
             </ListView.View>
+
+            <!-- Disable tab stop on the top-level item container -->
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="IsTabStop" Value="False" />
+
+                    <!-- Need to override this too for some reason. -->
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
     </Grid>
 </UserControl>
