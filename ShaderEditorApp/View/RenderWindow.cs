@@ -86,6 +86,8 @@ public class RenderWindow : Control
 		deviceCreationFlags |= DeviceCreationFlags.Debug;
 #endif
 
+		// If you get a debug-only crash here, make sure you have the debug D3D dlls installed
+		// ("Graphics Tools" under Optional Features in Windows 10).
 		SlimDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, deviceCreationFlags, description, out device, out swapChain);
 
 		resources.Add(device);
