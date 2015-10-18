@@ -20,6 +20,6 @@ namespace ShaderEditorApp.ViewModel
 			IsReadOnly = property.IsReadOnly;
 		}
 
-		public bool IsReadOnly { get; private set; }
+		public bool IsReadOnly { get; }
 	}
 }

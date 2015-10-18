@@ -17,17 +17,14 @@ namespace ShaderEditorApp.ViewModel.Scene
 		#region IPropertySource interface
 
 		private ObservableAsPropertyHelper<IEnumerable<IUserProperty>> _properties;
-		public IEnumerable<IUserProperty> Properties
-		{
-			get { return _properties.Value; }
-		}
+		public IEnumerable<IUserProperty> Properties => _properties.Value;
 
 		#endregion
 
 		#region IHierarchicalBrowserRootViewModel interface
 
 		private IHierarchicalBrowserNodeViewModel[] _rootNodes;
-		public IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes { get { return _rootNodes; } }
+		public IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes => _rootNodes;
 
 		private IHierarchicalBrowserNodeViewModel _activeItem;
 		public IHierarchicalBrowserNodeViewModel ActiveItem

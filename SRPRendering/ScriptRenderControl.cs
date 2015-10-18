@@ -90,7 +90,7 @@ namespace SRPRendering
 			}
 		}
 
-		public IObservable<Unit> RedrawRequired { get { return _redrawRequired; } }
+		public IObservable<Unit> RedrawRequired => _redrawRequired;
 		private readonly Subject<Unit> _redrawRequired = new Subject<Unit>();
 		private bool _bIgnoreRedrawRequests;
 
@@ -394,16 +394,14 @@ namespace SRPRendering
 		}
 
 		private bool IsValidShader(dynamic handle)
-		{
-			return handle is ShaderHandle && handle.index >= 0 && handle.index < shaders.Count;
-		}
+			=> handle is ShaderHandle && handle.index >= 0 && handle.index < shaders.Count;
 
 		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
-		public IRenderInterface ScriptInterface { get; private set; }
+		public IRenderInterface ScriptInterface { get; }
 
 		private ObservableCollection<IUserProperty> properties = new ObservableCollection<IUserProperty>();
-		public ObservableCollection<IUserProperty> Properties { get { return properties; } }
-		IEnumerable<IUserProperty> IPropertySource.Properties { get { return properties; } }
+		public ObservableCollection<IUserProperty> Properties => properties;
+		IEnumerable<IUserProperty> IPropertySource.Properties => properties;
 
 		private Device device;
 
@@ -428,10 +426,10 @@ namespace SRPRendering
 		private IWorkspace workspace;
 
 		private bool bScriptExecutionError = false;		// True if there was a problem executing the script
-		private bool bScriptRenderError = false;		// True if there was a script error while rendering
+		private bool bScriptRenderError = false;        // True if there was a script error while rendering
 
 		// If true, previous rendering failed with a script problem, so we don't keep re-running until the script is fixed & re-run.
-		public bool HasScriptError { get { return bScriptExecutionError || bScriptRenderError; } }
+		public bool HasScriptError => bScriptExecutionError || bScriptRenderError;
 
 		// User variables.
 		private List<UserVariable> userVariables = new List<UserVariable>();

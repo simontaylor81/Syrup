@@ -30,17 +30,11 @@ namespace ShaderEditorApp.ViewModel.Scene
 		}
 
 		private IHierarchicalBrowserNodeViewModel[] _children;
-		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children
-		{
-			get { return _children; }
-		}
+		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children => _children;
 
-		public ICommand DefaultCmd
-		{
-			get { return null; }
-		}
+		public ICommand DefaultCmd => null;
 
-		public bool IsDefault { get { return false; } }
+		public bool IsDefault => false;
 
 		#endregion
 

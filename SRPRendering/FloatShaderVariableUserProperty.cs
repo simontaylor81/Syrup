@@ -19,9 +19,8 @@ namespace SRPRendering
 			_componentIndex = componentIndex;
 		}
 
-		public bool IsReadOnly { get { return false; } }
-
-		public string Name { get { return _variable.Name; } }
+		public bool IsReadOnly => false;
+		public string Name => _variable.Name;
 
 		public float Value
 		{

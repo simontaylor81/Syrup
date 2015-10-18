@@ -15,13 +15,7 @@ namespace ShaderEditorApp.ViewModel
 		}
 
 		// Names of the available camera modes.
-		public IEnumerable<CameraMode> CameraModes
-		{
-			get
-			{
-				return Enum.GetValues(typeof(CameraMode)).OfType<CameraMode>();
-			}
-		}
+		public IEnumerable<CameraMode> CameraModes => Enum.GetValues(typeof(CameraMode)).OfType<CameraMode>();
 
 		// The currently selected camera mode.
 		private CameraMode selectedCameraMode = CameraMode.Orbit;

@@ -23,7 +23,7 @@ namespace SRPCommon.Util
 		// Global instance. We don't enforce singleton in-case we want to create other instancing for some reason,
 		// but most of the time you just want to use OutputLogger.Instance.
 		private static Lazy<OutputLogger> instance = new Lazy<OutputLogger>(CreateDefaultInstance);
-		public static OutputLogger Instance { get { return instance.Value; } }
+		public static OutputLogger Instance => instance.Value;
 
 		public void AddTarget(ILogTarget target)
 		{
@@ -112,7 +112,7 @@ namespace SRPCommon.Util
 			category = inCategory;
 		}
 
-		public Encoding StringEncoding { get { return encoding; } }
+		public Encoding StringEncoding => encoding;
 
 		// Stream interface.
 
@@ -143,9 +143,9 @@ namespace SRPCommon.Util
 			// Nothing to flush.
 		}
 
-		public override bool CanRead { get { return false; } }
-		public override bool CanSeek { get { return false; } }
-		public override bool CanWrite { get { return true; } }
+		public override bool CanRead => false;
+		public override bool CanSeek => false;
+		public override bool CanWrite => true;
 
 		public override Int64 Length { get { throw new NotSupportedException(); } }
 		public override long Position

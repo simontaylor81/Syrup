@@ -52,7 +52,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 		// Properties to display for the currently selected property item.
 		private ObservableAsPropertyHelper<IEnumerable<IUserProperty>> _properties;
-		public IEnumerable<IUserProperty> Properties { get { return _properties.Value; } }
+		public IEnumerable<IUserProperty> Properties => _properties.Value;
 
 		// Currently selected node in the project.
 		private IHierarchicalBrowserNodeViewModel activeItem;
@@ -135,7 +135,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 
 		// Allow this object to be used as a single root node of the tree (since the tree control needs a list of items).
-		public IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes { get { return new [] { this }; } }
+		public IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes => new[] { this };
 
 		// Command to save the project.
 		private NamedCommand saveCmd;

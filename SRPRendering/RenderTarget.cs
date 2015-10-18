@@ -10,11 +10,11 @@ namespace SRPRendering
 	// Encapsulation of a D3D render target.
 	class RenderTarget : IDisposable
 	{
-		public RenderTargetView RTV { get { return rtv; } }
-		public ShaderResourceView SRV { get { return srv; } }
+		public RenderTargetView RTV => rtv;
+		public ShaderResourceView SRV => srv;
 
-		public int Width { get { return texture.Description.Width; } }
-		public int Height { get { return texture.Description.Height; } }
+		public int Width => texture.Description.Width;
+		public int Height => texture.Description.Height;
 
 		public RenderTarget(Device device, int width, int height)
 		{

@@ -24,20 +24,18 @@ namespace ShaderEditorApp.Projects
 			this.parent = parent;
 		}
 
-		public string Name { get { return Path.GetFileName(path); } }
-		public string AbsolutePath { get { return path; } }
-		public string Extension { get { return Path.GetExtension(path); } }
+		public string Name => Path.GetFileName(path);
+		public string AbsolutePath => path;
+		public string Extension => Path.GetExtension(path);
 
 		public bool RunAtStartup { get; set; }
 
 		// Is this item the default of its type?
 		public bool IsDefault
-		{
-			get { return (Type == ProjectItemType.Scene) ? (parent.Project.DefaultScene == this) : false; }
-		}
+			=> (Type == ProjectItemType.Scene) ? (parent.Project.DefaultScene == this) : false;
 
 		// The path within the projects internal folder structure (not related to the file path).
-		public object InternalPath { get { return parent.InternalPath + "/" + Name; } }
+		public object InternalPath => parent.InternalPath + "/" + Name;
 
 		// Get the type of file this item represents.
 		public ProjectItemType Type

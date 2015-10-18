@@ -20,7 +20,7 @@ namespace SRPRendering
 
 	class RenderScene : IRenderScene
 	{
-		public IEnumerable<IPrimitive> Primitives { get { return primitiveProxies; } }
+		public IEnumerable<IPrimitive> Primitives => primitiveProxies;
 
 		// Return the texture for a given filename. Always returns a valid ref.
 		public Texture GetTexture(string filename)

@@ -18,18 +18,15 @@ namespace SRPCommon.UserProperties
 		private Action<object> _setter;
 		private ObjectFieldUserProperty<float>[] _fields;
 
-		public int NumComponents { get { return _fields.Length; } }
-		public string Name { get; private set; }
-		public bool IsReadOnly { get { return false; } }
+		public string Name { get; }
+		public bool IsReadOnly => false;
+
+		public int NumComponents => _fields.Length;
+		public IUserProperty GetComponent(int index) => _fields[index];
 
 		public IDisposable Subscribe(IObserver<Unit> observer)
 		{
 			return Observable.Merge(_fields).Subscribe(observer);
-		}
-
-		public IUserProperty GetComponent(int index)
-		{
-			return _fields[index];
 		}
 
 		// Can't pass a struct by reference, so pass getter and setter functions.
@@ -57,9 +54,9 @@ namespace SRPCommon.UserProperties
 			_member = member;
 		}
 
-		public bool IsReadOnly { get { return false; } }
+		public bool IsReadOnly => false;
 
-		public string Name { get { return _member.Name; } }
+		public string Name => _member.Name;
 
 		public IDisposable Subscribe(IObserver<Unit> observer)
 		{
