@@ -3,12 +3,17 @@ using SRPCommon.UserProperties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace SRPCommon.Scene
 {
 	public class SpherePrimitive : Primitive
 	{
+		public override PrimitiveType Type => PrimitiveType.Sphere;
+
+		[JsonProperty]
 		public int Stacks { get; set; }
+		[JsonProperty]
 		public int Slices { get; set; }
 
 		public SpherePrimitive()

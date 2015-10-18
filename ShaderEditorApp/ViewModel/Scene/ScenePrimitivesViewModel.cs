@@ -47,7 +47,8 @@ namespace ShaderEditorApp.ViewModel.Scene
 			// Create commands.
 			Commands = new[]
 			{
-				NamedCommand.CreateReactive("Add Sphere", _ => AddSphere())
+				NamedCommand.CreateReactive("Add Sphere", _ => AddSphere()),
+				NamedCommand.CreateReactive("Save", _ => scene.Save())
 			};
 		}
 

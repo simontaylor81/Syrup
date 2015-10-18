@@ -9,15 +9,38 @@ using SRPCommon.Util;
 using SRPCommon.UserProperties;
 using System.Reactive.Linq;
 using System.Reactive;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace SRPCommon.Scene
 {
+	public enum PrimitiveType
+	{
+		MeshInstance,
+		Sphere,
+	}
+
+	[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 	public abstract class Primitive
 	{
+		[JsonProperty]
+		[JsonConverter(typeof(StringEnumConverter))]
+		public abstract PrimitiveType Type { get; }
+
+		[JsonProperty]
 		public Vector3 Position { get; set; }
+
+		[JsonProperty]
+
 		public Vector3 Scale { get; set; }
+
+		[JsonProperty]
 		public Vector3 Rotation { get; set; }
+
 		public Material Material { get; private set; }
+
+		[JsonProperty("material")]
+		private string MaterialName => Material?.Name;
 
 		protected List<IUserProperty> _userProperties = new List<IUserProperty>();
 		public IEnumerable<IUserProperty> UserProperties => _userProperties;

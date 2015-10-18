@@ -6,12 +6,17 @@ using Assimp;
 using SlimDX;
 using Newtonsoft.Json.Linq;
 using SRPCommon.Util;
+using Newtonsoft.Json;
 
 namespace SRPCommon.Scene
 {
+	[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 	public class SceneMesh
 	{
+		[JsonProperty]
 		public string Name { get; private set; }
+
+		[JsonProperty]
 		public string Filename { get; private set; }
 
 		private bool isValid = false;

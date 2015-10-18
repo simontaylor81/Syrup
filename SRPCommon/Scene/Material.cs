@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using SlimDX;
 using Newtonsoft.Json.Linq;
 using SRPCommon.Util;
+using Newtonsoft.Json;
 
 namespace SRPCommon.Scene
 {
 	// A material definition. Basically just a collection of parameters that can be bound to shader inputs.
+	[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 	public class Material
 	{
+		[JsonProperty]
 		public string Name { get; private set; }
 
 		public IDictionary<string, Vector4> Parameters => vectorParameters;
@@ -18,6 +20,14 @@ namespace SRPCommon.Scene
 
 		private Dictionary<string, Vector4> vectorParameters;
 		private Dictionary<string, string> textures;
+
+		[JsonProperty("vectorParams")]
+		private IEnumerable<object> SerialisedVectorParams
+			=> vectorParameters.Select(param => new { name = param.Key, value = param.Value });
+
+		[JsonProperty("textures")]
+		private IEnumerable<object> SerialisedTextures
+			=> textures.Select(param => new { name = param.Key, filename = param.Value });
 
 		public static Material Load(JToken obj)
 		{

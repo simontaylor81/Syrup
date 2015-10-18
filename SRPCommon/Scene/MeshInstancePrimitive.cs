@@ -8,6 +8,8 @@ namespace SRPCommon.Scene
 {
 	public class MeshInstancePrimitive : Primitive
 	{
+		public override PrimitiveType Type => PrimitiveType.MeshInstance;
+
 		// Load the element from a JSON object.
 		internal override void Load(JToken obj, Scene scene)
 		{
