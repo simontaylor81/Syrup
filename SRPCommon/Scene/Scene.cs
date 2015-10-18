@@ -10,6 +10,7 @@ using SRPCommon.Util;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using ReactiveUI;
 
 namespace SRPCommon.Scene
 {
@@ -49,11 +50,10 @@ namespace SRPCommon.Scene
 					.ToDictionary(mat => mat.Name);
 
 				// Load primitives. Must be done after meshes and materials as primitives can refer to them.
-				result.primitives = root["primitives"]
+				result.primitives.AddRange(root["primitives"]
 					.EmptyIfNull()
 					.Select(obj => result.CreatePrimitive(obj))
-					.Where(prim => prim != null)
-					.ToList();
+					.Where(prim => prim != null));
 
 				// Load lights. Lights are completely semantic free to the app, they're just there
 				// so the script can access them. Do we just convert the JSON directly to dynamic objects.
@@ -123,7 +123,7 @@ namespace SRPCommon.Scene
 		private IDisposable _onPrimitivesChangedSubscription;
 
 		private string filename;
-		private List<Primitive> primitives;
+		private ReactiveList<Primitive> primitives = new ReactiveList<Primitive>();
 		private Dictionary<string, SceneMesh> meshes;
 		private Dictionary<string, Material> materials;
 
@@ -146,12 +146,6 @@ namespace SRPCommon.Scene
 
 			var primitivesChanged = Observable.Merge(Primitives.Select(p => p.OnChanged));
 			_onPrimitivesChangedSubscription = primitivesChanged.Subscribe(_onChanged);
-
-			//primitivesChanged.Subscribe(_ => System.Diagnostics.Debug.WriteLine("Scene prims changed"));
-			//foreach (var prim in Primitives)
-			//{
-			//	prim.OnChanged.Subscribe(_ => System.Diagnostics.Debug.WriteLine("Scene prim changed"));
-			//}
 
 			// Fire an event for this change itself.
 			_onChanged.OnNext(Unit.Default);

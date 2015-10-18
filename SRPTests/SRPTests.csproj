@@ -105,7 +105,6 @@
     <Compile Include="TestRenderer\TestRenderer.cs" />
     <Compile Include="TestRenderer\TestReport.cs" />
     <Compile Include="TestRenderer\TestWorkspace.cs" />
-    <Compile Include="UnitTests\LazyMappingTests.cs" />
     <Compile Include="UserVariableTests.cs" />
     <Compile Include="Util\AppveyorCI.cs" />
     <Compile Include="Util\CIHelper.cs" />

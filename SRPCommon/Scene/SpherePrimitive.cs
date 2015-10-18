@@ -14,8 +14,11 @@ namespace SRPCommon.Scene
 		public SpherePrimitive()
 		{
 			// Set safe defaults.
-			Stacks = 12;
-			Slices = 6;
+			Stacks = 6;
+			Slices = 12;
+
+			_userProperties.Add(new ObjectPropertyUserProperty<int>(GetType().GetProperty(nameof(Stacks)), this));
+			_userProperties.Add(new ObjectPropertyUserProperty<int>(GetType().GetProperty(nameof(Slices)), this));
 		}
 
 		// Load the primitive from a JSON object.
@@ -25,9 +28,6 @@ namespace SRPCommon.Scene
 
 			Stacks = (int)obj["stacks"];
 			Slices = (int)obj["slices"];
-
-			_userProperties.Add(new ObjectPropertyUserProperty<int>(GetType().GetProperty("Stacks"), this));
-			_userProperties.Add(new ObjectPropertyUserProperty<int>(GetType().GetProperty("Slices"), this));
 		}
 	}
 }

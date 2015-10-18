@@ -29,7 +29,7 @@ namespace ShaderEditorApp.ViewModel.Scene
 			get { return Enumerable.Empty<IUserProperty>(); }
 		}
 
-		private IHierarchicalBrowserNodeViewModel[] _children;
+		private IReactiveDerivedList<ScenePrimitiveViewModel> _children;
 		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children => _children;
 
 		public ICommand DefaultCmd => null;
@@ -41,7 +41,8 @@ namespace ShaderEditorApp.ViewModel.Scene
 		public ScenePrimitivesViewModel(SRPCommon.Scene.Scene scene)
 		{
 			Scene = scene;
-			_children = scene.Primitives.Select(prim => ScenePrimitiveViewModel.Create(prim)).ToArray();
+
+			_children = scene.Primitives.CreateDerivedCollection(prim => ScenePrimitiveViewModel.Create(prim));
 
 			// Create commands.
 			Commands = new[]
