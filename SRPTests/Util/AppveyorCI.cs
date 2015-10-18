@@ -23,33 +23,13 @@ namespace SRPTests.Util
 			return null;
 		}
 
-		public bool IsCI { get { return true; } }
-		public bool IsAppVeyor { get { return true; } }
-		public bool IsDummy { get { return false; } }
+		public bool IsCI => true;
+		public bool IsAppVeyor => true;
+		public bool IsDummy => false;
 
-		public string BuildNumber
-		{
-			get
-			{
-				return Environment.GetEnvironmentVariable("APPVEYOR_BUILD_NUMBER");
-			}
-		}
-
-		public string Version
-		{
-			get
-			{
-				return Environment.GetEnvironmentVariable("APPVEYOR_BUILD_VERSION");
-			}
-		}
-
-		public string Commit
-		{
-			get
-			{
-				return Environment.GetEnvironmentVariable("APPVEYOR_REPO_COMMIT");
-			}
-		}
+		public string BuildNumber => Environment.GetEnvironmentVariable("APPVEYOR_BUILD_NUMBER");
+		public string Version => Environment.GetEnvironmentVariable("APPVEYOR_BUILD_VERSION");
+		public string Commit => Environment.GetEnvironmentVariable("APPVEYOR_REPO_COMMIT");
 
 		public async Task PublishArtefactAsync(string path)
 		{

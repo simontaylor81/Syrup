@@ -241,10 +241,7 @@ namespace ShaderEditorApp.Workspace
 			RedrawViewports();
 		}
 
-		private bool IsActiveScript()
-		{
-			return ActiveDocument != null;
-		}
+		private bool IsActiveScript() => ActiveDocument != null;
 
 		// Do we have a scene loaded currently?
 		public bool HasCurrentScene { get { return currentScene != null; } }
@@ -284,7 +281,7 @@ namespace ShaderEditorApp.Workspace
 		}
 
 		private ObservableCollection<DocumentViewModel> documents;
-		public ReadOnlyObservableCollection<DocumentViewModel> Documents { get; private set; }
+		public ReadOnlyObservableCollection<DocumentViewModel> Documents { get; }
 
 		// Property that tracks the currently active document.
 		private DocumentViewModel activeDocument;
@@ -460,7 +457,7 @@ namespace ShaderEditorApp.Workspace
 		// TODO: Multiple viewports.
 		// TODO: Move info needed?
 		// TODO: Cleanup, consoliate. Interface?
-		public System.Drawing.Size ViewportSize { get { return renderWindow.Size; } }
+		public System.Drawing.Size ViewportSize => renderWindow.Size;
 
 		// List of documents that have been externally modified.
 		private HashSet<DocumentViewModel> modifiedDocuments = new HashSet<DocumentViewModel>();
@@ -489,7 +486,7 @@ namespace ShaderEditorApp.Workspace
 
 		// Command to create a new project, closing the old one.
 		private RelayCommand newProjectCmd;
-		public ICommand NewProjectCmd { get { return RelayCommand.LazyInit(ref newProjectCmd, param => NewProject()); } }
+		public ICommand NewProjectCmd => RelayCommand.LazyInit(ref newProjectCmd, param => NewProject());
 
 		// Command to open a document (shows the open file dialog unless passed a string).
 		private RelayCommand openDocumentCmd;
@@ -509,52 +506,32 @@ namespace ShaderEditorApp.Workspace
 
 		// Command to create a new document.
 		private RelayCommand newDocumentCmd;
-		public ICommand NewDocumentCmd { get { return RelayCommand.LazyInit(ref newDocumentCmd, param => NewDocument()); } }
+		public ICommand NewDocumentCmd => RelayCommand.LazyInit(ref newDocumentCmd, param => NewDocument());
 
 		// Command to close the currently active document.
 		private NamedCommand closeActiveDocumentCmd;
 		public NamedCommand CloseActiveDocumentCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref closeActiveDocumentCmd, "Close",
-					param => CloseDocument(ActiveDocument), param => ActiveDocument != null);
-			}
-		}
+			=> NamedCommand.LazyInit(ref closeActiveDocumentCmd, "Close",
+				param => CloseDocument(ActiveDocument), param => ActiveDocument != null);
 
 		// Command to save the currently active document.
 		private NamedCommand saveActiveDocumentCmd;
 		public NamedCommand SaveActiveDocumentCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref saveActiveDocumentCmd, "Save",
-					param => ActiveDocument.Save(), param => ActiveDocument != null);
-			}
-		}
+			=> NamedCommand.LazyInit(ref saveActiveDocumentCmd, "Save",
+				param => ActiveDocument.Save(), param => ActiveDocument != null);
 
 		// Command to save the currently active document under a new filename.
 		private NamedCommand saveActiveDocumentAsCmd;
 		public NamedCommand SaveActiveDocumentAsCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref saveActiveDocumentAsCmd, "Save As",
-					param => ActiveDocument.SaveAs(), param => ActiveDocument != null);
-			}
-		}
+			=> NamedCommand.LazyInit(ref saveActiveDocumentAsCmd, "Save As",
+				param => ActiveDocument.SaveAs(), param => ActiveDocument != null);
 
 		// Command to execute the currently active script document.
 		private NamedCommand runActiveScriptCmd;
 		public NamedCommand RunActiveScriptCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref runActiveScriptCmd, "Run Current Script",
-					param => RunActiveScript(),
-					param => IsActiveScript());
-			}
-		}
+			=> NamedCommand.LazyInit(ref runActiveScriptCmd, "Run Current Script",
+				param => RunActiveScript(),
+				param => IsActiveScript());
 
 		#endregion
 	}

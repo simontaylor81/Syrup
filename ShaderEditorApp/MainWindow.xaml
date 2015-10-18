@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
-        xmlns:avalondock="http://avalondock.codeplex.com"
+        xmlns:avalondock="http://schemas.xceed.com/wpf/xaml/avalondock"
         xmlns:winforms="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:srp="clr-namespace:ShaderEditorApp"
         xmlns:srpprojects="clr-namespace:ShaderEditorApp.Projects"

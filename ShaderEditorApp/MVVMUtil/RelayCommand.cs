@@ -28,7 +28,7 @@ namespace ShaderEditorApp.MVVMUtil
 		public RelayCommand(Action<object> execute, Predicate<object> canExecute)
 		{
 			if (execute == null)
-				throw new ArgumentNullException("execute");
+				throw new ArgumentNullException(nameof(execute));
 
 			_execute = execute;
 			_canExecute = canExecute;
@@ -39,9 +39,7 @@ namespace ShaderEditorApp.MVVMUtil
 
 		[DebuggerStepThrough]
 		public bool CanExecute(object parameter)
-		{
-			return _canExecute == null ? true : _canExecute(parameter);
-		}
+			=> _canExecute == null ? true : _canExecute(parameter);
 
 		public event EventHandler CanExecuteChanged
 		{
@@ -73,16 +71,13 @@ namespace ShaderEditorApp.MVVMUtil
 			innerCmd = innerCommand;
 		}
 
-		public string Name { get; private set; }
+		public string Name { get; }
 		private ICommand innerCmd;
 
 		// ICommand interface. Everything just passes through to the inner command.
 
 		[DebuggerStepThrough]
-		public bool CanExecute(object parameter)
-		{
-			return innerCmd.CanExecute(parameter);
-		}
+		public bool CanExecute(object parameter) => innerCmd.CanExecute(parameter);
 
 		public event EventHandler CanExecuteChanged
 		{

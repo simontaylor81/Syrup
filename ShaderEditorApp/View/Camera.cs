@@ -31,18 +31,10 @@ namespace SRPRendering
 
 		// Get the world -> view space matrix.
 		public Matrix WorldToViewMatrix
-		{
-			get
-			{
-				return
-					Matrix.Translation(-pos) *
-					Matrix.RotationY(-yaw) *
-					Matrix.RotationX(-pitch);
-			}
-		}
+			=> Matrix.Translation(-pos) * Matrix.RotationY(-yaw) * Matrix.RotationX(-pitch);
 
 		// Get the eye position.
-		public Vector3 EyePosition { get { return pos; } }
+		public Vector3 EyePosition => pos;
 
 		// Get view -> projection matrix. Aspect ratio differs per viewport so must be passed as a param.
 		public Matrix GetViewToProjectionMatrix(float aspectRatio)

@@ -15,10 +15,10 @@ namespace SRPCommon.Scripting
 {
 	public class ScriptHelper
 	{
-		public static ScriptHelper Instance { get { return instance; } }
+		public static ScriptHelper Instance => instance;
 
 		public ScriptEngine Engine { get; set; }
-		public ObjectOperations Operations { get { return Engine.Operations; } }
+		public ObjectOperations Operations => Engine.Operations;
 
 		// If x is a function, execute it and return the result. Otherwise just return x.
 		public dynamic ResolveFunction(dynamic x)

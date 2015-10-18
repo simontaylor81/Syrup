@@ -82,7 +82,7 @@ namespace ShaderEditorApp
 		}
 
 		// Get the text box corresponding to the current category.
-		private TextBox CurrentTextbox { get { return categoryTextBoxes[(int) CurrentCategory]; } }
+		private TextBox CurrentTextbox => categoryTextBoxes[(int)CurrentCategory];
 
 		// Called when the category selection is changed, either in the UI or programmatically.
 		private void categoryCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

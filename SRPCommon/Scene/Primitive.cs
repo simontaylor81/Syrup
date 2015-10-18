@@ -20,10 +20,10 @@ namespace SRPCommon.Scene
 		public Material Material { get; private set; }
 
 		protected List<IUserProperty> _userProperties = new List<IUserProperty>();
-		public IEnumerable<IUserProperty> UserProperties { get { return _userProperties; } }
+		public IEnumerable<IUserProperty> UserProperties => _userProperties;
 
 		// Observable that fires when something important changes in the primitive.
-		public IObservable<Unit> OnChanged { get; private set; }
+		public IObservable<Unit> OnChanged { get; }
 
 		public Primitive()
 		{
@@ -61,9 +61,7 @@ namespace SRPCommon.Scene
 		}
 
 		public Matrix GetLocalToWorld()
-		{
 			// TODO: rotation!
-			return Matrix.Scaling(Scale) * Matrix.Translation(Position);
-		}
+			=> Matrix.Scaling(Scale) * Matrix.Translation(Position);
 	}
 }

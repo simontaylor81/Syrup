@@ -15,8 +15,8 @@ namespace SRPRendering
 {
 	public class Texture : IDisposable
 	{
-		public Texture2D Texture2D { get; private set; }
-		public ShaderResourceView SRV { get; private set; }
+		public Texture2D Texture2D { get; }
+		public ShaderResourceView SRV { get; }
 
 		// Simple constructor taking a texture and shader resource view.
 		public Texture(Texture2D texture2D, ShaderResourceView srv)

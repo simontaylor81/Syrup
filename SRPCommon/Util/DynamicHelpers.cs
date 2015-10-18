@@ -20,7 +20,7 @@ namespace SRPCommon.Util
 		{
 			if (token == null)
 			{
-				throw new ArgumentNullException("token");
+				throw new ArgumentNullException(nameof(token));
 			}
 
 			switch (token.Type)
@@ -104,10 +104,7 @@ namespace SRPCommon.Util
 			}
 
 			// Return all dynamic member names.
-			public override IEnumerable<string> GetDynamicMemberNames()
-			{
-				return dictionary.Keys;
-			}
+			public override IEnumerable<string> GetDynamicMemberNames() => dictionary.Keys;
 
 			// Allow accessing components array by index, if we have one.
 			public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)

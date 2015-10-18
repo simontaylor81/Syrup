@@ -15,7 +15,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 {
 	public class ProjectItemViewModel : ReactiveObject, IHierarchicalBrowserNodeViewModel
 	{
-		public string DisplayName { get { return item.Name; } }
+		public string DisplayName => item.Name;
 
 		public ProjectItemViewModel(ProjectItem item, Project project, WorkspaceViewModel workspace)
 		{
@@ -110,7 +110,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 		public IEnumerable<IUserProperty> UserProperties { get; private set; }
 
 		// 'Default' command -- i.e. the one to execute when double clicking on the item.
-		public ICommand DefaultCmd { get { return _defaultCmd; } }
+		public ICommand DefaultCmd => _defaultCmd;
 		private NamedCommand _defaultCmd;
 
 		// We don't have any children -- we're a leaf node.

@@ -114,12 +114,10 @@ namespace ShaderEditorApp.Projects
 
 		// Can this folder be moved to the given folder?
 		public bool CanMoveTo(ProjectFolder dest)
-		{
-			return !IsRoot					// Can't move the root.
-				&& this != dest				// Can't move to outselves.
-				&& parent != dest			// Can't move if we're already in it.
-				&& !dest.IsChildOf(this);	// Can't move into one of our children.
-		}
+			=> !IsRoot						// Can't move the root.
+				&& this != dest             // Can't move to outselves.
+				&& parent != dest           // Can't move if we're already in it.
+				&& !dest.IsChildOf(this);   // Can't move into one of our children.
 
 		// Move the folder to the given target folder.
 		public void MoveTo(ProjectFolder dest)
@@ -134,10 +132,7 @@ namespace ShaderEditorApp.Projects
 		public string Name { get; set; }
 
 		// The path within the projects internal folder structure.
-		public object InternalPath
-		{
-			get { return parent != null ? (parent.InternalPath + "/" + Name) : ""; }
-		}
+		public object InternalPath => parent != null ? (parent.InternalPath + "/" + Name) : "";
 
 		// All items in this folder, including those in sub-folders.
 		public IEnumerable<ProjectItem> AllItems
@@ -150,7 +145,7 @@ namespace ShaderEditorApp.Projects
 		}
 
 		// Is this folder the root?
-		public bool IsRoot { get { return parent == null; } }
+		public bool IsRoot => parent == null;
 
 		// Public is this folder a child of the given folder.
 		public bool IsChildOf(ProjectFolder other)
@@ -168,14 +163,14 @@ namespace ShaderEditorApp.Projects
 		}
 
 		// Read-only mirrors of the sub-folder and item lists.
-		public IReadOnlyReactiveList<ProjectFolder> SubFolders { get { return subfolders; } }
-		public IReadOnlyReactiveList<ProjectItem> Items { get { return items; } }
+		public IReadOnlyReactiveList<ProjectFolder> SubFolders => subfolders;
+		public IReadOnlyReactiveList<ProjectItem> Items => items;
 
 		// Lists containing our sub-folders and items.
 		private ReactiveList<ProjectFolder> subfolders;
 		private ReactiveList<ProjectItem> items;
 
-		internal Project Project { get; private set; }
+		internal Project Project { get; }
 		private ProjectFolder parent;
 	}
 }
