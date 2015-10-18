@@ -3,12 +3,18 @@ using SRPCommon.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace SRPCommon.Scene
 {
 	public class MeshInstancePrimitive : Primitive
 	{
 		public override PrimitiveType Type => PrimitiveType.MeshInstance;
+
+		public SceneMesh Mesh { get; private set; }
+
+		[JsonProperty("mesh")]
+		private string MeshName => Mesh.Name;
 
 		// Load the element from a JSON object.
 		internal override void Load(JToken obj, Scene scene)
@@ -31,7 +37,5 @@ namespace SRPCommon.Scene
 				}
 			}
 		}
-
-		public SceneMesh Mesh { get; private set; }
 	}
 }

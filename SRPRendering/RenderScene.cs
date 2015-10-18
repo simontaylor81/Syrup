@@ -95,14 +95,15 @@ namespace SRPRendering
 			PrimitiveProxy result = null;
 			Mesh mesh = null;
 
-			if (primitive is MeshInstancePrimitive)
+			var meshInstance = primitive as MeshInstancePrimitive;
+			var sphere = primitive as SpherePrimitive;
+
+			if (meshInstance?.Mesh != null)
 			{
-				var instance = (MeshInstancePrimitive)primitive;
-				mesh = _meshCache.GetForSceneMesh(instance.Mesh);
+				mesh = _meshCache.GetForSceneMesh(meshInstance.Mesh);
 			}
-			else if (primitive is SpherePrimitive)
+			else if (sphere != null)
 			{
-				var sphere = (SpherePrimitive)primitive;
 				mesh = _meshCache.GetForSphere(sphere.Slices, sphere.Stacks);
 			}
 

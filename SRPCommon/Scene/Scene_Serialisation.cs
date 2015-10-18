@@ -16,7 +16,7 @@ namespace SRPCommon.Scene
 		static private JsonSerializerSettings _serializerSettings = new JsonSerializerSettings()
 		{
 			Formatting = Formatting.Indented,
-			ContractResolver = new CamelCasePropertyNamesContractResolver(),
+			ContractResolver = new SceneContractResolver(),
 		};
 
 		// Load an existing scene from disk.
@@ -29,6 +29,8 @@ namespace SRPCommon.Scene
 			// TODO: do this more elegantly.
 			var prevCurrentDir = Environment.CurrentDirectory;
 			Environment.CurrentDirectory = Path.GetDirectoryName(filename);
+
+			//var something = JsonConvert.DeserializeObject(File.ReadAllText(filename));
 
 			try
 			{
@@ -111,12 +113,12 @@ namespace SRPCommon.Scene
 			var type = (string)obj["type"];
 			switch (type)
 			{
-				case "sphere":
+				case "Sphere":
 					var sphere = new SpherePrimitive();
 					sphere.Load(obj, this);
 					return sphere;
 
-				case "meshInstance":
+				case "MeshInstance":
 					var meshPrim = new MeshInstancePrimitive();
 					meshPrim.Load(obj, this);
 					return meshPrim;
@@ -127,10 +129,16 @@ namespace SRPCommon.Scene
 		}
 	}
 
-	//class MyContractResolver : CamelCasePropertyNamesContractResolver
-	//{
-	//	public new static readonly MyContractResolver Instance = new MyContractResolver();
- 
-	//	protected override 
-	//}
+	class SceneContractResolver : CamelCasePropertyNamesContractResolver
+	{
+		protected override JsonDictionaryContract CreateDictionaryContract(Type objectType)
+		{
+			var contract = base.CreateDictionaryContract(objectType);
+
+			// Do not camel-case dictionary keys.
+			contract.DictionaryKeyResolver = name => name;
+
+			return contract;
+		}
+	}
 }

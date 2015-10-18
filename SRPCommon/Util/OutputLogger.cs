@@ -38,6 +38,10 @@ namespace SRPCommon.Util
 			}
 		}
 
+		public void LogLine(LogCategory category, string format)
+		{
+			Log(category, format + "\n");
+		}
 		public void LogLine(LogCategory category, string format, params object[] args)
 		{
 			Log(category, string.Format(format + "\n", args));
