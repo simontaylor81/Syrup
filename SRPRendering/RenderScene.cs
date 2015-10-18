@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using SRPCommon.Scene;
 using SlimDX.Direct3D11;
-using Buffer = SlimDX.Direct3D11.Buffer;
 
 namespace SRPRendering
 {
@@ -20,7 +19,39 @@ namespace SRPRendering
 
 	class RenderScene : IRenderScene
 	{
+		private List<PrimitiveProxy> primitiveProxies = new List<PrimitiveProxy>();
+		private Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
+		private readonly IGlobalResources _globalResources;
+		private readonly Device _device;
+		private readonly Scene _scene;
+		private readonly IDisposable _subscription;
+		private readonly SceneMeshCache _meshCache;
+
 		public IEnumerable<IPrimitive> Primitives => primitiveProxies;
+
+		public RenderScene(Scene scene, Device device, IGlobalResources globalResources)
+		{
+			_scene = scene;
+			_device = device;
+			_globalResources = globalResources;
+
+			_meshCache = new SceneMeshCache(device);
+
+			// Create proxies now, and when the scene changes.
+			CreateProxies();
+			_subscription = scene.OnChanged.Subscribe(_ => CreateProxies());
+		}
+
+		public void Dispose()
+		{
+			_meshCache.Dispose();
+			_subscription.Dispose();
+			
+			foreach (var texture in textures.Values)
+			{
+				texture.Dispose();
+			}
+		}
 
 		// Return the texture for a given filename. Always returns a valid ref.
 		public Texture GetTexture(string filename)
@@ -39,35 +70,24 @@ namespace SRPRendering
 			}
 		}
 
-		public RenderScene(Scene scene, Device device, IGlobalResources globalResources)
+		// Create render proxies for primitives in the scene.
+		private void CreateProxies()
 		{
-			_device = device;
-			_globalResources = globalResources;
-
-			var meshDict = new Dictionary<SceneMesh, Mesh>();
-
 			// Any relative (texture) paths are relative to the scene file itself.
 			var prevCurrentDir = Environment.CurrentDirectory;
-			Environment.CurrentDirectory = Path.GetDirectoryName(scene.Filename);
+			Environment.CurrentDirectory = Path.GetDirectoryName(_scene.Filename);
 
-			// Create render proxies for primitives in the scene.
-			foreach (var primitive in scene.Primitives)
-			{
-			}
+			// Create a proxy for each primitive.
+			primitiveProxies = _scene.Primitives
+				.Select(primitive => CreateProxy(primitive))
+				.Where(proxy => proxy != null)
+				.ToList();
+
+			// Release unused meshes.
+			var usedMeshes = primitiveProxies.Select(proxy => proxy.Mesh).Distinct().ToList();
+			_meshCache.ReleaseUnusedMeshes(usedMeshes);
 
 			Environment.CurrentDirectory = prevCurrentDir;
-		}
-
-		public void Dispose()
-		{
-			foreach (var mesh in meshes)
-			{
-				mesh.Dispose();
-			}
-			foreach (var texture in textures.Values)
-			{
-				texture.Dispose();
-			}
 		}
 
 		private PrimitiveProxy CreateProxy(Primitive primitive)
@@ -78,19 +98,12 @@ namespace SRPRendering
 			if (primitive is MeshInstancePrimitive)
 			{
 				var instance = (MeshInstancePrimitive)primitive;
-				if (!meshDict.TryGetValue(instance.Mesh, out mesh))
-				{
-					// Create the mesh and add to the lookup map.
-					mesh = new Mesh(_device, instance.Mesh.Vertices, SceneVertex.GetStride(),
-						instance.Mesh.Indices, SceneVertex.InputElements);
-					meshDict.Add(instance.Mesh, mesh);
-				}
+				mesh = _meshCache.GetForSceneMesh(instance.Mesh);
 			}
 			else if (primitive is SpherePrimitive)
 			{
-				// No instancing of spheres, just create a mesh for each one.
 				var sphere = (SpherePrimitive)primitive;
-				mesh = BasicMesh.CreateSphere(_device, sphere.Slices, sphere.Stacks);
+				mesh = _meshCache.GetForSphere(sphere.Slices, sphere.Stacks);
 			}
 
 			if (mesh != null)
@@ -117,12 +130,8 @@ namespace SRPRendering
 					}
 				}
 			}
-		}
 
-		private List<PrimitiveProxy> primitiveProxies = new List<PrimitiveProxy>();
-		private Dictionary<SceneMesh, Mesh> _meshes = new Dictionary<SceneMesh, Mesh>();
-		private Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
-		private readonly IGlobalResources _globalResources;
-		private readonly Device _device;
+			return result;
+		}
 	}
 }
