@@ -1,668 +1,406 @@
 {
-  "meshes":[
+  "primitives": [
     {
-      "name":"ground_planeShape_subset0_ground",
-      "filename":"ground_planeShape_subset0_ground.obj"
+      "type": "MeshInstance",
+      "mesh": "ground_planeShape_subset0_ground",
+      "position": "0, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": "ground"
     },
     {
-      "name":"polySurfaceShape371_subset0_left_engine_phong",
-      "filename":"polySurfaceShape371_subset0_left_engine_phong.obj"
+      "type": "MeshInstance",
+      "mesh": "polySurfaceShape371_subset0_left_engine_phong",
+      "position": "0, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": "left_engine_phong"
     },
     {
-      "name":"polySurfaceShape376_subset0_left_engine_phong",
-      "filename":"polySurfaceShape376_subset0_left_engine_phong.obj"
+      "type": "MeshInstance",
+      "mesh": "polySurfaceShape376_subset0_left_engine_phong",
+      "position": "0, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": "left_engine_phong"
     },
     {
-      "name":"polySurfaceShape380_subset0_left_engine_phong",
-      "filename":"polySurfaceShape380_subset0_left_engine_phong.obj"
+      "type": "MeshInstance",
+      "mesh": "polySurfaceShape380_subset0_left_engine_phong",
+      "position": "0, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": "left_engine_phong"
     },
     {
-      "name":"polySurfaceShape381_subset0_left_engine_phong",
-      "filename":"polySurfaceShape381_subset0_left_engine_phong.obj"
+      "type": "MeshInstance",
+      "mesh": "polySurfaceShape381_subset0_left_engine_phong",
+      "position": "0, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": "left_engine_phong"
     },
     {
-      "name":"polySurfaceShape382_subset0_left_engine_phong",
-      "filename":"polySurfaceShape382_subset0_left_engine_phong.obj"
+      "type": "MeshInstance",
+      "mesh": "polySurfaceShape382_subset0_left_engine_phong",
+      "position": "0, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": "left_engine_phong"
     },
     {
-      "name":"tank_geoShape_subset0_left_engine_phong",
-      "filename":"tank_geoShape_subset0_left_engine_phong.obj"
+      "type": "MeshInstance",
+      "mesh": "tank_geoShape_subset0_left_engine_phong",
+      "position": "0, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": "left_engine_phong"
     },
     {
-      "name":"tank_geoShape_subset1_right_engine_phong",
-      "filename":"tank_geoShape_subset1_right_engine_phong.obj"
+      "type": "MeshInstance",
+      "mesh": "tank_geoShape_subset1_right_engine_phong",
+      "position": "0, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": "right_engine_phong"
     },
     {
-      "name":"tank_geoShape_subset2_turret_phong",
-      "filename":"tank_geoShape_subset2_turret_phong.obj"
+      "type": "MeshInstance",
+      "mesh": "tank_geoShape_subset2_turret_phong",
+      "position": "0, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": "turret_phong"
     },
     {
-      "name":"barricade_geoShape_subset0_barricade_phong",
-      "filename":"barricade_geoShape_subset0_barricade_phong.obj"
+      "type": "MeshInstance",
+      "mesh": "barricade_geoShape_subset0_barricade_phong",
+      "position": "0, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": "barricade_phong"
     }
   ],
-  "materials":[
-    {
-      "name":"ground",
-      "textures":[
-        {
-          "name":"DiffuseTexture",
-          "filename":"ground_diff.dds"
-        },
-        {
-          "name":"NormalTexture",
-          "filename":"ground_norm.dds"
-        }
-      ],
-      "vectorParams":[
-        {
-          "name":"Diffuse",
-          "value":{
-            "x":1,
-            "y":1,
-            "z":1,
-            "w":1
-          }
-        },
-        {
-          "name":"Ambient",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Specular",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Emissive",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Power",
-          "value":{
-            "x":1,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        }
-      ]
+  "meshes": {
+    "ground_planeShape_subset0_ground": {
+      "filename": "ground_planeShape_subset0_ground.obj"
     },
-    {
-      "name":"left_engine_phong",
-      "textures":[
-        {
-          "name":"DiffuseTexture",
-          "filename":"left_engine_diff.dds"
-        },
-        {
-          "name":"NormalTexture",
-          "filename":"left_engine_norm.dds"
-        }
-      ],
-      "vectorParams":[
-        {
-          "name":"Diffuse",
-          "value":{
-            "x":1,
-            "y":1,
-            "z":1,
-            "w":1
-          }
-        },
-        {
-          "name":"Ambient",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Specular",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Emissive",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Power",
-          "value":{
-            "x":1,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        }
-      ]
+    "polySurfaceShape371_subset0_left_engine_phong": {
+      "filename": "polySurfaceShape371_subset0_left_engine_phong.obj"
     },
-    {
-      "name":"right_engine_phong",
-      "textures":[
-        {
-          "name":"DiffuseTexture",
-          "filename":"left_engine_diff.dds"
-        },
-        {
-          "name":"NormalTexture",
-          "filename":"left_engine_norm.dds"
-        }
-      ],
-      "vectorParams":[
-        {
-          "name":"Diffuse",
-          "value":{
-            "x":1,
-            "y":1,
-            "z":1,
-            "w":1
-          }
-        },
-        {
-          "name":"Ambient",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Specular",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Emissive",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Power",
-          "value":{
-            "x":1,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        }
-      ]
+    "polySurfaceShape376_subset0_left_engine_phong": {
+      "filename": "polySurfaceShape376_subset0_left_engine_phong.obj"
     },
-    {
-      "name":"turret_phong",
-      "textures":[
-        {
-          "name":"DiffuseTexture",
-          "filename":"turret_diff.dds"
-        },
-        {
-          "name":"NormalTexture",
-          "filename":"turret_norm.dds"
-        }
-      ],
-      "vectorParams":[
-        {
-          "name":"Diffuse",
-          "value":{
-            "x":1,
-            "y":1,
-            "z":1,
-            "w":1
-          }
-        },
-        {
-          "name":"Ambient",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Specular",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Emissive",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Power",
-          "value":{
-            "x":1,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        }
-      ]
+    "polySurfaceShape380_subset0_left_engine_phong": {
+      "filename": "polySurfaceShape380_subset0_left_engine_phong.obj"
     },
-    {
-      "name":"lambert1",
-      "textures":[
-        {
-          "name":"DiffuseTexture",
-          "filename":"default.dds"
-        },
-        {
-          "name":"NormalTexture",
-          "filename":"default-normalmap.dds"
-        }
-      ],
-      "vectorParams":[
-        {
-          "name":"Diffuse",
-          "value":{
-            "x":1,
-            "y":1,
-            "z":1,
-            "w":1
-          }
-        },
-        {
-          "name":"Ambient",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Specular",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Emissive",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Power",
-          "value":{
-            "x":1,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        }
-      ]
+    "polySurfaceShape381_subset0_left_engine_phong": {
+      "filename": "polySurfaceShape381_subset0_left_engine_phong.obj"
     },
-    {
-      "name":"barricade_phong",
-      "textures":[
-        {
-          "name":"DiffuseTexture",
-          "filename":"turret_diff.dds"
-        },
-        {
-          "name":"NormalTexture",
-          "filename":"turret_norm.dds"
-        }
-      ],
-      "vectorParams":[
-        {
-          "name":"Diffuse",
-          "value":{
-            "x":1,
-            "y":1,
-            "z":1,
-            "w":1
-          }
-        },
-        {
-          "name":"Ambient",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Specular",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Emissive",
-          "value":{
-            "x":0,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        },
-        {
-          "name":"Power",
-          "value":{
-            "x":1,
-            "y":0,
-            "z":0,
-            "w":0
-          }
-        }
-      ]
+    "polySurfaceShape382_subset0_left_engine_phong": {
+      "filename": "polySurfaceShape382_subset0_left_engine_phong.obj"
+    },
+    "tank_geoShape_subset0_left_engine_phong": {
+      "filename": "tank_geoShape_subset0_left_engine_phong.obj"
+    },
+    "tank_geoShape_subset1_right_engine_phong": {
+      "filename": "tank_geoShape_subset1_right_engine_phong.obj"
+    },
+    "tank_geoShape_subset2_turret_phong": {
+      "filename": "tank_geoShape_subset2_turret_phong.obj"
+    },
+    "barricade_geoShape_subset0_barricade_phong": {
+      "filename": "barricade_geoShape_subset0_barricade_phong.obj"
     }
-  ],
-  "primitives":[
-    {
-      "type":"meshInstance",
-      "mesh":"ground_planeShape_subset0_ground",
-      "material":"ground"
+  },
+  "materials": {
+    "ground": {
+      "vectorParams": {
+        "Diffuse": "1, 1, 1, 1",
+        "Ambient": "0, 0, 0, 0",
+        "Specular": "0, 0, 0, 0",
+        "Emissive": "0, 0, 0, 0",
+        "Power": "1, 0, 0, 0"
+      },
+      "textures": {
+        "DiffuseTexture": "ground_diff.dds",
+        "NormalTexture": "ground_norm.dds"
+      }
     },
-    {
-      "type":"meshInstance",
-      "mesh":"polySurfaceShape371_subset0_left_engine_phong",
-      "material":"left_engine_phong"
+    "left_engine_phong": {
+      "vectorParams": {
+        "Diffuse": "1, 1, 1, 1",
+        "Ambient": "0, 0, 0, 0",
+        "Specular": "0, 0, 0, 0",
+        "Emissive": "0, 0, 0, 0",
+        "Power": "1, 0, 0, 0"
+      },
+      "textures": {
+        "DiffuseTexture": "left_engine_diff.dds",
+        "NormalTexture": "left_engine_norm.dds"
+      }
     },
-    {
-      "type":"meshInstance",
-      "mesh":"polySurfaceShape376_subset0_left_engine_phong",
-      "material":"left_engine_phong"
+    "right_engine_phong": {
+      "vectorParams": {
+        "Diffuse": "1, 1, 1, 1",
+        "Ambient": "0, 0, 0, 0",
+        "Specular": "0, 0, 0, 0",
+        "Emissive": "0, 0, 0, 0",
+        "Power": "1, 0, 0, 0"
+      },
+      "textures": {
+        "DiffuseTexture": "left_engine_diff.dds",
+        "NormalTexture": "left_engine_norm.dds"
+      }
     },
-    {
-      "type":"meshInstance",
-      "mesh":"polySurfaceShape380_subset0_left_engine_phong",
-      "material":"left_engine_phong"
+    "turret_phong": {
+      "vectorParams": {
+        "Diffuse": "1, 1, 1, 1",
+        "Ambient": "0, 0, 0, 0",
+        "Specular": "0, 0, 0, 0",
+        "Emissive": "0, 0, 0, 0",
+        "Power": "1, 0, 0, 0"
+      },
+      "textures": {
+        "DiffuseTexture": "turret_diff.dds",
+        "NormalTexture": "turret_norm.dds"
+      }
     },
-    {
-      "type":"meshInstance",
-      "mesh":"polySurfaceShape381_subset0_left_engine_phong",
-      "material":"left_engine_phong"
+    "lambert1": {
+      "vectorParams": {
+        "Diffuse": "1, 1, 1, 1",
+        "Ambient": "0, 0, 0, 0",
+        "Specular": "0, 0, 0, 0",
+        "Emissive": "0, 0, 0, 0",
+        "Power": "1, 0, 0, 0"
+      },
+      "textures": {
+        "DiffuseTexture": "default.dds",
+        "NormalTexture": "default-normalmap.dds"
+      }
     },
-    {
-      "type":"meshInstance",
-      "mesh":"polySurfaceShape382_subset0_left_engine_phong",
-      "material":"left_engine_phong"
-    },
-    {
-      "type":"meshInstance",
-      "mesh":"tank_geoShape_subset0_left_engine_phong",
-      "material":"left_engine_phong"
-    },
-    {
-      "type":"meshInstance",
-      "mesh":"tank_geoShape_subset1_right_engine_phong",
-      "material":"right_engine_phong"
-    },
-    {
-      "type":"meshInstance",
-      "mesh":"tank_geoShape_subset2_turret_phong",
-      "material":"turret_phong"
-    },
-    {
-      "type":"meshInstance",
-      "mesh":"barricade_geoShape_subset0_barricade_phong",
-      "material":"barricade_phong"
+    "barricade_phong": {
+      "vectorParams": {
+        "Diffuse": "1, 1, 1, 1",
+        "Ambient": "0, 0, 0, 0",
+        "Specular": "0, 0, 0, 0",
+        "Emissive": "0, 0, 0, 0",
+        "Power": "1, 0, 0, 0"
+      },
+      "textures": {
+        "DiffuseTexture": "turret_diff.dds",
+        "NormalTexture": "turret_norm.dds"
+      }
     }
-  ],
-  "lights":[
+  },
+  "lights": [
     {
-      "position":{
-        "x":-10,
-        "y":1,
-        "z":-10
+      "position": {
+        "x": -10,
+        "y": 1,
+        "z": -10
       },
-      "colour":{
-        "r":0.035,
-        "g":0.03,
-        "b":0.488
+      "colour": {
+        "r": 0.035,
+        "g": 0.03,
+        "b": 0.488
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":-5,
-        "y":1,
-        "z":-10
+      "position": {
+        "x": -5,
+        "y": 1,
+        "z": -10
       },
-      "colour":{
-        "r":0.47,
-        "g":0.567,
-        "b":0.028
+      "colour": {
+        "r": 0.47,
+        "g": 0.567,
+        "b": 0.028
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":0,
-        "y":1,
-        "z":-10
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": -10
       },
-      "colour":{
-        "r":0.143,
-        "g":0.888,
-        "b":0.216
+      "colour": {
+        "r": 0.143,
+        "g": 0.888,
+        "b": 0.216
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":5,
-        "y":1,
-        "z":-10
+      "position": {
+        "x": 5,
+        "y": 1,
+        "z": -10
       },
-      "colour":{
-        "r":0.905,
-        "g":0.208,
-        "b":0.083
+      "colour": {
+        "r": 0.905,
+        "g": 0.208,
+        "b": 0.083
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":-10,
-        "y":1,
-        "z":-5
+      "position": {
+        "x": -10,
+        "y": 1,
+        "z": -5
       },
-      "colour":{
-        "r":0.493,
-        "g":0.464,
-        "b":0.264
+      "colour": {
+        "r": 0.493,
+        "g": 0.464,
+        "b": 0.264
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":-5,
-        "y":1,
-        "z":-5
+      "position": {
+        "x": -5,
+        "y": 1,
+        "z": -5
       },
-      "colour":{
-        "r":0.138,
-        "g":0.826,
-        "b":0.624
+      "colour": {
+        "r": 0.138,
+        "g": 0.826,
+        "b": 0.624
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":0,
-        "y":1,
-        "z":-5
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": -5
       },
-      "colour":{
-        "r":0.717,
-        "g":0.35,
-        "b":0.619
+      "colour": {
+        "r": 0.717,
+        "g": 0.35,
+        "b": 0.619
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":5,
-        "y":1,
-        "z":-5
+      "position": {
+        "x": 5,
+        "y": 1,
+        "z": -5
       },
-      "colour":{
-        "r":0.964,
-        "g":0.913,
-        "b":0.617
+      "colour": {
+        "r": 0.964,
+        "g": 0.913,
+        "b": 0.617
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":-10,
-        "y":1,
-        "z":0
+      "position": {
+        "x": -10,
+        "y": 1,
+        "z": 0
       },
-      "colour":{
-        "r":0.976,
-        "g":0.443,
-        "b":0.297
+      "colour": {
+        "r": 0.976,
+        "g": 0.443,
+        "b": 0.297
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":-5,
-        "y":1,
-        "z":0
+      "position": {
+        "x": -5,
+        "y": 1,
+        "z": 0
       },
-      "colour":{
-        "r":0.129,
-        "g":0.26,
-        "b":0.995
+      "colour": {
+        "r": 0.129,
+        "g": 0.26,
+        "b": 0.995
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":0,
-        "y":1,
-        "z":0
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": 0
       },
-      "colour":{
-        "r":0.236,
-        "g":0.342,
-        "b":0.491
+      "colour": {
+        "r": 0.236,
+        "g": 0.342,
+        "b": 0.491
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":5,
-        "y":1,
-        "z":0
+      "position": {
+        "x": 5,
+        "y": 1,
+        "z": 0
       },
-      "colour":{
-        "r":0.995,
-        "g":0.284,
-        "b":0.87
+      "colour": {
+        "r": 0.995,
+        "g": 0.284,
+        "b": 0.87
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":-10,
-        "y":1,
-        "z":5
+      "position": {
+        "x": -10,
+        "y": 1,
+        "z": 5
       },
-      "colour":{
-        "r":0.082,
-        "g":0.87,
-        "b":0.93
+      "colour": {
+        "r": 0.082,
+        "g": 0.87,
+        "b": 0.93
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":-5,
-        "y":1,
-        "z":5
+      "position": {
+        "x": -5,
+        "y": 1,
+        "z": 5
       },
-      "colour":{
-        "r":0.86,
-        "g":0.303,
-        "b":0.316
+      "colour": {
+        "r": 0.86,
+        "g": 0.303,
+        "b": 0.316
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":0,
-        "y":1,
-        "z":5
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": 5
       },
-      "colour":{
-        "r":0.995,
-        "g":0.884,
-        "b":0.305
+      "colour": {
+        "r": 0.995,
+        "g": 0.884,
+        "b": 0.305
       },
-	  radius: 20
+      "radius": 20
     },
     {
-      "position":{
-        "x":5,
-        "y":1,
-        "z":5
+      "position": {
+        "x": 5,
+        "y": 1,
+        "z": 5
       },
-      "colour":{
-        "r":0.868,
-        "g":0.469,
-        "b":0.442
+      "colour": {
+        "r": 0.868,
+        "g": 0.469,
+        "b": 0.442
       },
-	  radius: 20
+      "radius": 20
     }
   ]
 }
