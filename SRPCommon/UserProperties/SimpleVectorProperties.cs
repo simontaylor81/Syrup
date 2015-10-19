@@ -14,9 +14,9 @@ namespace SRPCommon.UserProperties
 {
 	public class StructUserProperty : IVectorProperty
 	{
-		private Func<object> _getter;
-		private Action<object> _setter;
-		private ObjectFieldUserProperty<float>[] _fields;
+		private readonly Func<object> _getter;
+		private readonly Action<object> _setter;
+		private readonly ObjectFieldUserProperty<float>[] _fields;
 
 		public string Name { get; }
 		public bool IsReadOnly => false;
@@ -49,7 +49,7 @@ namespace SRPCommon.UserProperties
 		private MemberInfo _member;
 		protected Subject<Unit> Subject { get; set; } = new Subject<Unit>();
 
-		public MemberProperty(MemberInfo member)
+		protected MemberProperty(MemberInfo member)
 		{
 			_member = member;
 		}
@@ -67,9 +67,9 @@ namespace SRPCommon.UserProperties
 	// User property for a class or struct field.
 	public class ObjectFieldUserProperty<T> : MemberProperty, IScalarProperty<T>
 	{
-		private Func<object> _getter;
-		private Action<object> _setter;
-		private FieldInfo _field;
+		private readonly Func<object> _getter;
+		private readonly Action<object> _setter;
+		private readonly FieldInfo _field;
 
 		// Construct for a struct member, which can't be stored as a reference, so need explicit getter and setters.
 		public ObjectFieldUserProperty(FieldInfo field, Func<object> objectGetter, Action<object> objectSetter)
@@ -115,9 +115,9 @@ namespace SRPCommon.UserProperties
 	// User property for a class or struct property (must have accessible get and set).
 	public class ObjectPropertyUserProperty<T> : MemberProperty, IScalarProperty<T>
 	{
-		private Func<object> _getter;
-		private Action<object> _setter;
-		private PropertyInfo _prop;
+		private readonly Func<object> _getter;
+		private readonly Action<object> _setter;
+		private readonly PropertyInfo _prop;
 
 		// Construct for a struct member, which can't be stored as a reference, so need explicit getter and setters.
 		public ObjectPropertyUserProperty(PropertyInfo prop, Func<object> objectGetter, Action<object> objectSetter)

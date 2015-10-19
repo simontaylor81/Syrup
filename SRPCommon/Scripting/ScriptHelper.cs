@@ -40,37 +40,27 @@ namespace SRPCommon.Scripting
 
 		// Helper function for casting to a concrete type, wrapped in try/catch to convert the
 		// weird script engine exceptions into a nicer ScriptException.
-		public static T GuardedCast<T>(dynamic x)
-		{
-			// Python floats are actually doubles, so we need a cast.
-			return RunGuarded(() => (T)x);
-		}
+		public static T GuardedCast<T>(dynamic x) => RunGuarded(() => (T)x);
 
 		// Helper functions that convert a dynamic object into various vector/colour types.
 		public static Vector2 ConvertToVector2(dynamic x)
-		{
 			// Scripts pass vectors as tuples, so we extract the values to form the vector.
-			return RunGuarded(() => new Vector2((float)x[0], (float)x[1]));
-		}
+			=> RunGuarded(() => new Vector2((float)x[0], (float)x[1]));
+
 		public static Vector3 ConvertToVector3(dynamic x)
-		{
 			// Scripts pass vectors as tuples, so we extract the values to form the vector.
-			return RunGuarded(() => new Vector3((float)x[0], (float)x[1], (float)x[2]));
-		}
+			=> RunGuarded(() => new Vector3((float)x[0], (float)x[1], (float)x[2]));
+
 		public static Vector4 ConvertToVector4(dynamic x)
-		{
 			// Scripts pass vectors as tuples, so we extract the values to form the vector.
-			return RunGuarded(() => new Vector4((float) x[0], (float) x[1], (float) x[2], (float) x[3]));
-		}
+			=> RunGuarded(() => new Vector4((float) x[0], (float) x[1], (float) x[2], (float) x[3]));
+
 		public static Color3 ConvertToColor3(dynamic x)
-		{
-			return RunGuarded(() => new Color3((float)x[0], (float)x[1], (float)x[2]));
-		}
+			=> RunGuarded(() => new Color3((float)x[0], (float)x[1], (float)x[2]));
+
 		public static Color4 ConvertToColor4(dynamic x)
-		{
 			// Color4 constructor takes A, R, G, B.
-			return RunGuarded(() => new Color4((float)x[3], (float)x[0], (float)x[1], (float)x[2]));
-		}
+			=> RunGuarded(() => new Color4((float)x[3], (float)x[0], (float)x[1], (float)x[2]));
 
 		// Helper method for running potentially throwy code, throwing a ScriptException if something bad happen.
 		private static T RunGuarded<T>(Func<T> func, [CallerMemberName] string context = null)

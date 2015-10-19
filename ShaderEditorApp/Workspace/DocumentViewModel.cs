@@ -182,10 +182,10 @@ namespace ShaderEditorApp.Workspace
 		public int SelectionLength { get; set; }
 
 		// Back-pointer to the workspace we're in.
-		WorkspaceViewModel workspace;
+		private readonly WorkspaceViewModel workspace;
 
 		// Watcher to look for external modifications.
-		FileSystemWatcher watcher;
+		private FileSystemWatcher watcher;
 
 		// Command to close this document.
 		private RelayCommand closeCmd;

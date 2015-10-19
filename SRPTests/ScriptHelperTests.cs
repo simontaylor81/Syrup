@@ -14,7 +14,7 @@ namespace SRPTests
 	// Tests for SRPCommon.Scripting.ScriptHelper
 	public class ScriptHelperTests
 	{
-		private Scripting scripting;
+		private readonly Scripting scripting;
 
 		// Common initialisation
 		public ScriptHelperTests()

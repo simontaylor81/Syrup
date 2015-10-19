@@ -40,7 +40,7 @@ namespace SRPRendering
 			variable.Resource = globalResources.ErrorTexture.SRV;
 		}
 
-		private string paramName;
+		private readonly string paramName;
 	}
 
 	class TextureShaderResourceVariableBind : IShaderResourceVariableBind
@@ -57,7 +57,7 @@ namespace SRPRendering
 			variable.Resource = texture.SRV;
 		}
 
-		private Texture texture;
+		private readonly Texture texture;
 	}
 
 	class RenderTargetShaderResourceVariableBind : IShaderResourceVariableBind
@@ -76,7 +76,7 @@ namespace SRPRendering
 			variable.Resource = descriptor.renderTarget.SRV;
 		}
 
-		private RenderTargetDescriptor descriptor;
+		private readonly RenderTargetDescriptor descriptor;
 	}
 
 	class DefaultDepthBufferShaderResourceVariableBind : IShaderResourceVariableBind

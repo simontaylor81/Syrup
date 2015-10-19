@@ -13,7 +13,7 @@ namespace ShaderEditorApp.ViewModel.Scene
 {
 	abstract class ScenePrimitiveViewModel : ReactiveObject, IHierarchicalBrowserNodeViewModel
 	{
-		private Primitive _primitive;
+		private readonly Primitive _primitive;
 
 		#region IHierarchicalBrowserNodeViewModel interface
 

@@ -171,8 +171,7 @@ namespace SRPRendering
 
 		private void MouseUp(object sender, MouseEventArgs e)
 		{
-			if (Control.MouseButtons == MouseButtons.None)
-				bDragging = false;
+			bDragging &= Control.MouseButtons != MouseButtons.None;
 		}
 
 		private void MouseDown(object sender, MouseEventArgs e)

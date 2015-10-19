@@ -69,11 +69,9 @@ namespace SRPRendering
 		}
 
 		// Special handle to the default depth buffer.
-		internal static DepthBufferHandle Default => default_;
-		private static DepthBufferHandle default_ = new DepthBufferHandle(-1);
+		internal static DepthBufferHandle Default { get; } = new DepthBufferHandle(-1);
 
 		// Special handle to indicate that no depth buffer should be set.
-		internal static DepthBufferHandle NoDepthBuffer => noDepthBuffer_;
-		private static DepthBufferHandle noDepthBuffer_ = new DepthBufferHandle(-2);
+		internal static DepthBufferHandle NoDepthBuffer { get; } = new DepthBufferHandle(-2);
 	}
 }

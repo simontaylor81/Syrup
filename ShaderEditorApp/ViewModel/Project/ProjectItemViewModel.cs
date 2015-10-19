@@ -95,7 +95,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 		}
 
 		// Get type of item as a string.
-		public string ItemTypeString { get { return Enum.GetName(typeof(ProjectItemType), item.Type); } }
+		public string ItemTypeString => Enum.GetName(typeof(ProjectItemType), item.Type);
 
 		#region IHierarchicalBrowserNodeViewModel interface
 
@@ -114,18 +114,15 @@ namespace ShaderEditorApp.ViewModel.Projects
 		private NamedCommand _defaultCmd;
 
 		// We don't have any children -- we're a leaf node.
-		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children { get { return null; } }
+		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children => null;
 
 		// Is this item the defaut of its type?
 		private readonly ObservableAsPropertyHelper<bool> _isDefault;
-		public bool IsDefault { get { return _isDefault.Value; } }
+		public bool IsDefault => _isDefault.Value;
 
 		#endregion
 
-		public bool CanMoveTo(ProjectFolderViewModel targetFolder)
-		{
-			return item.CanMoveTo(targetFolder.Folder);
-		}
+		public bool CanMoveTo(ProjectFolderViewModel targetFolder) => item.CanMoveTo(targetFolder.Folder);
 
 		public void MoveTo(ProjectFolderViewModel targetFolder)
 		{

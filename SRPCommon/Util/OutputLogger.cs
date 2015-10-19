@@ -74,7 +74,7 @@ namespace SRPCommon.Util
 		}
 		public StreamWriter GetStreamWriter(LogCategory category)
 		{
-			LogStream stream = new LogStream(this, category);
+			var stream = new LogStream(this, category);
 			return new StreamWriter(stream, stream.StringEncoding);
 		}
 

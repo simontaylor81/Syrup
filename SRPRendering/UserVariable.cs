@@ -120,7 +120,7 @@ namespace SRPRendering
 	// User variable representing a vector of values.
 	class UserVariableVector : UserVariable, IVectorProperty
 	{
-		private UserVariable[] components;
+		private readonly UserVariable[] components;
 
 		public override dynamic GetFunction()
 		{

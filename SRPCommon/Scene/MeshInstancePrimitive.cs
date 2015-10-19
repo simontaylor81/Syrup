@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SRPCommon.Scene
 {
@@ -13,6 +14,7 @@ namespace SRPCommon.Scene
 		public SceneMesh Mesh { get; private set; }
 
 		[JsonProperty("mesh")]
+		[SuppressMessage("Language", "CSE0002:Use getter-only auto properties", Justification = "Needed for serialisation")]
 		private string MeshName { get; set; }
 
 		internal override void PostLoad(Scene scene)

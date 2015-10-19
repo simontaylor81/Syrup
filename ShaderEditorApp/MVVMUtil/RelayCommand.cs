@@ -38,8 +38,7 @@ namespace ShaderEditorApp.MVVMUtil
 		#region ICommand Members
 
 		[DebuggerStepThrough]
-		public bool CanExecute(object parameter)
-			=> _canExecute == null ? true : _canExecute(parameter);
+		public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
 
 		public event EventHandler CanExecuteChanged
 		{

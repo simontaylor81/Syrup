@@ -6,6 +6,7 @@ using Assimp;
 using SlimDX;
 using SRPCommon.Util;
 using Newtonsoft.Json;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SRPCommon.Scene
 {
@@ -15,6 +16,7 @@ namespace SRPCommon.Scene
 		public string Name { get; internal set; }
 
 		[JsonProperty]
+		[SuppressMessage("Language", "CSE0002:Use getter-only auto properties", Justification = "Needed for serialisation")]
 		public string Filename { get; private set; }
 
 		private bool isValid = false;
@@ -69,7 +71,7 @@ namespace SRPCommon.Scene
 
 					for (int i = 0; i < srcMesh.VertexCount; i++)
 					{
-						SceneVertex vertex = new SceneVertex(
+						var vertex = new SceneVertex(
 							ToVector3(srcMesh.Vertices[i]),
 							ToVector3(srcMesh.Normals[i]));
 

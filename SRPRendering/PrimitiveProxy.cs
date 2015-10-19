@@ -18,7 +18,8 @@ namespace SRPRendering
 
 	class PrimitiveProxy : IPrimitive
 	{
-		private Primitive primitive;
+		private readonly Primitive primitive;
+
 		public IDrawable Mesh { get; }
 		public IRenderScene Scene { get; }
 
@@ -36,16 +37,14 @@ namespace SRPRendering
 	// A primitive proxy that doesn't actually represent a primitive in the scene, just a simple shape drawn directly.
 	class SimplePrimitiveProxy : IPrimitive
 	{
-		public Matrix LocalToWorld => localToWorld;
+		public Matrix LocalToWorld { get; }
 		public Material Material => null;
 		public IRenderScene Scene => null;
 		public IDrawable Mesh => null;
 
 		public SimplePrimitiveProxy(Matrix localToWorld)
 		{
-			this.localToWorld = localToWorld;
+			LocalToWorld = localToWorld;
 		}
-
-		private Matrix localToWorld;
 	}
 }

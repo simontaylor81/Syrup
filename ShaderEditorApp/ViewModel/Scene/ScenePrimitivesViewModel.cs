@@ -18,16 +18,13 @@ namespace ShaderEditorApp.ViewModel.Scene
 	{
 		#region IHierarchicalBrowserNodeViewModel interface
 
-		public string DisplayName { get { return "Primitives"; } }
+		public string DisplayName => "Primitives";
 
-		private SRPCommon.Scene.Scene Scene { get; set; }
+		private SRPCommon.Scene.Scene Scene { get; }
 
-		public IEnumerable<ICommand> Commands { get; private set; }
+		public IEnumerable<ICommand> Commands { get; }
 
-		public IEnumerable<IUserProperty> UserProperties
-		{
-			get { return Enumerable.Empty<IUserProperty>(); }
-		}
+		public IEnumerable<IUserProperty> UserProperties => Enumerable.Empty<IUserProperty>();
 
 		private IReactiveDerivedList<ScenePrimitiveViewModel> _children;
 		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children => _children;

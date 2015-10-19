@@ -13,7 +13,7 @@ namespace SRPCommon.Scene
 	// Split into a separate file simply for cleanliness.
 	public partial class Scene
 	{
-		static private JsonSerializerSettings _serializerSettings = new JsonSerializerSettings()
+		static private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings()
 		{
 			Formatting = Formatting.Indented,
 			ContractResolver = new SceneContractResolver(),

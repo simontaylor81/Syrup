@@ -20,7 +20,7 @@ namespace SRPRendering
 	class RenderScene : IRenderScene
 	{
 		private List<PrimitiveProxy> primitiveProxies = new List<PrimitiveProxy>();
-		private Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
+		private readonly Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
 		private readonly IGlobalResources _globalResources;
 		private readonly Device _device;
 		private readonly Scene _scene;

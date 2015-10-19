@@ -32,7 +32,7 @@ namespace ShaderEditorApp.Projects
 
 		// Is this item the default of its type?
 		public bool IsDefault
-			=> (Type == ProjectItemType.Scene) ? (parent.Project.DefaultScene == this) : false;
+			=> (Type == ProjectItemType.Scene) && (parent.Project.DefaultScene == this);
 
 		// The path within the projects internal folder structure (not related to the file path).
 		public object InternalPath => parent.InternalPath + "/" + Name;
@@ -83,11 +83,8 @@ namespace ShaderEditorApp.Projects
 			parent.RemoveItem(this);
 		}
 
-		public bool CanMoveTo(ProjectFolder target)
-		{
-			// Can move anywhere except our own parent.
-			return target != parent;
-		}
+		// Can move anywhere except our own parent.
+		public bool CanMoveTo(ProjectFolder target) => target != parent;
 
 		public void MoveTo(ProjectFolder target)
 		{

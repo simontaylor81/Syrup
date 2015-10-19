@@ -53,7 +53,7 @@ namespace ShaderEditorApp
 
 		public bool RealTimeMode
 		{
-			get { return renderWindow != null ? renderWindow.RealTimeMode : false; }
+			get { return renderWindow != null && renderWindow.RealTimeMode; }
 			set { renderWindow.RealTimeMode = value; }
 		}
 

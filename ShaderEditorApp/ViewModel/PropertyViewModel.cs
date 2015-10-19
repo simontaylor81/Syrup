@@ -14,7 +14,7 @@ namespace ShaderEditorApp.ViewModel
 	// Properties have a type, a name and a value.
 	public abstract class PropertyViewModel : ViewModelBase
 	{
-		public PropertyViewModel(IUserProperty property)
+		protected PropertyViewModel(IUserProperty property)
 		{
 			DisplayName = property.Name;
 			IsReadOnly = property.IsReadOnly;

@@ -146,7 +146,7 @@ namespace ShaderEditorApp.View
 			context.ClearDepthStencilView(depthBuffer.DSV, DepthStencilClearFlags.Depth, 1.0f, 0);
 
 			// Construct view info object.
-			ViewInfo viewInfo = new ViewInfo(
+			var viewInfo = new ViewInfo(
 				camera.WorldToViewMatrix,
 				camera.GetViewToProjectionMatrix(AspectRatio),
 				camera.EyePosition,

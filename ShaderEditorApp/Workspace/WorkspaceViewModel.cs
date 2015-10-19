@@ -244,7 +244,7 @@ namespace ShaderEditorApp.Workspace
 		private bool IsActiveScript() => ActiveDocument != null;
 
 		// Do we have a scene loaded currently?
-		public bool HasCurrentScene { get { return currentScene != null; } }
+		public bool HasCurrentScene => currentScene != null;
 
 		// Load the scene with the given filename and set it as the current one.
 		public void SetCurrentScene(string path)
@@ -444,7 +444,7 @@ namespace ShaderEditorApp.Workspace
 
 		// Viewport view model that contains settings for the viewport (e.g. camera mode).
 		private ViewportViewModel viewportViewModel = new ViewportViewModel();
-		public ViewportViewModel ViewportViewModel { get { return viewportViewModel; } }
+		public ViewportViewModel ViewportViewModel => viewportViewModel;
 
 		// Rendering/script related stuff.
 		private ScriptRenderControl scriptRenderControl;

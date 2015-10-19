@@ -10,6 +10,7 @@ using System.Reactive.Linq;
 using System.Reactive;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SRPCommon.Scene
 {
@@ -39,6 +40,7 @@ namespace SRPCommon.Scene
 		public Material Material { get; private set; }
 
 		[JsonProperty("material")]
+		[SuppressMessage("Language", "CSE0002:Use getter-only auto properties", Justification = "Needed for serialisation")]
 		private string MaterialName { get; set; }
 
 		protected List<IUserProperty> _userProperties = new List<IUserProperty>();
@@ -47,7 +49,7 @@ namespace SRPCommon.Scene
 		// Observable that fires when something important changes in the primitive.
 		public IObservable<Unit> OnChanged { get; }
 
-		public Primitive()
+		protected Primitive()
 		{
 			Scale = new Vector3(1.0f, 1.0f, 1.0f);
 

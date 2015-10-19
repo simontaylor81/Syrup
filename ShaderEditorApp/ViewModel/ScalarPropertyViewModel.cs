@@ -23,6 +23,6 @@ namespace ShaderEditorApp.ViewModel
 			set { _property.Value = value; }
 		}
 
-		private IScalarProperty<T> _property;
+		private readonly IScalarProperty<T> _property;
 	}
 }

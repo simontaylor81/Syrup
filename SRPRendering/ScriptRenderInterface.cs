@@ -77,6 +77,6 @@ namespace SRPRendering
 		}
 
 		// Pointer back to the class that does the actual work.
-		private ScriptRenderControl src;
+		private readonly ScriptRenderControl src;
 	}
 }

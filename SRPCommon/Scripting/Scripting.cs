@@ -110,7 +110,7 @@ namespace SRPCommon.Scripting
 		private bool RunSource(ScriptSource source)
 		{
 			// Clear any cached modules (user may have edited them).
-			Python.GetSysModule(pythonEngine).GetVariable("modules").Clear();
+			pythonEngine.GetSysModule().GetVariable("modules").Clear();
 
 			// Create scope and set the render interface as a variable.
 			Debug.Assert(RenderInterface != null);
@@ -136,7 +136,7 @@ namespace SRPCommon.Scripting
 		// Custom script host class that uses our custom PAL.
 		private class SRPScriptHost : ScriptHost
 		{
-			private PlatformAdaptationLayer _pal;
+			private readonly PlatformAdaptationLayer _pal;
 			public override PlatformAdaptationLayer PlatformAdaptationLayer => _pal;
 
 			public SRPScriptHost(PlatformAdaptationLayer pal)

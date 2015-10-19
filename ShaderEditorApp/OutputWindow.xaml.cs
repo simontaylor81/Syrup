@@ -32,7 +32,7 @@ namespace ShaderEditorApp
 				categoryCombo.Items.Add(category.ToString());
 
 				// Create text box. Properties automatically come from style in XAML.
-				TextBox textBox = new TextBox();
+				var textBox = new TextBox();
 
 				// Add to control and list.
 				grid.Children.Add(textBox);

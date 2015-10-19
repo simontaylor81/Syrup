@@ -13,7 +13,7 @@ namespace ShaderEditorApp.Projects
 		// Load an existing project from disk.
 		public static Project LoadFromFile(string filename)
 		{
-			Project result = new Project();
+			var result = new Project();
 			result.filename = filename;
 
 			// Load the xml file.
@@ -51,7 +51,7 @@ namespace ShaderEditorApp.Projects
 		public static Project CreateNew(string filename)
 		{
 			// Create empty project.
-			Project result = new Project();
+			var result = new Project();
 			result.filename = filename;
 
 			// Create new empty root folder.
@@ -151,14 +151,9 @@ namespace ShaderEditorApp.Projects
 
 		// List of scripts to be executed at startup.
 		public IEnumerable<string> StartupScripts
-		{
-			get
-			{
-				return from item in AllItems
-					   where item.RunAtStartup && item.Type == ProjectItemType.Script
-					   select item.AbsolutePath;
-			}
-		}
+			=> from item in AllItems
+			   where item.RunAtStartup && item.Type == ProjectItemType.Script
+			   select item.AbsolutePath;
 
 		// ProjectItem for the default scene.
 		public ProjectItem DefaultScene

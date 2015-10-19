@@ -124,7 +124,7 @@ namespace SRPCommon.Util
 	public class JsonDynamicObjectConverter : JsonConverter
 	{
 		// Standalone serialiser that does not do stuff like camel-casing.
-		JsonSerializer _rawSerializer = new JsonSerializer();
+		private readonly JsonSerializer _rawSerializer = new JsonSerializer();
 
 		public override bool CanConvert(Type objectType) => objectType == typeof(object);
 		public override bool CanRead => true;

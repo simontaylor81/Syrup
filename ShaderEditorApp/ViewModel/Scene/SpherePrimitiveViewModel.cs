@@ -8,9 +8,9 @@ namespace ShaderEditorApp.ViewModel.Scene
 {
 	class SpherePrimitiveViewModel : ScenePrimitiveViewModel
 	{
-		private SpherePrimitive _sphere;
+		private readonly SpherePrimitive _sphere;
 
-		public override string DisplayName { get { return "Sphere"; } }
+		public override string DisplayName => "Sphere";
 
 		public SpherePrimitiveViewModel(SRPCommon.Scene.SpherePrimitive sphere)
 			: base(sphere)

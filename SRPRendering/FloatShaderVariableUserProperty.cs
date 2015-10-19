@@ -10,7 +10,7 @@ namespace SRPRendering
 {
 	class FloatShaderVariableUserProperty : IScalarProperty<float>
 	{
-		private IShaderVariable _variable;
+		private readonly IShaderVariable _variable;
 		int _componentIndex;
 
 		public FloatShaderVariableUserProperty(IShaderVariable variable, int componentIndex)

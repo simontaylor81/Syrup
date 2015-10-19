@@ -218,15 +218,11 @@ namespace SRPRendering
 
 		// Find a variable by name.
 		public IShaderVariable FindVariable(string name)
-		{
-			return Variables.FirstOrDefault(v => v.Name == name);
-		}
+			=> Variables.FirstOrDefault(v => v.Name == name);
 
 		// Find a resource variable by name.
 		public IShaderResourceVariable FindResourceVariable(string name)
-		{
-			return resourceVariables.FirstOrDefault(v => v.Name == name);
-		}
+			=> resourceVariables.FirstOrDefault(v => v.Name == name);
 
 		// Actual shader. Only one of these is non-null.
 		private VertexShader vertexShader;

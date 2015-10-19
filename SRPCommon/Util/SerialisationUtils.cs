@@ -8,7 +8,7 @@ using SlimDX;
 
 namespace SRPCommon.Util
 {
-	public class SerialisationUtils
+	public static class SerialisationUtils
 	{
 		public static Vector3 ParseVector3(string str)
 		{

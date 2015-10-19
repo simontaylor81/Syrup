@@ -86,7 +86,7 @@ namespace SRPTests.TestRenderer
 
 			// Construct view info object.
 			// TODO: What about the camera?
-			ViewInfo viewInfo = new ViewInfo(
+			var viewInfo = new ViewInfo(
 				Matrix.Identity,
 				Matrix.Identity,
 				Vector3.Zero,

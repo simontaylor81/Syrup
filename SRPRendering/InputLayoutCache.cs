@@ -55,10 +55,8 @@ namespace SRPRendering
 			public InputElement[] inputElements;
 
 			public bool Equals(Key other)
-			{
-				return shaderSignature == other.shaderSignature &&
+				=> shaderSignature == other.shaderSignature &&
 					inputElements.SequenceEqual(other.inputElements);
-			}
 		}
 
 		private Dictionary<Key, InputLayout> entries = new Dictionary<Key, InputLayout>();
