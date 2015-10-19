@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using SRPCommon.Util;
@@ -39,51 +36,6 @@ namespace SRPCommon.Scene
 
 				result.filename = filename;
 
-				/*
-				JObject root;
-				using (var reader = File.OpenText(filename))
-				{
-					root = JObject.Load(new JsonTextReader(reader));
-				}
-
-				// Load meshes.
-				//result.meshes = root["meshes"]
-				//	.EmptyIfNull()
-				//	.Select(obj => SceneMesh.Load(obj))
-				//	.ToDictionary(mesh => mesh.Name);
-
-				// TEMP
-				result.meshes = JsonConvert.DeserializeObject<Dictionary<string, SceneMesh>>(root["meshes"].ToString());
-
-				// Load materials.
-				//result.materials = root["materials"]
-				//	.EmptyIfNull()
-				//	.Select(obj => Material.Load(obj))
-				//	.ToDictionary(mat => mat.Name);
-
-				// TEMP
-				result.materials = JsonConvert.DeserializeObject<Dictionary<string, Material>>(root["materials"].ToString());
-
-				// Load primitives. Must be done after meshes and materials as primitives can refer to them.
-				//result.primitives.AddRange(root["primitives"]
-				//	.EmptyIfNull()
-				//	.Select(obj => result.CreatePrimitive(obj))
-				//	.Where(prim => prim != null));
-
-				result.primitives = JsonConvert.DeserializeObject<ReactiveUI.ReactiveList<Primitive>>(
-					root["primitives"].ToString(), _serializerSettings);
-
-				// Load lights. Lights are completely semantic free to the app, they're just there
-				// so the script can access them. So we just convert the JSON directly to dynamic objects.
-				//result.lights = root["lights"]
-				//	.EmptyIfNull()
-				//	.Select(obj => DynamicHelpers.CreateDynamicObject(obj))
-				//	.ToList();
-
-				result.lights = JsonConvert.DeserializeObject<List<dynamic>>(
-					root["lights"].ToString(), new JsonDynamicObjectConverter());
-				*/
-
 				result.PostLoad();
 				result.NotifyChanged();
 
@@ -96,7 +48,7 @@ namespace SRPCommon.Scene
 				OutputLogger.Instance.LogLine(LogCategory.Log, ex.Message);
 				return null;
 			}
-			catch (JsonReaderException ex)
+			catch (JsonException ex)
 			{
 				OutputLogger.Instance.LogLine(LogCategory.Log, "Failed to parse scene {0}", filename);
 				OutputLogger.Instance.LogLine(LogCategory.Log, ex.Message);
@@ -117,27 +69,6 @@ namespace SRPCommon.Scene
 			// Serialise and write to file.
 			var json = JsonConvert.SerializeObject(this, _serializerSettings);
 			File.WriteAllText(filename + ".test", json);
-		}
-
-		// Create a new primitive of the appropriate type.
-		private Primitive CreatePrimitive(JToken obj)
-		{
-			var type = (string)obj["type"];
-			switch (type)
-			{
-				case "sphere":
-					var sphere = new SpherePrimitive();
-					sphere.Load(obj, this);
-					return sphere;
-
-				case "meshInstance":
-					var meshPrim = new MeshInstancePrimitive();
-					meshPrim.Load(obj, this);
-					return meshPrim;
-			}
-
-			OutputLogger.Instance.LogLine(LogCategory.Log, "Unknown primitive type: " + type);
-			return null;
 		}
 
 		private void PostLoad()

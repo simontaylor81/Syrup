@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SlimDX;
-using Newtonsoft.Json.Linq;
 using SRPCommon.Util;
 using SRPCommon.UserProperties;
 using System.Reactive.Linq;
@@ -60,29 +59,9 @@ namespace SRPCommon.Scene
 			OnChanged = Observable.Merge(UserProperties);
 		}
 
-		internal virtual void Load(JToken obj, Scene scene)
-		{
-			Position = SerialisationUtils.ParseVector3(obj["position"]);
-			Scale = SerialisationUtils.ParseVector3(obj["scale"], new Vector3(1.0f, 1.0f, 1.0f));
-			Rotation = SerialisationUtils.ParseVector3(obj["rotation"]);
-
-			// Get material name.
-			MaterialName = (string)obj["material"];
-			//var matName = (string)obj["material"];
-			//if (matName != null)
-			//{
-			//	// Look up mesh in the scene's collection.
-			//	Material mat;
-			//	if (scene.Materials.TryGetValue(matName, out mat))
-			//	{
-			//		Material = mat;
-			//	}
-			//	else
-			//	{
-			//		OutputLogger.Instance.LogLine(LogCategory.Log, "Material not found: " + matName);
-			//	}
-			//}
-		}
+		public Matrix LocalToWorld
+			// TODO: rotation!
+			=> Matrix.Scaling(Scale) * Matrix.Translation(Position);
 
 		internal virtual void PostLoad(Scene scene)
 		{
@@ -100,9 +79,5 @@ namespace SRPCommon.Scene
 				}
 			}
 		}
-
-		public Matrix GetLocalToWorld()
-			// TODO: rotation!
-			=> Matrix.Scaling(Scale) * Matrix.Translation(Position);
 	}
 }

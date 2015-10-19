@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using SRPCommon.UserProperties;
+﻿using SRPCommon.UserProperties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,15 +23,6 @@ namespace SRPCommon.Scene
 
 			_userProperties.Add(new ObjectPropertyUserProperty<int>(GetType().GetProperty(nameof(Stacks)), this));
 			_userProperties.Add(new ObjectPropertyUserProperty<int>(GetType().GetProperty(nameof(Slices)), this));
-		}
-
-		// Load the primitive from a JSON object.
-		internal override void Load(JToken obj, Scene scene)
-		{
-			base.Load(obj, scene);
-
-			Stacks = (int)obj["stacks"];
-			Slices = (int)obj["slices"];
 		}
 	}
 }

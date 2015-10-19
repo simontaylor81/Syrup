@@ -22,7 +22,7 @@ namespace SRPRendering
 		public IDrawable Mesh { get; }
 		public IRenderScene Scene { get; }
 
-		public Matrix LocalToWorld => primitive.GetLocalToWorld();
+		public Matrix LocalToWorld => primitive.LocalToWorld;
 		public Material Material => primitive.Material;
 
 		public PrimitiveProxy(Primitive primitive, Mesh mesh, IRenderScene scene)

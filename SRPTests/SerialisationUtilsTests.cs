@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using SlimDX;
+﻿using SlimDX;
 using SRPCommon.Util;
 using System;
 using System.Collections.Generic;
@@ -38,32 +37,6 @@ namespace SRPTests
 			// Nonsense input.
 			Assert.Throws<FormatException>(() => SerialisationUtils.ParseVector3("Not a vector"));
 			Assert.Throws<FormatException>(() => SerialisationUtils.ParseVector3("Not a vector 4"));
-		}
-
-		[Fact]
-		public void TestVectorJsonParse()
-		{
-			// Basic parsing.
-			Assert.Equal(new Vector3(1.1f, 2.2f, 3.0f), SerialisationUtils.ParseVector3(JToken.Parse("{\"x\": 1.1, \"y\": 2.2, \"z\": 3}")));
-			Assert.Equal(new Vector4(1.1f, 2.2f, 3.0f, 4.0f), SerialisationUtils.ParseVector4(JToken.Parse("{\"x\": 1.1, \"y\": 2.2, \"z\": 3, \"w\": 4}")));
-
-			// Null argument should return default value.
-			var defaultVec3 = new Vector3(-1.0f, -2.0f, -3.0f);
-			Assert.Equal(defaultVec3, SerialisationUtils.ParseVector3(null, defaultVec3));
-			var defaultVec4 = new Vector4(-1.0f, -2.0f, -3.0f, -4.0f);
-			Assert.Equal(defaultVec4, SerialisationUtils.ParseVector4(null, defaultVec4));
-
-			// Wrong type of JToken.
-			Assert.Throws<ArgumentException>(() => SerialisationUtils.ParseVector3(JToken.Parse("0")));
-			Assert.Throws<ArgumentException>(() => SerialisationUtils.ParseVector4(JToken.Parse("0")));
-
-			// Missing members.
-			Assert.Throws<ArgumentException>(() => SerialisationUtils.ParseVector3(JToken.Parse("{}")));
-			Assert.Throws<ArgumentException>(() => SerialisationUtils.ParseVector4(JToken.Parse("{}")));
-
-			// Members of wrong type.
-			Assert.Throws<ArgumentException>(() => SerialisationUtils.ParseVector3(JToken.Parse("{\"x\": {}, \"y\": {}, \"z\": {}}")));
-			Assert.Throws<ArgumentException>(() => SerialisationUtils.ParseVector4(JToken.Parse("{\"x\": {}, \"y\": {}, \"z\": {}, \"w\": {}}")));
 		}
 
 		[Fact]

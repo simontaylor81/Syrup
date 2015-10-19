@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Assimp;
 using SlimDX;
-using Newtonsoft.Json.Linq;
 using SRPCommon.Util;
 using Newtonsoft.Json;
 
@@ -36,16 +35,6 @@ namespace SRPCommon.Scene
 			{
 				OutputLogger.Instance.LogLine(LogCategory.Log, "Mesh not found: {0}", Filename);
 			}
-		}
-
-		public static SceneMesh Load(JToken obj)
-		{
-			SceneMesh result = new SceneMesh();
-
-			result.Name = (string)obj["name"];
-			result.Filename = (string)obj["filename"];
-
-			return result;
 		}
 
 		private void Import()
