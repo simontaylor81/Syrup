@@ -157,7 +157,7 @@ namespace SRPCommon.Scripting
 
 			public override bool FileExists(string path)
 			{
-				if (_workspace != null && path.StartsWith(_projectPathPrefix))
+				if (_workspace != null && path.StartsWith(_projectPathPrefix, StringComparison.Ordinal))
 				{
 					return _workspace.FindProjectFile(path.Substring(_projectPathPrefix.Length)) != null;
 				}
@@ -178,7 +178,7 @@ namespace SRPCommon.Scripting
 
 			public override string GetDirectoryName(string path)
 			{
-				if (path.StartsWith(_projectPathPrefix))
+				if (path.StartsWith(_projectPathPrefix, StringComparison.Ordinal))
 				{
 					return _projectPathPrefix;
 				}

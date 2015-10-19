@@ -127,7 +127,6 @@
     <Compile Include="Scene\SceneMesh.cs" />
     <Compile Include="Scene\SceneVertex.cs" />
     <Compile Include="Scene\SpherePrimitive.cs" />
-    <Compile Include="Scene\Texture.cs" />
     <Compile Include="Scripting\ScriptHelper.cs" />
     <Compile Include="Scripting\Scripting.cs" />
     <Compile Include="UserProperties\IScalarProperty.cs" />

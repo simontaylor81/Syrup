@@ -33,7 +33,7 @@ namespace SRPCommon.Scene
 				case 2: return UV2;
 				case 3: return UV3;
 			}
-			throw new ArgumentOutOfRangeException("UV index must be between 0 and 3");
+			throw new ArgumentOutOfRangeException(nameof(index), "UV index must be between 0 and 3");
 		}
 
 		public void SetUV(int index, Vector2 value)
@@ -44,7 +44,7 @@ namespace SRPCommon.Scene
 				case 1: UV1 = value; break;
 				case 2: UV2 = value; break;
 				case 3: UV3 = value; break;
-				default: throw new ArgumentOutOfRangeException("UV index must be between 0 and 3");
+				default: throw new ArgumentOutOfRangeException(nameof(index), "UV index must be between 0 and 3");
 			}
 		}
 

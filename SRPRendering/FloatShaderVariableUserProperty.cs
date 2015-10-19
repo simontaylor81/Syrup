@@ -30,7 +30,9 @@ namespace SRPRendering
 			}
 			set
 			{
+#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
 				if (value != Value)
+#pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 				{
 					_variable.SetComponent(_componentIndex, value);
 				}

@@ -319,7 +319,7 @@ namespace SRPRendering
 				if (handle != null)
 				{
 					var rt = GetRenderTarget(handle);
-					new Viewport(0.0f, 0.0f, rt.Width, rt.Height);
+					return new Viewport(0.0f, 0.0f, rt.Width, rt.Height);
 				}
 			}
 

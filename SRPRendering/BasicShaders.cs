@@ -56,7 +56,7 @@ namespace SRPRendering
 			var filename = RenderUtils.GetShaderFilename("BasicShaders.hlsl");
 
 			// Compile basic scene vertex shader.
-			BasicSceneVS = new Shader(device, filename, "BasicSceneVS", "vs_4_0", null); ;
+			BasicSceneVS = new Shader(device, filename, "BasicSceneVS", "vs_4_0", null);
 			disposables.Add(BasicSceneVS);
 
 			// Bind the required shader variables.

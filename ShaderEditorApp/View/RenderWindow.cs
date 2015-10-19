@@ -180,7 +180,7 @@ namespace ShaderEditorApp.View
 		}
 
 		// Override background paint event to prevent flickering.
-		protected override void OnPaintBackground(PaintEventArgs e)
+		protected override void OnPaintBackground(PaintEventArgs pevent)
 		{
 			// Do nothing -- Render() clears the whole window.
 		}

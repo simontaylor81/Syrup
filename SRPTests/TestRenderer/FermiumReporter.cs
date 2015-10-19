@@ -29,7 +29,7 @@ namespace SRPTests.TestRenderer
 			//var server = Environment.GetEnvironmentVariable("SRP_FERMIUM_SERVER");
 			if (!string.IsNullOrEmpty(_fermiumBaseUrl))
 			{
-				if (!_fermiumBaseUrl.EndsWith("/"))
+				if (!_fermiumBaseUrl.EndsWith("/", StringComparison.Ordinal))
 				{
 					_fermiumBaseUrl += "/";
 				}

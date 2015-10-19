@@ -132,9 +132,9 @@ namespace SRPRendering
 				profile.GetHashCode() ^
 				Path.GetFullPath(filename).ToLowerInvariant().GetHashCode();
 
-		public string filename;
-		public string entryPoint;
-		public string profile;
+		public readonly string filename;
+		public readonly string entryPoint;
+		public readonly string profile;
 	}
 
 	struct ShaderCacheEntry
