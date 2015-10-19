@@ -19,5 +19,7 @@
   <OpenDocuments>
     <OpenDocument path="C:\github\Syrup\testproject\scripttest.py" />
     <OpenDocument path="C:\github\Syrup\testproject\BasicShaders.hlsl" />
+    <OpenDocument path="C:\GitHub\Syrup\testproject\DeferredShading.py" />
+    <OpenDocument path="C:\GitHub\Syrup\testproject\DeferredShading.hlsl" />
   </OpenDocuments>
 </project>
