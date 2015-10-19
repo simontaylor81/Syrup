@@ -68,7 +68,7 @@ namespace SRPCommon.Scene
 		{
 			// Serialise and write to file.
 			var json = JsonConvert.SerializeObject(this, _serializerSettings);
-			File.WriteAllText(filename + ".test", json);
+			File.WriteAllText(filename, json);
 		}
 
 		private void PostLoad()
