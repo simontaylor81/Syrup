@@ -13,8 +13,7 @@ namespace SRPCommon.Scene
 	[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 	public class SceneMesh
 	{
-		[JsonProperty]
-		public string Name { get; private set; }
+		public string Name { get; set; }
 
 		[JsonProperty]
 		public string Filename { get; private set; }
@@ -24,6 +23,21 @@ namespace SRPCommon.Scene
 
 		public DataStream Vertices { get; private set; }
 		public DataStream Indices { get; private set; }
+
+		// Load the mesh itself after serialisation.
+		[System.Runtime.Serialization.OnDeserialized]
+		internal void OnDeserializedMethod(System.Runtime.Serialization.StreamingContext context)
+		{
+			// Load the file if it exists.
+			if (File.Exists(Filename))
+			{
+				Import();
+			}
+			else
+			{
+				OutputLogger.Instance.LogLine(LogCategory.Log, "Mesh not found: {0}", Filename);
+			}
+		}
 
 		public static SceneMesh Load(JToken obj)
 		{

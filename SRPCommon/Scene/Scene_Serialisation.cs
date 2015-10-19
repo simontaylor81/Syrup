@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -42,10 +44,13 @@ namespace SRPCommon.Scene
 				}
 
 				// Load meshes.
-				result.meshes = root["meshes"]
-					.EmptyIfNull()
-					.Select(obj => SceneMesh.Load(obj))
-					.ToDictionary(mesh => mesh.Name);
+				//result.meshes = root["meshes"]
+				//	.EmptyIfNull()
+				//	.Select(obj => SceneMesh.Load(obj))
+				//	.ToDictionary(mesh => mesh.Name);
+
+				// TEMP
+				result.meshes = JsonConvert.DeserializeObject<Dictionary<string, SceneMesh>>(root["meshes"].ToString());
 
 				// Load materials.
 				result.materials = root["materials"]
@@ -97,7 +102,7 @@ namespace SRPCommon.Scene
 		{
 			var root = new
 			{
-				meshes = Meshes.Values,
+				meshes = Meshes,
 				materials = Materials.Values,
 				primitives = Primitives,
 			};
@@ -126,6 +131,16 @@ namespace SRPCommon.Scene
 
 			OutputLogger.Instance.LogLine(LogCategory.Log, "Unknown primitive type: " + type);
 			return null;
+		}
+
+		[OnDeserialized]
+		internal void OnDeserializedMethod(StreamingContext context)
+		{
+			// Fix up mesh names after serialisation.
+			foreach (var kvp in Meshes)
+			{
+				kvp.Value.Name = kvp.Key;
+			}
 		}
 	}
 
