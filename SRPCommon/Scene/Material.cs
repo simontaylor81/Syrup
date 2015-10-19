@@ -12,16 +12,15 @@ namespace SRPCommon.Scene
 	[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 	public class Material
 	{
-		[JsonProperty]
-		public string Name { get; private set; }
+		public string Name { get; internal set; }
 
-		[JsonProperty("vectorParams")]
 		public IDictionary<string, Vector4> Parameters => vectorParameters;
-		[JsonProperty]
 		public IDictionary<string, string> Textures => textures;
 
+		[JsonProperty("vectorParams")]
 		private Dictionary<string, Vector4> vectorParameters;
-		private Dictionary<string, string> textures;
+		[JsonProperty]
+		private Dictionary<string, string> textures = new Dictionary<string, string>();
 
 		public static Material Load(JToken obj)
 		{
@@ -29,26 +28,18 @@ namespace SRPCommon.Scene
 			result.Name = (string)obj["name"];
 
 			// Load vector params.
-			//result.vectorParameters = obj["vectorParams"]
-			//	.EmptyIfNull()		// Missing value means no vector params
-			//	.Select(paramObj => LoadVectorParam(paramObj))
-			//	.Where(param => param != null)
-			//	.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
-
-			// TEMP
-			result.vectorParameters = JsonConvert.DeserializeObject<Dictionary<string, Vector4>>(
-				obj["vectorParams"].ToString());
+			result.vectorParameters = obj["vectorParams"]
+				.EmptyIfNull()      // Missing value means no vector params
+				.Select(paramObj => LoadVectorParam(paramObj))
+				.Where(param => param != null)
+				.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
 
 			// Load texture references.
-			//result.textures = obj["textures"]
-			//	.EmptyIfNull()		// Missing value means no textures
-			//	.Select(texObj => LoadTexture(texObj))
-			//	.Where(texture => texture != null)
-			//	.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
-
-			// TEMP
-			result.textures = JsonConvert.DeserializeObject<Dictionary<string, string>>(
-				obj["textures"].ToString());
+			result.textures = obj["textures"]
+				.EmptyIfNull()      // Missing value means no textures
+				.Select(texObj => LoadTexture(texObj))
+				.Where(texture => texture != null)
+				.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
 
 			return result;
 		}

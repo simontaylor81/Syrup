@@ -40,7 +40,7 @@ namespace SRPCommon.Scene
 		public Material Material { get; private set; }
 
 		[JsonProperty("material")]
-		private string MaterialName => Material?.Name;
+		private string MaterialName { get; set; }
 
 		protected List<IUserProperty> _userProperties = new List<IUserProperty>();
 		public IEnumerable<IUserProperty> UserProperties => _userProperties;
@@ -67,18 +67,36 @@ namespace SRPCommon.Scene
 			Rotation = SerialisationUtils.ParseVector3(obj["rotation"]);
 
 			// Get material name.
-			var matName = (string)obj["material"];
-			if (matName != null)
+			MaterialName = (string)obj["material"];
+			//var matName = (string)obj["material"];
+			//if (matName != null)
+			//{
+			//	// Look up mesh in the scene's collection.
+			//	Material mat;
+			//	if (scene.Materials.TryGetValue(matName, out mat))
+			//	{
+			//		Material = mat;
+			//	}
+			//	else
+			//	{
+			//		OutputLogger.Instance.LogLine(LogCategory.Log, "Material not found: " + matName);
+			//	}
+			//}
+		}
+
+		internal virtual void PostLoad(Scene scene)
+		{
+			if (MaterialName != null)
 			{
 				// Look up mesh in the scene's collection.
 				Material mat;
-				if (scene.Materials.TryGetValue(matName, out mat))
+				if (scene.Materials.TryGetValue(MaterialName, out mat))
 				{
 					Material = mat;
 				}
 				else
 				{
-					OutputLogger.Instance.LogLine(LogCategory.Log, "Material not found: " + matName);
+					OutputLogger.Instance.LogLine(LogCategory.Log, "Material not found: " + MaterialName);
 				}
 			}
 		}

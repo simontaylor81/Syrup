@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using SRPCommon.Util;
@@ -19,6 +20,7 @@ namespace SRPCommon.Scene
 		{
 			Formatting = Formatting.Indented,
 			ContractResolver = new SceneContractResolver(),
+			Converters = { new PrimitiveCreationConverter() }
 		};
 
 		// Load an existing scene from disk.
@@ -44,13 +46,13 @@ namespace SRPCommon.Scene
 				}
 
 				// Load meshes.
-				//result.meshes = root["meshes"]
-				//	.EmptyIfNull()
-				//	.Select(obj => SceneMesh.Load(obj))
-				//	.ToDictionary(mesh => mesh.Name);
+				result.meshes = root["meshes"]
+					.EmptyIfNull()
+					.Select(obj => SceneMesh.Load(obj))
+					.ToDictionary(mesh => mesh.Name);
 
 				// TEMP
-				result.meshes = JsonConvert.DeserializeObject<Dictionary<string, SceneMesh>>(root["meshes"].ToString());
+				//result.meshes = JsonConvert.DeserializeObject<Dictionary<string, SceneMesh>>(root["meshes"].ToString());
 
 				// Load materials.
 				result.materials = root["materials"]
@@ -58,11 +60,17 @@ namespace SRPCommon.Scene
 					.Select(obj => Material.Load(obj))
 					.ToDictionary(mat => mat.Name);
 
+				// TEMP
+				//result.materials = JsonConvert.DeserializeObject<Dictionary<string, Material>>(root["materials"].ToString());
+
 				// Load primitives. Must be done after meshes and materials as primitives can refer to them.
 				result.primitives.AddRange(root["primitives"]
 					.EmptyIfNull()
 					.Select(obj => result.CreatePrimitive(obj))
 					.Where(prim => prim != null));
+
+				//result.primitives = JsonConvert.DeserializeObject<ReactiveUI.ReactiveList<Primitive>>(
+				//	root["primitives"].ToString(), _serializerSettings);
 
 				// Load lights. Lights are completely semantic free to the app, they're just there
 				// so the script can access them. Do we just convert the JSON directly to dynamic objects.
@@ -71,6 +79,7 @@ namespace SRPCommon.Scene
 					.Select(obj => DynamicHelpers.CreateDynamicObject(obj))
 					.ToList();
 
+				result.PostLoad();
 				result.NotifyChanged();
 
 				Environment.CurrentDirectory = prevCurrentDir;
@@ -103,7 +112,7 @@ namespace SRPCommon.Scene
 			var root = new
 			{
 				meshes = Meshes,
-				materials = Materials.Values,
+				materials = Materials,
 				primitives = Primitives,
 			};
 
@@ -118,12 +127,12 @@ namespace SRPCommon.Scene
 			var type = (string)obj["type"];
 			switch (type)
 			{
-				case "Sphere":
+				case "sphere":
 					var sphere = new SpherePrimitive();
 					sphere.Load(obj, this);
 					return sphere;
 
-				case "MeshInstance":
+				case "meshInstance":
 					var meshPrim = new MeshInstancePrimitive();
 					meshPrim.Load(obj, this);
 					return meshPrim;
@@ -133,14 +142,21 @@ namespace SRPCommon.Scene
 			return null;
 		}
 
-		[OnDeserialized]
-		internal void OnDeserializedMethod(StreamingContext context)
+		private void PostLoad()
 		{
-			// Fix up mesh names after serialisation.
+			// Fix up mesh and material names after serialisation.
 			foreach (var kvp in Meshes)
 			{
 				kvp.Value.Name = kvp.Key;
 			}
+			foreach (var kvp in Materials)
+			{
+				kvp.Value.Name = kvp.Key;
+			}
+
+			// Call PostLoad on sub-objects.
+			Meshes.Values.ForEach(mesh => mesh.PostLoad());
+			Primitives.ForEach(mesh => mesh.PostLoad(this));
 		}
 	}
 
@@ -154,6 +170,23 @@ namespace SRPCommon.Scene
 			contract.DictionaryKeyResolver = name => name;
 
 			return contract;
+		}
+	}
+
+	class PrimitiveCreationConverter : PolymorphicJsonCreationConverter<Primitive>
+	{
+		protected override Primitive Create(JObject jObject)
+		{
+			var type = (string)jObject["type"];
+			switch (type)
+			{
+				case "Sphere":
+					return new SpherePrimitive();
+				case "MeshInstance":
+					return new MeshInstancePrimitive();
+			}
+
+			throw new JsonException("Unknown primitive type: " + type);
 		}
 	}
 }

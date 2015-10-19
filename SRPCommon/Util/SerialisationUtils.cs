@@ -53,9 +53,6 @@ namespace SRPCommon.Util
 		{
 			if (obj != null)
 			{
-				// TEMP!
-				return Newtonsoft.Json.JsonConvert.DeserializeObject<Vector3>($"\"{obj.ToString()}\"");
-
 				if (obj.Type != JTokenType.Object) throw new ArgumentException("Must be JSON object", nameof(obj));
 
 				var x = obj["x"];
