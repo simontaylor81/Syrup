@@ -1,55 +1,49 @@
 {
-  "meshes": [
-    {
-      "name": "Duck",
+  "meshes": {
+    "Duck": {
       "filename": "..\\ThirdParty\\AssimpNet-2.1.2 Refresh\\Samples\\duck.dae"
     }
-  ],
-  "materials": [
-    {
-      "name": "DuckMat",
-      "vectorParams": [
-        {
-          "name": "DiffuseColour",
-          "value": { "x": 1, "y": 0, "z": 0, "w": 0 }
-        }
-      ],
-      "textures": [
-        {
-          "name": "DiffuseTexture",
-          "filename": "..\\ThirdParty\\AssimpNet-2.1.2 Refresh\\Samples\\duckCM.bmp"
-        }
-      ]
+  },
+  "materials": {
+    "DuckMat": {
+      "vectorParams": {
+        "DiffuseColour": "1, 0, 0, 0"
+      },
+      "textures": {
+        "DiffuseTexture": "..\\ThirdParty\\AssimpNet-2.1.2 Refresh\\Samples\\duckCM.bmp"
+      }
     },
-    {
-      "name": "SphereMat",
-      "vectorParams":  [
-	    {
-          "name": "DiffuseColour",
-          "value": { "x": 0, "y": 1, "z": 0, "w": 0 }
-        }
-      ]
+    "SphereMat": {
+      "vectorParams": {
+        "DiffuseColour": "0, 1, 0, 0"
+      }
     }
-  ],
+  },
   "primitives": [
     {
-      "type": "sphere",
-      "position": { "x":-1, "y":0, "z":0 },
+      "type": "Sphere",
       "stacks": 6,
       "slices": 12,
+      "position": "-1, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
       "material": "SphereMat"
     },
     {
-      "type": "sphere",
-      "position": {"x":1,"y":0,"z":0},
+      "type": "Sphere",
       "stacks": 8,
-      "slices": 12
+      "slices": 12,
+      "position": "1, 0, 0",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": null
     },
     {
-      "type": "meshInstance",
-      "position": {"x":0,"y":0,"z":0},
-      "scale": { "x":0.01, "y":0.01, "z":0.01 },
+      "type": "MeshInstance",
       "mesh": "Duck",
+      "position": "0, 0, 0",
+      "scale": "0.01, 0.01, 0.01",
+      "rotation": "0, 0, 0",
       "material": "DuckMat"
     }
   ]

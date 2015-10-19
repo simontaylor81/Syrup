@@ -4,14 +4,17 @@ using System.IO;
 using System.Linq;
 using Assimp;
 using SlimDX;
-using Newtonsoft.Json.Linq;
 using SRPCommon.Util;
+using Newtonsoft.Json;
 
 namespace SRPCommon.Scene
 {
+	[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 	public class SceneMesh
 	{
-		public string Name { get; private set; }
+		public string Name { get; internal set; }
+
+		[JsonProperty]
 		public string Filename { get; private set; }
 
 		private bool isValid = false;
@@ -20,24 +23,18 @@ namespace SRPCommon.Scene
 		public DataStream Vertices { get; private set; }
 		public DataStream Indices { get; private set; }
 
-		public static SceneMesh Load(JToken obj)
+		// Load the mesh itself after serialisation.
+		internal void PostLoad()
 		{
-			SceneMesh result = new SceneMesh();
-
-			result.Name = (string)obj["name"];
-			result.Filename = (string)obj["filename"];
-
 			// Load the file if it exists.
-			if (File.Exists(result.Filename))
+			if (File.Exists(Filename))
 			{
-				result.Import();
+				Import();
 			}
 			else
 			{
-				OutputLogger.Instance.LogLine(LogCategory.Log, "Mesh not found: {0}", result.Filename);
+				OutputLogger.Instance.LogLine(LogCategory.Log, "Mesh not found: {0}", Filename);
 			}
-
-			return result;
 		}
 
 		private void Import()

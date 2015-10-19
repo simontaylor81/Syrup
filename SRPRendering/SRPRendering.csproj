@@ -113,6 +113,7 @@
     <Compile Include="RenderTargetDescriptor.cs" />
     <Compile Include="RenderUtils.cs" />
     <Compile Include="ResourceHandles.cs" />
+    <Compile Include="SceneMeshCache.cs" />
     <Compile Include="ScriptInterfaceExtensions.cs" />
     <Compile Include="ScriptRenderContext.cs" />
     <Compile Include="ScriptRenderControl.cs" />

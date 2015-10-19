@@ -47,7 +47,7 @@ namespace SRPCommon.UserProperties
 	public abstract class MemberProperty : IUserProperty
 	{
 		private MemberInfo _member;
-		private Subject<Unit> _subject = new Subject<Unit>();
+		protected Subject<Unit> Subject { get; set; } = new Subject<Unit>();
 
 		public MemberProperty(MemberInfo member)
 		{
@@ -60,7 +60,7 @@ namespace SRPCommon.UserProperties
 
 		public IDisposable Subscribe(IObserver<Unit> observer)
 		{
-			return _subject.Subscribe(observer);
+			return Subject.Subscribe(observer);
 		}
 	}
 
@@ -70,8 +70,6 @@ namespace SRPCommon.UserProperties
 		private Func<object> _getter;
 		private Action<object> _setter;
 		private FieldInfo _field;
-
-		private Subject<Unit> _subject = new Subject<Unit>();
 
 		// Construct for a struct member, which can't be stored as a reference, so need explicit getter and setters.
 		public ObjectFieldUserProperty(FieldInfo field, Func<object> objectGetter, Action<object> objectSetter)
@@ -108,7 +106,7 @@ namespace SRPCommon.UserProperties
 					var obj = _getter();
 					_field.SetValue(obj, value);
 					_setter(obj);
-					_subject.OnNext(Unit.Default);
+					Subject.OnNext(Unit.Default);
 				}
 			}
 		}
@@ -120,8 +118,6 @@ namespace SRPCommon.UserProperties
 		private Func<object> _getter;
 		private Action<object> _setter;
 		private PropertyInfo _prop;
-
-		private Subject<Unit> _subject = new Subject<Unit>();
 
 		// Construct for a struct member, which can't be stored as a reference, so need explicit getter and setters.
 		public ObjectPropertyUserProperty(PropertyInfo prop, Func<object> objectGetter, Action<object> objectSetter)
@@ -158,7 +154,7 @@ namespace SRPCommon.UserProperties
 					var obj = _getter();
 					_prop.SetValue(obj, value);
 					_setter(obj);
-					_subject.OnNext(Unit.Default);
+					Subject.OnNext(Unit.Default);
 				}
 			}
 		}

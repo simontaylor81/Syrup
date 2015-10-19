@@ -70,11 +70,23 @@
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ReactiveUI, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\reactiveui-core.6.5.0\lib\Net45\ReactiveUI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SlimDX, Version=4.0.13.43, Culture=neutral, PublicKeyToken=b1b0c32fd1ffe4f9, processorArchitecture=x86">
       <HintPath>..\packages\SlimDX.4.0.13.44\lib\NET40\SlimDX.dll</HintPath>
     </Reference>
+    <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Interactive, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ix-Main.1.2.5\lib\net45\System.Interactive.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
@@ -91,13 +103,19 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
     </Reference>
+    <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Scene\Scene_Serialisation.cs" />
     <Compile Include="UserProperties\IMatrixProperty.cs" />
     <Compile Include="UserProperties\IPropertySource.cs" />
     <Compile Include="Interfaces\IWorkspace.cs" />
@@ -118,11 +136,13 @@
     <Compile Include="UserProperties\MutableScalarProperty.cs" />
     <Compile Include="UserProperties\ReadOnlyScalarProperty.cs" />
     <Compile Include="UserProperties\SimpleVectorProperties.cs" />
+    <Compile Include="Util\DictionaryExtensions.cs" />
     <Compile Include="Util\DisposableUtil.cs" />
     <Compile Include="Util\DynamicHelpers.cs" />
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\GlobalConfig.cs" />
     <Compile Include="Util\OutputLogger.cs" />
+    <Compile Include="Util\PolymorphicJsonCreationConverter.cs" />
     <Compile Include="Util\SerialisationUtils.cs" />
   </ItemGroup>
   <ItemGroup>

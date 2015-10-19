@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using SRPCommon.Scene;
 using SlimDX.Direct3D11;
-using Buffer = SlimDX.Direct3D11.Buffer;
 
 namespace SRPRendering
 {
@@ -20,7 +19,39 @@ namespace SRPRendering
 
 	class RenderScene : IRenderScene
 	{
+		private List<PrimitiveProxy> primitiveProxies = new List<PrimitiveProxy>();
+		private Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
+		private readonly IGlobalResources _globalResources;
+		private readonly Device _device;
+		private readonly Scene _scene;
+		private readonly IDisposable _subscription;
+		private readonly SceneMeshCache _meshCache;
+
 		public IEnumerable<IPrimitive> Primitives => primitiveProxies;
+
+		public RenderScene(Scene scene, Device device, IGlobalResources globalResources)
+		{
+			_scene = scene;
+			_device = device;
+			_globalResources = globalResources;
+
+			_meshCache = new SceneMeshCache(device);
+
+			// Create proxies now, and when the scene changes.
+			CreateProxies();
+			_subscription = scene.OnChanged.Subscribe(_ => CreateProxies());
+		}
+
+		public void Dispose()
+		{
+			_meshCache.Dispose();
+			_subscription.Dispose();
+			
+			foreach (var texture in textures.Values)
+			{
+				texture.Dispose();
+			}
+		}
 
 		// Return the texture for a given filename. Always returns a valid ref.
 		public Texture GetTexture(string filename)
@@ -39,80 +70,69 @@ namespace SRPRendering
 			}
 		}
 
-		public RenderScene(Scene scene, Device device, IGlobalResources globalResources)
+		// Create render proxies for primitives in the scene.
+		private void CreateProxies()
 		{
-			_globalResources = globalResources;
-
-			var meshDict = new Dictionary<SceneMesh, Mesh>();
-
 			// Any relative (texture) paths are relative to the scene file itself.
 			var prevCurrentDir = Environment.CurrentDirectory;
-			Environment.CurrentDirectory = Path.GetDirectoryName(scene.Filename);
+			Environment.CurrentDirectory = Path.GetDirectoryName(_scene.Filename);
 
-			// Create render proxies for primitives in the scene.
-			foreach (var primitive in scene.Primitives)
+			// Create a proxy for each primitive.
+			primitiveProxies = _scene.Primitives
+				.Select(primitive => CreateProxy(primitive))
+				.Where(proxy => proxy != null)
+				.ToList();
+
+			// Release unused meshes.
+			var usedMeshes = primitiveProxies.Select(proxy => proxy.Mesh).Distinct().ToList();
+			_meshCache.ReleaseUnusedMeshes(usedMeshes);
+
+			Environment.CurrentDirectory = prevCurrentDir;
+		}
+
+		private PrimitiveProxy CreateProxy(Primitive primitive)
+		{
+			PrimitiveProxy result = null;
+			Mesh mesh = null;
+
+			var meshInstance = primitive as MeshInstancePrimitive;
+			var sphere = primitive as SpherePrimitive;
+
+			if (meshInstance?.Mesh != null)
 			{
-				Mesh mesh = null;
+				mesh = _meshCache.GetForSceneMesh(meshInstance.Mesh);
+			}
+			else if (sphere != null)
+			{
+				mesh = _meshCache.GetForSphere(sphere.Slices, sphere.Stacks);
+			}
 
-				if (primitive is MeshInstancePrimitive)
+			if (mesh != null)
+			{
+				// Create proxy for the instance.
+				result = new PrimitiveProxy(primitive, mesh, this);
+
+				// Create texture resource for textures used by this primitive's material.
+				if (primitive.Material != null)
 				{
-					var instance = (MeshInstancePrimitive)primitive;
-					if (!meshDict.TryGetValue(instance.Mesh, out mesh))
+					foreach (var file in primitive.Material.Textures.Values)
 					{
-						// Create the mesh and add to the lookup map.
-						mesh = new Mesh(device, instance.Mesh.Vertices, SceneVertex.GetStride(),
-							instance.Mesh.Indices, SceneVertex.InputElements);
-						meshDict.Add(instance.Mesh, mesh);
-					}
-				}
-				else if (primitive is SpherePrimitive)
-				{
-					// No instancing of spheres, just create a mesh for each one.
-					var sphere = (SpherePrimitive)primitive;
-					mesh = BasicMesh.CreateSphere(device, sphere.Slices, sphere.Stacks);
-				}
-
-				if (mesh != null)
-				{
-					// Create proxy for the instance and add to the list.
-					primitiveProxies.Add(new PrimitiveProxy(primitive, mesh, this));
-					meshes.Add(mesh);
-
-					// Create texture resource for textures used by this primitive's material.
-					if (primitive.Material != null)
-					{
-						foreach (var file in primitive.Material.Textures.Values)
+						if (!textures.ContainsKey(file))
 						{
-							if (!textures.ContainsKey(file))
+							try
 							{
-								try
-								{
-									textures.Add(file, Texture.LoadFromFile(device, file));
-								}
-								catch (Exception)
-								{
-									// For now, just don't add the texture.
-								}
+								textures.Add(file, Texture.LoadFromFile(_device, file));
+							}
+							catch (Exception)
+							{
+								// For now, just don't add the texture.
 							}
 						}
 					}
 				}
 			}
 
-			Environment.CurrentDirectory = prevCurrentDir;
+			return result;
 		}
-
-		public void Dispose()
-		{
-			foreach (var mesh in meshes)
-				mesh.Dispose();
-			foreach (var texture in textures.Values)
-				texture.Dispose();
-		}
-
-		private List<PrimitiveProxy> primitiveProxies = new List<PrimitiveProxy>();
-		private List<Mesh> meshes = new List<Mesh>();
-		private Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
-		private readonly IGlobalResources _globalResources;
 	}
 }

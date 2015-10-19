@@ -7,6 +7,7 @@ using System.Windows.Input;
 using ReactiveUI;
 using SRPCommon.UserProperties;
 using SRPCommon.Scene;
+using ShaderEditorApp.MVVMUtil;
 
 namespace ShaderEditorApp.ViewModel.Scene
 {
@@ -17,12 +18,18 @@ namespace ShaderEditorApp.ViewModel.Scene
 	{
 		#region IHierarchicalBrowserNodeViewModel interface
 
-		public string DisplayName => "Primitives";
+		public string DisplayName { get { return "Primitives"; } }
 
-		public IEnumerable<ICommand> Commands => Enumerable.Empty<ICommand>();
-		public IEnumerable<IUserProperty> UserProperties => Enumerable.Empty<IUserProperty>();
+		private SRPCommon.Scene.Scene Scene { get; set; }
 
-		private IHierarchicalBrowserNodeViewModel[] _children;
+		public IEnumerable<ICommand> Commands { get; private set; }
+
+		public IEnumerable<IUserProperty> UserProperties
+		{
+			get { return Enumerable.Empty<IUserProperty>(); }
+		}
+
+		private IReactiveDerivedList<ScenePrimitiveViewModel> _children;
 		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children => _children;
 
 		public ICommand DefaultCmd => null;
@@ -31,9 +38,24 @@ namespace ShaderEditorApp.ViewModel.Scene
 
 		#endregion
 
-		public ScenePrimitivesViewModel(IEnumerable<Primitive> primitives)
+		public ScenePrimitivesViewModel(SRPCommon.Scene.Scene scene)
 		{
-			_children = primitives.Select(prim => ScenePrimitiveViewModel.Create(prim)).ToArray();
+			Scene = scene;
+
+			_children = scene.Primitives.CreateDerivedCollection(prim => ScenePrimitiveViewModel.Create(prim));
+
+			// Create commands.
+			Commands = new[]
+			{
+				NamedCommand.CreateReactive("Add Sphere", _ => AddSphere()),
+				NamedCommand.CreateReactive("Save", _ => scene.Save())
+			};
+		}
+
+		private void AddSphere()
+		{
+			var sphere = new SpherePrimitive();
+			Scene.AddPrimitive(sphere);
 		}
 	}
 }

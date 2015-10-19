@@ -37,7 +37,7 @@ namespace ShaderEditorApp.ViewModel.Scene
 
 		public SceneViewModel(SRPCommon.Scene.Scene scene)
 		{
-			_rootNodes = new[] { new ScenePrimitivesViewModel(scene.Primitives) };
+			_rootNodes = new[] { new ScenePrimitivesViewModel(scene) };
 
 			_properties = this.WhenAny(x => x.ActiveItem, change => change.Value)
 				.Where(node => node != null)
