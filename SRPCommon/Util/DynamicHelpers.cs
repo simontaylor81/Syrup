@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace SRPCommon.Util
 {
@@ -117,6 +118,31 @@ namespace SRPCommon.Util
 				}
 				return base.TryGetIndex(binder, indexes, out result);
 			}
+		}
+	}
+
+	public class JsonDynamicObjectConverter : JsonConverter
+	{
+		// Standalone serialiser that does not do stuff like camel-casing.
+		JsonSerializer _rawSerializer = new JsonSerializer();
+
+		public override bool CanConvert(Type objectType) => objectType == typeof(object);
+		public override bool CanRead => true;
+		public override bool CanWrite => true;
+
+		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+		{
+			// Read JToken from the current reader.
+			var token = JToken.Load(reader);
+
+			// Create dynamic object from it.
+			return DynamicHelpers.CreateDynamicObject(token);
+		}
+
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+		{
+			// Use raw serialiser to avoid camel-casing.
+			_rawSerializer.Serialize(writer, value);
 		}
 	}
 }

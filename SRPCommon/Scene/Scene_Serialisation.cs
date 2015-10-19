@@ -26,19 +26,20 @@ namespace SRPCommon.Scene
 		// Load an existing scene from disk.
 		public static Scene LoadFromFile(string filename)
 		{
-			Scene result = new Scene();
-			result.filename = filename;
-
 			// Any relative paths are relative to the scene file itself.
 			// TODO: do this more elegantly.
 			var prevCurrentDir = Environment.CurrentDirectory;
 			Environment.CurrentDirectory = Path.GetDirectoryName(filename);
 
-			//var something = JsonConvert.DeserializeObject(File.ReadAllText(filename));
-
 			try
 			{
 				// Load JSON file.
+				var contents = File.ReadAllText(filename);
+				var result = JsonConvert.DeserializeObject<Scene>(contents, _serializerSettings);
+
+				result.filename = filename;
+
+				/*
 				JObject root;
 				using (var reader = File.OpenText(filename))
 				{
@@ -46,38 +47,42 @@ namespace SRPCommon.Scene
 				}
 
 				// Load meshes.
-				result.meshes = root["meshes"]
-					.EmptyIfNull()
-					.Select(obj => SceneMesh.Load(obj))
-					.ToDictionary(mesh => mesh.Name);
+				//result.meshes = root["meshes"]
+				//	.EmptyIfNull()
+				//	.Select(obj => SceneMesh.Load(obj))
+				//	.ToDictionary(mesh => mesh.Name);
 
 				// TEMP
-				//result.meshes = JsonConvert.DeserializeObject<Dictionary<string, SceneMesh>>(root["meshes"].ToString());
+				result.meshes = JsonConvert.DeserializeObject<Dictionary<string, SceneMesh>>(root["meshes"].ToString());
 
 				// Load materials.
-				result.materials = root["materials"]
-					.EmptyIfNull()
-					.Select(obj => Material.Load(obj))
-					.ToDictionary(mat => mat.Name);
+				//result.materials = root["materials"]
+				//	.EmptyIfNull()
+				//	.Select(obj => Material.Load(obj))
+				//	.ToDictionary(mat => mat.Name);
 
 				// TEMP
-				//result.materials = JsonConvert.DeserializeObject<Dictionary<string, Material>>(root["materials"].ToString());
+				result.materials = JsonConvert.DeserializeObject<Dictionary<string, Material>>(root["materials"].ToString());
 
 				// Load primitives. Must be done after meshes and materials as primitives can refer to them.
-				result.primitives.AddRange(root["primitives"]
-					.EmptyIfNull()
-					.Select(obj => result.CreatePrimitive(obj))
-					.Where(prim => prim != null));
+				//result.primitives.AddRange(root["primitives"]
+				//	.EmptyIfNull()
+				//	.Select(obj => result.CreatePrimitive(obj))
+				//	.Where(prim => prim != null));
 
-				//result.primitives = JsonConvert.DeserializeObject<ReactiveUI.ReactiveList<Primitive>>(
-				//	root["primitives"].ToString(), _serializerSettings);
+				result.primitives = JsonConvert.DeserializeObject<ReactiveUI.ReactiveList<Primitive>>(
+					root["primitives"].ToString(), _serializerSettings);
 
 				// Load lights. Lights are completely semantic free to the app, they're just there
-				// so the script can access them. Do we just convert the JSON directly to dynamic objects.
-				result.lights = root["lights"]
-					.EmptyIfNull()
-					.Select(obj => DynamicHelpers.CreateDynamicObject(obj))
-					.ToList();
+				// so the script can access them. So we just convert the JSON directly to dynamic objects.
+				//result.lights = root["lights"]
+				//	.EmptyIfNull()
+				//	.Select(obj => DynamicHelpers.CreateDynamicObject(obj))
+				//	.ToList();
+
+				result.lights = JsonConvert.DeserializeObject<List<dynamic>>(
+					root["lights"].ToString(), new JsonDynamicObjectConverter());
+				*/
 
 				result.PostLoad();
 				result.NotifyChanged();
@@ -109,15 +114,8 @@ namespace SRPCommon.Scene
 
 		public void Save()
 		{
-			var root = new
-			{
-				meshes = Meshes,
-				materials = Materials,
-				primitives = Primitives,
-			};
-
 			// Serialise and write to file.
-			var json = JsonConvert.SerializeObject(root, _serializerSettings);
+			var json = JsonConvert.SerializeObject(this, _serializerSettings);
 			File.WriteAllText(filename + ".test", json);
 		}
 
