@@ -18,10 +18,15 @@ namespace SRPCommon.Scene
 		public Vector2 UV3;
 
 		public SceneVertex(Vector3 position, Vector3 normal)
+			: this(position, normal, Vector2.Zero)
+		{
+		}
+
+		public SceneVertex(Vector3 position, Vector3 normal, Vector2 uv)
 		{
 			Position = position;
 			Normal = normal;
-			UV0 = UV1 = UV2 = UV3 = Vector2.Zero;
+			UV0 = UV1 = UV2 = UV3 = uv;
 		}
 
 		public Vector2 GetUV(int index)

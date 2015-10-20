@@ -19,41 +19,14 @@ namespace SRPRendering
 			int vertexBufferSize = SceneVertex.GetStride() * numVerts;
 			var vertices = new DataStream(vertexBufferSize, true, true);
 
-			// +X face
-			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, -1.0f), new Vector3(1.0f, 0.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, 1.0f), new Vector3(1.0f, 0.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, -1.0f), new Vector3(1.0f, 0.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 0.0f, 0.0f)));
+			WriteCubeFaceVerts(vertices, Vector3.UnitX, Vector3.UnitZ, Vector3.UnitY);
+			WriteCubeFaceVerts(vertices, -Vector3.UnitX, -Vector3.UnitZ, Vector3.UnitY);
 
-			// -X face
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, 1.0f), new Vector3(-1.0f, 0.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, -1.0f), new Vector3(-1.0f, 0.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, 1.0f), new Vector3(-1.0f, 0.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, -1.0f), new Vector3(-1.0f, 0.0f, 0.0f)));
+			WriteCubeFaceVerts(vertices, Vector3.UnitY, Vector3.UnitX, Vector3.UnitZ);
+			WriteCubeFaceVerts(vertices, -Vector3.UnitY, Vector3.UnitX, -Vector3.UnitZ);
 
-			// +Y face
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, 1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, -1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, 1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, -1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
-
-			// -Y face
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, -1.0f), new Vector3(0.0f, -1.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, 1.0f), new Vector3(0.0f, -1.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, -1.0f), new Vector3(0.0f, -1.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, 1.0f), new Vector3(0.0f, -1.0f, 0.0f)));
-
-			// +Z face
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f)));
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f)));
-
-			// -Z face
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, -1.0f), new Vector3(0.0f, 0.0f, -1.0f)));
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, -1.0f), new Vector3(0.0f, 0.0f, -1.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, -1.0f), new Vector3(0.0f, 0.0f, -1.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, -1.0f), new Vector3(0.0f, 0.0f, -1.0f)));
+			WriteCubeFaceVerts(vertices, Vector3.UnitZ, -Vector3.UnitX, Vector3.UnitY);
+			WriteCubeFaceVerts(vertices, -Vector3.UnitZ, Vector3.UnitX, Vector3.UnitY);
 
 			// Generate indices.
 			int numIndices = 36;
@@ -62,8 +35,8 @@ namespace SRPRendering
 
 			for (int face = 0; face < 6; face++)
 			{
-				AddFace(indices, 4 * face + 0, 4 * face + 3, 4 * face + 1);
-				AddFace(indices, 4 * face + 0, 4 * face + 2, 4 * face + 3);
+				AddFace(indices, 4 * face + 0, 4 * face + 1, 4 * face + 3);
+				AddFace(indices, 4 * face + 0, 4 * face + 3, 4 * face + 2);
 			}
 
 			return new Mesh(device, vertices, SceneVertex.GetStride(), indices, InputElements);
@@ -77,18 +50,15 @@ namespace SRPRendering
 			int vertexBufferSize = SceneVertex.GetStride() * numVerts;
 			var vertices = new DataStream(vertexBufferSize, true, true);
 
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, 0.0f, 1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(-1.0f, 0.0f, -1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, 0.0f, 1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
-			vertices.Write(new SceneVertex(new Vector3(1.0f, 0.0f, -1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
+			WriteSquareVerts(vertices, Vector3.Zero, Vector3.UnitY, Vector3.UnitX, Vector3.UnitZ);
 
 			// Generate indices.
 			int numIndices = 6;
 			int indexBufferSize = numIndices * sizeof(Int16);
 			var indices = new DataStream(indexBufferSize, true, true);
 
-			AddFace(indices, 0, 3, 1);
-			AddFace(indices, 0, 2, 3);
+			AddFace(indices, 0, 1, 3);
+			AddFace(indices, 0, 3, 2);
 
 			return new Mesh(device, vertices, SceneVertex.GetStride(), indices, InputElements);
 		}
@@ -101,8 +71,8 @@ namespace SRPRendering
 			// sin/cos caches.
 			float[] sliceSin = new float[slices];
 			float[] sliceCos = new float[slices];
-			float[] stackSin = new float[stacks];
-			float[] stackCos = new float[stacks];
+			float[] stackSin = new float[stacks + 1];
+			float[] stackCos = new float[stacks + 1];
 
 			// Populate caches.
 			for (i = 0; i < slices; i++)
@@ -111,7 +81,7 @@ namespace SRPRendering
 				sliceSin[i] = (float)Math.Sin(theta);
 				sliceCos[i] = (float)Math.Cos(theta);
 			}
-			for (i = 0; i < stacks; i++)
+			for (i = 0; i <= stacks; i++)
 			{
 				double theta = Math.PI * (double)i / (double)stacks;
 				stackSin[i] = (float)Math.Sin(theta);
@@ -119,28 +89,26 @@ namespace SRPRendering
 			}
 
 			// Generate vertices.
-			int numVerts = (stacks - 1) * slices + 2;
+			int numVerts = (stacks + 1) * (slices + 1);
 			int vertexBufferSize = SceneVertex.GetStride() * numVerts;
 			var vertices = new DataStream(vertexBufferSize, true, true);
 
-			// +Y pole
-			WriteSphereVert(vertices, new Vector3(0.0f, 1.0f, 0.0f));
-
 			// Stacks
-			for (int j = 1; j < stacks; j++)
+			for (int j = 0; j <= stacks; j++)
 			{
-				for (i = 0; i < slices; i++)
+				float v = (float)j / (float)stacks;
+
+				for (i = 0; i <= slices; i++)
 				{
+					float u = (float)i / (float)slices;
 					WriteSphereVert(vertices, new Vector3(
-						sliceSin[i] * stackSin[j],
+						sliceSin[i % slices] * stackSin[j],
 						stackCos[j],
-						sliceCos[i] * stackSin[j]
-						));
+						sliceCos[i % slices] * stackSin[j]
+						),
+						new Vector2(u, v));
 				}
 			}
-
-			// -Y pole.
-			WriteSphereVert(vertices, new Vector3(0.0f, -1.0f, 0.0f));
 
 			// Generate indices.
 			int numIndices = 2 * (stacks - 1) * slices * 3;
@@ -148,36 +116,34 @@ namespace SRPRendering
 			var indices = new DataStream(indexBufferSize, true, true);
 
 			int rowA = 0;
-			int rowB = 1;
+			int rowB = rowA + slices + 1;
 
-			for (i = 0; i < slices - 1; i++)
-				AddFace(indices, rowA, rowB + i, rowB + i + 1);
-
-			AddFace(indices, rowA, rowB + i, rowB);
+			for (i = 0; i < slices; i++)
+			{
+				AddFace(indices, rowA + i, rowB + i, rowB + i + 1);
+			}
 
 			// Interior stacks.
 			for (int j = 1; j < stacks - 1; j++)
 			{
-				rowA = 1 + (j - 1) * slices;
-				rowB = rowA + slices;
+				rowA = j * (slices + 1);
+				rowB = rowA + slices + 1;
 
-				for (i = 0; i < slices - 1; i++)
+				for (i = 0; i < slices; i++)
 				{
 					AddFace(indices, rowA + i, rowB + i, rowA + i + 1);
 					AddFace(indices, rowA + i + 1, rowB + i, rowB + i + 1);
 				}
-				AddFace(indices, rowA, rowA + i, rowB + i);
-				AddFace(indices, rowA, rowB + i, rowB);
 			}
 
 			// -Z pole
-			rowA = 1 + (stacks - 2) * slices;
-			rowB = rowA + slices;
+			rowA = (stacks - 1) * (slices + 1);
+			rowB = rowA + slices + 1;
 
-			for (i = 0; i < slices - 1; i++)
-				AddFace(indices, rowA + i, rowB, rowA + i + 1);
-
-			AddFace(indices, rowA + i, rowB, rowA);
+			for (i = 0; i < slices; i++)
+			{
+				AddFace(indices, rowA + i, rowB + i, rowA + i + 1);
+			}
 
 			// Wrap up in a new mesh object.
 			return new Mesh(device, vertices, SceneVertex.GetStride(), indices, InputElements);
@@ -186,16 +152,32 @@ namespace SRPRendering
 		public static InputElement[] InputElements => SceneVertex.InputElements;
 
 		// Write a vertex for a sphere, which has a normal equal to its position.
-		private static void WriteSphereVert(DataStream stream, Vector3 position)
+		private static void WriteSphereVert(DataStream vertices, Vector3 position, Vector2 uv)
 		{
-			stream.Write(new SceneVertex(position, position));
+			vertices.Write(new SceneVertex(position, position, uv));
 		}
 
-		private static void AddFace(DataStream stream, int i0, int i1, int i2)
+		// Write 4 verts forming a square quad.
+		private static void WriteSquareVerts(DataStream vertices, Vector3 o, Vector3 n, Vector3 u, Vector3 v)
 		{
-			stream.Write((Int16)i0);
-			stream.Write((Int16)i1);
-			stream.Write((Int16)i2);
+			vertices.Write(new SceneVertex(o - u + v, n, new Vector2(0.0f, 0.0f)));
+			vertices.Write(new SceneVertex(o + u + v, n, new Vector2(1.0f, 0.0f)));
+			vertices.Write(new SceneVertex(o - u - v, n, new Vector2(0.0f, 1.0f)));
+			vertices.Write(new SceneVertex(o + u - v, n, new Vector2(1.0f, 1.0f)));
+		}
+
+		// Write 4 verts forming the face of a cube.
+		private static void WriteCubeFaceVerts(DataStream vertices, Vector3 n, Vector3 u, Vector3 v)
+		{
+			// Origin is the normal.
+			WriteSquareVerts(vertices, n, n, u, v);
+		}
+
+		private static void AddFace(DataStream indices, int i0, int i1, int i2)
+		{
+			indices.Write((Int16)i0);
+			indices.Write((Int16)i1);
+			indices.Write((Int16)i2);
 		}
 	}
 }
