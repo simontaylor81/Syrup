@@ -44,15 +44,29 @@ namespace ShaderEditorApp.ViewModel.Scene
 			// Create commands.
 			Commands = new[]
 			{
+				NamedCommand.CreateReactive("Add Cube", _ => AddCube()),
 				NamedCommand.CreateReactive("Add Sphere", _ => AddSphere()),
+				NamedCommand.CreateReactive("Add Plane", _ => AddPlane()),
 				NamedCommand.CreateReactive("Save", _ => scene.Save())
 			};
+		}
+
+		private void AddCube()
+		{
+			var cube = new SimplePrimitive(PrimitiveType.Cube);
+			Scene.AddPrimitive(cube);
 		}
 
 		private void AddSphere()
 		{
 			var sphere = new SpherePrimitive();
 			Scene.AddPrimitive(sphere);
+		}
+
+		private void AddPlane()
+		{
+			var plane = new SimplePrimitive(PrimitiveType.Plane);
+			Scene.AddPrimitive(plane);
 		}
 	}
 }
