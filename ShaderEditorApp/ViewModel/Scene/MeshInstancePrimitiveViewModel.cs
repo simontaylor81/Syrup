@@ -10,7 +10,7 @@ namespace ShaderEditorApp.ViewModel.Scene
 	{
 		private readonly MeshInstancePrimitive _mesh;
 
-		public override string DisplayName => "Mesh";
+		public override string DisplayName => "Mesh - " + _mesh.Mesh.Name;
 
 		public MeshInstancePrimitiveViewModel(MeshInstancePrimitive mesh)
 			: base(mesh)
