@@ -8,7 +8,9 @@ cbuffer vbConstants
 
 cbuffer psConstants
 {
-	float3		SolidColour = float3(1, 1, 0);		// Solid colour to render in.
+	float3	SolidColour = float3(1, 1, 0);		// Solid colour to render in.
+	float3	LightVector = float3(0, 1, 0);		// Light vector for directional light.
+	float3	Ambient = 0.1;
 }
 
 Texture2D DiffuseTex;
@@ -52,7 +54,13 @@ PSIn BasicVS(VSIn In)
 // Pixel shader for very simple solid colour rendering.
 float4 SolidColourPS(PSIn In) : SV_Target
 {
-	float3 colour = SolidColour * (dot(In.Normal, float3(0,1,0)) * 0.5 + 0.5);
+	// Ambient lighting
+	float lighting = Ambient * (dot(In.Normal, float3(0,1,0)) * 0.5 + 0.5);
+	
+	// Directional light (lambert).
+	lighting += dot(In.Normal, normalize(LightVector));
+	
+	float3 colour = SolidColour * lighting;
 	return float4(colour, 1.0f);
 }
 
