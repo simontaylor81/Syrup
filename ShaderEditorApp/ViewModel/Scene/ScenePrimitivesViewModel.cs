@@ -39,7 +39,7 @@ namespace ShaderEditorApp.ViewModel.Scene
 		{
 			Scene = scene;
 
-			_children = scene.Primitives.CreateDerivedCollection(prim => ScenePrimitiveViewModel.Create(prim));
+			_children = scene.Primitives.CreateDerivedCollection(prim => ScenePrimitiveViewModel.Create(prim, scene));
 
 			// Create commands.
 			Commands = new[]

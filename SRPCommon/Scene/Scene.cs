@@ -49,6 +49,11 @@ namespace SRPCommon.Scene
 			_primitives.Add(primitive);
 		}
 
+		public void RemovePrimitive(Primitive primitive)
+		{
+			_primitives.Remove(primitive);
+		}
+
 		private void InitObservables()
 		{
 			var primitiveChanged = _primitives.Changed									// When the primitive list changes...

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Windows.Input;
+using ShaderEditorApp.MVVMUtil;
 
 namespace ShaderEditorApp.ViewModel.Scene
 {
@@ -19,7 +20,7 @@ namespace ShaderEditorApp.ViewModel.Scene
 
 		public virtual string DisplayName => _primitive.Type.ToString();
 
-		public IEnumerable<ICommand> Commands => Enumerable.Empty<ICommand>();
+		public IEnumerable<ICommand> Commands { get; }
 
 		public IEnumerable<IUserProperty> UserProperties => _primitive.UserProperties;
 
@@ -32,23 +33,29 @@ namespace ShaderEditorApp.ViewModel.Scene
 
 		#endregion
 
-		public static ScenePrimitiveViewModel Create(Primitive primitive)
+		public static ScenePrimitiveViewModel Create(Primitive primitive, SRPCommon.Scene.Scene scene)
 		{
 			var mesh = primitive as MeshInstancePrimitive;
 
 			if (mesh != null)
 			{
-				return new MeshInstancePrimitiveViewModel(mesh);
+				return new MeshInstancePrimitiveViewModel(mesh, scene);
 			}
 			else
 			{
-				return new ScenePrimitiveViewModel(primitive);
+				return new ScenePrimitiveViewModel(primitive, scene);
 			}
 		}
 
-		protected ScenePrimitiveViewModel(Primitive primitive)
+		protected ScenePrimitiveViewModel(Primitive primitive, SRPCommon.Scene.Scene scene)
 		{
 			_primitive = primitive;
+
+			// Create commands.
+			Commands = new[]
+			{
+				NamedCommand.CreateReactive("Remove", _ => scene.RemovePrimitive(_primitive))
+			};
 		}
 	}
 }
