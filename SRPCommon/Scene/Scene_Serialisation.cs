@@ -34,10 +34,9 @@ namespace SRPCommon.Scene
 				var contents = File.ReadAllText(filename);
 				var result = JsonConvert.DeserializeObject<Scene>(contents, _serializerSettings);
 
-				result.filename = filename;
+				result._filename = filename;
 
 				result.PostLoad();
-				result.NotifyChanged();
 
 				Environment.CurrentDirectory = prevCurrentDir;
 				return result;
@@ -68,7 +67,7 @@ namespace SRPCommon.Scene
 		{
 			// Serialise and write to file.
 			var json = JsonConvert.SerializeObject(this, _serializerSettings);
-			File.WriteAllText(filename, json);
+			File.WriteAllText(_filename, json);
 		}
 
 		private void PostLoad()
@@ -86,6 +85,9 @@ namespace SRPCommon.Scene
 			// Call PostLoad on sub-objects.
 			Meshes.Values.ForEach(mesh => mesh.PostLoad());
 			Primitives.ForEach(mesh => mesh.PostLoad(this));
+
+			// ReactiveList resets its observales post-serialisation, so need to set ours up again.
+			InitObservables();
 		}
 	}
 

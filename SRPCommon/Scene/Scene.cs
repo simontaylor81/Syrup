@@ -14,53 +14,50 @@ namespace SRPCommon.Scene
 	[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 	public partial class Scene
 	{
-		public string Filename => filename;
-		public IEnumerable<Primitive> Primitives => primitives;
-		public IDictionary<string, SceneMesh> Meshes => meshes;
-		public IDictionary<string, Material> Materials => materials;
+		public string Filename => _filename;
+		public IEnumerable<Primitive> Primitives => _primitives;
+		public IDictionary<string, SceneMesh> Meshes => _meshes;
+		public IDictionary<string, Material> Materials => _materials;
 
 		// Array of lights. Purely for access by script, so just dynamic objects.
-		public IEnumerable<dynamic> Lights => lights;
+		public IEnumerable<dynamic> Lights => _lights;
 
 		// Observable that fires when something important changes in the scene.
-		public IObservable<Unit> OnChanged => _onChanged;
-		private Subject<Unit> _onChanged = new Subject<Unit>();
+		public IObservable<Unit> OnChanged { get; private set; }
+		
+		private string _filename;
 
-		// Subscription to primitives' OnChanged observables.
-		private IDisposable _onPrimitivesChangedSubscription;
+		[JsonProperty("primitives")]
+		private ReactiveList<Primitive> _primitives = new ReactiveList<Primitive>();
 
-		private string filename;
+		[JsonProperty("meshes")]
+		private Dictionary<string, SceneMesh> _meshes = new Dictionary<string, SceneMesh>();
 
-		[JsonProperty]
-		private ReactiveList<Primitive> primitives = new ReactiveList<Primitive>();
+		[JsonProperty("materials")]
+		private Dictionary<string, Material> _materials = new Dictionary<string, Material>();
 
-		[JsonProperty]
-		private Dictionary<string, SceneMesh> meshes = new Dictionary<string, SceneMesh>();
+		[JsonProperty("lights", ItemConverterType = typeof(JsonDynamicObjectConverter))]
+		private List<dynamic> _lights = new List<dynamic>();
 
-		[JsonProperty]
-		private Dictionary<string, Material> materials = new Dictionary<string, Material>();
-
-		[JsonProperty(ItemConverterType = typeof(JsonDynamicObjectConverter))]
-		private List<dynamic> lights = new List<dynamic>();
+		public Scene()
+		{
+			InitObservables();
+		}
 
 		public void AddPrimitive(Primitive primitive)
 		{
-			primitives.Add(primitive);
-			NotifyChanged();
+			_primitives.Add(primitive);
 		}
 
-		private void NotifyChanged()
+		private void InitObservables()
 		{
-			if (_onPrimitivesChangedSubscription != null)
-			{
-				_onPrimitivesChangedSubscription.Dispose();
-			}
+			var primitiveChanged = _primitives.Changed									// When the primitive list changes...
+				.Select(evt => _primitives)												// get the list of primitives...
+				.Select(primList => primList.Select(prim => prim.OnChanged).Merge())	// merge all the primitive notifications...
+				.Switch();                                                              // and take the most recent set.
 
-			var primitivesChanged = Observable.Merge(Primitives.Select(p => p.OnChanged));
-			_onPrimitivesChangedSubscription = primitivesChanged.Subscribe(_onChanged);
-
-			// Fire an event for this change itself.
-			_onChanged.OnNext(Unit.Default);
+			// We change when a primitive changes, or the primitive list changes.
+			OnChanged = Observable.Merge(primitiveChanged, _primitives.Changed.Select(_ => Unit.Default));
 		}
 	}
 }
