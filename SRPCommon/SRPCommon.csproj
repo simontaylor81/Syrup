@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Scene\Scene_Serialisation.cs" />
+    <Compile Include="Scene\SimplePrimitive.cs" />
     <Compile Include="UserProperties\IMatrixProperty.cs" />
     <Compile Include="UserProperties\IPropertySource.cs" />
     <Compile Include="Interfaces\IWorkspace.cs" />

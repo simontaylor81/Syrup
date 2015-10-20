@@ -113,6 +113,10 @@ namespace SRPCommon.Scene
 					return new SpherePrimitive();
 				case "MeshInstance":
 					return new MeshInstancePrimitive();
+				case "Cube":
+					return new SimplePrimitive(PrimitiveType.Cube);
+				case "Plane":
+					return new SimplePrimitive(PrimitiveType.Plane);
 			}
 
 			throw new JsonException("Unknown primitive type: " + type);

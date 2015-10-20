@@ -14,6 +14,8 @@ namespace SRPRendering
 		// Texture to use to indicate error when non is found.
 		Texture ErrorTexture { get; }
 
+		IDrawable CubeMesh { get; }
+		IDrawable PlaneMesh { get; }
 		IDrawable SphereMesh { get; }
 		IDrawable FullscreenQuad { get; }
 
@@ -34,6 +36,8 @@ namespace SRPRendering
 		// The resources themselves.
 		public Texture ErrorTexture { get; }
 
+		public IDrawable CubeMesh { get; }
+		public IDrawable PlaneMesh { get; }
 		public IDrawable SphereMesh { get; }
 		public IDrawable FullscreenQuad { get; }
 
@@ -57,6 +61,14 @@ namespace SRPRendering
 			disposables.Add(ErrorTexture);
 
 			// Create simple utility meshes.
+			var cubeMesh = BasicMesh.CreateCube(device);
+			CubeMesh = cubeMesh;
+			disposables.Add(cubeMesh);
+
+			var planeMesh = BasicMesh.CreatePlane(device);
+			PlaneMesh = planeMesh;
+			disposables.Add(planeMesh);
+
 			var sphereMesh = BasicMesh.CreateSphere(device, 12, 6);
 			SphereMesh = sphereMesh;
 			disposables.Add(sphereMesh);

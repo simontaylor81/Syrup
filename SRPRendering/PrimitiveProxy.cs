@@ -26,7 +26,7 @@ namespace SRPRendering
 		public Matrix LocalToWorld => primitive.LocalToWorld;
 		public Material Material => primitive.Material;
 
-		public PrimitiveProxy(Primitive primitive, Mesh mesh, IRenderScene scene)
+		public PrimitiveProxy(Primitive primitive, IDrawable mesh, IRenderScene scene)
 		{
 			this.primitive = primitive;
 			this.Mesh = mesh;

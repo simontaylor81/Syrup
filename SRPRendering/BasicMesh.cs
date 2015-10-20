@@ -11,6 +11,89 @@ namespace SRPRendering
 	// Methods for creation of basic meshes.
 	class BasicMesh
 	{
+		// Create a cube with corners at 1 (side length 2).
+		public static Mesh CreateCube(SlimDX.Direct3D11.Device device)
+		{
+			// Generate vertices.
+			int numVerts = 24;
+			int vertexBufferSize = SceneVertex.GetStride() * numVerts;
+			var vertices = new DataStream(vertexBufferSize, true, true);
+
+			// +X face
+			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, -1.0f), new Vector3(1.0f, 0.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, 1.0f), new Vector3(1.0f, 0.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, -1.0f), new Vector3(1.0f, 0.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, 1.0f), new Vector3(1.0f, 0.0f, 0.0f)));
+
+			// -X face
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, 1.0f), new Vector3(-1.0f, 0.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, -1.0f), new Vector3(-1.0f, 0.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, 1.0f), new Vector3(-1.0f, 0.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, -1.0f), new Vector3(-1.0f, 0.0f, 0.0f)));
+
+			// +Y face
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, 1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, -1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, 1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, -1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
+
+			// -Y face
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, -1.0f), new Vector3(0.0f, -1.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, 1.0f), new Vector3(0.0f, -1.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, -1.0f), new Vector3(0.0f, -1.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, 1.0f), new Vector3(0.0f, -1.0f, 0.0f)));
+
+			// +Z face
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f)));
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, 1.0f), new Vector3(0.0f, 0.0f, 1.0f)));
+
+			// -Z face
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, 1.0f, -1.0f), new Vector3(0.0f, 0.0f, -1.0f)));
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, -1.0f, -1.0f), new Vector3(0.0f, 0.0f, -1.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, 1.0f, -1.0f), new Vector3(0.0f, 0.0f, -1.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, -1.0f, -1.0f), new Vector3(0.0f, 0.0f, -1.0f)));
+
+			// Generate indices.
+			int numIndices = 36;
+			int indexBufferSize = numIndices * sizeof(Int16);
+			var indices = new DataStream(indexBufferSize, true, true);
+
+			for (int face = 0; face < 6; face++)
+			{
+				AddFace(indices, 4 * face + 0, 4 * face + 3, 4 * face + 1);
+				AddFace(indices, 4 * face + 0, 4 * face + 2, 4 * face + 3);
+			}
+
+			return new Mesh(device, vertices, SceneVertex.GetStride(), indices, InputElements);
+		}
+
+		// Create single square face in the XZ plane with corners at 1 (edge length 2).
+		public static Mesh CreatePlane(SlimDX.Direct3D11.Device device)
+		{
+			// Generate vertices.
+			int numVerts = 4;
+			int vertexBufferSize = SceneVertex.GetStride() * numVerts;
+			var vertices = new DataStream(vertexBufferSize, true, true);
+
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, 0.0f, 1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(-1.0f, 0.0f, -1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, 0.0f, 1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
+			vertices.Write(new SceneVertex(new Vector3(1.0f, 0.0f, -1.0f), new Vector3(0.0f, 1.0f, 0.0f)));
+
+			// Generate indices.
+			int numIndices = 6;
+			int indexBufferSize = numIndices * sizeof(Int16);
+			var indices = new DataStream(indexBufferSize, true, true);
+
+			AddFace(indices, 0, 3, 1);
+			AddFace(indices, 0, 2, 3);
+
+			return new Mesh(device, vertices, SceneVertex.GetStride(), indices, InputElements);
+		}
+
+		// Create a sphere with radius 1.
 		public static Mesh CreateSphere(SlimDX.Direct3D11.Device device, int slices, int stacks)
 		{
 			int i;

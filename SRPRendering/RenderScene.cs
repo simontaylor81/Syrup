@@ -93,18 +93,28 @@ namespace SRPRendering
 		private PrimitiveProxy CreateProxy(Primitive primitive)
 		{
 			PrimitiveProxy result = null;
-			Mesh mesh = null;
+			IDrawable mesh = null;
 
-			var meshInstance = primitive as MeshInstancePrimitive;
-			var sphere = primitive as SpherePrimitive;
 
-			if (meshInstance?.Mesh != null)
+			switch (primitive.Type)
 			{
-				mesh = _meshCache.GetForSceneMesh(meshInstance.Mesh);
-			}
-			else if (sphere != null)
-			{
-				mesh = _meshCache.GetForSphere(sphere.Slices, sphere.Stacks);
+				case PrimitiveType.MeshInstance:
+					var meshInstance = (MeshInstancePrimitive)primitive;
+					mesh = _meshCache.GetForSceneMesh(meshInstance.Mesh);
+					break;
+
+				case PrimitiveType.Sphere:
+					var sphere = (SpherePrimitive)primitive;
+					mesh = _meshCache.GetForSphere(sphere.Slices, sphere.Stacks);
+					break;
+
+				case PrimitiveType.Cube:
+					mesh = _globalResources.CubeMesh;
+					break;
+
+				case PrimitiveType.Plane:
+					mesh = _globalResources.PlaneMesh;
+					break;
 			}
 
 			if (mesh != null)

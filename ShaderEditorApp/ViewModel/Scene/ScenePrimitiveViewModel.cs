@@ -11,13 +11,13 @@ using System.Windows.Input;
 
 namespace ShaderEditorApp.ViewModel.Scene
 {
-	abstract class ScenePrimitiveViewModel : ReactiveObject, IHierarchicalBrowserNodeViewModel
+	class ScenePrimitiveViewModel : ReactiveObject, IHierarchicalBrowserNodeViewModel
 	{
 		private readonly Primitive _primitive;
 
 		#region IHierarchicalBrowserNodeViewModel interface
 
-		public abstract string DisplayName { get; }
+		public virtual string DisplayName => _primitive.Type.ToString();
 
 		public IEnumerable<ICommand> Commands => Enumerable.Empty<ICommand>();
 
@@ -35,17 +35,15 @@ namespace ShaderEditorApp.ViewModel.Scene
 		public static ScenePrimitiveViewModel Create(Primitive primitive)
 		{
 			var mesh = primitive as MeshInstancePrimitive;
-			var sphere = primitive as SpherePrimitive;
 
 			if (mesh != null)
 			{
 				return new MeshInstancePrimitiveViewModel(mesh);
 			}
-			else if (sphere != null)
+			else
 			{
-				return new SpherePrimitiveViewModel(sphere);
+				return new ScenePrimitiveViewModel(primitive);
 			}
-			throw new ArgumentException("Unknown primitive type");
 		}
 
 		protected ScenePrimitiveViewModel(Primitive primitive)

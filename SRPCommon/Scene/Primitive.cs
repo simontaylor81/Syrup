@@ -18,6 +18,8 @@ namespace SRPCommon.Scene
 	{
 		MeshInstance,
 		Sphere,
+		Cube,
+		Plane,
 	}
 
 	[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
