@@ -180,6 +180,8 @@
     <Compile Include="ViewModel\ScalarPropertyViewModel.cs" />
     <Compile Include="ViewModel\Scene\MeshInstancePrimitiveViewModel.cs" />
     <Compile Include="ViewModel\Scene\SceneItemViewModel.cs" />
+    <Compile Include="ViewModel\Scene\SceneMaterialsViewModel.cs" />
+    <Compile Include="ViewModel\Scene\SceneMaterialViewModel.cs" />
     <Compile Include="ViewModel\Scene\ScenePrimitivesViewModel.cs" />
     <Compile Include="ViewModel\Scene\ScenePrimitiveViewModel.cs" />
     <Compile Include="ViewModel\Scene\SceneViewModel.cs" />

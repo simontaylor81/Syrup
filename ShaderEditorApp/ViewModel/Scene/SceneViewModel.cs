@@ -23,8 +23,7 @@ namespace ShaderEditorApp.ViewModel.Scene
 
 		#region IHierarchicalBrowserRootViewModel interface
 
-		private readonly IHierarchicalBrowserNodeViewModel[] _rootNodes;
-		public IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes => _rootNodes;
+		public IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes { get; }
 
 		private IHierarchicalBrowserNodeViewModel _activeItem;
 		public IHierarchicalBrowserNodeViewModel ActiveItem
@@ -37,7 +36,11 @@ namespace ShaderEditorApp.ViewModel.Scene
 
 		public SceneViewModel(SRPCommon.Scene.Scene scene)
 		{
-			_rootNodes = new[] { new ScenePrimitivesViewModel(scene) };
+			RootNodes = new IHierarchicalBrowserNodeViewModel[]
+			{
+				new ScenePrimitivesViewModel(scene),
+				new SceneMaterialsViewModel(scene)
+			};
 
 			_properties = this.WhenAny(x => x.ActiveItem, change => change.Value)
 				.Where(node => node != null)
