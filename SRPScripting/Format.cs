@@ -50,7 +50,7 @@ namespace SRPScripting
 			}
 		}
 
-		private static FormatProperties[] formatProps = new[] 
+		private static FormatProperties[] formatProps =
 			{
 				new FormatProperties(16, 4),	// R32G32B32A32_Float
 				new FormatProperties(12, 3),	// R32G32B32_Float
