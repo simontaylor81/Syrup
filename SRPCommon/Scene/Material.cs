@@ -4,6 +4,8 @@ using System.Linq;
 using SlimDX;
 using Newtonsoft.Json;
 using SRPCommon.UserProperties;
+using System.Reactive;
+using System.Reactive.Linq;
 
 namespace SRPCommon.Scene
 {
@@ -18,6 +20,9 @@ namespace SRPCommon.Scene
 
 		private List<IUserProperty> _userProperties = new List<IUserProperty>();
 		public IEnumerable<IUserProperty> UserProperties => _userProperties;
+
+		// Observable that fires when something important changes in the primitive.
+		public IObservable<Unit> OnChanged { get; private set; }
 
 		[JsonProperty("vectorParams")]
 		private Dictionary<string, Vector4> vectorParameters = new Dictionary<string, Vector4>();
@@ -34,6 +39,8 @@ namespace SRPCommon.Scene
 				)
 				.ToList();
 
+			// We change whenever our properties change.
+			OnChanged = Observable.Merge(UserProperties);
 		}
 	}
 }

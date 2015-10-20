@@ -61,8 +61,16 @@ namespace SRPCommon.Scene
 				.Select(primList => primList.Select(prim => prim.OnChanged).Merge())	// merge all the primitive notifications...
 				.Switch();                                                              // and take the most recent set.
 
-			// We change when a primitive changes, or the primitive list changes.
-			OnChanged = Observable.Merge(primitiveChanged, _primitives.Changed.Select(_ => Unit.Default));
+			// Materials currently can't be added or removed, so they're simpler.
+			var materialChanged = _materials.Values
+				.Select(mat => mat.OnChanged)
+				.Merge();
+
+			// We change when a primitive changes, the primitive list changes, or a material changes.
+			OnChanged = Observable.Merge(
+				primitiveChanged,
+				_primitives.Changed.Select(_ => Unit.Default),
+				materialChanged);
 		}
 	}
 }
