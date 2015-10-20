@@ -1,9 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project DefaultScene="/balls.srpscene">
   <folder name="root">
-    <include filename="pbr.py" runAtStartup="false" />
+    <include filename="pbr.py" runAtStartup="true" />
     <include filename="pbr.hlsl" runAtStartup="false" />
     <include filename="balls.srpscene" runAtStartup="false" />
   </folder>
-  <OpenDocuments />
+  <OpenDocuments>
+    <OpenDocument path="C:\GitHub\Syrup\Samples\PBR\pbr.hlsl" />
+    <OpenDocument path="C:\GitHub\Syrup\Samples\PBR\pbr.py" />
+  </OpenDocuments>
 </project>

@@ -1,1 +1,50 @@
-{}
+{
+  "primitives": [
+    {
+      "type": "Plane",
+      "position": "0, 0, 0",
+      "scale": "10, 1, 10",
+      "rotation": "0, 0, 0",
+      "material": null
+    },
+    {
+      "type": "Sphere",
+      "stacks": 6,
+      "slices": 12,
+      "position": "2, 1, 2",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": null
+    },
+    {
+      "type": "Sphere",
+      "stacks": 6,
+      "slices": 12,
+      "position": "-2, 1, 2",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": null
+    },
+    {
+      "type": "Sphere",
+      "stacks": 6,
+      "slices": 12,
+      "position": "2, 1, -2",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": null
+    },
+    {
+      "type": "Sphere",
+      "stacks": 6,
+      "slices": 12,
+      "position": "-2, 1, -2",
+      "scale": "1, 1, 1",
+      "rotation": "0, 0, 0",
+      "material": null
+    }
+  ],
+  "meshes": {},
+  "materials": {},
+  "lights": []
+}
