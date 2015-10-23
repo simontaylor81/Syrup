@@ -7,11 +7,11 @@ backgroundVs = ri.LoadShader("background.hlsl", "VS", "vs_4_0")
 backgroundPs = ri.LoadShader("background.hlsl", "PS", "ps_4_0")
 
 ri.BindShaderVariableToMaterial(ps, "SolidColour", "DiffuseColour")
-ri.BindShaderResourceToMaterial(ps, "CubeTex", "Env")
 
 # Load environment cubemap.
 envmap = ri.LoadTexture("assets/Arches_E_PineTree_Cube.dds")
 ri.SetShaderResourceVariable(backgroundPs, "EnvCube", envmap)
+ri.SetShaderResourceVariable(ps, "EnvCube", envmap)
 
 def RenderFrame(context):
 	context.Clear((0.5, 0.5, 1.0, 0))

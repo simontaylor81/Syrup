@@ -9,8 +9,8 @@
     },
     {
       "type": "Sphere",
-      "stacks": 6,
-      "slices": 12,
+      "stacks": 12,
+      "slices": 24,
       "position": "2, 1, 2",
       "scale": "1, 1, 1",
       "rotation": "0, 0, 0",
@@ -18,8 +18,8 @@
     },
     {
       "type": "Sphere",
-      "stacks": 6,
-      "slices": 12,
+      "stacks": 12,
+      "slices": 24,
       "position": "-2, 1, 2",
       "scale": "1, 1, 1",
       "rotation": "0, 0, 0",
@@ -27,8 +27,8 @@
     },
     {
       "type": "Sphere",
-      "stacks": 6,
-      "slices": 12,
+      "stacks": 12,
+      "slices": 24,
       "position": "2, 1, -2",
       "scale": "1, 1, 1",
       "rotation": "0, 0, 0",
@@ -36,8 +36,8 @@
     },
     {
       "type": "Sphere",
-      "stacks": 6,
-      "slices": 12,
+      "stacks": 12,
+      "slices": 24,
       "position": "-2, 1, -2",
       "scale": "1, 1, 1",
       "rotation": "0, 0, 0",
