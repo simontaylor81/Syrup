@@ -46,9 +46,9 @@ namespace ShaderEditorApp.Workspace
 		}
 
 		// Save the file to disk.
-		public void Save()
+		public bool Save()
 		{
-			if (!String.IsNullOrEmpty(FilePath))
+			if (!string.IsNullOrEmpty(FilePath))
 			{
 				// Disable file change notifications -- don't want to reload if we saved it ourselves!
 				watcher.EnableRaisingEvents = false;
@@ -60,28 +60,33 @@ namespace ShaderEditorApp.Workspace
 
 				// Re-enable the watcher.
 				watcher.EnableRaisingEvents = true;
+				return true;
 			}
 			else
 			{
-				SaveAs();
+				return SaveAs();
 			}
 		}
 
 		// Prompt the use for a new filename under which to save the file.
-		public void SaveAs()
+		public bool SaveAs()
 		{
 			var dialog = new SaveFileDialog();
 			dialog.Filter = "All files|*.*";
 
-			if (!String.IsNullOrEmpty(FilePath))
+			if (!string.IsNullOrEmpty(FilePath))
+			{
 				dialog.InitialDirectory = Path.GetDirectoryName(FilePath);
+			}
 
 			var result = dialog.ShowDialog();
 			if (result == true)
 			{
 				FilePath = dialog.FileName;
-				Save();
+				return Save();
 			}
+
+			return false;
 		}
 
 		protected override void OnDispose()
@@ -170,6 +175,8 @@ namespace ShaderEditorApp.Workspace
 			}
 		}
 
+		public bool IsScript => Path.GetExtension(FilePath).ToLowerInvariant() == ".py";
+		
 		// Position of caret in the editor.
 		public int CaretPosition { get; set; }
 

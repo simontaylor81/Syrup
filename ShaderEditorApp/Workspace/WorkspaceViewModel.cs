@@ -222,19 +222,29 @@ namespace ShaderEditorApp.Workspace
 			}
 		}
 
-		private async void RunActiveScript()
+		private void RunActiveScript()
 		{
-			if (ActiveDocument != null)
+			// Save all so we running the latest contents.
+			if (!SaveAllDirty())
 			{
-				// Asynchronously execute the script.
-				await scripting.RunScript(ActiveDocument.Contents);
+				// Save failed (likely Save As cancelled). Abort.
+				return;
+			}
 
-				RedrawViewports();
+			if (ActiveDocument != null && ActiveDocument.IsScript)
+			{
+				RunScriptFile(ActiveDocument.FilePath);
+			}
+			else if (_lastRunScriptFile != null)
+			{
+				RunScriptFile(_lastRunScriptFile);
 			}
 		}
 
 		internal async void RunScriptFile(string path)
 		{
+			_lastRunScriptFile = path;
+
 			// Asynchronously execute the script.
 			await scripting.RunScriptFromFile(path);
 
@@ -453,15 +463,19 @@ namespace ShaderEditorApp.Workspace
 		}
 
 		// Save all dirty documents.
-		private void SaveAllDirty()
+		private bool SaveAllDirty()
 		{
+			var result = true;
+
 			foreach (var document in Documents)
 			{
 				if (document.IsDirty)
 				{
-					document.Save();
+					result = document.Save() & result;
 				}
 			}
+
+			return result;
 		}
 
 		// Viewport view model that contains settings for the viewport (e.g. camera mode).
@@ -475,6 +489,9 @@ namespace ShaderEditorApp.Workspace
 
 		private Scene currentScene;
 		private IDisposable sceneChangeSubscription;
+
+		// Script file that was last run.
+		private string _lastRunScriptFile;
 
 		// TODO: Multiple viewports.
 		// TODO: Move info needed?
