@@ -8,8 +8,9 @@ cbuffer vbConstants
 
 cbuffer psConstants
 {
-	float3	SolidColour = float3(1, 1, 0);		// Solid colour to render in.
-	float3	LightVector = float3(0, 1, 0);		// Light vector for directional light.
+	float3	BaseColour = float3(0.4, 0.5, 0.1);		// Solid colour to render in.
+	float3	DirLightVector = float3(1, 1, 0);	// Light vector for directional light.
+	float3 	DirLightColour = float3(1, 1, 1);
 	float	Ambient = 0.1;
 	
 	float3 CameraPosition;
@@ -39,6 +40,8 @@ struct PSIn
 	float4 Pos : SV_Position;
 };
 
+#include "lighting.hlsl"
+
 // Very basic vertex shader.
 PSIn BasicVS(VSIn In)
 {
@@ -58,22 +61,21 @@ PSIn BasicVS(VSIn In)
 // Pixel shader for very simple solid colour rendering.
 float4 SolidColourPS(PSIn In) : SV_Target
 {
-	float3 N = In.Normal;
+	float3 N = normalize(In.Normal);
 	float3 V = normalize(CameraPosition - In.WorldPos);
 	float3 R = 2 * dot(N, V) * N - V;
 
 	// Ambient lighting
-	float lighting = Ambient * (dot(In.Normal, float3(0,1,0)) * 0.5 + 0.5);
+	float3 lighting = Ambient * (dot(In.Normal, float3(0,1,0)) * 0.5 + 0.5);
 	
 	// Directional light (lambert).
-	lighting += dot(In.Normal, normalize(LightVector));
+	//lighting += dot(In.Normal, normalize(LightVector));
 	
-	float3 env = EnvCube.Sample(mySampler, R).rgb;
+	lighting += DirectionalLight(N, normalize(DirLightVector), V, DirLightColour);
 	
-	float3 colour = SolidColour * lighting + env;
-	//return float4(colour, 1.0f);
+	//float3 env = EnvCube.Sample(mySampler, R).rgb;
 	
-	return float4(env, 1.0f);
+	return float4(lighting, 1.0f);
 }
 
 // Pixel shader for simple textured rendering

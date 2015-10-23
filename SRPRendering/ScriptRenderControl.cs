@@ -325,6 +325,8 @@ namespace SRPRendering
 
 		public void Dispose()
 		{
+			Reset();
+
 			disposables.Dispose();
 
 			inputLayoutCache.Dispose();
