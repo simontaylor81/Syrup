@@ -452,6 +452,18 @@ namespace ShaderEditorApp.Workspace
 			OnPropertyChanged("Properties");
 		}
 
+		// Save all dirty documents.
+		private void SaveAllDirty()
+		{
+			foreach (var document in Documents)
+			{
+				if (document.IsDirty)
+				{
+					document.Save();
+				}
+			}
+		}
+
 		// Viewport view model that contains settings for the viewport (e.g. camera mode).
 		private ViewportViewModel viewportViewModel = new ViewportViewModel();
 		public ViewportViewModel ViewportViewModel => viewportViewModel;
@@ -542,6 +554,12 @@ namespace ShaderEditorApp.Workspace
 			=> NamedCommand.LazyInit(ref runActiveScriptCmd, "Run Current Script",
 				param => RunActiveScript(),
 				param => IsActiveScript());
+
+		// Command to save all (dirty) open documents.
+		private NamedCommand saveAllCmd;
+		public NamedCommand SaveAllCmd
+			=> NamedCommand.LazyInit(ref saveAllCmd, "Save All",
+				param => SaveAllDirty());
 
 		#endregion
 	}

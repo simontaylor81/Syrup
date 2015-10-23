@@ -53,6 +53,7 @@
         <KeyBinding Key="N" Modifiers="Control+Shift" Command="{Binding NewProjectCmd}"/>
         <KeyBinding Key="F4" Modifiers="Control" Command="{Binding CloseActiveDocumentCmd}"/>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveActiveDocumentCmd}"/>
+        <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAllCmd}"/>
     </Window.InputBindings>
 
     <Grid>
@@ -73,6 +74,7 @@
                     <MenuItem Command="{Binding OpenDocumentCmd}" Header="Document" InputGestureText="Ctrl+O"/>
                 </MenuItem>
                 <MenuItem Command="{Binding SaveActiveDocumentCmd}" Header="{Binding SaveActiveDocumentCmd.Name}" InputGestureText="Ctrl+S"/>
+                <MenuItem Command="{Binding SaveAllCmd}" Header="{Binding SaveAllCmd.Name}" InputGestureText="Ctrl+Shift+S"/>
                 <MenuItem Command="{Binding SaveActiveDocumentAsCmd}" Header="{Binding SaveActiveDocumentAsCmd.Name}"/>
                 <MenuItem Command="{Binding CloseActiveDocumentCmd}" Header="{Binding CloseActiveDocumentCmd.Name}" InputGestureText="Ctrl+F4"/>     <!-- TODO: Make InputGestureText generic. -->
                 <MenuItem Header="Exit"/>
