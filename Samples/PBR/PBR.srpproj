@@ -4,9 +4,11 @@
     <include filename="pbr.py" runAtStartup="true" />
     <include filename="pbr.hlsl" runAtStartup="false" />
     <include filename="balls.srpscene" runAtStartup="false" />
+    <include filename="background.hlsl" runAtStartup="false" />
   </folder>
   <OpenDocuments>
     <OpenDocument path="C:\GitHub\Syrup\Samples\PBR\pbr.hlsl" />
     <OpenDocument path="C:\GitHub\Syrup\Samples\PBR\pbr.py" />
+    <OpenDocument path="C:\GitHub\Syrup\Samples\PBR\background.hlsl" />
   </OpenDocuments>
 </project>
