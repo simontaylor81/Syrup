@@ -30,5 +30,10 @@ namespace SRPTests.TestRenderer
 			}
 			return null;
 		}
+
+		public string GetAbsolutePath(string path)
+		{
+			return path;
+		}
 	}
 }

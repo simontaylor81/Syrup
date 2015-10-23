@@ -280,6 +280,16 @@ namespace ShaderEditorApp.Workspace
 			return shaderFileItem != null ? shaderFileItem.AbsolutePath : null;
 		}
 
+		// Given an absolute or project-relative path, get an absolute path.
+		public string GetAbsolutePath(string path)
+		{
+			if (Path.IsPathRooted(path))
+			{
+				return path;
+			}
+			return Path.Combine(project_.BasePath, path);
+		}
+
 		private ObservableCollection<DocumentViewModel> documents;
 		public ReadOnlyObservableCollection<DocumentViewModel> Documents { get; }
 

@@ -27,6 +27,8 @@ namespace SRPRendering
 			return src.CreateTexture2D(width, height, format, contents);
 		}
 
+		public object LoadTexture(string path) => src.LoadTexture(path);
+
 		public void BindShaderVariable(dynamic shader, string var, ShaderVariableBindSource source)
 		{
 			src.BindShaderVariable(shader, var, source);

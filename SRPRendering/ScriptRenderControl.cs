@@ -316,6 +316,13 @@ namespace SRPRendering
 			return new TextureHandle(textures.Count - 1);
 		}
 
+		// Load a texture from disk.
+		public object LoadTexture(string path)
+		{
+			textures.Add(Texture.LoadFromFile(device, workspace.GetAbsolutePath(path)));
+			return new TextureHandle(textures.Count - 1);
+		}
+
 		public void Dispose()
 		{
 			disposables.Dispose();

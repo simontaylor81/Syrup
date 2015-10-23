@@ -15,5 +15,8 @@ namespace SRPCommon.Interfaces
 		/// <param name="name">Filename (without path) of the file to find.</param>
 		/// <returns>The absolute path of the file if found, null otherwise.</returns>
 		string FindProjectFile(string name);
+
+		// Given an absolute or project-relative path, get an absolute path.
+		string GetAbsolutePath(string path);
 	}
 }
