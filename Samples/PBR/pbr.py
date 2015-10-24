@@ -1,10 +1,10 @@
 from SRPScripting import *
 
-vs = ri.LoadShader("pbr.hlsl", "BasicVS", "vs_4_0")
-ps = ri.LoadShader("pbr.hlsl", "SolidColourPS", "ps_4_0")
+vs = ri.CompileShader("pbr.hlsl", "BasicVS", "vs_4_0")
+ps = ri.CompileShader("pbr.hlsl", "SolidColourPS", "ps_4_0")
 
-backgroundVs = ri.LoadShader("background.hlsl", "VS", "vs_4_0")
-backgroundPs = ri.LoadShader("background.hlsl", "PS", "ps_4_0")
+backgroundVs = ri.CompileShader("background.hlsl", "VS", "vs_4_0")
+backgroundPs = ri.CompileShader("background.hlsl", "PS", "ps_4_0")
 
 ri.BindShaderVariableToMaterial(ps, "SolidColour", "DiffuseColour")
 

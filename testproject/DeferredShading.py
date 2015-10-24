@@ -2,10 +2,10 @@ from SRPScripting import *
 import random
 
 # Compile shaders for base and deferred passes.
-basepassVS = ri.LoadShader("DeferredShading.hlsl", "BasePass_VS", "vs_4_0")
-basepassPS = ri.LoadShader("DeferredShading.hlsl", "BasePass_PS", "ps_4_0")
-deferredVS = ri.LoadShader("DeferredShading.hlsl", "DeferredPass_VS", "vs_4_0")
-deferredPS = ri.LoadShader("DeferredShading.hlsl", "DeferredPass_PS", "ps_4_0")
+basepassVS = ri.CompileShader("DeferredShading.hlsl", "BasePass_VS", "vs_4_0")
+basepassPS = ri.CompileShader("DeferredShading.hlsl", "BasePass_PS", "ps_4_0")
+deferredVS = ri.CompileShader("DeferredShading.hlsl", "DeferredPass_VS", "vs_4_0")
+deferredPS = ri.CompileShader("DeferredShading.hlsl", "DeferredPass_PS", "ps_4_0")
 
 # Create g-buffer render targets.
 albedoRT = ri.CreateRenderTarget()

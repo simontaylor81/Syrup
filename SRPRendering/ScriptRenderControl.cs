@@ -132,7 +132,7 @@ namespace SRPRendering
 
 		// IScriptRenderInterface implementation.
 
-		public object LoadShader(string filename, string entryPoint, string profile)
+		public object CompileShader(string filename, string entryPoint, string profile)
 		{
 			var path = FindShader(filename);
 			if (!File.Exists(path))

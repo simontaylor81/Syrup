@@ -1,11 +1,11 @@
 from SRPScripting import *
 import random
 
-vs = ri.LoadShader("Lights.hlsl", "VSMain", "vs_4_0")
-ps = ri.LoadShader("Lights.hlsl", "ForwardLightPS", "ps_4_0")
+vs = ri.CompileShader("Lights.hlsl", "VSMain", "vs_4_0")
+ps = ri.CompileShader("Lights.hlsl", "ForwardLightPS", "ps_4_0")
 
-copytexVS = ri.LoadShader("CopyTex.hlsl", "CopyTex_VS", "vs_4_0")
-copytexPS = ri.LoadShader("CopyTex.hlsl", "CopyTex_PS", "ps_4_0")
+copytexVS = ri.CompileShader("CopyTex.hlsl", "CopyTex_VS", "vs_4_0")
+copytexPS = ri.CompileShader("CopyTex.hlsl", "CopyTex_PS", "ps_4_0")
 
 rt = ri.CreateRenderTarget()
 

@@ -12,9 +12,9 @@ namespace SRPRendering
 	// It basically just calls back to the ScriptRenderControl that created it.
 	public class ScriptRenderInterface : IRenderInterface
 	{
-		public object LoadShader(string filename, string entryPoint, string profile)
+		public object CompileShader(string filename, string entryPoint, string profile)
 		{
-			return src.LoadShader(filename, entryPoint, profile);
+			return src.CompileShader(filename, entryPoint, profile);
 		}
 
 		public object CreateRenderTarget()

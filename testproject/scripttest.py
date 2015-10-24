@@ -1,9 +1,9 @@
 from SRPScripting import *
 import random
 
-vs = ri.LoadShader("BasicShaders.hlsl", "BasicVS", "vs_4_0")
-ps = ri.LoadShader("BasicShaders.hlsl", "SolidColourPS", "ps_4_0")
-psTex = ri.LoadShader("BasicShaders.hlsl", "TexturedPS", "ps_4_0")
+vs = ri.CompileShader("BasicShaders.hlsl", "BasicVS", "vs_4_0")
+ps = ri.CompileShader("BasicShaders.hlsl", "SolidColourPS", "ps_4_0")
+psTex = ri.CompileShader("BasicShaders.hlsl", "TexturedPS", "ps_4_0")
 
 def func(x, y):
 	return (random.random(), random.random(), random.random(), random.random())
