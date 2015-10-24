@@ -12,7 +12,8 @@ namespace SRPRendering
 {
 	public interface IShaderCache : IDisposable
 	{
-		IShader GetShader(string filename, string entryPoint, string profile, Func<string, string> includeLookup);
+		IShader GetShader(string filename, string entryPoint, string profile,
+			Func<string, string> includeLookup, ShaderMacro[] defines);
 	}
 
 	// Simple cache to avoid recompiling shaders every execution if they haven't changed.
@@ -32,14 +33,11 @@ namespace SRPRendering
 			cache.Clear();
 		}
 
-		public IShader GetShader(string filename, string entryPoint, string profile, Func<string, string> includeLookup)
+		public IShader GetShader(string filename, string entryPoint, string profile,
+			Func<string, string> includeLookup, ShaderMacro[] defines)
 		{
-			// Read the file and compute its hash.
-			// TODO: Hash include files as well
-			//var hash = ComputeHash(filename);
-
 			// Look in the dictionary to see if we already have this file.
-			var key = new ShaderCacheKey(filename, entryPoint, profile);
+			var key = new ShaderCacheKey(filename, entryPoint, profile, defines);
 			ShaderCacheEntry existingEntry;
 			if (cache.TryGetValue(key, out existingEntry))
 			{
@@ -66,7 +64,7 @@ namespace SRPRendering
 
 			// If we go this far, either the shader is not present or had a hash mismatch,
 			// so, we compile a new shader.
-			var shader = new Shader(device, filename, entryPoint, profile, includeLookup);
+			var shader = new Shader(device, filename, entryPoint, profile, includeLookup, defines);
 			cache[key] = new ShaderCacheEntry(shader, ComputeHash(shader.IncludedFiles.StartWith(filename)));
 
 			return shader;
@@ -106,11 +104,12 @@ namespace SRPRendering
 
 	struct ShaderCacheKey
 	{
-		public ShaderCacheKey(string filename, string entryPoint, string profile)
+		public ShaderCacheKey(string filename, string entryPoint, string profile, ShaderMacro[] defines)
 		{
 			this.filename = filename;
 			this.entryPoint = entryPoint;
 			this.profile = profile;
+			this.defines = defines;
 		}
 
 		// Override equality and hash functions to semantic filename comparisons.
@@ -121,20 +120,28 @@ namespace SRPRendering
 			return
 				entryPoint == other.entryPoint &&
 				profile == other.profile &&
-				String.Equals(
+				string.Equals(
 					Path.GetFullPath(filename),
 					Path.GetFullPath(other.filename),
-					StringComparison.InvariantCultureIgnoreCase);
+					StringComparison.InvariantCultureIgnoreCase) &&
+				defines.SequenceEqual(other.defines);
 		}
 
 		public override int GetHashCode()
-			=>	entryPoint.GetHashCode() ^
+		{
+			var definesHash = defines.Aggregate(0,
+				(hash, define) => hash ^ define.Name.GetHashCode() ^ define.Value.GetHashCode());
+
+			return entryPoint.GetHashCode() ^
 				profile.GetHashCode() ^
-				Path.GetFullPath(filename).ToLowerInvariant().GetHashCode();
+				Path.GetFullPath(filename).ToLowerInvariant().GetHashCode() ^
+				definesHash;
+		}
 
 		public readonly string filename;
 		public readonly string entryPoint;
 		public readonly string profile;
+		public readonly ShaderMacro[] defines;
 	}
 
 	struct ShaderCacheEntry

@@ -2,6 +2,11 @@
 
 #include "util.hlsl"
 
+// Some defaults
+#ifndef PBR_USE_IBL
+#define PBR_USE_IBL 1
+#endif
+
 cbuffer vbConstants
 {
 	float4x4	LocalToWorldMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};			// Transform from model space to world space.
@@ -74,7 +79,10 @@ float4 SolidColourPS(PSIn In) : SV_Target
 	float3 lighting = Ambient * (dot(In.Normal, float3(0,1,0)) * 0.5 + 0.5);
 	
 	lighting += DirectionalLight(N, normalize(DirLightVector), V, DirLightColour);
+	
+#if PBR_USE_IBL
 	lighting += IBL(N, V, EnvCube, random);
+#endif
 	
 	return float4(lighting, 1.0f);
 }

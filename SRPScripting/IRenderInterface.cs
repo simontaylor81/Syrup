@@ -35,7 +35,8 @@ namespace SRPScripting
 	// Interface to the rendering system exposed to the scripting system.
 	public interface IRenderInterface
 	{
-		object CompileShader(string filename, string entryPoint, string profile);
+		object CompileShader(string filename, string entryPoint, string profile,
+			IDictionary<string, object> defines = null);
 
 		// Create a render target of dimensions equal to the viewport.
 		object CreateRenderTarget();

@@ -132,13 +132,19 @@ namespace SRPRendering
 
 		// IScriptRenderInterface implementation.
 
-		public object CompileShader(string filename, string entryPoint, string profile)
+		public object CompileShader(
+			string filename, string entryPoint, string profile, IDictionary<string, object> defines)
 		{
 			var path = FindShader(filename);
 			if (!File.Exists(path))
 				throw new ScriptException("Shader file " + filename + " not found in project.");
 
-			var shader = _globalResources.ShaderCache.GetShader(path, entryPoint, profile, FindShader);
+			var macros = defines
+				.EmptyIfNull()
+				.Select(define => new ShaderMacro(define.Key, define.Value.ToString()))
+				.ToArray();
+
+			var shader = _globalResources.ShaderCache.GetShader(path, entryPoint, profile, FindShader, macros);
 			shaders.Add(shader);
 
 			// Set up auto variable binds for this shader.

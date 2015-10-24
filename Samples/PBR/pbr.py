@@ -1,7 +1,9 @@
 from SRPScripting import *
 
-vs = ri.CompileShader("pbr.hlsl", "BasicVS", "vs_4_0")
-ps = ri.CompileShader("pbr.hlsl", "SolidColourPS", "ps_4_0")
+defines = { 'PBR_USE_IBL': 1 }
+
+vs = ri.CompileShader("pbr.hlsl", "BasicVS", "vs_4_0", defines)
+ps = ri.CompileShader("pbr.hlsl", "SolidColourPS", "ps_4_0", defines)
 
 backgroundVs = ri.CompileShader("background.hlsl", "VS", "vs_4_0")
 backgroundPs = ri.CompileShader("background.hlsl", "PS", "ps_4_0")

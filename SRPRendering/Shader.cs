@@ -52,7 +52,8 @@ namespace SRPRendering
 
 	class Shader : IShader
 	{
-		public Shader(Device device, string filename, string entryPoint, string profile, Func<string, string> includeLookup)
+		public Shader(Device device, string filename, string entryPoint, string profile,
+			Func<string, string> includeLookup, ShaderMacro[] defines)
 		{
 			try
 			{
@@ -60,7 +61,7 @@ namespace SRPRendering
 
 				// Compile the shader to bytecode.
 				using (var bytecode = ShaderBytecode.CompileFromFile(filename, entryPoint,
-					profile, ShaderFlags.None, EffectFlags.None, null, includeHandler))
+					profile, ShaderFlags.None, EffectFlags.None, defines, includeHandler))
 				{
 					IncludedFiles = includeHandler != null ? includeHandler.IncludedFiles : Enumerable.Empty<string>();
 
