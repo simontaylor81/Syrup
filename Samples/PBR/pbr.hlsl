@@ -1,5 +1,7 @@
 // Physically based shizzle.
 
+#include "util.hlsl"
+
 cbuffer vbConstants
 {
 	float4x4	LocalToWorldMatrix = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};			// Transform from model space to world space.
@@ -64,16 +66,15 @@ float4 SolidColourPS(PSIn In) : SV_Target
 	float3 N = normalize(In.Normal);
 	float3 V = normalize(CameraPosition - In.WorldPos);
 	float3 R = 2 * dot(N, V) * N - V;
+	
+	// Pseudo-random number for jittering, etc.
+	uint2 random = ScrambleTEA(asuint(In.Pos.xy));
 
 	// Ambient lighting
 	float3 lighting = Ambient * (dot(In.Normal, float3(0,1,0)) * 0.5 + 0.5);
 	
-	// Directional light (lambert).
-	//lighting += dot(In.Normal, normalize(LightVector));
-	
 	lighting += DirectionalLight(N, normalize(DirLightVector), V, DirLightColour);
-	
-	//float3 env = EnvCube.Sample(mySampler, R).rgb;
+	lighting += IBL(N, V, EnvCube, random);
 	
 	return float4(lighting, 1.0f);
 }
