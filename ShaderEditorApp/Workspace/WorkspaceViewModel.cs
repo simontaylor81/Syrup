@@ -19,6 +19,7 @@ using SRPRendering;
 using ShaderEditorApp.ViewModel.Projects;
 using ShaderEditorApp.ViewModel.Scene;
 using System.Reactive;
+using System.Threading.Tasks;
 
 namespace ShaderEditorApp.Workspace
 {
@@ -222,7 +223,8 @@ namespace ShaderEditorApp.Workspace
 			}
 		}
 
-		private void RunActiveScript()
+		// TODO: Fix async void nastiness.
+		private async void RunActiveScript()
 		{
 			// Save all so we running the latest contents.
 			if (!SaveAllDirty())
@@ -235,18 +237,25 @@ namespace ShaderEditorApp.Workspace
 			{
 				RunScriptFile(ActiveDocument.FilePath);
 			}
-			else if (_lastRunScriptFile != null)
+			else if (_lastRunScript != null)
 			{
-				RunScriptFile(_lastRunScriptFile);
+				await RunScript(_lastRunScript);
 			}
 		}
 
+		// TODO: Fix async void nastiness.
 		internal async void RunScriptFile(string path)
 		{
-			_lastRunScriptFile = path;
+			var script = _scripts.GetOrAdd(path, () => new Script(path));
+			await RunScript(script);
+		}
+
+		private async Task RunScript(Script script)
+		{
+			_lastRunScript = script;
 
 			// Asynchronously execute the script.
-			await scripting.RunScriptFromFile(path);
+			await scripting.RunScript(script);
 
 			RedrawViewports();
 		}
@@ -490,8 +499,11 @@ namespace ShaderEditorApp.Workspace
 		private Scene currentScene;
 		private IDisposable sceneChangeSubscription;
 
+		// Previously run scripts.
+		private readonly Dictionary<string, Script> _scripts = new Dictionary<string, Script>();
+
 		// Script file that was last run.
-		private string _lastRunScriptFile;
+		private Script _lastRunScript;
 
 		// TODO: Multiple viewports.
 		// TODO: Move info needed?

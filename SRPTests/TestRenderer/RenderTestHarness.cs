@@ -50,7 +50,7 @@ namespace SRPTests.TestRenderer
 			try
 			{
 				// Execute the script.
-				await _scripting.RunScriptFromFile(scriptFile);
+				await _scripting.RunScript(File.ReadAllText(scriptFile));
 
 				Assert.False(_src.HasScriptError, "Error executing script");
 
@@ -67,7 +67,7 @@ namespace SRPTests.TestRenderer
 				// Compare the images.
 				ImageComparison.AssertImagesEqual(expected, result);
 				bSuccess = true;
-            }
+			}
 			finally
 			{
 				// Report result to Fermium.
