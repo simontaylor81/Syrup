@@ -213,8 +213,8 @@ namespace SRPRendering
 			}
 		}
 
+		// Get all variables from all cbuffers.
 		public IEnumerable<IShaderVariable> Variables
-			// Get all variables from all cbuffers.
 			=> from cbuffer in cbuffers from variable in cbuffer.Variables select variable;
 
 		// Find a variable by name.
@@ -278,62 +278,5 @@ namespace SRPRendering
 				stream.Dispose();
 			}
 		}
-	}
-
-	class ConstantBuffer : IDisposable
-	{
-		public ConstantBuffer(Device device, SlimDX.D3DCompiler.ConstantBuffer bufferInfo)
-		{
-			// Gather info about the variables in this buffer.
-			variables = (from i in Enumerable.Range(0, bufferInfo.Description.Variables)
-						 select new ShaderVariable(bufferInfo.GetVariable(i))).ToArray();
-
-			// Create a data stream containing the initial contents buffer.
-			var stream = new DataStream(bufferInfo.Description.Size, true, true);
-			contents = new DataBox(bufferInfo.Description.Size, bufferInfo.Description.Size, stream);
-
-			// Write initial values to buffer.
-			foreach (var variable in variables)
-				variable.WriteToBuffer(stream);
-
-			// Create the actual buffer.
-			stream.Position = 0;
-			Buffer = new Buffer(
-				device,
-				stream,
-				bufferInfo.Description.Size,
-				ResourceUsage.Default,
-				BindFlags.ConstantBuffer,
-				CpuAccessFlags.None,
-				ResourceOptionFlags.None,
-				0);
-
-		}
-
-		public void Dispose()
-		{
-			Buffer.Dispose();
-		}
-
-		// Upload the constants to the buffer if dirty.
-		public void Update(DeviceContext context)
-		{
-			bool bDirty = false;
-			foreach (var variable in variables)
-				bDirty |= variable.WriteToBuffer(contents.Data);
-
-			if (bDirty)
-			{
-				contents.Data.Position = 0;
-				context.UpdateSubresource(contents, Buffer, 0);
-			}
-		}
-
-		public Buffer Buffer { get; }
-
-		public IEnumerable<IShaderVariable> Variables => variables;
-
-		private ShaderVariable[] variables;
-		private DataBox contents;
 	}
 }

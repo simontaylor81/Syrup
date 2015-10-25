@@ -8,24 +8,27 @@ using SlimDX.D3DCompiler;
 using SRPCommon.UserProperties;
 using System.Reactive;
 using System.Reactive.Subjects;
+using System.Reactive.Linq;
 
 namespace SRPRendering
 {
 	class MatrixShaderVariableUserProperty : IMatrixProperty
 	{
-		public MatrixShaderVariableUserProperty(IShaderVariable variable, IUserProperty[,] components)
+		public MatrixShaderVariableUserProperty(IEnumerable<IShaderVariable> variables, IUserProperty[,] components)
 		{
+			var first = variables.First();
+
 			// TODO: Row-major?
-			Debug.Assert(variable.VariableType.Class == ShaderVariableClass.MatrixColumns);
+			Debug.Assert(first.VariableType.Class == ShaderVariableClass.MatrixColumns);
 
-			Debug.Assert(components.GetLength(0) == variable.VariableType.Columns);
-			Debug.Assert(components.GetLength(1) == variable.VariableType.Rows);
+			Debug.Assert(components.GetLength(0) == first.VariableType.Columns);
+			Debug.Assert(components.GetLength(1) == first.VariableType.Rows);
 
-			this._components = components;
-			this._variable = variable;
+			_components = components;
+			_variables = variables;
 		}
 
-		public string Name => _variable.Name;
+		public string Name => _variables.First().Name;
 		public bool IsReadOnly => false;
 		public int NumColumns => _components.GetLength(0);
 		public int NumRows => _components.GetLength(1);
@@ -35,10 +38,10 @@ namespace SRPRendering
 		public IDisposable Subscribe(IObserver<Unit> observer)
 		{
 			// We change when the underlying variable changes.
-			return _variable.Subscribe(observer);
+			return _variables.Merge().Subscribe(observer);
 		}
 
-		private IUserProperty[,] _components;
-		private IShaderVariable _variable;
+		private readonly IUserProperty[,] _components;
+		private readonly IEnumerable<IShaderVariable> _variables;
 	}
 }

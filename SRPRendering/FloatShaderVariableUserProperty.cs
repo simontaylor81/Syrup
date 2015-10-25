@@ -5,22 +5,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reactive;
+using System.Reactive.Linq;
 
 namespace SRPRendering
 {
 	class FloatShaderVariableUserProperty : IScalarProperty<float>
 	{
-		private readonly IShaderVariable _variable;
+		private readonly IEnumerable<IShaderVariable> _variables;
 		int _componentIndex;
 
-		public FloatShaderVariableUserProperty(IShaderVariable variable, int componentIndex)
+		public FloatShaderVariableUserProperty(IEnumerable<IShaderVariable> variables, int componentIndex)
 		{
-			_variable = variable;
+			_variables = variables;
 			_componentIndex = componentIndex;
+
+			// Different variables may have different defaults,
+			// so force them all to the same value now.
+			var firstValue = variables.First().GetComponent<float>(componentIndex);
+			foreach (var variable in variables.Skip(1))
+			{
+				variable.SetComponent(_componentIndex, firstValue);
+			}
 		}
 
 		public bool IsReadOnly => false;
-		public string Name => _variable.Name;
+		public string Name => _variables.First().Name;
 
 		public Type Type => typeof(float);
 
@@ -28,7 +37,8 @@ namespace SRPRendering
 		{
 			get
 			{
-				return _variable.GetComponent<float>(_componentIndex);
+				// Assume everything has the same value.
+				return _variables.First().GetComponent<float>(_componentIndex);
 			}
 			set
 			{
@@ -36,14 +46,18 @@ namespace SRPRendering
 				if (value != Value)
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 				{
-					_variable.SetComponent(_componentIndex, value);
+					// Set on all variables.
+					foreach (var variable in _variables)
+					{
+						variable.SetComponent(_componentIndex, value);
+					}
 				}
 			}
 		}
 
 		public IDisposable Subscribe(IObserver<Unit> observer)
 		{
-			return _variable.Subscribe(observer);
+			return _variables.Merge().Subscribe(observer);
 		}
 	}
 }

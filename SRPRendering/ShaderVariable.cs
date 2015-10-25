@@ -10,12 +10,13 @@ using SlimDX;
 using SlimDX.D3DCompiler;
 using SRPCommon.UserProperties;
 using SRPCommon.Scripting;
+using System.Diagnostics;
 
 namespace SRPRendering
 {
 	// Need out own shader variable type descriptor because the SlimDX one just references a D3D
 	// object that needs to be cleaned up after compilation is complete.
-	public struct ShaderVariableTypeDesc
+	public struct ShaderVariableTypeDesc : IEquatable<ShaderVariableTypeDesc>
 	{
 		public ShaderVariableClass Class;
 		public ShaderVariableType Type;
@@ -29,6 +30,9 @@ namespace SRPRendering
 			Columns = type.Description.Columns;
 			Rows = type.Description.Rows;
 		}
+
+		public bool Equals(ShaderVariableTypeDesc other)
+			=> Class == other.Class && Type == other.Type && Columns == other.Columns && Rows == other.Rows;
 	}
 
 	/// <summary>
@@ -215,25 +219,36 @@ namespace SRPRendering
 		private byte[] initialValue;
 		private Subject<Unit> _subject = new Subject<Unit>();
 
-		internal static IUserProperty CreateUserProperty(IShaderVariable variable)
+		public static IUserProperty CreateUserProperty(IEnumerable<IShaderVariable> variables)
 		{
-			switch (variable.VariableType.Class)
+			// Convert to list to avoid multiple potentially expensive iterations.
+			variables = variables.ToList();
+
+			// Must have at least one element.
+			var first = variables.First();
+
+			// Must be all the same type.
+			if (!variables.All(v => v.VariableType.Equals(first.VariableType)))
 			{
-				// Treat matrices as many-component vectors, for now.
+				throw new ScriptException($"Shader variables named '{first.Name}' do not all share the same type.");
+			}
+
+			switch (first.VariableType.Class)
+			{
 				case ShaderVariableClass.Vector:
 					{
-						int numComponents = variable.VariableType.Rows * variable.VariableType.Columns;
+						int numComponents = first.VariableType.Rows * first.VariableType.Columns;
 						var components = Enumerable.Range(0, numComponents)
-							.Select(i => CreateScalar(variable, i))
+							.Select(i => CreateScalar(variables, i))
 							.ToArray();
-						return new VectorShaderVariableUserProperty(variable, components);
+						return new VectorShaderVariableUserProperty(variables, components);
 					}
 
 				case ShaderVariableClass.MatrixColumns:
 					{
 						// Save typing
-						var numCols = variable.VariableType.Columns;
-						var numRows = variable.VariableType.Rows;
+						var numCols = first.VariableType.Columns;
+						var numRows = first.VariableType.Rows;
 
 						// Create a scalar property for each element in the matrix.
 						var components = new IUserProperty[numCols, numRows];
@@ -241,33 +256,30 @@ namespace SRPRendering
 						{
 							for (int row = 0; row < numRows; row++)
 							{
-								components[col, row] = CreateScalar(variable, row + col * numRows);
+								components[col, row] = CreateScalar(variables, row + col * numRows);
 							}
 						}
 
 						// Create matrix property.
-						return new MatrixShaderVariableUserProperty(variable, components);
+						return new MatrixShaderVariableUserProperty(variables, components);
 					}
 
 				case ShaderVariableClass.Scalar:
-					return CreateScalar(variable, 0);
+					return CreateScalar(variables, 0);
 			}
 
-			// TEMP fallback.
-			return new MutableScalarProperty<float>(variable.Name, 0.0f);
+			throw new ScriptException("Unsupported shader parameter type. Variable: " + first.Name);
 		}
 
-		private static IUserProperty CreateScalar(IShaderVariable variable, int componentIndex)
+		private static IUserProperty CreateScalar(IEnumerable<IShaderVariable> variables, int componentIndex)
 		{
-			switch (variable.VariableType.Type)
+			switch (variables.First().VariableType.Type)
 			{
 				case ShaderVariableType.Float:
-					return new FloatShaderVariableUserProperty(variable, componentIndex);
-
-				default:
-					// TEMP fallback.
-					return new MutableScalarProperty<float>(variable.Name, 0.0f);
+					return new FloatShaderVariableUserProperty(variables, componentIndex);
 			}
+
+			throw new ScriptException("Unsupported shader parameter type. Variable: " + variables.First());
 		}
 	}
 }

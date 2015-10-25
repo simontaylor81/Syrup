@@ -8,23 +8,25 @@ using SlimDX.D3DCompiler;
 using SRPCommon.UserProperties;
 using System.Reactive;
 using System.Reactive.Subjects;
+using System.Reactive.Linq;
 
 namespace SRPRendering
 {
 	class VectorShaderVariableUserProperty : IVectorProperty
 	{
-		public VectorShaderVariableUserProperty(IShaderVariable variable, IUserProperty[] components)
+		public VectorShaderVariableUserProperty(IEnumerable<IShaderVariable> variables, IUserProperty[] components)
 		{
-			Debug.Assert(variable.VariableType.Class == ShaderVariableClass.Vector ||
-						 variable.VariableType.Class == ShaderVariableClass.MatrixColumns);
+			var first = variables.First();
+			Debug.Assert(first.VariableType.Class == ShaderVariableClass.Vector ||
+						 first.VariableType.Class == ShaderVariableClass.MatrixColumns);
 
-			Debug.Assert(components.Length == variable.VariableType.Columns * variable.VariableType.Rows);
+			Debug.Assert(components.Length == first.VariableType.Columns * first.VariableType.Rows);
 
 			this._components = components;
-			this._variable = variable;
+			this._variables = variables;
 		}
 
-		public string Name => _variable.Name;
+		public string Name => _variables.First().Name;
 		public bool IsReadOnly => false;
 
 		public int NumComponents => _components.Length;
@@ -32,11 +34,11 @@ namespace SRPRendering
 
 		public IDisposable Subscribe(IObserver<Unit> observer)
 		{
-			// We change when the underlying variable changes.
-			return _variable.Subscribe(observer);
+			// We change when any of the underlying variables change.
+			return _variables.Merge().Subscribe(observer);
 		}
 
-		private IUserProperty[] _components;
-		private IShaderVariable _variable;
+		private readonly IUserProperty[] _components;
+		private readonly IEnumerable<IShaderVariable> _variables;
 	}
 }

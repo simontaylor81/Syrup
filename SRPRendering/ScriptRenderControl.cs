@@ -66,21 +66,32 @@ namespace SRPRendering
 
 		private void ExecutionComplete(bool bSuccess)
 		{
-			bScriptExecutionError = !bSuccess;
 			bScriptRenderError = false;
 
-			// Add shader variables to the properties list.
-			foreach (var shader in shaders)
+			var script = _currentScript;
+			_currentScript = null;
+
+			try
 			{
-				foreach (var variable in shader.Variables)
+				// Group variables by name so we don't create duplicate entries with the same name.
+				// Don't add bound variables, not event as read-only
+				// (as they're too slow to update every time we render the frame).
+				var variablesByName = from shader in shaders
+									  from variable in shader.Variables
+									  where variable.Bind == null
+									  group variable by variable.Name;
+
+				// Add shader variable property to the list for each unique name.
+				foreach (var variableGroup in variablesByName)
 				{
-					// Don't add bound variables.
-					// Don't even add them as read-only, as they're too slow to update every time we render the frame.
-					if (variable.Bind == null)
-					{
-						properties.Add(ShaderVariable.CreateUserProperty(variable));
-					}
+					properties.Add(ShaderVariable.CreateUserProperty(variableGroup));
 				}
+			}
+			catch (ScriptException ex)
+			{
+				ScriptHelper.Instance.LogScriptError(ex);
+				bScriptExecutionError = true;
+				return;
 			}
 
 			// Add user variables too.
@@ -92,14 +103,14 @@ namespace SRPRendering
 			foreach (var property in properties)
 			{
 				IUserProperty prevProperty;
-				if (_currentScript.UserProperties.TryGetValue(property.Name, out prevProperty))
+				if (script.UserProperties.TryGetValue(property.Name, out prevProperty))
 				{
 					// Copy value from existing property.
 					property.TryCopyFrom(prevProperty);
 				}
 
 				// Save this property for next time.
-				_currentScript.UserProperties[property.Name] = property;
+				script.UserProperties[property.Name] = property;
 			}
 
 			// When a property changes, redraw the viewports.
@@ -108,7 +119,7 @@ namespace SRPRendering
 				disposables.Add(property.Subscribe(_ => FireRedrawRequired()));
 			}
 
-			_currentScript = null;
+			bScriptExecutionError = !bSuccess;
 		}
 
 		public IObservable<Unit> RedrawRequired => _redrawRequired;
