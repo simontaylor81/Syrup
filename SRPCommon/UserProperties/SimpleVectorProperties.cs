@@ -93,6 +93,8 @@ namespace SRPCommon.UserProperties
 			_setter = val => { };		// No need to set, since we're modifying the original object.
 		}
 
+		public Type Type => typeof(T);
+
 		public T Value
 		{
 			get
@@ -140,6 +142,8 @@ namespace SRPCommon.UserProperties
 			_getter = () => obj;
 			_setter = val => { };		// No need to set, since we're modifying the original object.
 		}
+
+		public Type Type => typeof(T);
 
 		public T Value
 		{

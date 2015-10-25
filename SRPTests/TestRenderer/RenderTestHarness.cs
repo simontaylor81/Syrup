@@ -50,7 +50,7 @@ namespace SRPTests.TestRenderer
 			try
 			{
 				// Execute the script.
-				await _scripting.RunScript(File.ReadAllText(scriptFile));
+				await _scripting.RunScript(new Script(scriptFile));
 
 				Assert.False(_src.HasScriptError, "Error executing script");
 

@@ -22,6 +22,8 @@ namespace SRPRendering
 		public bool IsReadOnly => false;
 		public string Name => _variable.Name;
 
+		public Type Type => typeof(float);
+
 		public float Value
 		{
 			get

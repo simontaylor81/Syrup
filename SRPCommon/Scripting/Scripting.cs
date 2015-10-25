@@ -30,11 +30,11 @@ namespace SRPCommon.Scripting
 		private bool bInProgress;
 
 		// Events fired before and after script execution.
-		public IObservable<Unit> PreExecute => _preExecute;
+		public IObservable<Script> PreExecute => _preExecute;
 		public IObservable<bool> ExecutionComplete => _executionComplete;
 
 		// Subjects for the above.
-		private Subject<Unit> _preExecute = new Subject<Unit>();
+		private Subject<Script> _preExecute = new Subject<Script>();
 		private Subject<bool> _executionComplete = new Subject<bool>();
 
 		private const string _projectPathPrefix = "project:";
@@ -47,7 +47,7 @@ namespace SRPCommon.Scripting
 			pythonEngine = CreatePythonEngine();
 
 			// Load assemblies so the scripts can use them.
-			pythonEngine.Runtime.LoadAssembly(typeof(String).Assembly);		// mscorlib.dll
+			pythonEngine.Runtime.LoadAssembly(typeof(string).Assembly);		// mscorlib.dll
 			pythonEngine.Runtime.LoadAssembly(typeof(Uri).Assembly);		// System.dll
 			pythonEngine.Runtime.LoadAssembly(typeof(SRPScripting.IRenderInterface).Assembly);
 
@@ -72,16 +72,6 @@ namespace SRPCommon.Scripting
 			return Python.GetEngine(runtime);
 		}
 
-		public Task RunScriptFromFile(string filename)
-		{
-			return Execute(() => pythonEngine.CreateScriptSourceFromFile(filename));
-		}
-
-		public Task RunScript(string code)
-		{
-			return Execute(() => pythonEngine.CreateScriptSourceFromString(code, SourceCodeKind.Statements));
-		}
-
 		public void AddSearchPath(string path)
 		{
 			pythonEngine.SetSearchPaths(
@@ -90,17 +80,24 @@ namespace SRPCommon.Scripting
 				.ToList());
 		}
 
-		private async Task Execute(Func<ScriptSource> sourceFunc)
+		public async Task RunScript(Script script)
 		{
 			// Don't run if we're already running a script.
 			if (!bInProgress)
 			{
 				bInProgress = true;
 
-				_preExecute.OnNext(Unit.Default);
+				_preExecute.OnNext(script);
+
+				// Get code to execute.
+				var code = await script.GetCodeAsync();
 
 				// Execute script on thread pool.
-				bool bSuccess = await Task.Run(() => RunSource(sourceFunc()));
+				bool bSuccess = await Task.Run(() =>
+					{
+						var source = pythonEngine.CreateScriptSourceFromString(code, SourceCodeKind.Statements);
+						return RunSource(source);
+					});
 
 				_executionComplete.OnNext(bSuccess);
 				bInProgress = false;

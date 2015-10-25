@@ -137,6 +137,7 @@
     <Compile Include="UserProperties\MutableScalarProperty.cs" />
     <Compile Include="UserProperties\ReadOnlyScalarProperty.cs" />
     <Compile Include="UserProperties\SimpleVectorProperties.cs" />
+    <Compile Include="UserProperties\UserPropertyExtensions.cs" />
     <Compile Include="Util\DictionaryExtensions.cs" />
     <Compile Include="Util\DisposableUtil.cs" />
     <Compile Include="Util\DynamicHelpers.cs" />

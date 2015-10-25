@@ -35,10 +35,16 @@ namespace SRPRendering
 			disposables.Add(_globalResources);
 
 			// Reset before script execution.
-			disposables.Add(scripting.PreExecute.Subscribe(_ => Reset()));
+			disposables.Add(scripting.PreExecute.Subscribe(PreExecuteScript));
 			disposables.Add(scripting.ExecutionComplete.Subscribe(ExecutionComplete));
 
 			overlayRenderer = new OverlayRenderer(_globalResources);
+		}
+
+		private void PreExecuteScript(Script script)
+		{
+			Reset();
+			_currentScript = script;
 		}
 
 		private void Reset()
@@ -83,11 +89,26 @@ namespace SRPRendering
 				properties.Add(userVar);
 			}
 
+			foreach (var property in properties)
+			{
+				IUserProperty prevProperty;
+				if (_currentScript.UserProperties.TryGetValue(property.Name, out prevProperty))
+				{
+					// Copy value from existing property.
+					property.TryCopyFrom(prevProperty);
+				}
+
+				// Save this property for next time.
+				_currentScript.UserProperties[property.Name] = property;
+			}
+
 			// When a property changes, redraw the viewports.
 			foreach (var property in properties)
 			{
 				disposables.Add(property.Subscribe(_ => FireRedrawRequired()));
 			}
+
+			_currentScript = null;
 		}
 
 		public IObservable<Unit> RedrawRequired => _redrawRequired;
@@ -457,6 +478,9 @@ namespace SRPRendering
 
 		// Original scene data the above was created from.
 		private Scene baseScene;
+
+		// Script currently being executed.
+		private Script _currentScript;
 
 		// List of things to dispose.
 		private CompositeDisposable disposables = new CompositeDisposable();

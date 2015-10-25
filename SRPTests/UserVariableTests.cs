@@ -62,8 +62,7 @@ namespace SRPTests
 			Assert.False(uv.IsReadOnly);
 
 			// Must be a scalar property of the right type.
-			Assert.IsAssignableFrom<IVectorProperty>(uv);
-			var prop = (IVectorProperty)uv;
+			var prop = Assert.IsAssignableFrom<IVectorProperty>(uv);
 
 			Assert.Equal(defaultValue.Length, prop.NumComponents);
 
@@ -90,7 +89,7 @@ namespace SRPTests
 			for (int i = 0; i < prop.NumComponents; i++)
 			{
 				((IScalarProperty<T>)prop.GetComponent(i)).Value = otherValue[i];
-            }
+			}
 
 			// Should be notified on the parent when changing the value of a component.
 			Assert.True(receivedNotification);

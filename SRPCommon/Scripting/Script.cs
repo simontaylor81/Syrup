@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SRPCommon.UserProperties;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace SRPCommon.Scripting
 	public class Script
 	{
 		private readonly string _filename;
+
+		public IDictionary<string, IUserProperty> UserProperties { get; } = new Dictionary<string, IUserProperty>();
 
 		public Script(string filename)
 		{

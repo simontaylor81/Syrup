@@ -92,6 +92,8 @@ namespace SRPRendering
 			value = (T)defaultValue;
 		}
 
+		public Type Type => typeof(T);
+
 		public T Value
 		{
 			get { return value; }

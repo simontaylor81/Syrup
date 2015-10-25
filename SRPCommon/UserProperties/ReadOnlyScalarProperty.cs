@@ -17,6 +17,8 @@ namespace SRPCommon.UserProperties
 		public string Name { get; }
 		public bool IsReadOnly => true;
 
+		public Type Type => typeof(T);
+
 		// IScalarProperty interface
 		public T Value
 		{
