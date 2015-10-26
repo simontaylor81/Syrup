@@ -79,6 +79,7 @@ namespace SRPRendering
 
 			// Create a proxy for each primitive.
 			primitiveProxies = _scene.Primitives
+				.Where(primitive => primitive.IsValid)
 				.Select(primitive => CreateProxy(primitive))
 				.Where(proxy => proxy != null)
 				.ToList();

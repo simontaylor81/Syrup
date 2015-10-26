@@ -48,6 +48,8 @@ namespace SRPCommon.Scene
 		protected List<IUserProperty> _userProperties = new List<IUserProperty>();
 		public IEnumerable<IUserProperty> UserProperties => _userProperties;
 
+		public virtual bool IsValid => true;
+
 		// Observable that fires when something important changes in the primitive.
 		public IObservable<Unit> OnChanged { get; }
 

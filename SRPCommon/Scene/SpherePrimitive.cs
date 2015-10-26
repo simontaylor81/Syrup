@@ -15,6 +15,8 @@ namespace SRPCommon.Scene
 		[JsonProperty]
 		public int Slices { get; set; }
 
+		public override bool IsValid => Stacks > 0 && Slices > 0;
+
 		public SpherePrimitive()
 		{
 			// Set safe defaults.
