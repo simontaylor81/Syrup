@@ -276,7 +276,9 @@ namespace SRPRendering
 			switch (variables.First().VariableType.Type)
 			{
 				case ShaderVariableType.Float:
-					return new FloatShaderVariableUserProperty(variables, componentIndex);
+					return new ScalarShaderVariableUserProperty<float>(variables, componentIndex);
+				case ShaderVariableType.Int:
+					return new ScalarShaderVariableUserProperty<int>(variables, componentIndex);
 			}
 
 			throw new ScriptException("Unsupported shader parameter type. Variable: " + variables.First());
