@@ -43,7 +43,7 @@ namespace SRPRendering
 			set
 			{
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-				if (EqualityComparer<T>.Default.Equals(value, Value))
+				if (!EqualityComparer<T>.Default.Equals(value, Value))
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 				{
 					// Set on all variables.
