@@ -214,69 +214,66 @@ namespace SRPRendering
 			}
 		}
 
-		public void BindShaderVariable(dynamic shaderHandle, string varName, ShaderVariableBindSource source)
+		public void BindShaderVariable(object handleOrHandles, string varName, ShaderVariableBindSource source)
 		{
-			if (!IsValidShader(shaderHandle))
-				throw new ScriptException("Invalid shader.");
-
-			IShaderVariable variable = shaders[shaderHandle.index].FindVariable(varName);
-			SetShaderBind(variable, () => new SimpleShaderVariableBind(variable, source));
+			var shaders = GetShaders(handleOrHandles);
+			var variables = shaders.Select(shader => shader.FindVariable(varName));
+			SetShaderBind(variables, variable => new SimpleShaderVariableBind(variable, source));
 		}
 
-		public void BindShaderVariableToMaterial(dynamic shaderHandle, string varName, string paramName)
+		public void BindShaderVariableToMaterial(object handleOrHandles, string varName, string paramName)
 		{
-			if (!IsValidShader(shaderHandle))
-				throw new ScriptException("Invalid shader.");
-
-			IShaderVariable variable = shaders[shaderHandle.index].FindVariable(varName);
-			SetShaderBind(variable, () => new MaterialShaderVariableBind(variable, paramName));
+			var shaders = GetShaders(handleOrHandles);
+			var variables = shaders.Select(shader => shader.FindVariable(varName));
+			SetShaderBind(variables, variable => new MaterialShaderVariableBind(variable, paramName));
 		}
 
-		public void SetShaderVariable(dynamic shaderHandle, string varName, dynamic value)
+		public void SetShaderVariable(object handleOrHandles, string varName, dynamic value)
 		{
-			if (!IsValidShader(shaderHandle))
-				throw new ScriptException("Invalid shader.");
-
-			IShaderVariable variable = shaders[shaderHandle.index].FindVariable(varName);
-			SetShaderBind(variable, () => new ScriptShaderVariableBind(variable, value));
+			var shaders = GetShaders(handleOrHandles);
+			var variables = shaders.Select(shader => shader.FindVariable(varName));
+			SetShaderBind(variables, variable => new ScriptShaderVariableBind(variable, value));
 		}
 
-		public void ShaderVariableIsScriptOverride(dynamic shaderHandle, string varName)
+		public void ShaderVariableIsScriptOverride(object handleOrHandles, string varName)
 		{
-			if (!IsValidShader(shaderHandle))
-				throw new ScriptException("Invalid shader.");
-
-			IShaderVariable variable = shaders[shaderHandle.index].FindVariable(varName);
-			SetShaderBind(variable, () => new ScriptOverrideShaderVariableBind(variable));
+			var shaders = GetShaders(handleOrHandles);
+			var variables = shaders.Select(shader => shader.FindVariable(varName));
+			SetShaderBind(variables, variable => new ScriptOverrideShaderVariableBind(variable));
 		}
 
 		// Simple helper to avoid duplication.
 		// If the passed in variable is valid, and it is not already bound, sets its
 		// bind to the result of the given function.
-		private void SetShaderBind(IShaderVariable variable, Func<IShaderVariableBind> createBind)
+		private void SetShaderBind(IEnumerable<IShaderVariable> variables,
+			Func<IShaderVariable, IShaderVariableBind> createBind)
 		{
-			// Silently fail on null (not-found) variable, as they can be removed by optimisation.
-			if (variable != null)
+			foreach (var variable in variables)
 			{
-				// Allow manual override of auto-binds
-				if (variable.Bind != null && !variable.IsAutoBound)
+				// Silently fail on null (not-found) variable, as they can be removed by optimisation.
+				if (variable != null)
 				{
-					throw new ScriptException("Attempting to bind already bound shader variable: " + variable.Name);
-				}
+					// Allow manual override of auto-binds
+					if (variable.Bind != null && !variable.IsAutoBound)
+					{
+						throw new ScriptException("Attempting to bind already bound shader variable: " + variable.Name);
+					}
 
-				// Bind the variable's value to the script value.
-				variable.Bind = createBind();
-				variable.IsAutoBound = false;
+					// Bind the variable's value to the script value.
+					variable.Bind = createBind(variable);
+					variable.IsAutoBound = false;
+				}
 			}
 		}
 
-		public void BindShaderResourceToMaterial(dynamic shaderHandle, string varName, string paramName)
+		public void BindShaderResourceToMaterial(object handleOrHandles, string varName, string paramName)
 		{
-			if (!IsValidShader(shaderHandle))
-				throw new ScriptException("Invalid shader.");
+			var shaders = GetShaders(handleOrHandles);
+			var variables = shaders
+				.Select(shader => shader.FindResourceVariable(varName))
+				.Where(shader => shader != null);
 
-			IShaderResourceVariable variable = shaders[shaderHandle.index].FindResourceVariable(varName);
-			if (variable != null)
+			foreach (var variable in variables)
 			{
 				if (variable.Bind != null)
 				{
@@ -287,13 +284,14 @@ namespace SRPRendering
 			}
 		}
 
-		public void SetShaderResourceVariable(dynamic shaderHandle, string varName, object value)
+		public void SetShaderResourceVariable(object handleOrHandles, string varName, object value)
 		{
-			if (!IsValidShader(shaderHandle))
-				throw new ScriptException("Invalid shader.");
+			var shaders = GetShaders(handleOrHandles);
+			var variables = shaders
+				.Select(shader => shader.FindResourceVariable(varName))
+				.Where(shader => shader != null);
 
-			IShaderResourceVariable variable = shaders[shaderHandle.index].FindResourceVariable(varName);
-			if (variable != null)
+			foreach (var variable in variables)
 			{
 				if (variable.Bind != null)
 				{
@@ -440,8 +438,32 @@ namespace SRPRendering
 			}
 		}
 
-		private bool IsValidShader(dynamic handle)
-			=> handle is ShaderHandle && handle.index >= 0 && handle.index < shaders.Count;
+		private bool IsValidShaderHandle(ShaderHandle handle)
+			=> handle != null && handle.index >= 0 && handle.index < shaders.Count;
+
+		// Given a shader handle or list of handles, get a list of shaders they correspond to.
+		private IEnumerable<IShader> GetShaders(object handleOrHandles)
+		{
+			var handle = handleOrHandles as ShaderHandle;
+			var handleList = handleOrHandles as IEnumerable<object>;
+
+			IEnumerable<ShaderHandle> handles = null;
+			if (handle != null)
+			{
+				handles = EnumerableEx.Return(handle);
+			}
+			else if (handleList != null)
+			{
+				handles = handleList.Select(h => h as ShaderHandle);
+			}
+
+			if (handles == null || handles.Any(h => !IsValidShaderHandle(h)))
+			{
+				throw new ScriptException("Invalid shader.");
+			}
+
+			return handles.Select(h => shaders[h.index]);
+		}
 
 		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
 		public IRenderInterface ScriptInterface { get; }
