@@ -66,8 +66,11 @@ namespace SRPCommon.Scene
 		}
 
 		public Matrix LocalToWorld
-			// TODO: rotation!
-			=> Matrix.Scaling(Scale) * Matrix.Translation(Position);
+			=> Matrix.Scaling(Scale)
+				* Matrix.RotationYawPitchRoll(ToRadians(Rotation.Y), ToRadians(Rotation.X), ToRadians(Rotation.Z))
+				* Matrix.Translation(Position);
+
+		private float ToRadians(float degrees) => degrees * ((float)Math.PI / 180.0f);
 
 		internal virtual void PostLoad(Scene scene)
 		{
