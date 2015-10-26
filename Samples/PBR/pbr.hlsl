@@ -15,7 +15,6 @@ cbuffer vbConstants
 
 cbuffer psConstants
 {
-	float3	BaseColour = float3(0.4, 0.5, 0.1);		// Solid colour to render in.
 	float3	DirLightVector = float3(1, 1, 0);	// Light vector for directional light.
 	float3 	DirLightColour = float3(1, 1, 1);
 	float	Ambient = 0.1;

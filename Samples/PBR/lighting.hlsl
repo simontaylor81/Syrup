@@ -1,7 +1,6 @@
 // Various lighting and material stuff.
 
-float Smoothness = 0.5;
-float3 f0 = 0.5;
+#include "material.hlsl"
 
 struct BrdfParams
 {
@@ -17,13 +16,13 @@ struct BrdfParams
 
 float GGXAlpha()
 {
-	return Sqr(1 - Smoothness);
+	return Sqr(1 - GetSmoothness());
 }
 
 float3 LambertDiffuse()
 {
 	// Simple Labertian diffuse -- constant colour.
-	return BaseColour;
+	return GetDiffuseAlbedo();
 	//return 0;
 }
 
@@ -35,6 +34,7 @@ float3 BlinnSpecular(BrdfParams params)
 float3 Fresnel(BrdfParams params)
 {
 	// Schlick approximation
+	float3 f0 = GetF0();
 	return f0 + (1 - f0) * pow(1 - params.LoH, 5);
 }
 
@@ -161,7 +161,7 @@ float3 SpecularIBL(float3 n, float3 v, TextureCube cube, uint2 random)
 			float3 sampleColour = cube.SampleLevel(mySampler, l, 0).rgb;
 			float vis = Visibility(params);
 			float Fc = pow(1 - VoH, 5);
-			float3 F = (1 - Fc) * f0 + Fc;
+			float3 F = (1 - Fc) * GetF0() + Fc;
 			
 			// Incident light = sampleColour * NoL
 			// Microfacet specular = D * G * F / (4*NoL * NoV)

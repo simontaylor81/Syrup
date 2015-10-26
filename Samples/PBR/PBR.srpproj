@@ -7,11 +7,13 @@
     <include filename="background.hlsl" runAtStartup="false" />
     <include filename="lighting.hlsl" runAtStartup="false" />
     <include filename="util.hlsl" runAtStartup="false" />
+    <include filename="material.hlsl" runAtStartup="false" />
   </folder>
   <OpenDocuments>
     <OpenDocument path="C:\GitHub\Syrup\Samples\PBR\pbr.hlsl" />
     <OpenDocument path="C:\GitHub\Syrup\Samples\PBR\pbr.py" />
     <OpenDocument path="C:\GitHub\Syrup\Samples\PBR\lighting.hlsl" />
     <OpenDocument path="C:\GitHub\Syrup\Samples\PBR\util.hlsl" />
+    <OpenDocument path="C:\GitHub\Syrup\Samples\PBR\material.hlsl" />
   </OpenDocuments>
 </project>

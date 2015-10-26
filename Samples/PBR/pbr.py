@@ -8,8 +8,10 @@ ps_noibl = ri.CompileShader("pbr.hlsl", "SolidColourPS", "ps_4_0", { 'PBR_USE_IB
 backgroundVs = ri.CompileShader("background.hlsl", "VS", "vs_4_0")
 backgroundPs = ri.CompileShader("background.hlsl", "PS", "ps_4_0")
 
-ri.BindShaderVariableToMaterial(ps_ibl, "SolidColour", "DiffuseColour")
-ri.BindShaderVariableToMaterial(ps_noibl, "SolidColour", "DiffuseColour")
+ri.BindShaderVariableToMaterial(ps_ibl, "BaseColour", "BaseColour")
+ri.BindShaderVariableToMaterial(ps_noibl, "BaseColour", "BaseColour")
+ri.BindShaderVariableToMaterial(ps_ibl, "PbrParams", "PbrParams")
+ri.BindShaderVariableToMaterial(ps_noibl, "PbrParams", "PbrParams")
 
 useIbl = ri.AddUserVar("Use IBL", UserVariableType.Bool, True)
 

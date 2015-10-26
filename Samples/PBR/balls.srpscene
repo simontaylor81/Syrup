@@ -14,7 +14,7 @@
       "position": "2, 1, 2",
       "scale": "1, 1, 1",
       "rotation": "0, 0, 0",
-      "material": null
+      "material": "M0"
     },
     {
       "type": "Sphere",
@@ -23,7 +23,7 @@
       "position": "-2, 1, 2",
       "scale": "1, 1, 1",
       "rotation": "0, 0, 0",
-      "material": null
+      "material": "M1"
     },
     {
       "type": "Sphere",
@@ -32,7 +32,7 @@
       "position": "2, 1, -2",
       "scale": "1, 1, 1",
       "rotation": "0, 0, 0",
-      "material": null
+      "material": "M2"
     },
     {
       "type": "Sphere",
@@ -41,10 +41,35 @@
       "position": "-2, 1, -2",
       "scale": "1, 1, 1",
       "rotation": "0, 0, 0",
-      "material": null
+      "material": "M3"
     }
   ],
   "meshes": {},
-  "materials": {},
+  "materials": {
+    "M0": {
+      "vectorParams": {
+        "BaseColour": "1, 1, 0, 0",
+		"PbrParams" : "0, 0, 0.5, 0"
+      }
+    },
+    "M1": {
+      "vectorParams": {
+        "BaseColour": "1, 0, 1, 0",
+		"PbrParams" : "0.8, 0, 0.5, 0"
+      }
+    },
+    "M2": {
+      "vectorParams": {
+        "BaseColour": "1, 0, 0, 0",
+		"PbrParams" : "0.4, 1, 0.5, 0"
+      }
+    },
+    "M3": {
+      "vectorParams": {
+        "BaseColour": "0, 1, 0, 0",
+		"PbrParams" : "0.9, 1, 0.5, 0"
+      }
+    },
+  },
   "lights": []
 }
