@@ -73,6 +73,9 @@ namespace SRPRendering
 		public object DepthBuffer => DepthBufferHandle.Default;
 		public object NoDepthBuffer => DepthBufferHandle.NoDepthBuffer;
 
+		public object BlackTexture => src.BlackTexture;
+		public object WhiteTexture => src.WhiteTexture;
+
 		// Internal constructor, so python can't create new instances.
 		internal ScriptRenderInterface(ScriptRenderControl src)
 		{

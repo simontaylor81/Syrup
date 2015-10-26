@@ -11,6 +11,10 @@ namespace SRPRendering
 {
 	public interface IGlobalResources : IDisposable
 	{
+		// Simple constant colour textures.
+		Texture BlackTexture { get; }
+		Texture WhiteTexture { get; }
+
 		// Texture to use to indicate error when non is found.
 		Texture ErrorTexture { get; }
 
@@ -34,6 +38,8 @@ namespace SRPRendering
 	internal class GlobalResources : IGlobalResources
 	{
 		// The resources themselves.
+		public Texture BlackTexture { get; }
+		public Texture WhiteTexture { get; }
 		public Texture ErrorTexture { get; }
 
 		public IDrawable CubeMesh { get; }
@@ -57,7 +63,11 @@ namespace SRPRendering
 		public GlobalResources(Device device)
 		{
 			// Create constant pink error texture.
+			BlackTexture = CreateConstantColourTexture(device, Color.Black);
+			WhiteTexture = CreateConstantColourTexture(device, Color.White);
 			ErrorTexture = CreateConstantColourTexture(device, Color.Magenta);
+			disposables.Add(BlackTexture);
+			disposables.Add(WhiteTexture);
 			disposables.Add(ErrorTexture);
 
 			// Create simple utility meshes.

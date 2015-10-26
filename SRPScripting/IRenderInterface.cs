@@ -67,5 +67,8 @@ namespace SRPScripting
 		//object BackBuffer { get; }
 		object DepthBuffer { get; }
 		object NoDepthBuffer { get; }
+
+		object BlackTexture { get; }
+		object WhiteTexture { get; }
 	}
 }

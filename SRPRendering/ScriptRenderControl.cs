@@ -298,7 +298,15 @@ namespace SRPRendering
 					throw new ScriptException("Attempting to bind already bound shader variable: " + varName);
 				}
 
-				if (value is TextureHandle)
+				if (value == BlackTexture)
+				{
+					variable.Bind = new TextureShaderResourceVariableBind(_globalResources.BlackTexture);
+				}
+				else if (value == WhiteTexture)
+				{
+					variable.Bind = new TextureShaderResourceVariableBind(_globalResources.WhiteTexture);
+				}
+				else if (value is TextureHandle)
 				{
 					// Bind the variable to a texture's SRV.
 					int texIndex = ((TextureHandle)value).index;
@@ -467,6 +475,10 @@ namespace SRPRendering
 
 		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
 		public IRenderInterface ScriptInterface { get; }
+
+		// These don't need to be anything, we're just going to use them with reference equality checks.
+		public object BlackTexture { get; } = new object();
+		public object WhiteTexture { get; } = new object();
 
 		private ObservableCollection<IUserProperty> properties = new ObservableCollection<IUserProperty>();
 		public ObservableCollection<IUserProperty> Properties => properties;
