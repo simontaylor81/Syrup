@@ -41,7 +41,7 @@ namespace SRPCommon.Scene
 
 		private void Import()
 		{
-			using (var importer = new AssimpImporter())
+			using (var importer = new AssimpContext())
 			{
 				// Set configuration. TODO: What does this stuff do?!
 				importer.SetConfig(new Assimp.Configs.NormalSmoothingAngleConfig(66.0f));
@@ -75,9 +75,9 @@ namespace SRPCommon.Scene
 							ToVector3(srcMesh.Vertices[i]),
 							ToVector3(srcMesh.Normals[i]));
 
-						for (int uvChannel = 0; uvChannel < srcMesh.TextureCoordsChannelCount; uvChannel++)
+						for (int uvChannel = 0; uvChannel < srcMesh.TextureCoordinateChannelCount; uvChannel++)
 						{
-							var uv = srcMesh.GetTextureCoords(uvChannel)[i];
+							var uv = srcMesh.TextureCoordinateChannels[uvChannel][i];
 							vertex.SetUV(uvChannel, new Vector2(uv.X, uv.Y));
 						}
 
