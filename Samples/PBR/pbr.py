@@ -12,13 +12,16 @@ pixelshaders = [ps_ibl, ps_noibl]
 ri.BindShaderVariableToMaterial(pixelshaders, "BaseColour", "BaseColour")
 ri.BindShaderVariableToMaterial(pixelshaders, "PbrParams", "PbrParams")
 
+ri.BindShaderResourceToMaterial(pixelshaders, "BaseColourTex", "BaseColour", fallback = ri.WhiteTexture);
+ri.BindShaderResourceToMaterial(pixelshaders, "SmoothnessTex", "Smoothness", fallback = ri.WhiteTexture);
+ri.BindShaderResourceToMaterial(pixelshaders, "MetallicTex", "Metallic", fallback = ri.WhiteTexture);
+
 useIbl = ri.AddUserVar("Use IBL", UserVariableType.Bool, True)
 
 # Load environment cubemap.
 envmap = ri.LoadTexture("assets/Arches_E_PineTree_Cube.dds")
 ri.SetShaderResourceVariable(backgroundPs, "EnvCube", envmap)
-ri.SetShaderResourceVariable(ps_ibl, "EnvCube", envmap)
-ri.SetShaderResourceVariable(ps_noibl, "EnvCube", envmap)
+ri.SetShaderResourceVariable(pixelshaders, "EnvCube", envmap)
 
 def RenderFrame(context):
 	context.Clear((0.5, 0.5, 1.0, 0))

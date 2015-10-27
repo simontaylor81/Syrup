@@ -57,7 +57,7 @@ PSIn BasicVS(VSIn In)
 	Out.Pos = mul(WorldToProjectionMatrix, WorldPos);
 	Out.WorldPos = WorldPos.xyz;
 	
-	Out.Normal = In.Normal;
+	Out.Normal = mul(LocalToWorldMatrix, float4(In.Normal, 0.0f)).xyz;
 	for (int i = 0; i < 4; i++)
 		Out.UVs[i] = In.UVs[i];
 		
@@ -73,14 +73,16 @@ float4 SolidColourPS(PSIn In) : SV_Target
 	
 	// Pseudo-random number for jittering, etc.
 	uint2 random = ScrambleTEA(asuint(In.Pos.xy));
+	
+	MaterialParams matParams = GetMaterialParams(In.UVs[0]);
 
 	// Ambient lighting
 	float3 lighting = Ambient * (dot(In.Normal, float3(0,1,0)) * 0.5 + 0.5);
 	
-	lighting += DirectionalLight(N, normalize(DirLightVector), V, DirLightColour);
+	lighting += DirectionalLight(N, normalize(DirLightVector), V, DirLightColour, matParams);
 	
 #if PBR_USE_IBL
-	lighting += IBL(N, V, EnvCube, random);
+	lighting += IBL(N, V, EnvCube, matParams, random);
 #endif
 	
 	return float4(lighting, 1.0f);
