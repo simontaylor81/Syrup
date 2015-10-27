@@ -97,7 +97,8 @@
 	  "textures": {
 	    "BaseColour": "assets\\Cerberus_by_Andrew_Maximov\\Textures\\Cerberus_A.tga",
 		"Smoothness": "assets\\Cerberus_by_Andrew_Maximov\\Textures\\Cerberus_Sm.tga",
-		"Metallic": "assets\\Cerberus_by_Andrew_Maximov\\Textures\\Cerberus_M.tga"
+		"Metallic": "assets\\Cerberus_by_Andrew_Maximov\\Textures\\Cerberus_M.tga",
+		"Normal": "assets\\Cerberus_by_Andrew_Maximov\\Textures\\Cerberus_N.tga"
 	  }
 	}
   },

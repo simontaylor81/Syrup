@@ -15,6 +15,7 @@ ri.BindShaderVariableToMaterial(pixelshaders, "PbrParams", "PbrParams")
 ri.BindShaderResourceToMaterial(pixelshaders, "BaseColourTex", "BaseColour", fallback = ri.WhiteTexture);
 ri.BindShaderResourceToMaterial(pixelshaders, "SmoothnessTex", "Smoothness", fallback = ri.WhiteTexture);
 ri.BindShaderResourceToMaterial(pixelshaders, "MetallicTex", "Metallic", fallback = ri.WhiteTexture);
+ri.BindShaderResourceToMaterial(pixelshaders, "NormalTex", "Normal", fallback = ri.DefaultNormalTexture);
 
 useIbl = ri.AddUserVar("Use IBL", UserVariableType.Bool, True)
 

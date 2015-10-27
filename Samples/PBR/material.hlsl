@@ -3,6 +3,7 @@ float3 BaseColour = float3(1, 1, 1);
 Texture2D BaseColourTex;
 Texture2D SmoothnessTex;
 Texture2D MetallicTex;
+Texture2D NormalTex;
 
 // (Smoothness, Metallic, Reflectance)
 float3 PbrParams = float3(1, 1, 0.5);
@@ -12,6 +13,7 @@ struct MaterialParams
 	float3 DiffuseAlbedo;
 	float Smoothness;
 	float3 F0;
+	float3 Normal;
 };
 
 MaterialParams GetMaterialParams(float2 uv)
@@ -26,6 +28,7 @@ MaterialParams GetMaterialParams(float2 uv)
 	result.DiffuseAlbedo = lerp(baseColour, 0, metallic);
 	result.Smoothness = smoothness;
 	result.F0 = lerp(reflectance * 0.08, baseColour, metallic);
-	
+	result.Normal = normalize(NormalTex.Sample(mySampler, uv).xyz * 2 - 1);
+
 	return result;
 }
