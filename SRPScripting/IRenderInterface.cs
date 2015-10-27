@@ -12,6 +12,7 @@ namespace SRPScripting
 		ProjectionToWorldMatrix,	// Bind to the combined projection to world space matrix (i.e. the inverse of the WorldToProjectionMatrix).
 		LocalToWorldMatrix,			// Bind to the object-local to world space matrix.
 		WorldToLocalMatrix,			// Bind to the world to object-local space matrix (i.e. the inverse of the local to world matrix).
+		LocalToWorldInverseTransposeMatrix,	// Bind to the inverse-transpose of the local-to-world matrix.
 		CameraPosition,				// Bind to the position of the camera in world-space.
 	}
 
@@ -70,5 +71,6 @@ namespace SRPScripting
 
 		object BlackTexture { get; }
 		object WhiteTexture { get; }
+		object DefaultNormalTexture { get; }
 	}
 }

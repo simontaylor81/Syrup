@@ -62,8 +62,9 @@ namespace SRPCommon.Scene
 					if (!srcMesh.HasVertices || !srcMesh.HasFaces)
 						return;
 
-					// We have generate normals enabled, so all meshes should have them.
+					// We have generate normals/tangent basis enabled, so all meshes should have them.
 					Debug.Assert(srcMesh.HasNormals);
+					Debug.Assert(srcMesh.HasTangentBasis);
 
 					// Create vertex stream.
 					int vertexBufferSize = SceneVertex.GetStride() * srcMesh.VertexCount;
@@ -73,7 +74,9 @@ namespace SRPCommon.Scene
 					{
 						var vertex = new SceneVertex(
 							ToVector3(srcMesh.Vertices[i]),
-							ToVector3(srcMesh.Normals[i]));
+							ToVector3(srcMesh.Normals[i]),
+							ToVector3(srcMesh.Tangents[i]),
+							ToVector3(srcMesh.BiTangents[i]));
 
 						for (int uvChannel = 0; uvChannel < srcMesh.TextureCoordinateChannelCount; uvChannel++)
 						{
