@@ -47,9 +47,9 @@ namespace SRPRendering
 			src.ShaderVariableIsScriptOverride(shader, var);
 		}
 
-		public void BindShaderResourceToMaterial(dynamic shader, string var, string param)
+		public void BindShaderResourceToMaterial(dynamic shader, string var, string param, object fallback = null)
 		{
-			src.BindShaderResourceToMaterial(shader, var, param);
+			src.BindShaderResourceToMaterial(shader, var, param, fallback);
 		}
 		public void SetShaderResourceVariable(dynamic shader, string var, object value)
 		{
