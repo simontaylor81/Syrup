@@ -75,6 +75,7 @@ namespace SRPRendering
 
 		public object BlackTexture => src.BlackTexture;
 		public object WhiteTexture => src.WhiteTexture;
+		public object DefaultNormalTexture => src.DefaultNormalTexture;
 
 		// Internal constructor, so python can't create new instances.
 		internal ScriptRenderInterface(ScriptRenderControl src)

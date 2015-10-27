@@ -481,6 +481,10 @@ namespace SRPRendering
 			{
 				return _globalResources.WhiteTexture;
 			}
+			else if (handle == DefaultNormalTexture)
+			{
+				return _globalResources.DefaultNormalTexture;
+			}
 			else if (handle is TextureHandle)
 			{
 				// Bind the variable to a texture's SRV.
@@ -499,6 +503,7 @@ namespace SRPRendering
 		// These don't need to be anything, we're just going to use them with reference equality checks.
 		public object BlackTexture { get; } = new object();
 		public object WhiteTexture { get; } = new object();
+		public object DefaultNormalTexture { get; } = new object();
 
 		private ObservableCollection<IUserProperty> properties = new ObservableCollection<IUserProperty>();
 		public ObservableCollection<IUserProperty> Properties => properties;

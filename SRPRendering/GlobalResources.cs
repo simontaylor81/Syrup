@@ -14,6 +14,7 @@ namespace SRPRendering
 		// Simple constant colour textures.
 		Texture BlackTexture { get; }
 		Texture WhiteTexture { get; }
+		Texture DefaultNormalTexture { get; }
 
 		// Texture to use to indicate error when non is found.
 		Texture ErrorTexture { get; }
@@ -40,6 +41,7 @@ namespace SRPRendering
 		// The resources themselves.
 		public Texture BlackTexture { get; }
 		public Texture WhiteTexture { get; }
+		public Texture DefaultNormalTexture { get; }
 		public Texture ErrorTexture { get; }
 
 		public IDrawable CubeMesh { get; }
@@ -65,9 +67,11 @@ namespace SRPRendering
 			// Create constant pink error texture.
 			BlackTexture = CreateConstantColourTexture(device, Color.Black);
 			WhiteTexture = CreateConstantColourTexture(device, Color.White);
+			DefaultNormalTexture = CreateConstantColourTexture(device, Color.FromArgb(128, 128, 255), sRGB: false);
 			ErrorTexture = CreateConstantColourTexture(device, Color.Magenta);
 			disposables.Add(BlackTexture);
 			disposables.Add(WhiteTexture);
+			disposables.Add(DefaultNormalTexture);
 			disposables.Add(ErrorTexture);
 
 			// Create simple utility meshes.
@@ -114,14 +118,14 @@ namespace SRPRendering
 		}
 
 		// Create a texture with a solid colour.
-		private Texture CreateConstantColourTexture(Device device, Color colour)
+		private Texture CreateConstantColourTexture(Device device, Color colour, bool sRGB = true)
 		{
 			// Make a 1x1 texture.
 			var description = new Texture2DDescription()
 			{
 				Width = 1,
 				Height = 1,
-				Format = SlimDX.DXGI.Format.R8G8B8A8_UNorm_SRGB,
+				Format = sRGB ? SlimDX.DXGI.Format.R8G8B8A8_UNorm_SRGB : SlimDX.DXGI.Format.R8G8B8A8_UNorm,
 				MipLevels = 1,
 				SampleDescription = new SlimDX.DXGI.SampleDescription() { Count = 1 },
 				ArraySize = 1,
