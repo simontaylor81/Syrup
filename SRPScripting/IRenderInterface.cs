@@ -15,20 +15,6 @@ namespace SRPScripting
 		CameraPosition,				// Bind to the position of the camera in world-space.
 	}
 
-	public enum UserVariableType
-	{
-		Float,		// Scalar floating point value.
-		Float2,		// Floating point vector types.
-		Float3,
-		Float4,
-		Int,
-		Int2,
-		Int3,
-		Int4,
-		Bool,		// Boolean value.
-		String,
-	}
-
 	// Delegate type for the per-frame callback. Cannot be inside the interface cos C# is silly.
 	public delegate void FrameCallback(IRenderContext context);
 
@@ -55,7 +41,18 @@ namespace SRPScripting
 		void BindShaderResourceToMaterial(dynamic shader, string var, string param);
 		void SetShaderResourceVariable(dynamic shader, string var, object value);
 
-		dynamic AddUserVar(string name, UserVariableType type, dynamic defaultValue);
+		#region User Variables
+		dynamic AddUserVar_Float(string name, float defaultValue);
+		dynamic AddUserVar_Float2(string name, object defaultValue);
+		dynamic AddUserVar_Float3(string name, object defaultValue);
+		dynamic AddUserVar_Float4(string name, object defaultValue);
+		dynamic AddUserVar_Int(string name, int defaultValue);
+		dynamic AddUserVar_Int2(string name, object defaultValue);
+		dynamic AddUserVar_Int3(string name, object defaultValue);
+		dynamic AddUserVar_Int4(string name, object defaultValue);
+		dynamic AddUserVar_Bool(string name, bool defaultValue);
+		dynamic AddUserVar_String(string name, string defaultValue);
+		#endregion
 
 		// Still unsure if this is the best way to go.
 		void SetFrameCallback(FrameCallback callback);

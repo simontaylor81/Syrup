@@ -21,53 +21,25 @@ namespace SRPRendering
 		// IObservable interface
 		public abstract IDisposable Subscribe(IObserver<Unit> observer);
 
-		public static UserVariable Create(string name, UserVariableType type, object defaultValue)
+		public static UserVariable CreateScalar<T>(string name, T defaultValue)
+		{
+			return new UserVariableScalar<T>(name, defaultValue);
+		}
+
+		// TODO: Typed default?
+		public static UserVariable CreateVector<T>(int numComponents, string name, dynamic defaultValue)
 		{
 			try
 			{
-				switch (type)
-				{
-					// Scalar types.
-					case UserVariableType.Float:
-						return new UserVariableScalar<float>(name, defaultValue);
-					case UserVariableType.Int:
-						return new UserVariableScalar<int>(name, defaultValue);
-					case UserVariableType.Bool:
-						return new UserVariableScalar<bool>(name, defaultValue);
-					case UserVariableType.String:
-						return new UserVariableScalar<string>(name, defaultValue);
-
-					// Vector types
-					case UserVariableType.Float2:
-						return CreateVector<float>(2, name, defaultValue);
-					case UserVariableType.Float3:
-						return CreateVector<float>(3, name, defaultValue);
-					case UserVariableType.Float4:
-						return CreateVector<float>(4, name, defaultValue);
-
-					case UserVariableType.Int2:
-						return CreateVector<int>(2, name, defaultValue);
-					case UserVariableType.Int3:
-						return CreateVector<int>(3, name, defaultValue);
-					case UserVariableType.Int4:
-						return CreateVector<int>(4, name, defaultValue);
-
-					default:
-						throw new ArgumentException("Invalid user variable type.");
-				}
+				var components = Enumerable.Range(0, numComponents)
+					.Select(i => new UserVariableScalar<T>(i.ToString(), defaultValue[i]))
+					.ToArray();
+				return new UserVariableVector(name, components);
 			}
 			catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
 			{
-				throw new ScriptException("Incorrect type for user variable default value.", ex);
+				throw new ScriptException($"Incorrect type for user variable '{name}' default value.", ex);
 			}
-		}
-
-		private static UserVariable CreateVector<T>(int numComponents, string name, dynamic defaultValue)
-		{
-			var components = Enumerable.Range(0, numComponents)
-				.Select(i => new UserVariableScalar<T>(i.ToString(), defaultValue[i]))
-				.ToArray();
-			return new UserVariableVector(name, components);
 		}
 
 		protected UserVariable(string name)
@@ -85,12 +57,10 @@ namespace SRPRendering
 			return func;
 		}
 
-		public UserVariableScalar(string name, object defaultValue)
+		public UserVariableScalar(string name, T defaultValue)
 			: base(name)
 		{
-			// Use explicit dynamic cast to convert from similar types (e.g. ints/doubles -> float).
-			dynamic dynamicDefault = defaultValue;
-			value = (T)dynamicDefault;
+			value = defaultValue;
 		}
 
 		public Type Type => typeof(T);

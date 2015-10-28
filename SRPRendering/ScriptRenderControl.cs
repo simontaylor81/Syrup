@@ -331,13 +331,33 @@ namespace SRPRendering
 			}
 		}
 
-		// Add a user-exposed variable.
-		public dynamic AddUserVar(string name, UserVariableType type, dynamic defaultValue)
+		#region User Variables
+		public dynamic AddUserVar_Float(string name, float defaultValue) => AddScalarUserVar<float>(name, defaultValue);
+		public dynamic AddUserVar_Float2(string name, object defaultValue) => AddVectorUserVar<float>(2, name, defaultValue);
+		public dynamic AddUserVar_Float3(string name, object defaultValue) => AddVectorUserVar<float>(3, name, defaultValue);
+		public dynamic AddUserVar_Float4(string name, object defaultValue) => AddVectorUserVar<float>(4, name, defaultValue);
+		public dynamic AddUserVar_Int(string name, int defaultValue) => AddScalarUserVar<int>(name, defaultValue);
+		public dynamic AddUserVar_Int2(string name, object defaultValue) => AddVectorUserVar<int>(2, name, defaultValue);
+		public dynamic AddUserVar_Int3(string name, object defaultValue) => AddVectorUserVar<int>(3, name, defaultValue);
+		public dynamic AddUserVar_Int4(string name, object defaultValue) => AddVectorUserVar<int>(4, name, defaultValue);
+		public dynamic AddUserVar_Bool(string name, bool defaultValue) => AddScalarUserVar<bool>(name, defaultValue);
+		public dynamic AddUserVar_String(string name, string defaultValue) => AddScalarUserVar<string>(name, defaultValue);
+
+		// Add a single-component user variable.
+		private dynamic AddScalarUserVar<T>(string name, T defaultValue)
+			=> AddUserVar(UserVariable.CreateScalar(name, defaultValue));
+
+		// Add a vector user variable.
+		private dynamic AddVectorUserVar<T>(int numComponents, string name, object defaultValue)
+			=> AddUserVar(UserVariable.CreateVector<T>(numComponents, name, defaultValue));
+
+		// Add a user variable.
+		private dynamic AddUserVar(UserVariable userVar)
 		{
-			var userVar = UserVariable.Create(name, type, defaultValue);
 			userVariables.Add(userVar);
 			return userVar.GetFunction();
 		}
+		#endregion
 
 		// Create a render target of dimensions equal to the viewport.
 		public object CreateRenderTarget()

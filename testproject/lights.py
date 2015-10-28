@@ -16,13 +16,13 @@ ri.BindShaderVariable(ps, "CameraPos", ShaderVariableBindSource.CameraPosition);
 ri.SetShaderResourceVariable(copytexPS, "tex", rt)
 
 # Expose radius rather than inverse-square-radius.
-radius = ri.AddUserVar("Radius", UserVariableType.Float, 20)
+radius = ri.AddUserVar_Float("Radius", 20)
 def InvSqrRadius():
 	r = max(0.0001, radius())
 	return 1.0 / (r*r)
 ri.SetShaderVariable(ps, "LightInvSqrRadius", InvSqrRadius)
 
-wireframe = ri.AddUserVar("Wireframe?", UserVariableType.Bool, False)
+wireframe = ri.AddUserVar_Bool("Wireframe?", False)
 
 ri.BindShaderResourceToMaterial(ps, "DiffuseTex", "DiffuseTexture")
 

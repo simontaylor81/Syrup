@@ -12,7 +12,7 @@ pixelshaders = [ps_ibl, ps_noibl]
 ri.BindShaderVariableToMaterial(pixelshaders, "BaseColour", "BaseColour")
 ri.BindShaderVariableToMaterial(pixelshaders, "PbrParams", "PbrParams")
 
-useIbl = ri.AddUserVar("Use IBL", UserVariableType.Bool, True)
+useIbl = ri.AddUserVar_Bool("Use IBL", True)
 
 # Load environment cubemap.
 envmap = ri.LoadTexture("assets/Arches_E_PineTree_Cube.dds")
