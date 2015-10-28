@@ -88,8 +88,9 @@ namespace SRPRendering
 		public UserVariableScalar(string name, object defaultValue)
 			: base(name)
 		{
-			// Use explicit cast to convert from similar types (e.g. ints/doubles -> float).
-			value = (T)defaultValue;
+			// Use explicit dynamic cast to convert from similar types (e.g. ints/doubles -> float).
+			dynamic dynamicDefault = defaultValue;
+			value = (T)dynamicDefault;
 		}
 
 		public Type Type => typeof(T);
