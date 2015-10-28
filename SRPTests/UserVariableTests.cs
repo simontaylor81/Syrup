@@ -21,7 +21,7 @@ namespace SRPTests
 		public void ScalarVariable<T>(UserVariableType type, T defaultValue, T otherValue)
 		{
 			var uv = UserVariable.Create("myvar", type, defaultValue);
-			Func<T> getValue = uv.GetFunction();
+			var getValue = (Func<T>)uv.GetFunction();
 
 			// Basics
 			Assert.Equal("myvar", uv.Name);
@@ -73,8 +73,10 @@ namespace SRPTests
 				Assert.IsAssignableFrom<IScalarProperty<T>>(prop.GetComponent(i));
 			}
 
+			var func = (Func<IEnumerable<dynamic>>)uv.GetFunction();
+
 			// Check composite value is correct.
-			AssertEqualDynamicEnumerable(defaultValue, uv.GetFunction()());
+			AssertEqualDynamicEnumerable(defaultValue, func());
 
 			// Check each component against default value.
 			for (int i = 0; i < prop.NumComponents; i++)
@@ -95,7 +97,7 @@ namespace SRPTests
 			Assert.True(receivedNotification);
 
 			// Check composite value is correct.
-			AssertEqualDynamicEnumerable(otherValue, uv.GetFunction()());
+			AssertEqualDynamicEnumerable(otherValue, func());
 
 			// Check each component was changed.
 			for (int i = 0; i < prop.NumComponents; i++)

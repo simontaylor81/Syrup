@@ -16,12 +16,12 @@ namespace SRPRendering
 		public string Name { get; }
 		public bool IsReadOnly => false;
 
-		public abstract dynamic GetFunction();
+		public abstract object GetFunction();
 
 		// IObservable interface
 		public abstract IDisposable Subscribe(IObserver<Unit> observer);
 
-		public static UserVariable Create(string name, UserVariableType type, dynamic defaultValue)
+		public static UserVariable Create(string name, UserVariableType type, object defaultValue)
 		{
 			try
 			{
@@ -79,13 +79,13 @@ namespace SRPRendering
 	// User variable representing a single value of the given type.
 	class UserVariableScalar<T> : UserVariable, IScalarProperty<T>
 	{
-		public override dynamic GetFunction()
+		public override object GetFunction()
 		{
 			Func<T> func = () => value;
 			return func;
 		}
 
-		public UserVariableScalar(string name, dynamic defaultValue)
+		public UserVariableScalar(string name, object defaultValue)
 			: base(name)
 		{
 			// Use explicit cast to convert from similar types (e.g. ints/doubles -> float).
@@ -127,7 +127,7 @@ namespace SRPRendering
 		public override dynamic GetFunction()
 		{
 			// Get the function for each component.
-			var subFuncs = components.Select(c => c.GetFunction());
+			IEnumerable<dynamic> subFuncs = components.Select(c => c.GetFunction());
 
 			// Convert result to array so it's subscriptable in script.
 			Func<IEnumerable<dynamic>> func = () => subFuncs.Select(s => s()).ToArray();
