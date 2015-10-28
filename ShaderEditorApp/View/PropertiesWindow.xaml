@@ -26,8 +26,13 @@
                      KeyDown="ScalarPropertyValue_KeyDown"
                      GotFocus="ScalarPropertyValue_GotFocus"/>
         </DataTemplate>
+
         <DataTemplate x:Key="BoolPropertyValueTemplate">
             <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ChoicePropertyValueTemplate">
+            <ComboBox ItemsSource="{Binding Choices}" SelectedItem="{Binding Value}" />
         </DataTemplate>
 
         <DataTemplate x:Key="VectorPropertyValueTemplate">
@@ -61,6 +66,7 @@
         <local:PropertyValueTemplateSelector x:Key="PropertyValueTemplateSelector"
                                              ScalarTemplate="{StaticResource ScalarPropertyValueTemplate}"
                                              BoolTemplate="{StaticResource BoolPropertyValueTemplate}"
+                                             ChoiceTemplate="{StaticResource ChoicePropertyValueTemplate}"
                                              VectorTemplate="{StaticResource VectorPropertyValueTemplate}"
                                              MatrixTemplate="{StaticResource MatrixPropertyValueTemplate}"/>
 

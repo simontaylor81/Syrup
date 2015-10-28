@@ -21,25 +21,25 @@ namespace ShaderEditorApp.SampleData
 	public class DummyPropertyFloat : DummyPropertyBase
 	{
 		public float Value { get; set; }
-		//public bool IsComposite { get { return false; } }	// TEMP?
 	}
 	public class DummyPropertyBool : DummyPropertyBase
 	{
 		public bool Value { get; set; }
-		//public bool IsComposite { get { return false; } }	// TEMP?
 	}
 	public class DummyVectorProperty : DummyPropertyBase
 	{
 		public List<DummyPropertyBase> SubProperties { get; set; }
-		//public bool IsComposite { get { return true; } }	// TEMP?
+	}
+	public class DummyMatrixProperty : DummyPropertyBase
+	{
+		public List<DummyPropertyList> Rows { get; set; }
+	}
+	public class DummyChoiceProperty : DummyPropertyBase
+	{
+		public string Value { get; set; }
+		public List<string> Choices { get; set; }
 	}
 
 	public class DummyPropertyList : List<DummyPropertyBase>
 	{ }
-
-	public class DummyMatrixProperty : DummyPropertyBase
-	{
-		public List<DummyPropertyList> Rows { get; set; }
-		//public bool IsComposite { get { return true; } }	// TEMP?
-	}
 }

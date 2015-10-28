@@ -62,6 +62,7 @@ namespace ShaderEditorApp.View
 		// Templates to use for the various types.
 		public DataTemplate ScalarTemplate { get; set; }
 		public DataTemplate BoolTemplate { get; set; }
+		public DataTemplate ChoiceTemplate { get; set; }
 		public DataTemplate VectorTemplate { get; set; }
 		public DataTemplate MatrixTemplate { get; set; }
 
@@ -69,8 +70,10 @@ namespace ShaderEditorApp.View
 		{
 			// TODO: Can this be handled more generically?
 
+			if (item is ChoicePropertyViewModel || item is DummyChoiceProperty)
+				return ChoiceTemplate;
 			// Anything that just wants a single text box can use the scalar template.
-			if (item is ScalarPropertyViewModel<float> || item is ScalarPropertyViewModel<string> || item is ScalarPropertyViewModel<int> || item is DummyPropertyFloat)
+			else if (item is ScalarPropertyViewModel<float> || item is ScalarPropertyViewModel<string> || item is ScalarPropertyViewModel<int> || item is DummyPropertyFloat)
 				return ScalarTemplate;
 			else if (item is ScalarPropertyViewModel<bool> || item is DummyPropertyBool)
 				return BoolTemplate;
