@@ -16,19 +16,20 @@ using SRPCommon.Util;
 using SRPScripting;
 using System.Reactive;
 using System.Reactive.Subjects;
+using Castle.DynamicProxy;
 
 namespace SRPRendering
 {
 	// Class that takes commands from the script and controls the rendering.
-	// Anything not part of the IRenderInterface is marked internal to avoid the script calling it.
-	public class ScriptRenderControl : IDisposable, IPropertySource
+	public class ScriptRenderControl : IDisposable, IPropertySource, IRenderInterface
 	{
 		public ScriptRenderControl(IWorkspace workspace, Device device, Scripting scripting)
 		{
 			this.workspace = workspace;
 			this.device = device;
 
-			ScriptInterface = new ScriptRenderInterface(this);
+			// Generate wrapper proxy using Castle Dynamic Proxy to avoid direct script access to our internals.
+			ScriptInterface = new ProxyGenerator().CreateInterfaceProxyWithTarget<IRenderInterface>(this);
 
 			// Initialise basic resources.
 			_globalResources = new GlobalResources(device);
@@ -464,6 +465,11 @@ namespace SRPRendering
 
 			return handles.Select(h => shaders[h.index]);
 		}
+
+		public dynamic GetScene() => Scene;
+
+		public object DepthBuffer => DepthBufferHandle.Default;
+		public object NoDepthBuffer => DepthBufferHandle.NoDepthBuffer;
 
 		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
 		public IRenderInterface ScriptInterface { get; }
