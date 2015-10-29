@@ -73,10 +73,10 @@ namespace SRPTests
 				Assert.IsAssignableFrom<IScalarProperty<T>>(prop.GetComponent(i));
 			}
 
-			var func = (Func<IEnumerable<dynamic>>)uv.GetFunction();
+			var func = uv.GetFunction();
 
 			// Check composite value is correct.
-			AssertEqualDynamicEnumerable(defaultValue, func());
+			Assert.Equal(defaultValue, func());
 
 			// Check each component against default value.
 			for (int i = 0; i < prop.NumComponents; i++)
@@ -97,21 +97,12 @@ namespace SRPTests
 			Assert.True(receivedNotification);
 
 			// Check composite value is correct.
-			AssertEqualDynamicEnumerable(otherValue, func());
+			Assert.Equal(otherValue, func());
 
 			// Check each component was changed.
 			for (int i = 0; i < prop.NumComponents; i++)
 			{
 				Assert.Equal(otherValue[i], ((IScalarProperty<T>)prop.GetComponent(i)).Value);
-			}
-		}
-
-		private void AssertEqualDynamicEnumerable<T>(T[] expected, IEnumerable<dynamic> actual)
-		{
-			Assert.Equal(expected.Length, actual.Count());
-			for (int i = 0; i < expected.Length; i++)
-			{
-				Assert.Equal<T>(expected[i], actual.ElementAt(i));
 			}
 		}
 	}

@@ -352,7 +352,7 @@ namespace SRPRendering
 			=> AddUserVar(UserVariable.CreateVector<T>(numComponents, name, defaultValue));
 
 		// Add a user variable.
-		private dynamic AddUserVar(UserVariable userVar)
+		private dynamic AddUserVar<T>(UserVariable<T> userVar)
 		{
 			userVariables.Add(userVar);
 			return userVar.GetFunction();
@@ -527,7 +527,7 @@ namespace SRPRendering
 		public bool HasScriptError => bScriptExecutionError || bScriptRenderError;
 
 		// User variables.
-		private List<UserVariable> userVariables = new List<UserVariable>();
+		private List<IUserProperty> userVariables = new List<IUserProperty>();
 
 		// Object that handles rendering the viewport overlay.
 		private OverlayRenderer overlayRenderer;

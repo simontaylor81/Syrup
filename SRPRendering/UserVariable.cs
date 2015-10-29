@@ -4,43 +4,21 @@ using System.Reactive;
 using System.Reactive.Subjects;
 using SRPCommon.Scripting;
 using SRPCommon.UserProperties;
-using SRPScripting;
 using System.Linq;
 using System.Reactive.Linq;
 
 namespace SRPRendering
 {
-	abstract class UserVariable : IUserProperty
+	abstract class UserVariable<TValue> : IUserProperty
 	{
 		// IUserProperty interface
 		public string Name { get; }
 		public bool IsReadOnly => false;
 
-		public abstract object GetFunction();
+		public abstract Func<TValue> GetFunction();
 
 		// IObservable interface
 		public abstract IDisposable Subscribe(IObserver<Unit> observer);
-
-		public static UserVariable CreateScalar<T>(string name, T defaultValue)
-		{
-			return new UserVariableScalar<T>(name, defaultValue);
-		}
-
-		public static UserVariable CreateVector<T>(int numComponents, string name, object defaultValue)
-		{
-			dynamic dynamicDefault = defaultValue;
-			try
-			{
-				var components = Enumerable.Range(0, numComponents)
-					.Select(i => new UserVariableScalar<T>(i.ToString(), dynamicDefault[i]))
-					.ToArray();
-				return new UserVariableVector(name, components);
-			}
-			catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
-			{
-				throw new ScriptException($"Incorrect type for user variable '{name}' default value.", ex);
-			}
-		}
 
 		protected UserVariable(string name)
 		{
@@ -48,14 +26,34 @@ namespace SRPRendering
 		}
 	}
 
-	// User variable representing a single value of the given type.
-	class UserVariableScalar<T> : UserVariable, IScalarProperty<T>
+	static class UserVariable
 	{
-		public override object GetFunction()
+		public static UserVariable<T> CreateScalar<T>(string name, T defaultValue)
 		{
-			Func<T> func = () => value;
-			return func;
+			return new UserVariableScalar<T>(name, defaultValue);
 		}
+
+		public static UserVariable<T[]> CreateVector<T>(int numComponents, string name, object defaultValue)
+		{
+			dynamic dynamicDefault = defaultValue;
+			try
+			{
+				var components = Enumerable.Range(0, numComponents)
+					.Select(i => new UserVariableScalar<T>(i.ToString(), dynamicDefault[i]))
+					.ToArray();
+				return new UserVariableVector<T>(name, components);
+			}
+			catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
+			{
+				throw new ScriptException($"Incorrect type for user variable '{name}' default value.", ex);
+			}
+		}
+	}
+
+	// User variable representing a single value of the given type.
+	class UserVariableScalar<T> : UserVariable<T>, IScalarProperty<T>
+	{
+		public override Func<T> GetFunction() => (() => value);
 
 		public UserVariableScalar(string name, T defaultValue)
 			: base(name)
@@ -91,21 +89,20 @@ namespace SRPRendering
 	}
 
 	// User variable representing a vector of values.
-	class UserVariableVector : UserVariable, IVectorProperty
+	class UserVariableVector<TComponent> : UserVariable<TComponent[]>, IVectorProperty
 	{
-		private readonly UserVariable[] components;
+		private readonly UserVariable<TComponent>[] components;
 
-		public override dynamic GetFunction()
+		public override Func<TComponent[]> GetFunction()
 		{
 			// Get the function for each component.
-			IEnumerable<dynamic> subFuncs = components.Select(c => c.GetFunction());
+			var subFuncs = components.Select(c => c.GetFunction());
 
 			// Convert result to array so it's subscriptable in script.
-			Func<IEnumerable<dynamic>> func = () => subFuncs.Select(s => s()).ToArray();
-			return func;
+			return () => subFuncs.Select(s => s()).ToArray();
 		}
 
-		public UserVariableVector(string name, UserVariable[] components)
+		public UserVariableVector(string name, UserVariable<TComponent>[] components)
 			: base(name)
 		{
 			this.components = components;
