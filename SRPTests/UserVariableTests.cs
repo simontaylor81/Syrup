@@ -105,5 +105,15 @@ namespace SRPTests
 				Assert.Equal(otherValue[i], ((IScalarProperty<T>)prop.GetComponent(i)).Value);
 			}
 		}
+
+		[Fact]
+		public void DefaultValueIsCastCorrectly()
+		{
+			var defaultVal = new[] { 1, 2 };
+
+			var variable = UserVariable.CreateVector<float>(2, "test", defaultVal);
+
+			Assert.Equal(defaultVal.Select(x => (float)x), variable.GetFunction()());
+		}
 	}
 }
