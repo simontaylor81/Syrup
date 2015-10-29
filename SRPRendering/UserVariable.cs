@@ -26,13 +26,13 @@ namespace SRPRendering
 			return new UserVariableScalar<T>(name, defaultValue);
 		}
 
-		// TODO: Typed default?
-		public static UserVariable CreateVector<T>(int numComponents, string name, dynamic defaultValue)
+		public static UserVariable CreateVector<T>(int numComponents, string name, object defaultValue)
 		{
+			dynamic dynamicDefault = defaultValue;
 			try
 			{
 				var components = Enumerable.Range(0, numComponents)
-					.Select(i => new UserVariableScalar<T>(i.ToString(), defaultValue[i]))
+					.Select(i => new UserVariableScalar<T>(i.ToString(), dynamicDefault[i]))
 					.ToArray();
 				return new UserVariableVector(name, components);
 			}
