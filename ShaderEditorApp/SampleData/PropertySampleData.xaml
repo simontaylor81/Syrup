@@ -1,10 +1,17 @@
 ﻿<vm:DummyWorkspace xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                   xmlns:vm="clr-namespace:ShaderEditorApp.SampleData">
+                   xmlns:vm="clr-namespace:ShaderEditorApp.SampleData"
+                   xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <vm:DummyWorkspace.Properties>
         <vm:DummyPropertyFloat DisplayName="Property 1" IsReadOnly="False" Value="12.0"/>
         <vm:DummyPropertyFloat DisplayName="Property 2" IsReadOnly="True" Value="-7.0"/>
         <vm:DummyPropertyBool DisplayName="Bool prop" IsReadOnly="False" Value="True"/>
+        <vm:DummyChoiceProperty DisplayName="Choice prop" IsReadOnly="False" Value="Choice 1">
+            <vm:DummyChoiceProperty.Choices>
+                <sys:String>Hello</sys:String>
+                <sys:String>World</sys:String>
+            </vm:DummyChoiceProperty.Choices>
+        </vm:DummyChoiceProperty>
         <vm:DummyVectorProperty DisplayName="Vec prop" IsReadOnly="True">
             <vm:DummyVectorProperty.SubProperties>
                 <vm:DummyPropertyFloat DisplayName="X" IsReadOnly="False" Value="1.00001"/>

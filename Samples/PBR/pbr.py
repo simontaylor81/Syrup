@@ -17,7 +17,7 @@ ri.BindShaderResourceToMaterial(pixelshaders, "SmoothnessTex", "Smoothness", fal
 ri.BindShaderResourceToMaterial(pixelshaders, "MetallicTex", "Metallic", fallback = ri.WhiteTexture);
 ri.BindShaderResourceToMaterial(pixelshaders, "NormalTex", "Normal", fallback = ri.DefaultNormalTexture);
 
-useIbl = ri.AddUserVar("Use IBL", UserVariableType.Bool, True)
+useIbl = ri.AddUserVar_Bool("Use IBL", True)
 
 # Load environment cubemap.
 envmap = ri.LoadTexture("assets/Arches_E_PineTree_Cube.dds")

@@ -16,19 +16,20 @@ using SRPCommon.Util;
 using SRPScripting;
 using System.Reactive;
 using System.Reactive.Subjects;
+using Castle.DynamicProxy;
 
 namespace SRPRendering
 {
 	// Class that takes commands from the script and controls the rendering.
-	// Anything not part of the IRenderInterface is marked internal to avoid the script calling it.
-	public class ScriptRenderControl : IDisposable, IPropertySource
+	public class ScriptRenderControl : IDisposable, IPropertySource, IRenderInterface
 	{
 		public ScriptRenderControl(IWorkspace workspace, Device device, Scripting scripting)
 		{
 			this.workspace = workspace;
 			this.device = device;
 
-			ScriptInterface = new ScriptRenderInterface(this);
+			// Generate wrapper proxy using Castle Dynamic Proxy to avoid direct script access to our internals.
+			ScriptInterface = new ProxyGenerator().CreateInterfaceProxyWithTarget<IRenderInterface>(this);
 
 			// Initialise basic resources.
 			_globalResources = new GlobalResources(device);
@@ -266,7 +267,7 @@ namespace SRPRendering
 			}
 		}
 
-		public void BindShaderResourceToMaterial(object handleOrHandles, string varName, string paramName, object fallback)
+		public void BindShaderResourceToMaterial(object handleOrHandles, string varName, string paramName, object fallback = null)
 		{
 			var shaders = GetShaders(handleOrHandles);
 			var variables = shaders
@@ -274,6 +275,13 @@ namespace SRPRendering
 				.Where(shader => shader != null);
 
 			Texture fallbackTexture = _globalResources.ErrorTexture;
+
+			// Ugh, Castle DynamicProxy doesn't pass through the null default value, so detect it.
+			if (fallback == System.Reflection.Missing.Value)
+			{
+				fallback = null;
+			}
+
 			if (fallback != null)
 			{
 				fallbackTexture = GetTexture(fallback);
@@ -335,13 +343,36 @@ namespace SRPRendering
 			}
 		}
 
-		// Add a user-exposed variable.
-		public dynamic AddUserVar(string name, UserVariableType type, dynamic defaultValue)
+		#region User Variables
+		public dynamic AddUserVar_Float(string name, float defaultValue) => AddScalarUserVar<float>(name, defaultValue);
+		public dynamic AddUserVar_Float2(string name, object defaultValue) => AddVectorUserVar<float>(2, name, defaultValue);
+		public dynamic AddUserVar_Float3(string name, object defaultValue) => AddVectorUserVar<float>(3, name, defaultValue);
+		public dynamic AddUserVar_Float4(string name, object defaultValue) => AddVectorUserVar<float>(4, name, defaultValue);
+		public dynamic AddUserVar_Int(string name, int defaultValue) => AddScalarUserVar<int>(name, defaultValue);
+		public dynamic AddUserVar_Int2(string name, object defaultValue) => AddVectorUserVar<int>(2, name, defaultValue);
+		public dynamic AddUserVar_Int3(string name, object defaultValue) => AddVectorUserVar<int>(3, name, defaultValue);
+		public dynamic AddUserVar_Int4(string name, object defaultValue) => AddVectorUserVar<int>(4, name, defaultValue);
+		public dynamic AddUserVar_Bool(string name, bool defaultValue) => AddScalarUserVar<bool>(name, defaultValue);
+		public dynamic AddUserVar_String(string name, string defaultValue) => AddScalarUserVar<string>(name, defaultValue);
+
+		public dynamic AddUserVar_Choice(string name, IEnumerable<object> choices, object defaultValue)
+			=> AddUserVar(UserVariable.CreateChoice(name, choices, defaultValue));
+
+		// Add a single-component user variable.
+		private dynamic AddScalarUserVar<T>(string name, T defaultValue)
+			=> AddUserVar(UserVariable.CreateScalar(name, defaultValue));
+
+		// Add a vector user variable.
+		private dynamic AddVectorUserVar<T>(int numComponents, string name, object defaultValue)
+			=> AddUserVar(UserVariable.CreateVector<T>(numComponents, name, defaultValue));
+
+		// Add a user variable.
+		private dynamic AddUserVar<T>(UserVariable<T> userVar)
 		{
-			var userVar = UserVariable.Create(name, type, defaultValue);
 			userVariables.Add(userVar);
 			return userVar.GetFunction();
 		}
+		#endregion
 
 		// Create a render target of dimensions equal to the viewport.
 		public object CreateRenderTarget()
@@ -497,6 +528,11 @@ namespace SRPRendering
 			return null;
 		}
 
+		public dynamic GetScene() => Scene;
+
+		public object DepthBuffer => DepthBufferHandle.Default;
+		public object NoDepthBuffer => DepthBufferHandle.NoDepthBuffer;
+
 		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
 		public IRenderInterface ScriptInterface { get; }
 
@@ -538,7 +574,7 @@ namespace SRPRendering
 		public bool HasScriptError => bScriptExecutionError || bScriptRenderError;
 
 		// User variables.
-		private List<UserVariable> userVariables = new List<UserVariable>();
+		private List<IUserProperty> userVariables = new List<IUserProperty>();
 
 		// Object that handles rendering the viewport overlay.
 		private OverlayRenderer overlayRenderer;

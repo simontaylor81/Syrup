@@ -17,7 +17,9 @@ tex = ri.CreateTexture2D(16, 16, Format.R8G8B8A8_UNorm, ramp)
 ri.SetShaderResourceVariable(psTex, "DiffuseTex", tex)
 
 
-dummyVar = ri.AddUserVar("FloatUserVar", UserVariableType.Float4, (0,1,2,45))
+dummyVar = ri.AddUserVar_Float4("FloatUserVar", (0,1,2,45))
+
+choiceVar = ri.AddUserVar_Choice("A choice", ['A', 'B', 'C'], 'A')
 
 
 def errorfunc():
@@ -36,8 +38,10 @@ ri.BindShaderVariableToMaterial(ps, "SolidColour", "DiffuseColour")
 
 def RenderFrame(context):
 	rastState = RastState(fillMode = GetFillMode(), cullMode = CullMode.None)
-	#context.DrawSphere(vs, psTex, rastState)
-	context.DrawScene(vs, psTex, rastState)
+	if (choiceVar() == 'B'):
+		context.DrawSphere(vs, psTex, rastState)
+	else:
+		context.DrawScene(vs, psTex, rastState)
 
 ri.SetFrameCallback(RenderFrame)
 

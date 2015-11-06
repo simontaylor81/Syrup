@@ -10,7 +10,7 @@ cbuffer psConstants
 {
 	float3		SolidColour = float3(1, 1, 0);				// Solid colour to render in.
 	float		Alpha = 1.0f;
-	int4		IntVector = int4(0, 1, 2, -17);
+	//int4		IntVector = int4(0, 1, 2, -17);
 	float3x4	FloatMat;
 }
 

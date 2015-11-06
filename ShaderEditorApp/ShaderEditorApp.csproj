@@ -169,6 +169,7 @@
     </Compile>
     <Compile Include="Projects\ProjectFolder.cs" />
     <Compile Include="SampleData\DummyViewModels.cs" />
+    <Compile Include="ViewModel\ChoicePropertyViewModel.cs" />
     <Compile Include="ViewModel\IHierarchicalBrowserRootViewModel.cs" />
     <Compile Include="ViewModel\Project\ProjectFolderViewModel.cs" />
     <Compile Include="Projects\ProjectItem.cs" />

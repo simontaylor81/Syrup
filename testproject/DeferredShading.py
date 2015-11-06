@@ -30,7 +30,7 @@ def InvSqrRadius(radius):
 	r = max(0.0001, radius)
 	return 1.0 / (r*r)
 
-showlights = ri.AddUserVar("Show lights?", UserVariableType.Bool, False)
+showlights = ri.AddUserVar_Bool("Show lights?", False)
 
 
 # Build a list of light positions and colours.
