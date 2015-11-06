@@ -9,15 +9,16 @@ namespace ShaderEditorApp.ViewModel
 {
 	// View model for a property that lets the user select one of a number of strings.
 	// Basically an enum, but string based as they need to be created at runtime (via script).
-	class ChoicePropertyViewModel : ScalarPropertyViewModel<string>
+	class ChoicePropertyViewModel : ScalarPropertyViewModel<object>
 	{
-		public ChoicePropertyViewModel(IScalarProperty<string> property)
+		private readonly IChoiceProperty _choiceProperty;
+
+		public ChoicePropertyViewModel(IChoiceProperty property)
 			: base(property)
 		{
-			// TODO
-			Choices = new[] { "A", "B" };
+			_choiceProperty = property;
 		}
 
-		public IEnumerable<string> Choices { get; }
+		public IEnumerable<object> Choices => _choiceProperty.Choices;
 	}
 }

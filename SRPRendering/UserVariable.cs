@@ -48,29 +48,41 @@ namespace SRPRendering
 				throw new ScriptException($"Incorrect type for user variable '{name}' default value.", ex);
 			}
 		}
+
+		// Create a choice user variable (i.e. drop down selection of one or more options).
+		public static UserVariable<object> CreateChoice(string name, IEnumerable<object> choices, object defaultValue)
+		{
+			// Check that the default is a valid choice.
+			if (!choices.Contains(defaultValue))
+			{
+				throw new ScriptException($"Default for choice user var '{name}' must be one of the available choices.");
+			}
+
+			return new UserVariableChoice(name, choices, defaultValue);
+		}
 	}
 
 	// User variable representing a single value of the given type.
 	class UserVariableScalar<T> : UserVariable<T>, IScalarProperty<T>
 	{
-		public override Func<T> GetFunction() => (() => value);
+		public override Func<T> GetFunction() => (() => _value);
 
 		public UserVariableScalar(string name, T defaultValue)
 			: base(name)
 		{
-			value = defaultValue;
+			_value = defaultValue;
 		}
 
 		public Type Type => typeof(T);
 
-		public T Value
+		public virtual T Value
 		{
-			get { return value; }
+			get { return _value; }
 			set
 			{
-				if (!EqualityComparer<T>.Default.Equals(this.value, value))
+				if (!EqualityComparer<T>.Default.Equals(this._value, value))
 				{
-					this.value = value;
+					this._value = value;
 					_subject.OnNext(Unit.Default);
 				}
 			}
@@ -83,7 +95,7 @@ namespace SRPRendering
 		}
 
 		// The storage of the actual value.
-		private T value;
+		private T _value;
 
 		private Subject<Unit> _subject = new Subject<Unit>();
 	}

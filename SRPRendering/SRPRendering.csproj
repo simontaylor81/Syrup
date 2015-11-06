@@ -129,6 +129,7 @@
     <Compile Include="ShaderVariable.cs" />
     <Compile Include="ShaderVariableBind.cs" />
     <Compile Include="MatrixShaderVariableUserProperty.cs" />
+    <Compile Include="UserVariableChoice.cs" />
     <Compile Include="VectorShaderVariableUserProperty.cs" />
     <Compile Include="StateObjectCache.cs" />
     <Compile Include="Texture.cs" />

@@ -52,6 +52,7 @@ namespace SRPScripting
 		dynamic AddUserVar_Int4(string name, object defaultValue);
 		dynamic AddUserVar_Bool(string name, bool defaultValue);
 		dynamic AddUserVar_String(string name, string defaultValue);
+		dynamic AddUserVar_Choice(string name, IEnumerable<object> choices, object defaultValue);
 		#endregion
 
 		// Still unsure if this is the best way to go.

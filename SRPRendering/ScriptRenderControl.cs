@@ -343,6 +343,9 @@ namespace SRPRendering
 		public dynamic AddUserVar_Bool(string name, bool defaultValue) => AddScalarUserVar<bool>(name, defaultValue);
 		public dynamic AddUserVar_String(string name, string defaultValue) => AddScalarUserVar<string>(name, defaultValue);
 
+		public dynamic AddUserVar_Choice(string name, IEnumerable<object> choices, object defaultValue)
+			=> AddUserVar(UserVariable.CreateChoice(name, choices, defaultValue));
+
 		// Add a single-component user variable.
 		private dynamic AddScalarUserVar<T>(string name, T defaultValue)
 			=> AddUserVar(UserVariable.CreateScalar(name, defaultValue));

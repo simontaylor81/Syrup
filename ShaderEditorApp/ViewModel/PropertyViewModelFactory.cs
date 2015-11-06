@@ -13,6 +13,8 @@ namespace ShaderEditorApp.ViewModel
 		public static PropertyViewModel CreateViewModel(IUserProperty property)
 		{
 			// This is a bit nasty, would rather have something more generic.
+			if (property is IChoiceProperty)
+				return new ChoicePropertyViewModel((IChoiceProperty)property);
 			if (property is IScalarProperty<float>)
 				return new ScalarPropertyViewModel<float>((IScalarProperty<float>)property);
 			if (property is IScalarProperty<bool>)
