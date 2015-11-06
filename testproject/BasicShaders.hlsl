@@ -27,12 +27,16 @@ struct VSIn
 {
 	float3 Pos : POSITION;
 	float3 Normal : NORMAL;
+	float3 Tangent: TANGENT;
+	float3 BiTangent: BITANGENT;
 	float2 UVs[4] : TEXCOORD0;
 };
 struct PSIn
 {
 	float3 Normal : TEXCOORD0;
-	float2 UVs[4] : TEXCOORD1;
+	float3 Tangent: TEXCOORD1;
+	float3 BiTangent: TEXCOORD2;
+	float2 UVs[4] : TEXCOORD3;
 	float4 Pos : SV_Position;
 };
 
@@ -46,6 +50,9 @@ PSIn BasicVS(VSIn In)
 	Out.Pos = mul(WorldToProjectionMatrix, Out.Pos);
 	
 	Out.Normal = In.Normal;
+	Out.Tangent = In.Tangent;
+	Out.BiTangent = In.BiTangent;
+	
 	for (int i = 0; i < 4; i++)
 		Out.UVs[i] = In.UVs[i];
 		

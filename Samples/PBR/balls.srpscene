@@ -5,7 +5,7 @@
       "position": "0, 0, 0",
       "scale": "10, 1, 10",
       "rotation": "0, 0, 0",
-      "material": null
+      "material": "Floor"
     },
     {
       "type": "Sphere",
@@ -42,34 +42,65 @@
       "scale": "1, 1, 1",
       "rotation": "0, 0, 0",
       "material": "M3"
+    },
+    {
+      "type": "MeshInstance",
+      "mesh": "Cerberus",
+      "position": "-2, 5, 0",
+      "scale": "0.05, 0.05, 0.05",
+      "rotation": "270, 90, 0",
+      "material": "Cerberus"
     }
   ],
-  "meshes": {},
+  "meshes": {
+    "Cerberus": {
+      "filename": "assets\\Cerberus_by_Andrew_Maximov\\Cerberus_LP.fbx"
+    }
+  },
   "materials": {
     "M0": {
       "vectorParams": {
         "BaseColour": "1, 1, 0, 0",
-		"PbrParams" : "0, 0, 0.5, 0"
-      }
+        "PbrParams": "0, 0, 0.5, 0"
+      },
+      "textures": {}
     },
     "M1": {
       "vectorParams": {
         "BaseColour": "1, 0, 1, 0",
-		"PbrParams" : "0.8, 0, 0.5, 0"
-      }
+        "PbrParams": "0.8, 0, 0.5, 0"
+      },
+      "textures": {}
     },
     "M2": {
       "vectorParams": {
         "BaseColour": "1, 0, 0, 0",
-		"PbrParams" : "0.4, 1, 0.5, 0"
-      }
+        "PbrParams": "0.4, 1, 0.5, 0"
+      },
+      "textures": {}
     },
     "M3": {
       "vectorParams": {
         "BaseColour": "0, 1, 0, 0",
-		"PbrParams" : "0.9, 1, 0.5, 0"
-      }
+        "PbrParams": "0.9, 1, 0.5, 0"
+      },
+      "textures": {}
     },
+    "Floor": {
+      "vectorParams": {
+        "BaseColour": "0.25, 0.25, 0.25, 0",
+        "PbrParams": "0.3, 0, 0.5, 0"
+      },
+      "textures": {}
+    },
+	"Cerberus": {
+	  "textures": {
+	    "BaseColour": "assets\\Cerberus_by_Andrew_Maximov\\Textures\\Cerberus_A.tga",
+		"Smoothness": "assets\\Cerberus_by_Andrew_Maximov\\Textures\\Cerberus_Sm.tga",
+		"Metallic": "assets\\Cerberus_by_Andrew_Maximov\\Textures\\Cerberus_M.tga",
+		"Normal": "assets\\Cerberus_by_Andrew_Maximov\\Textures\\Cerberus_N.tga"
+	  }
+	}
   },
   "lights": []
 }

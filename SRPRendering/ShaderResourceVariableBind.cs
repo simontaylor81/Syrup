@@ -14,9 +14,10 @@ namespace SRPRendering
 
 	class MaterialShaderResourceVariableBind : IShaderResourceVariableBind
 	{
-		public MaterialShaderResourceVariableBind(string paramName)
+		public MaterialShaderResourceVariableBind(string paramName, Texture fallback)
 		{
-			this.paramName = paramName;
+			_paramName = paramName;
+			_fallback = fallback;
 		}
 
 		public void Set(IPrimitive primitive, ViewInfo viewInfo, IShaderResourceVariable variable, IGlobalResources globalResources)
@@ -28,7 +29,7 @@ namespace SRPRendering
 			if (primitive != null && primitive.Material != null)
 			{
 				string filename;
-				if (primitive.Material.Textures.TryGetValue(paramName, out filename))
+				if (primitive.Material.Textures.TryGetValue(_paramName, out filename))
 				{
 					// Get the actual texture object from the scene.
 					variable.Resource = primitive.Scene.GetTexture(filename).SRV;
@@ -36,11 +37,12 @@ namespace SRPRendering
 				}
 			}
 
-			// Fall back on error texture.
-			variable.Resource = globalResources.ErrorTexture.SRV;
+			// Fall back to fallback texture.
+			variable.Resource = _fallback.SRV;
 		}
 
-		private readonly string paramName;
+		private readonly string _paramName;
+		private readonly Texture _fallback;
 	}
 
 	class TextureShaderResourceVariableBind : IShaderResourceVariableBind

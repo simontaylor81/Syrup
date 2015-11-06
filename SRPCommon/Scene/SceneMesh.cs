@@ -41,7 +41,7 @@ namespace SRPCommon.Scene
 
 		private void Import()
 		{
-			using (var importer = new AssimpImporter())
+			using (var importer = new AssimpContext())
 			{
 				// Set configuration. TODO: What does this stuff do?!
 				importer.SetConfig(new Assimp.Configs.NormalSmoothingAngleConfig(66.0f));
@@ -62,8 +62,9 @@ namespace SRPCommon.Scene
 					if (!srcMesh.HasVertices || !srcMesh.HasFaces)
 						return;
 
-					// We have generate normals enabled, so all meshes should have them.
+					// We have generate normals/tangent basis enabled, so all meshes should have them.
 					Debug.Assert(srcMesh.HasNormals);
+					Debug.Assert(srcMesh.HasTangentBasis);
 
 					// Create vertex stream.
 					int vertexBufferSize = SceneVertex.GetStride() * srcMesh.VertexCount;
@@ -73,11 +74,13 @@ namespace SRPCommon.Scene
 					{
 						var vertex = new SceneVertex(
 							ToVector3(srcMesh.Vertices[i]),
-							ToVector3(srcMesh.Normals[i]));
+							ToVector3(srcMesh.Normals[i]),
+							ToVector3(srcMesh.Tangents[i]),
+							ToVector3(srcMesh.BiTangents[i]));
 
-						for (int uvChannel = 0; uvChannel < srcMesh.TextureCoordsChannelCount; uvChannel++)
+						for (int uvChannel = 0; uvChannel < srcMesh.TextureCoordinateChannelCount; uvChannel++)
 						{
-							var uv = srcMesh.GetTextureCoords(uvChannel)[i];
+							var uv = srcMesh.TextureCoordinateChannels[uvChannel][i];
 							vertex.SetUV(uvChannel, new Vector2(uv.X, uv.Y));
 						}
 

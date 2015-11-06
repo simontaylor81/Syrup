@@ -48,6 +48,8 @@ namespace SRPCommon.Scene
 		protected List<IUserProperty> _userProperties = new List<IUserProperty>();
 		public IEnumerable<IUserProperty> UserProperties => _userProperties;
 
+		public virtual bool IsValid => true;
+
 		// Observable that fires when something important changes in the primitive.
 		public IObservable<Unit> OnChanged { get; }
 
@@ -64,8 +66,11 @@ namespace SRPCommon.Scene
 		}
 
 		public Matrix LocalToWorld
-			// TODO: rotation!
-			=> Matrix.Scaling(Scale) * Matrix.Translation(Position);
+			=> Matrix.Scaling(Scale)
+				* Matrix.RotationYawPitchRoll(ToRadians(Rotation.Y), ToRadians(Rotation.X), ToRadians(Rotation.Z))
+				* Matrix.Translation(Position);
+
+		private float ToRadians(float degrees) => degrees * ((float)Math.PI / 180.0f);
 
 		internal virtual void PostLoad(Scene scene)
 		{

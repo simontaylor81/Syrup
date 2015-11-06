@@ -267,12 +267,22 @@ namespace SRPRendering
 			}
 		}
 
-		public void BindShaderResourceToMaterial(object handleOrHandles, string varName, string paramName)
+		public void BindShaderResourceToMaterial(object handleOrHandles, string varName, string paramName, object fallback)
 		{
 			var shaders = GetShaders(handleOrHandles);
 			var variables = shaders
 				.Select(shader => shader.FindResourceVariable(varName))
 				.Where(shader => shader != null);
+
+			Texture fallbackTexture = _globalResources.ErrorTexture;
+			if (fallback != null)
+			{
+				fallbackTexture = GetTexture(fallback);
+				if (fallbackTexture == null)
+				{
+					throw new ScriptException($"Invalid fallback texture binding {varName}");
+				}
+			}
 
 			foreach (var variable in variables)
 			{
@@ -281,7 +291,7 @@ namespace SRPRendering
 					throw new ScriptException("Attempting to bind already bound shader variable: " + varName);
 				}
 
-				variable.Bind = new MaterialShaderResourceVariableBind(paramName);
+				variable.Bind = new MaterialShaderResourceVariableBind(paramName, fallbackTexture);
 			}
 		}
 
@@ -292,6 +302,9 @@ namespace SRPRendering
 				.Select(shader => shader.FindResourceVariable(varName))
 				.Where(shader => shader != null);
 
+			var texture = GetTexture(value);
+			var renderTargetHandle = value as RenderTargetHandle;
+
 			foreach (var variable in variables)
 			{
 				if (variable.Bind != null)
@@ -299,30 +312,22 @@ namespace SRPRendering
 					throw new ScriptException("Attempting to bind already bound shader variable: " + varName);
 				}
 
-				if (value is TextureHandle)
+				if (texture != null)
 				{
-					// Bind the variable to a texture's SRV.
-					int texIndex = ((TextureHandle)value).index;
-					System.Diagnostics.Debug.Assert(texIndex >= 0 && texIndex < textures.Count);
-
-					variable.Bind = new TextureShaderResourceVariableBind(textures[texIndex]);
+					variable.Bind = new TextureShaderResourceVariableBind(texture);
 				}
-				else if (value is RenderTargetHandle)
+				else if (renderTargetHandle != null)
 				{
 					// Bind the variable to a render target's SRV.
-					int rtIndex = ((RenderTargetHandle)value).index;
+					int rtIndex = renderTargetHandle.index;
 					System.Diagnostics.Debug.Assert(rtIndex >= 0 && rtIndex < renderTargets.Count);
 
 					variable.Bind = new RenderTargetShaderResourceVariableBind(renderTargets[rtIndex]);
 				}
-				else if (value is DepthBufferHandle)
+				else if (value == DepthBufferHandle.Default)
 				{
-					var dbHandle = (DepthBufferHandle)value;
-					if (dbHandle.Equals(DepthBufferHandle.Default))
-					{
-						// Bind to the default depth buffer.
-						variable.Bind = new DefaultDepthBufferShaderResourceVariableBind();
-					}
+					// Bind to the default depth buffer.
+					variable.Bind = new DefaultDepthBufferShaderResourceVariableBind();
 				}
 				else
 				{
@@ -489,6 +494,33 @@ namespace SRPRendering
 			return handles.Select(h => shaders[h.index]);
 		}
 
+		// Get the texture to use for a shader resource variable.
+		private Texture GetTexture(object handle)
+		{
+			if (handle == BlackTexture)
+			{
+				return _globalResources.BlackTexture;
+			}
+			else if (handle == WhiteTexture)
+			{
+				return _globalResources.WhiteTexture;
+			}
+			else if (handle == DefaultNormalTexture)
+			{
+				return _globalResources.DefaultNormalTexture;
+			}
+			else if (handle is TextureHandle)
+			{
+				// Bind the variable to a texture's SRV.
+				int texIndex = ((TextureHandle)handle).index;
+				System.Diagnostics.Debug.Assert(texIndex >= 0 && texIndex < textures.Count);
+
+				return textures[texIndex];
+			}
+
+			return null;
+		}
+
 		public dynamic GetScene() => Scene;
 
 		public object DepthBuffer => DepthBufferHandle.Default;
@@ -496,6 +528,11 @@ namespace SRPRendering
 
 		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
 		public IRenderInterface ScriptInterface { get; }
+
+		// These don't need to be anything, we're just going to use them with reference equality checks.
+		public object BlackTexture { get; } = new object();
+		public object WhiteTexture { get; } = new object();
+		public object DefaultNormalTexture { get; } = new object();
 
 		private ObservableCollection<IUserProperty> properties = new ObservableCollection<IUserProperty>();
 		public ObservableCollection<IUserProperty> Properties => properties;

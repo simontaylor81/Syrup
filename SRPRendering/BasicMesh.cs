@@ -154,16 +154,26 @@ namespace SRPRendering
 		// Write a vertex for a sphere, which has a normal equal to its position.
 		private static void WriteSphereVert(DataStream vertices, Vector3 position, Vector2 uv)
 		{
-			vertices.Write(new SceneVertex(position, position, uv));
+			var tangent = Vector3.Cross(position, Vector3.UnitY);
+			if (tangent.LengthSquared() < 0.01f)
+			{
+				tangent = Vector3.UnitX;
+			}
+			tangent.Normalize();
+
+			var biTangent = Vector3.Cross(position, tangent);
+			biTangent.Normalize();
+
+			vertices.Write(new SceneVertex(position, position, tangent, biTangent, uv));
 		}
 
 		// Write 4 verts forming a square quad.
 		private static void WriteSquareVerts(DataStream vertices, Vector3 o, Vector3 n, Vector3 u, Vector3 v)
 		{
-			vertices.Write(new SceneVertex(o - u + v, n, new Vector2(0.0f, 0.0f)));
-			vertices.Write(new SceneVertex(o + u + v, n, new Vector2(1.0f, 0.0f)));
-			vertices.Write(new SceneVertex(o - u - v, n, new Vector2(0.0f, 1.0f)));
-			vertices.Write(new SceneVertex(o + u - v, n, new Vector2(1.0f, 1.0f)));
+			vertices.Write(new SceneVertex(o - u + v, n, u, v, new Vector2(0.0f, 0.0f)));
+			vertices.Write(new SceneVertex(o + u + v, n, u, v, new Vector2(1.0f, 0.0f)));
+			vertices.Write(new SceneVertex(o - u - v, n, u, v, new Vector2(0.0f, 1.0f)));
+			vertices.Write(new SceneVertex(o + u - v, n, u, v, new Vector2(1.0f, 1.0f)));
 		}
 
 		// Write 4 verts forming the face of a cube.

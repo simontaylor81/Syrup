@@ -11,21 +11,25 @@ namespace SRPCommon.Scene
 	{
 		public Vector3 Position;
 		public Vector3 Normal;
+		public Vector3 Tangent;
+		public Vector3 BiTangent;
 
 		public Vector2 UV0;
 		public Vector2 UV1;
 		public Vector2 UV2;
 		public Vector2 UV3;
 
-		public SceneVertex(Vector3 position, Vector3 normal)
-			: this(position, normal, Vector2.Zero)
+		public SceneVertex(Vector3 position, Vector3 normal, Vector3 tangent, Vector3 biTangent)
+			: this(position, normal, tangent, biTangent, Vector2.Zero)
 		{
 		}
 
-		public SceneVertex(Vector3 position, Vector3 normal, Vector2 uv)
+		public SceneVertex(Vector3 position, Vector3 normal, Vector3 tangent, Vector3 biTangent, Vector2 uv)
 		{
 			Position = position;
 			Normal = normal;
+			Tangent = tangent;
+			BiTangent = biTangent;
 			UV0 = UV1 = UV2 = UV3 = uv;
 		}
 
@@ -58,6 +62,8 @@ namespace SRPCommon.Scene
 		{
 			new InputElement("POSITION", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
 			new InputElement("NORMAL", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("TANGENT", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("BITANGENT", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
 			new InputElement("TEXCOORD", 0, SlimDX.DXGI.Format.R32G32_Float, 0),
 			new InputElement("TEXCOORD", 1, SlimDX.DXGI.Format.R32G32_Float, 0),
 			new InputElement("TEXCOORD", 2, SlimDX.DXGI.Format.R32G32_Float, 0),

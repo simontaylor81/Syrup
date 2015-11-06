@@ -1,7 +1,7 @@
 {
   "meshes": {
     "Duck": {
-      "filename": "..\\ThirdParty\\AssimpNet-2.1.2 Refresh\\Samples\\duck.dae"
+      "filename": "Duck\\duck.dae"
     }
   },
   "materials": {
@@ -10,7 +10,7 @@
         "DiffuseColour": "1, 0, 0, 0"
       },
       "textures": {
-        "DiffuseTexture": "..\\ThirdParty\\AssimpNet-2.1.2 Refresh\\Samples\\duckCM.bmp"
+        "DiffuseTexture": "Duck\\duckCM.bmp"
       }
     },
     "SphereMat": {

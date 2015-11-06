@@ -13,6 +13,8 @@ namespace SRPCommon.Scene
 
 		public SceneMesh Mesh { get; private set; }
 
+		public override bool IsValid => Mesh != null && Mesh.IsValid;
+
 		[JsonProperty("mesh")]
 		[SuppressMessage("Language", "CSE0002:Use getter-only auto properties", Justification = "Needed for serialisation")]
 		private string MeshName { get; set; }

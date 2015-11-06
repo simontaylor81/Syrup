@@ -58,6 +58,16 @@ namespace SRPRendering
 					}
 					break;
 
+				case ShaderVariableBindSource.LocalToWorldInverseTransposeMatrix:
+					if (primitive != null)
+					{
+						var matrix = primitive.LocalToWorld;
+						matrix.Invert();
+						variable.Set(Matrix.Transpose(matrix));
+						return;
+					}
+					break;
+
 				case ShaderVariableBindSource.CameraPosition:
 					variable.Set(viewInfo.EyePosition);
 					return;
