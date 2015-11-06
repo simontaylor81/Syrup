@@ -39,7 +39,7 @@ namespace SRPScripting
 		void SetShaderVariable(dynamic shader, string var, dynamic value);
 		void ShaderVariableIsScriptOverride(dynamic shader, string var);
 
-		void BindShaderResourceToMaterial(dynamic shader, string var, string param, object fallback);
+		void BindShaderResourceToMaterial(dynamic shader, string var, string param, object fallback = null);
 		void SetShaderResourceVariable(dynamic shader, string var, object value);
 
 		#region User Variables

@@ -267,7 +267,7 @@ namespace SRPRendering
 			}
 		}
 
-		public void BindShaderResourceToMaterial(object handleOrHandles, string varName, string paramName, object fallback)
+		public void BindShaderResourceToMaterial(object handleOrHandles, string varName, string paramName, object fallback = null)
 		{
 			var shaders = GetShaders(handleOrHandles);
 			var variables = shaders
@@ -275,6 +275,13 @@ namespace SRPRendering
 				.Where(shader => shader != null);
 
 			Texture fallbackTexture = _globalResources.ErrorTexture;
+
+			// Ugh, Castle DynamicProxy doesn't pass through the null default value, so detect it.
+			if (fallback == System.Reflection.Missing.Value)
+			{
+				fallback = null;
+			}
+
 			if (fallback != null)
 			{
 				fallbackTexture = GetTexture(fallback);
