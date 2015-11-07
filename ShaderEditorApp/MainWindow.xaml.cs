@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 
-using ShaderEditorApp.Workspace;
+using ShaderEditorApp.ViewModel;
 using ShaderEditorApp.View;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
@@ -22,7 +22,8 @@ namespace ShaderEditorApp
 			InitializeComponent();
 		}
 
-		private WorkspaceViewModel workspace;
+		private Model.Workspace _workspace;
+		private WorkspaceViewModel _workspaceViewModel;
 		private RenderWindow renderWindow;
 
 		private void Window_Initialized_1(object sender, EventArgs e)
@@ -33,22 +34,51 @@ namespace ShaderEditorApp
 
 			OutputLogger.Instance.AddTarget(outputWindow);
 
-			workspace = new WorkspaceViewModel(renderWindow);
-			DataContext = workspace;
+			_workspace = new Model.Workspace(renderWindow.Device);
+			_workspaceViewModel = new WorkspaceViewModel(_workspace, renderWindow);
 
-			viewportFrame.DataContext = workspace.ViewportViewModel;
+			renderWindow.ScriptControl = _workspace.ScriptRenderControl;
+
+			// Redraw viewports when required.
+			// TODO: Better way to hook this up?
+			_workspace.RedrawRequired.Subscribe(_ => renderWindow.Invalidate());
+
+
+			DataContext = _workspaceViewModel;
+
+			viewportFrame.DataContext = _workspaceViewModel.ViewportViewModel;
 
 			CompositionTarget.Rendering += CompositionTarget_Rendering;
 
 			// Set up syntax highlighting for the editor control.
 			LoadSyntaxHighlightingDefinition("Python");
 			LoadSyntaxHighlightingDefinition("HLSL");
+
+			// Load a file specified on the commandline.
+			var commandlineParams = Environment.GetCommandLineArgs();
+			if (commandlineParams.Length > 1)
+			{
+				var filename = commandlineParams[1];
+				if (File.Exists(filename))
+				{
+					if (string.Equals(Path.GetExtension(filename), ".srpproj", StringComparison.InvariantCultureIgnoreCase))
+					{
+						// Open .srpproj files as projects.
+						_workspace.OpenProject(filename);
+					}
+					else
+					{
+						// Open other files as documents.
+						_workspaceViewModel.OpenDocument(filename, false);
+					}
+				}
+			}
 		}
 
 		void CompositionTarget_Rendering(object sender, EventArgs e)
 		{
 			renderWindow.Tick();
-			workspace.Tick();
+			_workspaceViewModel.Tick();
 		}
 
 		private void LoadSyntaxHighlightingDefinition(string language)

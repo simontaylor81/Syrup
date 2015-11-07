@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ShaderEditorApp.Workspace;
+using ShaderEditorApp.ViewModel;
 using ShaderEditorApp.MVVMUtil;
 using System.Windows.Input;
 

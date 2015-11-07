@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ShaderEditorApp.Workspace;
-using ShaderEditorApp.MVVMUtil;
-using ShaderEditorApp.ViewModel;
 using SRPCommon.UserProperties;
 using ReactiveUI;
-using System.Windows.Input;
-using SRPCommon.Scene;
 using System.Reactive.Linq;
 
 namespace ShaderEditorApp.ViewModel.Scene

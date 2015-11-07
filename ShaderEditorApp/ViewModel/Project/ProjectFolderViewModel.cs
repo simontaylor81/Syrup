@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Windows;
 using Microsoft.Win32;
 using ShaderEditorApp.MVVMUtil;
-using ShaderEditorApp.Workspace;
-using ShaderEditorApp.ViewModel;
 using SRPCommon.UserProperties;
 using System.Windows.Input;
 using ShaderEditorApp.Projects;
@@ -20,11 +15,11 @@ namespace ShaderEditorApp.ViewModel.Projects
 {
 	public class ProjectFolderViewModel : ReactiveObject, IHierarchicalBrowserNodeViewModel
 	{
-		public ProjectFolderViewModel(ProjectFolder folder, Project project, WorkspaceViewModel workspace)
+		public ProjectFolderViewModel(ProjectFolder folder, Project project, WorkspaceViewModel workspaceVM)
 		{
 			this.Folder = folder;
 			Project = project;
-			Workspace = workspace;
+			WorkspaceVM = workspaceVM;
 
 			// Build the list of child items.
 			CreateChildrenProperty();
@@ -47,9 +42,9 @@ namespace ShaderEditorApp.ViewModel.Projects
 		private void CreateChildrenProperty()
 		{
 			IReactiveDerivedList<IHierarchicalBrowserNodeViewModel> subfolderViewModels
-				= Folder.SubFolders.CreateDerivedCollection(subfolder => new ProjectFolderViewModel(subfolder, Project, Workspace));
+				= Folder.SubFolders.CreateDerivedCollection(subfolder => new ProjectFolderViewModel(subfolder, Project, WorkspaceVM));
 			IReactiveDerivedList<IHierarchicalBrowserNodeViewModel> itemViewModels
-				= Folder.Items.CreateDerivedCollection(item => new ProjectItemViewModel(item, Project, Workspace));
+				= Folder.Items.CreateDerivedCollection(item => new ProjectItemViewModel(item, Project, WorkspaceVM));
 
 			_children = Observable.Merge(subfolderViewModels.Changed, itemViewModels.Changed)
 				.Select(_ => subfolderViewModels.Concat(itemViewModels))
@@ -124,9 +119,9 @@ namespace ShaderEditorApp.ViewModel.Projects
 				}
 
 				// If we don't have a scene loaded, load the new one.
-				if (!Workspace.HasCurrentScene)
+				if (!WorkspaceVM.Workspace.HasCurrentScene)
 				{
-					Workspace.SetCurrentScene(filename);
+					WorkspaceVM.Workspace.SetCurrentScene(filename);
 				}
 			}
 		}
@@ -231,7 +226,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 		#endregion
 
 		protected Project Project { get; }
-		protected WorkspaceViewModel Workspace { get; }
+		protected WorkspaceViewModel WorkspaceVM { get; }
 		internal ProjectFolder Folder { get; }
 	}
 }

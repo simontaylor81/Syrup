@@ -10,7 +10,7 @@ using ICSharpCode.AvalonEdit.Document;
 using Microsoft.Win32;
 using System.Windows;
 
-namespace ShaderEditorApp.Workspace
+namespace ShaderEditorApp.ViewModel
 {
 	// ViewModel class representing an open document.
 	public class DocumentViewModel : ViewModelBase

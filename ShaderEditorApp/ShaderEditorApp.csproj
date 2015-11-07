@@ -162,6 +162,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\Workspace.cs" />
     <Compile Include="MVVMUtil\Converters.cs" />
     <Compile Include="MVVMUtil\NamedCommand.cs" />
     <Compile Include="MVVMUtil\RelayCommand.cs" />
@@ -188,7 +189,6 @@
     <Compile Include="ViewModel\PropertyViewModelFactory.cs" />
     <Compile Include="ViewModel\ScalarPropertyViewModel.cs" />
     <Compile Include="ViewModel\Scene\MeshInstancePrimitiveViewModel.cs" />
-    <Compile Include="ViewModel\Scene\SceneItemViewModel.cs" />
     <Compile Include="ViewModel\Scene\SceneMaterialsViewModel.cs" />
     <Compile Include="ViewModel\Scene\SceneMaterialViewModel.cs" />
     <Compile Include="ViewModel\Scene\ScenePrimitivesViewModel.cs" />

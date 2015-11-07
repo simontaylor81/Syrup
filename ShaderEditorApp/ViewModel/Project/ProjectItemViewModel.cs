@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Linq;
-using ShaderEditorApp.ViewModel;
-using ShaderEditorApp.Workspace;
 using SRPCommon.UserProperties;
 using System.Windows.Input;
 using ShaderEditorApp.Projects;
@@ -17,11 +15,11 @@ namespace ShaderEditorApp.ViewModel.Projects
 	{
 		public string DisplayName => item.Name;
 
-		public ProjectItemViewModel(ProjectItem item, Project project, WorkspaceViewModel workspace)
+		public ProjectItemViewModel(ProjectItem item, Project project, WorkspaceViewModel workspaceVM)
 		{
 			this.item = item;
 			this.project = project;
-			this.workspace = workspace;
+			this._workspaceVM = workspaceVM;
 
 			_isDefault = project.DefaultSceneChanged
 				.Select(_ => item.IsDefault)
@@ -37,12 +35,12 @@ namespace ShaderEditorApp.ViewModel.Projects
 			if (item.Type == ProjectItemType.Scene)
 			{
 				// Default command for scenes is to open it and make it the current scene for the workspace.
-				_defaultCmd = NamedCommand.CreateReactive("Set as Current", _ => workspace.SetCurrentScene(item.AbsolutePath));
+				_defaultCmd = NamedCommand.CreateReactive("Set as Current", _ => _workspaceVM.Workspace.SetCurrentScene(item.AbsolutePath));
 			}
 			else
 			{
 				// Default for everything else is to open the item.s
-				_defaultCmd = NamedCommand.CreateReactive("Open", _ => workspace.OpenDocument(item.AbsolutePath, false));
+				_defaultCmd = NamedCommand.CreateReactive("Open", _ => _workspaceVM.OpenDocument(item.AbsolutePath, false));
 			}
 
 			// Command to remove the item from the scene.
@@ -60,7 +58,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 				// Scripts can be run.
 				commands.Add(NamedCommand.CreateReactive(
 					"Run",
-					_ => workspace.RunScriptFile(item.AbsolutePath)));
+					_ => _workspaceVM.Workspace.RunScriptFile(item.AbsolutePath)));
 			}
 			else if (item.Type == ProjectItemType.Scene)
 			{
@@ -141,6 +139,6 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 		private ProjectItem item;
 		private Project project;
-		private WorkspaceViewModel workspace;
+		private WorkspaceViewModel _workspaceVM;
 	}
 }

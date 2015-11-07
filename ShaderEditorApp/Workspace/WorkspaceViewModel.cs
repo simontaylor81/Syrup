@@ -22,15 +22,17 @@ using System.Reactive;
 using System.Threading.Tasks;
 using ReactiveUI;
 using System.Reactive.Linq;
+using ShaderEditorApp.Model;
 
-namespace ShaderEditorApp.Workspace
+namespace ShaderEditorApp.ViewModel
 {
 	// ViewModel for the application workspace, containing documents, docking windows, etc.
-	public class WorkspaceViewModel : ReactiveObject, IWorkspace
+	public class WorkspaceViewModel : ReactiveObject
 	{
-		public WorkspaceViewModel(RenderWindow renderWindow)
+		public WorkspaceViewModel(Model.Workspace _workspace, RenderWindow renderWindow)
 		{
-			this.renderWindow = renderWindow;
+			this.Workspace = _workspace;
+			this._renderWindow = renderWindow;
 
 			// Create documents list, and wrap in a read-only wrapper.
 			documents = new ObservableCollection<DocumentViewModel>();
@@ -39,17 +41,7 @@ namespace ShaderEditorApp.Workspace
 			// Create menu bar
 			MenuBar = new MenuBarViewModel(this);
 
-			// Create classes that handle scripting.
-			scripting = new Scripting(this);
-			scriptRenderControl = new ScriptRenderControl(this, renderWindow.Device, scripting);
-			scripting.RenderInterface = scriptRenderControl.ScriptInterface;
-			scriptRenderControl.RedrawRequired.Subscribe(_ => RedrawViewports());
-
-			renderWindow.ScriptControl = scriptRenderControl;
 			renderWindow.ViewportViewModel = ViewportViewModel;
-
-			Application.Current.Activated += (o, _e) => isAppForeground = true;
-			Application.Current.Deactivated += (o, _e) => isAppForeground = false;
 
 			{
 				// Active document is just the most recent active window that was a document.
@@ -73,13 +65,13 @@ namespace ShaderEditorApp.Workspace
 				// Combine sources of properties into a single observable.
 				var propertySources = Observable.Merge(
 					this.WhenAny(x => x.FocusPropertySource, x => x.FocusPropertySource.Properties, (x, y) => Unit.Default),
-					scriptRenderControl.PropertiesChanged.Select(_ => Unit.Default));
+					_workspace.ScriptRenderControl.PropertiesChanged.Select(_ => Unit.Default));
 
 				// Convert that into a stream of property view model lists.
 				_properties = propertySources
 					// Use focussed window if it's a property source, otherwise
 					// fallback on the render properties (i.e. shader and user variables).
-					.Select(x => FocusPropertySource != null ? FocusPropertySource.Properties : scriptRenderControl.Properties)
+					.Select(x => FocusPropertySource != null ? FocusPropertySource.Properties : _workspace.ScriptRenderControl.Properties)
 					.Select(x => x
 						// Create viewmodels for each property.
 						.EmptyIfNull()
@@ -88,41 +80,36 @@ namespace ShaderEditorApp.Workspace
 					.ToProperty(this, x => x.Properties);
 			}
 
-
-			// Load a file specified on the commandline.
-			var commandlineParams = Environment.GetCommandLineArgs();
-			if (commandlineParams.Length > 1)
+			// When the project changes, re-open documents that were open last time.
+			_workspace.WhenAnyValue(x => x.Project).Subscribe(project =>
 			{
-				var filename = commandlineParams[1];
-				if (File.Exists(filename))
+				if (project != null)
 				{
-					if (String.Equals(Path.GetExtension(filename), ".srpproj", StringComparison.InvariantCultureIgnoreCase))
+					foreach (var file in project.SavedOpenDocuments)
 					{
-						// Open .srpproj files as projects.
-						OpenProject(filename);
-					}
-					else
-					{
-						// Open other files as documents.
-						OpenDocument(filename, false);
+						OpenDocument(file, false);
 					}
 				}
-			}
+				else
+				{
+					CloseAllDocuments();
+				}
+			});
+
+			// Project view model tracks the underlying project.
+			_projectViewModel = _workspace.WhenAnyValue(x => x.Project)
+				.Select(project => new ProjectViewModel(project, this))
+				.ToProperty(this, x => x.ProjectViewModel);
+
+			// Scene view model tracks the underlying scene.
+			_sceneViewModel = _workspace.WhenAnyValue(x => x.CurrentScene)
+				.Select(scene => new SceneViewModel(scene))
+				.ToProperty(this, x => x.SceneViewModel);
 		}
 
 		public void Tick()
 		{
 			CheckModifiedDocuments();
-		}
-
-		// Open the project with the given path.
-		private void OpenProject(string path)
-		{
-			Project = Project.LoadFromFile(path);
-
-			// Reload saved open documents.
-			foreach (var file in Project.SavedOpenDocuments)
-				OpenDocument(file, false);
 		}
 
 		// Open a project by asking the user for a project file to open.
@@ -132,13 +119,15 @@ namespace ShaderEditorApp.Workspace
 			dialog.Filter = "SRP Projects|*.srpproj";
 
 			// Put initial directory in the same place as the current project, if there is one.
-			if (Project != null)
-				dialog.InitialDirectory = Project.BasePath;
+			if (Workspace.Project != null)
+			{
+				dialog.InitialDirectory = Workspace.Project.BasePath;
+			}
 
 			var result = dialog.ShowDialog();
 			if (result == true)
 			{
-				OpenProject(dialog.FileName);
+				Workspace.OpenProject(dialog.FileName);
 			}
 		}
 
@@ -150,14 +139,15 @@ namespace ShaderEditorApp.Workspace
 			dialog.Filter = "SRP Projects|*.srpproj";
 
 			// Put initial directory in the same place as the current project, if there is one.
-			if (Project != null)
-				dialog.InitialDirectory = Project.BasePath;
+			if (Workspace.Project != null)
+			{
+				dialog.InitialDirectory = Workspace.Project.BasePath;
+			}
 
 			var result = dialog.ShowDialog();
 			if (result == true)
 			{
-				// Create a new project, and immediately save it to the given file.
-				Project = Project.CreateNew(dialog.FileName);
+				Workspace.NewProject(dialog.FileName);
 			}
 		}
 
@@ -194,9 +184,13 @@ namespace ShaderEditorApp.Workspace
 
 			// Put initial directory in the same place as the current document, if there is one.
 			if (ActiveDocument != null && !String.IsNullOrEmpty(ActiveDocument.FilePath))
+			{
 				dialog.InitialDirectory = Path.GetDirectoryName(ActiveDocument.FilePath);
-			else if (Project != null)
-				dialog.InitialDirectory = Project.BasePath;
+			}
+			else if (Workspace.Project != null)
+			{
+				dialog.InitialDirectory = Workspace.Project.BasePath;
+			}
 
 			var result = dialog.ShowDialog();
 			if (result == true)
@@ -218,6 +212,31 @@ namespace ShaderEditorApp.Workspace
 		{
 			document.Dispose();
 			documents.Remove(document);
+		}
+
+		private void CloseAllDocuments()
+		{
+			foreach (var document in Documents)
+			{
+				document.Dispose();
+			}
+			documents.Clear();
+		}
+
+		// Save all dirty documents.
+		private bool SaveAllDirty()
+		{
+			var result = true;
+
+			foreach (var document in Documents)
+			{
+				if (document.IsDirty)
+				{
+					result = document.Save() & result;
+				}
+			}
+
+			return result;
 		}
 
 		// Notification that a document has been modified, and might need to be reloaded. Thread-safe.
@@ -268,78 +287,17 @@ namespace ShaderEditorApp.Workspace
 
 			if (ActiveDocument != null && ActiveDocument.IsScript)
 			{
-				RunScriptFile(ActiveDocument.FilePath);
+				Workspace.RunScriptFile(ActiveDocument.FilePath);
 			}
-			else if (_lastRunScript != null)
+			else
 			{
-				await RunScript(_lastRunScript);
-			}
-		}
-
-		// TODO: Fix async void nastiness.
-		internal async void RunScriptFile(string path)
-		{
-			var script = _scripts.GetOrAdd(path, () => new Script(path));
-			await RunScript(script);
-		}
-
-		private async Task RunScript(Script script)
-		{
-			_lastRunScript = script;
-
-			// Asynchronously execute the script.
-			await scripting.RunScript(script);
-
-			RedrawViewports();
-		}
-
-		private bool IsActiveScript() => ActiveDocument != null;
-
-		// Do we have a scene loaded currently?
-		public bool HasCurrentScene => currentScene != null;
-
-		// Load the scene with the given filename and set it as the current one.
-		public void SetCurrentScene(string path)
-		{
-			// Attempt to load the scene.
-			var newScene = Scene.LoadFromFile(path);
-			if (newScene != null)
-			{
-				currentScene = newScene;
-				scriptRenderControl.Scene = currentScene;
-
-				// Unsubscribe from previous scene.
-				if (sceneChangeSubscription != null)
-				{
-					sceneChangeSubscription.Dispose();
-				}
-
-				// Redraw the scene when the scene changes.
-				sceneChangeSubscription = currentScene.OnChanged.Subscribe(_ => RedrawViewports());
-
-				SceneViewModel = new SceneViewModel(newScene);
+				await Workspace.RerunLastScript();
 			}
 		}
 
 		public void RedrawViewports()
 		{
-			renderWindow.Invalidate();
-		}
-
-		public string FindProjectFile(string name)
-		{
-			var shaderFileItem = Project.AllItems.FirstOrDefault(item => item.Name == name);
-			return shaderFileItem != null ? shaderFileItem.AbsolutePath : null;
-		}
-
-		// Given an absolute or project-relative path, get an absolute path.
-		public string GetAbsolutePath(string path)
-		{
-			if (Path.IsPathRooted(path))
-			{
-				return path;
-			}
-			return Path.Combine(project_.BasePath, path);
+			_renderWindow.Invalidate();
 		}
 
 		private ObservableCollection<DocumentViewModel> documents;
@@ -357,93 +315,33 @@ namespace ShaderEditorApp.Workspace
 		private ObservableAsPropertyHelper<DocumentViewModel> _activeDocument;
 		public DocumentViewModel ActiveDocument => _activeDocument.Value;
 
-		private Project project_;
-		public Project Project
-		{
-			get { return project_; }
-			private set
-			{
-				// Close existing documents when opening a new project.
-				// TODO: Prompt to save.
-				DisposableUtil.DisposeList(documents);
-
-				project_ = value;
-				ProjectViewModel = new ProjectViewModel(project_, this);
-
-				// Load default scene, if present.
-				if (Project.DefaultScene != null)
-				{
-					SetCurrentScene(Project.DefaultScene.AbsolutePath);
-				}
-
-				// Run startup scripts.
-				foreach (var script in value.StartupScripts)
-					RunScriptFile(script);
-			}
-		}
-
-		private ProjectViewModel _projectViewModel;
-		public ProjectViewModel ProjectViewModel
-		{
-			get { return _projectViewModel; }
-			set { this.RaiseAndSetIfChanged(ref _projectViewModel, value); }
-		}
-
-		private SceneViewModel _sceneViewModel;
-		public SceneViewModel SceneViewModel
-		{
-			get { return _sceneViewModel; }
-			set { this.RaiseAndSetIfChanged(ref _sceneViewModel, value); }
-		}
-
 		// Property source to use based on focus.
 		private ObservableAsPropertyHelper<IPropertySource> _focusPropertySource;
 		public IPropertySource FocusPropertySource => _focusPropertySource.Value;
+
+		private ObservableAsPropertyHelper<ProjectViewModel> _projectViewModel;
+		public ProjectViewModel ProjectViewModel => _projectViewModel.Value;
+
+		private ObservableAsPropertyHelper<SceneViewModel> _sceneViewModel;
+		public SceneViewModel SceneViewModel => _sceneViewModel.Value;
 
 		public MenuBarViewModel MenuBar { get; }
 
 		private ObservableAsPropertyHelper<IEnumerable<PropertyViewModel>> _properties;
 		public IEnumerable<PropertyViewModel> Properties => _properties.Value;
 
-		// Save all dirty documents.
-		private bool SaveAllDirty()
-		{
-			var result = true;
-
-			foreach (var document in Documents)
-			{
-				if (document.IsDirty)
-				{
-					result = document.Save() & result;
-				}
-			}
-
-			return result;
-		}
-
 		// Viewport view model that contains settings for the viewport (e.g. camera mode).
 		private ViewportViewModel viewportViewModel = new ViewportViewModel();
 		public ViewportViewModel ViewportViewModel => viewportViewModel;
 
-		// Rendering/script related stuff.
-		private readonly ScriptRenderControl scriptRenderControl;
-		private readonly Scripting scripting;
-		private readonly RenderWindow renderWindow;
-
-		private Scene currentScene;
-		private IDisposable sceneChangeSubscription;
-
-		// Previously run scripts.
-		private readonly Dictionary<string, Script> _scripts = new Dictionary<string, Script>();
-
-		// Script file that was last run.
-		private Script _lastRunScript;
+		public Model.Workspace Workspace { get; }
+		private readonly RenderWindow _renderWindow;
 
 		// TODO: Make observable?
 		public bool RealTimeMode
 		{
-			get { return renderWindow != null && renderWindow.RealTimeMode; }
-			set { renderWindow.RealTimeMode = value; }
+			get { return _renderWindow != null && _renderWindow.RealTimeMode; }
+			set { _renderWindow.RealTimeMode = value; }
 		}
 
 		// List of documents that have been externally modified.
@@ -464,7 +362,7 @@ namespace ShaderEditorApp.Workspace
 				return RelayCommand.LazyInit(ref openProjectCmd, param =>
 					{
 						if (param is string)
-							OpenProject((string)param);
+							Workspace.OpenProject((string)param);
 						else
 							OpenProjectPrompt();
 					});
@@ -517,8 +415,7 @@ namespace ShaderEditorApp.Workspace
 		private NamedCommand runActiveScriptCmd;
 		public INamedCommand RunActiveScriptCmd
 			=> NamedCommand.LazyInit(ref runActiveScriptCmd, "Run Current Script",
-				param => RunActiveScript(),
-				param => IsActiveScript());
+				param => RunActiveScript());
 
 		// Command to save all (dirty) open documents.
 		private NamedCommand saveAllCmd;
