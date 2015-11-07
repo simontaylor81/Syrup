@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using SlimDX;
 using ShaderEditorApp.ViewModel;
 
-namespace SRPRendering
+namespace ShaderEditorApp.View
 {
 	// Class that handles camera controls for a viewport.
 	class Camera

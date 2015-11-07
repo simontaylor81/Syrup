@@ -50,7 +50,7 @@ namespace ShaderEditorApp.View
 			}
 		}
 
-		public ViewModel.ViewportViewModel ViewportViewModel { get; }
+		public ViewportViewModel ViewportViewModel { get; }
 
 		public RenderWindow()
 		{
