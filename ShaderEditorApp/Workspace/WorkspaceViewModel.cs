@@ -53,6 +53,17 @@ namespace ShaderEditorApp.Workspace
 			Application.Current.Deactivated += (o, _e) => isAppForeground = false;
 
 			{
+				// Get properties from active window if it's a property source.
+				// Technically this doesn't need to be a property as it's not used by anything
+				// other than the Properties source, but making it a property allows us to use
+				// WhenAny, which simplifies everything greatly.
+				_focusPropertySource = this.WhenAnyValue(x => x.ActiveWindow)
+					.Where(window => !(window is PropertiesWindow))
+					.Select(window => (window as FrameworkElement)?.DataContext as IPropertySource)
+					.ToProperty(this, x => x.FocusPropertySource);
+			}
+
+			{
 				// Combine sources of properties into a single observable.
 				var propertySources = Observable.Merge(
 					this.WhenAny(x => x.FocusPropertySource, x => x.FocusPropertySource.Properties, (x, y) => Unit.Default),
@@ -368,22 +379,6 @@ namespace ShaderEditorApp.Workspace
 					// If this is a document, update the active document property too.
 					if (value is DocumentViewModel)
 						ActiveDocument = (DocumentViewModel)value;
-
-					// Update property source window too.
-					// Don't change property source if when focusing on the properties window, otherwise you can't edit anything!
-					if (!(value is View.PropertiesWindow))
-					{
-						// Use data context of focused window if it's a property source.
-						var frameworkElement = value as FrameworkElement;
-						if (frameworkElement != null)
-						{
-							FocusPropertySource = frameworkElement.DataContext as IPropertySource;
-						}
-						else
-						{
-							FocusPropertySource = null;
-						}
-					}
 				}
 			}
 		}
@@ -428,12 +423,8 @@ namespace ShaderEditorApp.Workspace
 		}
 
 		// Property source to use based on focus.
-		private IPropertySource focusPropertySource;
-		public IPropertySource FocusPropertySource
-		{
-			get { return focusPropertySource; }
-			set { this.RaiseAndSetIfChanged(ref focusPropertySource, value); }
-		}
+		private ObservableAsPropertyHelper<IPropertySource> _focusPropertySource;
+		public IPropertySource FocusPropertySource => _focusPropertySource.Value;
 
 		public MenuBarViewModel MenuBar { get; }
 
