@@ -22,7 +22,6 @@ using System.Reactive;
 using System.Threading.Tasks;
 using ReactiveUI;
 using System.Reactive.Linq;
-using System.Diagnostics;
 
 namespace ShaderEditorApp.Workspace
 {
@@ -51,6 +50,13 @@ namespace ShaderEditorApp.Workspace
 
 			Application.Current.Activated += (o, _e) => isAppForeground = true;
 			Application.Current.Deactivated += (o, _e) => isAppForeground = false;
+
+			{
+				// Active document is just the most recent active window that was a document.
+				_activeDocument = this.WhenAnyValue(x => x.ActiveWindow)
+					.OfType<DocumentViewModel>()
+					.ToProperty(this, x => x.ActiveDocument);
+			}
 
 			{
 				// Get properties from active window if it's a property source.
@@ -177,7 +183,7 @@ namespace ShaderEditorApp.Workspace
 			}
 
 			// Make active document.
-			ActiveDocument = document;
+			ActiveWindow = document;
 		}
 
 		// Open a document by asking the user for a file to open.
@@ -205,19 +211,13 @@ namespace ShaderEditorApp.Workspace
 		{
 			var document = new DocumentViewModel(this);
 			documents.Add(document);
-			ActiveDocument = document;
+			ActiveWindow = document;
 		}
 
 		internal void CloseDocument(DocumentViewModel document)
 		{
 			document.Dispose();
 			documents.Remove(document);
-
-			if (ActiveDocument == document)
-			{
-				// TODO: Better new active document logic.
-				ActiveDocument = documents.FirstOrDefault();
-			}
 		}
 
 		// Notification that a document has been modified, and might need to be reloaded. Thread-safe.
@@ -345,43 +345,17 @@ namespace ShaderEditorApp.Workspace
 		private ObservableCollection<DocumentViewModel> documents;
 		public ReadOnlyObservableCollection<DocumentViewModel> Documents { get; }
 
-		// Property that tracks the currently active document.
-		private DocumentViewModel activeDocument;
-		public DocumentViewModel ActiveDocument
-		{
-			get { return activeDocument; }
-			//set { this.RaiseAndSetIfChanged(ref activeDocument, value); }
-			set
-			{
-				if (value != activeDocument)
-				{
-					activeDocument = value;
-					this.RaisePropertyChanged();
-
-					// Update the active window too so the UI is updated.
-					ActiveWindow = value;
-				}
-			}
-		}
-
 		// Property that tracks the active window, document or otherwise.
-		private object activeWindow;
+		private object _activeWindow;
 		public object ActiveWindow
 		{
-			get { return activeWindow; }
-			set
-			{
-				if (value != activeWindow)
-				{
-					activeWindow = value;
-					this.RaisePropertyChanged();
-
-					// If this is a document, update the active document property too.
-					if (value is DocumentViewModel)
-						ActiveDocument = (DocumentViewModel)value;
-				}
-			}
+			get { return _activeWindow; }
+			set { this.RaiseAndSetIfChanged(ref _activeWindow, value); }
 		}
+
+		// Property that tracks the currently active document.
+		private ObservableAsPropertyHelper<DocumentViewModel> _activeDocument;
+		public DocumentViewModel ActiveDocument => _activeDocument.Value;
 
 		private Project project_;
 		public Project Project
