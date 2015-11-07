@@ -413,34 +413,18 @@ namespace ShaderEditorApp.Workspace
 			}
 		}
 
-		private ProjectViewModel projectViewModel;
+		private ProjectViewModel _projectViewModel;
 		public ProjectViewModel ProjectViewModel
 		{
-			get { return projectViewModel; }
-			set
-			{
-				if (value != projectViewModel)
-				{
-					projectViewModel = value;
-					this.RaisePropertyChanged();
-					this.RaisePropertyChanged("Properties");
-				}
-			}
+			get { return _projectViewModel; }
+			set { this.RaiseAndSetIfChanged(ref _projectViewModel, value); }
 		}
 
 		private SceneViewModel _sceneViewModel;
 		public SceneViewModel SceneViewModel
 		{
 			get { return _sceneViewModel; }
-			set
-			{
-				if (value != _sceneViewModel)
-				{
-					_sceneViewModel = value;
-					this.RaisePropertyChanged();
-					this.RaisePropertyChanged("Properties");
-				}
-			}
+			set { this.RaiseAndSetIfChanged(ref _sceneViewModel, value); }
 		}
 
 		// Property source to use based on focus.
