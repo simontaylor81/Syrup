@@ -34,6 +34,9 @@ namespace ShaderEditorApp.Workspace
 			documents = new ObservableCollection<DocumentViewModel>();
 			Documents = new ReadOnlyObservableCollection<DocumentViewModel>(documents);
 
+			// Create menu bar
+			MenuBar = new MenuBarViewModel(this);
+
 			// Create classes that handle scripting.
 			scripting = new Scripting(this);
 			scriptRenderControl = new ScriptRenderControl(this, renderWindow.Device, scripting);
@@ -456,6 +459,8 @@ namespace ShaderEditorApp.Workspace
 
 		public IEnumerable<PropertyViewModel> Properties { get; private set; }
 
+		public MenuBarViewModel MenuBar { get; }
+
 		private void RecreatePropertiesList()
 		{
 			// Use focussed window if it's a property source, otherwise
@@ -510,6 +515,13 @@ namespace ShaderEditorApp.Workspace
 		// TODO: Cleanup, consoliate. Interface?
 		public System.Drawing.Size ViewportSize => renderWindow.Size;
 
+		// TODO: Make observable?
+		public bool RealTimeMode
+		{
+			get { return renderWindow != null && renderWindow.RealTimeMode; }
+			set { renderWindow.RealTimeMode = value; }
+		}
+
 		// List of documents that have been externally modified.
 		private HashSet<DocumentViewModel> modifiedDocuments = new HashSet<DocumentViewModel>();
 
@@ -561,32 +573,32 @@ namespace ShaderEditorApp.Workspace
 
 		// Command to close the currently active document.
 		private NamedCommand closeActiveDocumentCmd;
-		public NamedCommand CloseActiveDocumentCmd
+		public INamedCommand CloseActiveDocumentCmd
 			=> NamedCommand.LazyInit(ref closeActiveDocumentCmd, "Close",
 				param => CloseDocument(ActiveDocument), param => ActiveDocument != null);
 
 		// Command to save the currently active document.
 		private NamedCommand saveActiveDocumentCmd;
-		public NamedCommand SaveActiveDocumentCmd
+		public INamedCommand SaveActiveDocumentCmd
 			=> NamedCommand.LazyInit(ref saveActiveDocumentCmd, "Save",
 				param => ActiveDocument.Save(), param => ActiveDocument != null);
 
 		// Command to save the currently active document under a new filename.
 		private NamedCommand saveActiveDocumentAsCmd;
-		public NamedCommand SaveActiveDocumentAsCmd
+		public INamedCommand SaveActiveDocumentAsCmd
 			=> NamedCommand.LazyInit(ref saveActiveDocumentAsCmd, "Save As",
 				param => ActiveDocument.SaveAs(), param => ActiveDocument != null);
 
 		// Command to execute the currently active script document.
 		private NamedCommand runActiveScriptCmd;
-		public NamedCommand RunActiveScriptCmd
+		public INamedCommand RunActiveScriptCmd
 			=> NamedCommand.LazyInit(ref runActiveScriptCmd, "Run Current Script",
 				param => RunActiveScript(),
 				param => IsActiveScript());
 
 		// Command to save all (dirty) open documents.
 		private NamedCommand saveAllCmd;
-		public NamedCommand SaveAllCmd
+		public INamedCommand SaveAllCmd
 			=> NamedCommand.LazyInit(ref saveAllCmd, "Save All",
 				param => SaveAllDirty());
 

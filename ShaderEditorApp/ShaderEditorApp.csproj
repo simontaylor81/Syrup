@@ -163,6 +163,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="MVVMUtil\Converters.cs" />
+    <Compile Include="MVVMUtil\NamedCommand.cs" />
     <Compile Include="MVVMUtil\RelayCommand.cs" />
     <Compile Include="OutputWindow.xaml.cs">
       <DependentUpon>OutputWindow.xaml</DependentUpon>
@@ -171,6 +172,7 @@
     <Compile Include="SampleData\DummyViewModels.cs" />
     <Compile Include="ViewModel\ChoicePropertyViewModel.cs" />
     <Compile Include="ViewModel\IHierarchicalBrowserRootViewModel.cs" />
+    <Compile Include="ViewModel\MenuBarViewModel.cs" />
     <Compile Include="ViewModel\Project\ProjectFolderViewModel.cs" />
     <Compile Include="Projects\ProjectItem.cs" />
     <Compile Include="ViewModel\Project\ProjectItemViewModel.cs" />
