@@ -20,11 +20,12 @@ using ShaderEditorApp.ViewModel.Projects;
 using ShaderEditorApp.ViewModel.Scene;
 using System.Reactive;
 using System.Threading.Tasks;
+using ReactiveUI;
 
 namespace ShaderEditorApp.Workspace
 {
 	// ViewModel for the application workspace, containing documents, docking windows, etc.
-	public class WorkspaceViewModel : ViewModelBase, IWorkspace
+	public class WorkspaceViewModel : ReactiveObject, IWorkspace
 	{
 		public WorkspaceViewModel(RenderWindow renderWindow)
 		{
@@ -320,12 +321,13 @@ namespace ShaderEditorApp.Workspace
 		public DocumentViewModel ActiveDocument
 		{
 			get { return activeDocument; }
+			//set { this.RaiseAndSetIfChanged(ref activeDocument, value); }
 			set
 			{
 				if (value != activeDocument)
 				{
 					activeDocument = value;
-					OnPropertyChanged();
+					this.RaisePropertyChanged();
 
 					// Update the active window too so the UI is updated.
 					ActiveWindow = value;
@@ -343,7 +345,7 @@ namespace ShaderEditorApp.Workspace
 				if (value != activeWindow)
 				{
 					activeWindow = value;
-					OnPropertyChanged();
+					this.RaisePropertyChanged();
 
 					// If this is a document, update the active document property too.
 					if (value is DocumentViewModel)
@@ -402,8 +404,8 @@ namespace ShaderEditorApp.Workspace
 				if (value != projectViewModel)
 				{
 					projectViewModel = value;
-					OnPropertyChanged();
-					OnPropertyChanged("Properties");
+					this.RaisePropertyChanged();
+					this.RaisePropertyChanged("Properties");
 
 					// When the project's exposed properties change, so might ours.
 					projectViewModel.PropertyChanged += (o, e) =>
@@ -426,8 +428,8 @@ namespace ShaderEditorApp.Workspace
 				if (value != _sceneViewModel)
 				{
 					_sceneViewModel = value;
-					OnPropertyChanged();
-					OnPropertyChanged("Properties");
+					this.RaisePropertyChanged();
+					this.RaisePropertyChanged("Properties");
 
 					// When the project's exposed properties change, so might ours.
 					// TODO: Rx-ify?
@@ -473,7 +475,7 @@ namespace ShaderEditorApp.Workspace
 				.Select(prop => PropertyViewModelFactory.CreateViewModel(prop))
 				.ToArray();
 
-			OnPropertyChanged("Properties");
+			this.RaisePropertyChanged("Properties");
 		}
 
 		// Save all dirty documents.
