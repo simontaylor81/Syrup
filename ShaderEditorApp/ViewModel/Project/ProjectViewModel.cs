@@ -63,7 +63,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 		private void Save()
 		{
 			// Set list of open documents so they can be restored next time.
-			Project.SavedOpenDocuments = from doc in WorkspaceVM.Documents select doc.FilePath;
+			Project.SavedOpenDocuments = from doc in WorkspaceVM.OpenDocumentSet.Documents select doc.FilePath;
 
 			Project.Save();
 		}

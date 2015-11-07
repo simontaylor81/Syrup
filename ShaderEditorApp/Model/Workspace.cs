@@ -24,10 +24,6 @@ namespace ShaderEditorApp.Model
 	{
 		public Workspace(SlimDX.Direct3D11.Device d3dDevice)
 		{
-			// Create documents list, and wrap in a read-only wrapper.
-			documents = new ObservableCollection<DocumentViewModel>();
-			Documents = new ReadOnlyObservableCollection<DocumentViewModel>(documents);
-
 			// Create classes that handle scripting.
 			scripting = new Scripting(this);
 			ScriptRenderControl = new ScriptRenderControl(this, d3dDevice, scripting);
@@ -117,9 +113,6 @@ namespace ShaderEditorApp.Model
 			return Path.Combine(Project.BasePath, path);
 		}
 
-		private ObservableCollection<DocumentViewModel> documents;
-		public ReadOnlyObservableCollection<DocumentViewModel> Documents { get; }
-
 		private Project _project;
 		public Project Project
 		{
@@ -128,10 +121,6 @@ namespace ShaderEditorApp.Model
 			{
 				if (_project != value)
 				{
-					// Close existing documents when opening a new project.
-					// TODO: Prompt to save.
-					DisposableUtil.DisposeList(documents);
-
 					_project = value;
 
 					// Load default scene, if present.
@@ -154,7 +143,6 @@ namespace ShaderEditorApp.Model
 		// Rendering/script related stuff.
 		public ScriptRenderControl ScriptRenderControl { get; }
 		private readonly Scripting scripting;
-		//private readonly RenderWindow renderWindow;
 
 		private Scene _currentScene;
 		public Scene CurrentScene
@@ -170,11 +158,5 @@ namespace ShaderEditorApp.Model
 
 		// Script file that was last run.
 		private Script _lastRunScript;
-
-		// List of documents that have been externally modified.
-		private HashSet<DocumentViewModel> modifiedDocuments = new HashSet<DocumentViewModel>();
-
-		// Is the application in the foreground?
-		private bool isAppForeground = false;
 	}
 }

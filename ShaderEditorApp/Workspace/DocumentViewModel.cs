@@ -16,9 +16,9 @@ namespace ShaderEditorApp.ViewModel
 	public class DocumentViewModel : ViewModelBase
 	{
 		// Create a new (empty) document.
-		public DocumentViewModel(WorkspaceViewModel workspace)
+		public DocumentViewModel(OpenDocumentSetViewModel openDocumentSet)
 		{
-			this.workspace = workspace;
+			_openDocumentSet = openDocumentSet;
 			Document = new TextDocument();
 
 			// Dirty when document changes.
@@ -26,7 +26,7 @@ namespace ShaderEditorApp.ViewModel
 		}
 
 		// Create a document backed by a file.
-		public DocumentViewModel(WorkspaceViewModel workspace, string path)
+		public DocumentViewModel(OpenDocumentSetViewModel workspace, string path)
 			: this(workspace)
 		{
 			FilePath = path;
@@ -147,7 +147,7 @@ namespace ShaderEditorApp.ViewModel
 
 		void FileChanged(object sender, FileSystemEventArgs e)
 		{
-			workspace.AddModifiedDocument(this);
+			_openDocumentSet.AddModifiedDocument(this);
 		}
 
 		// Contents of the document.
@@ -188,8 +188,8 @@ namespace ShaderEditorApp.ViewModel
 		public int SelectionStart { get; set; }
 		public int SelectionLength { get; set; }
 
-		// Back-pointer to the workspace we're in.
-		private readonly WorkspaceViewModel workspace;
+		// Back-pointer to the open document set we're in.
+		private readonly OpenDocumentSetViewModel _openDocumentSet;
 
 		// Watcher to look for external modifications.
 		private FileSystemWatcher watcher;
@@ -202,7 +202,7 @@ namespace ShaderEditorApp.ViewModel
 			{
 				if (closeCmd == null)
 				{
-					closeCmd = new RelayCommand(param => workspace.CloseDocument(this));
+					closeCmd = new RelayCommand(param => _openDocumentSet.CloseDocument(this));
 				}
 				return closeCmd;
 			}

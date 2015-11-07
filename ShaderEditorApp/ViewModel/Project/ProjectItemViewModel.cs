@@ -40,7 +40,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 			else
 			{
 				// Default for everything else is to open the item.s
-				_defaultCmd = NamedCommand.CreateReactive("Open", _ => _workspaceVM.OpenDocument(item.AbsolutePath, false));
+				_defaultCmd = NamedCommand.CreateReactive("Open", _ => _workspaceVM.OpenDocumentSet.OpenDocument(item.AbsolutePath, false));
 			}
 
 			// Command to remove the item from the scene.

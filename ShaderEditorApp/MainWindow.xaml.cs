@@ -9,6 +9,7 @@ using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using SRPCommon.Util;
+using ShaderEditorApp.Model;
 
 namespace ShaderEditorApp
 {
@@ -22,7 +23,7 @@ namespace ShaderEditorApp
 			InitializeComponent();
 		}
 
-		private Model.Workspace _workspace;
+		private Workspace _workspace;
 		private WorkspaceViewModel _workspaceViewModel;
 		private RenderWindow renderWindow;
 
@@ -34,7 +35,7 @@ namespace ShaderEditorApp
 
 			OutputLogger.Instance.AddTarget(outputWindow);
 
-			_workspace = new Model.Workspace(renderWindow.Device);
+			_workspace = new Workspace(renderWindow.Device);
 			_workspaceViewModel = new WorkspaceViewModel(_workspace, renderWindow);
 
 			renderWindow.ScriptControl = _workspace.ScriptRenderControl;
@@ -69,7 +70,7 @@ namespace ShaderEditorApp
 					else
 					{
 						// Open other files as documents.
-						_workspaceViewModel.OpenDocument(filename, false);
+						_workspaceViewModel.OpenDocumentSet.OpenDocument(filename, false);
 					}
 				}
 			}
@@ -78,7 +79,7 @@ namespace ShaderEditorApp
 		void CompositionTarget_Rendering(object sender, EventArgs e)
 		{
 			renderWindow.Tick();
-			_workspaceViewModel.Tick();
+			_workspaceViewModel.OpenDocumentSet.Tick();
 		}
 
 		private void LoadSyntaxHighlightingDefinition(string language)

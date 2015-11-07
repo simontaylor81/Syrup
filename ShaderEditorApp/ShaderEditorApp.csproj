@@ -208,6 +208,7 @@
       <DependentUpon>ViewportFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="Workspace\DocumentViewModel.cs" />
+    <Compile Include="Workspace\OpenDocumentSetViewModel.cs" />
     <Compile Include="Workspace\WorkspaceViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

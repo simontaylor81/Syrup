@@ -85,7 +85,7 @@
         <avalondock:DockingManager x:Name="dockManager" Grid.Row="1"
                                    LayoutItemContainerStyleSelector="{StaticResource PaneStyleSelector}"
                                    LayoutItemTemplateSelector="{StaticResource PaneTemplateSelector}"
-                                   DocumentsSource="{Binding Documents}"
+                                   DocumentsSource="{Binding OpenDocumentSet.Documents}"
                                    ActiveContent="{Binding ActiveWindow, Mode=TwoWay}">
             <!--<avalondock:DockingManager.Theme>
                 <avalondock:VS2010Theme/>
