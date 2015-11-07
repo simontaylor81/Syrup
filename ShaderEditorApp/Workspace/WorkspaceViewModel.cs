@@ -21,6 +21,8 @@ using ShaderEditorApp.ViewModel.Scene;
 using System.Reactive;
 using System.Threading.Tasks;
 using ReactiveUI;
+using System.Reactive.Linq;
+using System.Diagnostics;
 
 namespace ShaderEditorApp.Workspace
 {
@@ -50,6 +52,25 @@ namespace ShaderEditorApp.Workspace
 			Application.Current.Activated += (o, _e) => isAppForeground = true;
 			Application.Current.Deactivated += (o, _e) => isAppForeground = false;
 
+			{
+				// Combine sources of properties into a single observable.
+				var propertySources = Observable.Merge(
+					this.WhenAny(x => x.FocusPropertySource, x => x.FocusPropertySource.Properties, (x, y) => Unit.Default),
+					scriptRenderControl.PropertiesChanged.Select(_ => Unit.Default));
+
+				// Convert that into a stream of property view model lists.
+				_properties = propertySources
+					// Use focussed window if it's a property source, otherwise
+					// fallback on the render properties (i.e. shader and user variables).
+					.Select(x => FocusPropertySource != null ? FocusPropertySource.Properties : scriptRenderControl.Properties)
+					.Select(x => x
+						// Create viewmodels for each property.
+						.EmptyIfNull()
+						.Select(prop => PropertyViewModelFactory.CreateViewModel(prop))
+						.ToArray())
+					.ToProperty(this, x => x.Properties);
+			}
+
 
 			// Load a file specified on the commandline.
 			var commandlineParams = Environment.GetCommandLineArgs();
@@ -70,9 +91,6 @@ namespace ShaderEditorApp.Workspace
 					}
 				}
 			}
-
-			// Recreate property list when the script's properties change.
-			scriptRenderControl.Properties.CollectionChanged += (o, e) => RecreatePropertiesList();
 		}
 
 		public void Tick()
@@ -406,15 +424,6 @@ namespace ShaderEditorApp.Workspace
 					projectViewModel = value;
 					this.RaisePropertyChanged();
 					this.RaisePropertyChanged("Properties");
-
-					// When the project's exposed properties change, so might ours.
-					projectViewModel.PropertyChanged += (o, e) =>
-						{
-							if (e.PropertyName == "Properties")
-							{
-								RecreatePropertiesList();
-							}
-						};
 				}
 			}
 		}
@@ -430,16 +439,6 @@ namespace ShaderEditorApp.Workspace
 					_sceneViewModel = value;
 					this.RaisePropertyChanged();
 					this.RaisePropertyChanged("Properties");
-
-					// When the project's exposed properties change, so might ours.
-					// TODO: Rx-ify?
-					_sceneViewModel.PropertyChanged += (o, e) =>
-						{
-							if (e.PropertyName == "Properties")
-							{
-								RecreatePropertiesList();
-							}
-						};
 				}
 			}
 		}
@@ -449,34 +448,13 @@ namespace ShaderEditorApp.Workspace
 		public IPropertySource FocusPropertySource
 		{
 			get { return focusPropertySource; }
-			set
-			{
-				if (value != focusPropertySource)
-				{
-					focusPropertySource = value;
-					RecreatePropertiesList();
-				}
-			}
+			set { this.RaiseAndSetIfChanged(ref focusPropertySource, value); }
 		}
-
-		public IEnumerable<PropertyViewModel> Properties { get; private set; }
 
 		public MenuBarViewModel MenuBar { get; }
 
-		private void RecreatePropertiesList()
-		{
-			// Use focussed window if it's a property source, otherwise
-			// fallback on the render properties (i.e. shader and user variables).
-			var source = FocusPropertySource != null ? FocusPropertySource.Properties : scriptRenderControl.Properties;
-
-			// Create viewmodels for each property.
-			Properties = source
-				.EmptyIfNull()
-				.Select(prop => PropertyViewModelFactory.CreateViewModel(prop))
-				.ToArray();
-
-			this.RaisePropertyChanged("Properties");
-		}
+		private ObservableAsPropertyHelper<IEnumerable<PropertyViewModel>> _properties;
+		public IEnumerable<PropertyViewModel> Properties => _properties.Value;
 
 		// Save all dirty documents.
 		private bool SaveAllDirty()
@@ -499,9 +477,9 @@ namespace ShaderEditorApp.Workspace
 		public ViewportViewModel ViewportViewModel => viewportViewModel;
 
 		// Rendering/script related stuff.
-		private ScriptRenderControl scriptRenderControl;
-		private Scripting scripting;
-		private RenderWindow renderWindow;
+		private readonly ScriptRenderControl scriptRenderControl;
+		private readonly Scripting scripting;
+		private readonly RenderWindow renderWindow;
 
 		private Scene currentScene;
 		private IDisposable sceneChangeSubscription;

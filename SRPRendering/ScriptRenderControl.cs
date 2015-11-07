@@ -17,6 +17,7 @@ using SRPScripting;
 using System.Reactive;
 using System.Reactive.Subjects;
 using Castle.DynamicProxy;
+using System.Reactive.Linq;
 
 namespace SRPRendering
 {
@@ -27,6 +28,9 @@ namespace SRPRendering
 		{
 			this.workspace = workspace;
 			this.device = device;
+
+			PropertiesChanged = Observable.FromEventPattern(properties, nameof(properties.CollectionChanged))
+				.Select(evt => properties);
 
 			// Generate wrapper proxy using Castle Dynamic Proxy to avoid direct script access to our internals.
 			ScriptInterface = new ProxyGenerator().CreateInterfaceProxyWithTarget<IRenderInterface>(this);
@@ -544,6 +548,8 @@ namespace SRPRendering
 		private ObservableCollection<IUserProperty> properties = new ObservableCollection<IUserProperty>();
 		public ObservableCollection<IUserProperty> Properties => properties;
 		IEnumerable<IUserProperty> IPropertySource.Properties => properties;
+
+		public IObservable<IEnumerable<IUserProperty>> PropertiesChanged { get; }
 
 		private Device device;
 
