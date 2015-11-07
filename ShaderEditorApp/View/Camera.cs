@@ -15,8 +15,7 @@ namespace SRPRendering
 		public delegate void CameraMovedHandler(Camera camera);
 		public event CameraMovedHandler Moved;
 
-		// Register a control to get input from, and be invalidated when the camera moves.
-		public void RegisterViewport(Control control)
+		public Camera(Control control, ViewportViewModel viewportViewModel)
 		{
 			// Hook the control's mouse events.
 			control.MouseMove += MouseMove;
@@ -27,6 +26,8 @@ namespace SRPRendering
 
 			// Register event to invalidate the control when the mouse moves.
 			Moved += (c) => { control.Invalidate(); };
+
+			ViewportViewModel = viewportViewModel;
 		}
 
 		// Get the world -> view space matrix.
@@ -42,7 +43,7 @@ namespace SRPRendering
 			return Matrix.PerspectiveFovLH(FOV * (float)Math.PI / 180.0f, aspectRatio, Near, Far);
 		}
 
-		public ViewportViewModel ViewportViewModel { get; set; }
+		public ViewportViewModel ViewportViewModel { get; }
 
 
 		//------------------------------------------------------------------------------------------

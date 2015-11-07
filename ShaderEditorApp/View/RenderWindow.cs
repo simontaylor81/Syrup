@@ -12,6 +12,7 @@ using SlimDX.Direct3D11;
 using SlimDX.D3DCompiler;
 
 using SRPRendering;
+using ShaderEditorApp.ViewModel;
 
 namespace ShaderEditorApp.View
 {
@@ -26,7 +27,7 @@ namespace ShaderEditorApp.View
 		private RenderTargetView renderTarget;
 
 		private ScriptRenderControl scriptControl;
-		private Camera camera = new Camera();
+		private Camera camera;
 
 		// TODO: Refactor so the device isn't owned by the viewport.
 		public SlimDX.Direct3D11.Device Device => device;
@@ -49,22 +50,13 @@ namespace ShaderEditorApp.View
 			}
 		}
 
-		private ViewModel.ViewportViewModel viewportViewModel;
-		public ViewModel.ViewportViewModel ViewportViewModel
-		{
-			get { return viewportViewModel; }
-			set
-			{
-				viewportViewModel = value;
-				if (camera != null)
-					camera.ViewportViewModel = value;
-			}
-		}
+		public ViewModel.ViewportViewModel ViewportViewModel { get; }
 
 		public RenderWindow()
 		{
-			// Register camera.
-			camera.RegisterViewport(this);
+			// Create camera.
+			ViewportViewModel = new ViewportViewModel();
+			camera = new Camera(this, ViewportViewModel);
 
 			MouseClick += RenderWindow_MouseClick;
 

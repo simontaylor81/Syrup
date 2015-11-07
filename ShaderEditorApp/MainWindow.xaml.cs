@@ -47,7 +47,7 @@ namespace ShaderEditorApp
 
 			DataContext = _workspaceViewModel;
 
-			viewportFrame.DataContext = _workspaceViewModel.ViewportViewModel;
+			viewportFrame.DataContext = renderWindow.ViewportViewModel;
 
 			CompositionTarget.Rendering += CompositionTarget_Rendering;
 

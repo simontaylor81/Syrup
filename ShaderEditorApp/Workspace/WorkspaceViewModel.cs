@@ -29,8 +29,6 @@ namespace ShaderEditorApp.ViewModel
 			// Create menu bar
 			MenuBar = new MenuBarViewModel(this);
 
-			renderWindow.ViewportViewModel = ViewportViewModel;
-
 			{
 				// Get properties from active window if it's a property source.
 				// Technically this doesn't need to be a property as it's not used by anything
@@ -153,10 +151,6 @@ namespace ShaderEditorApp.ViewModel
 
 		private ObservableAsPropertyHelper<IEnumerable<PropertyViewModel>> _properties;
 		public IEnumerable<PropertyViewModel> Properties => _properties.Value;
-
-		// Viewport view model that contains settings for the viewport (e.g. camera mode).
-		private ViewportViewModel viewportViewModel = new ViewportViewModel();
-		public ViewportViewModel ViewportViewModel => viewportViewModel;
 
 		public Workspace Workspace { get; }
 		public OpenDocumentSetViewModel OpenDocumentSet { get; }
