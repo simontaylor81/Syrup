@@ -510,11 +510,6 @@ namespace ShaderEditorApp.Workspace
 		// Script file that was last run.
 		private Script _lastRunScript;
 
-		// TODO: Multiple viewports.
-		// TODO: Move info needed?
-		// TODO: Cleanup, consoliate. Interface?
-		public System.Drawing.Size ViewportSize => renderWindow.Size;
-
 		// TODO: Make observable?
 		public bool RealTimeMode
 		{
