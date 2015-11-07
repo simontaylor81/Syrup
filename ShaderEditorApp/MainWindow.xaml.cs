@@ -51,12 +51,6 @@ namespace ShaderEditorApp
 			workspace.Tick();
 		}
 
-		public bool RealTimeMode
-		{
-			get { return renderWindow != null && renderWindow.RealTimeMode; }
-			set { renderWindow.RealTimeMode = value; }
-		}
-
 		private void LoadSyntaxHighlightingDefinition(string language)
 		{
 			string appPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);

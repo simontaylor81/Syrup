@@ -77,39 +77,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Main menu bar -->
         <Menu Grid.Row="0" ItemsSource="{Binding MenuBar.Items}"
               ItemTemplate="{StaticResource MenuBarTemplate}"
-              ItemContainerStyle="{StaticResource MenuBarStyle}">
-        <!--<Menu Grid.Row="0">-->
-            <!--<MenuItem Header="File">
-                <MenuItem Header="New">
-                    <MenuItem Command="{Binding NewProjectCmd}" Header="Project" InputGestureText="Ctrl+Shift+N"/>
-                    <MenuItem Command="{Binding NewDocumentCmd}" Header="Document" InputGestureText="Ctrl+N"/>
-                </MenuItem>
-                <MenuItem Header="Open">
-                    <MenuItem Command="{Binding OpenProjectCmd}" Header="Project" InputGestureText="Ctrl+Shift+O"/>
-                    <MenuItem Command="{Binding OpenDocumentCmd}" Header="Document" InputGestureText="Ctrl+O"/>
-                </MenuItem>
-                <MenuItem Command="{Binding SaveActiveDocumentCmd}" Header="{Binding SaveActiveDocumentCmd.Name}" InputGestureText="Ctrl+S"/>
-                <MenuItem Command="{Binding SaveAllCmd}" Header="{Binding SaveAllCmd.Name}" InputGestureText="Ctrl+Shift+S"/>
-                <MenuItem Command="{Binding SaveActiveDocumentAsCmd}" Header="{Binding SaveActiveDocumentAsCmd.Name}"/>
-                <MenuItem Command="{Binding CloseActiveDocumentCmd}" Header="{Binding CloseActiveDocumentCmd.Name}" InputGestureText="Ctrl+F4"/>     --><!-- TODO: Make InputGestureText generic. --><!--
-                <MenuItem Header="Exit"/>
-            </MenuItem>
-            <MenuItem Header="Edit">
-                <MenuItem Command="Undo"/>
-                <MenuItem Command="Redo"/>
-                <MenuItem Command="Cut"/>
-                <MenuItem Command="Copy"/>
-                <MenuItem Command="Paste"/>
-            </MenuItem>
-            <MenuItem Header="View">
-                <MenuItem Header="Real-Time Mode" IsCheckable="True" IsChecked="{Binding ElementName=mainWindow, Path=RealTimeMode}"/>
-            </MenuItem>
-            <MenuItem Header="Run">
-                <MenuItem Command="{Binding RunActiveScriptCmd}" Header="{Binding RunActiveScriptCmd.Name}" InputGestureText="F5"/>     --><!-- TODO: Make InputGestureTest generic. --><!--
-            </MenuItem>-->
-        </Menu>
+              ItemContainerStyle="{StaticResource MenuBarStyle}" />
 
         <avalondock:DockingManager x:Name="dockManager" Grid.Row="1"
                                    LayoutItemContainerStyleSelector="{StaticResource PaneStyleSelector}"
