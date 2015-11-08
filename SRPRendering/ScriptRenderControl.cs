@@ -319,9 +319,6 @@ namespace SRPRendering
 			// Create render targets if necessary.
 			UpdateRenderTargets(viewInfo.ViewportWidth, viewInfo.ViewportHeight);
 
-			// Always clear the back buffer to black to avoid the script having to do so for trivial stuff.
-			deviceContext.ClearRenderTargetView(viewInfo.BackBuffer, new Color4(0));
-
 			// Let the script do its thing.
 			if (frameCallback != null)
 			{
