@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Reactive.Disposables;
+using System.Reactive.Linq;
 
 using SlimDX;
 using SlimDX.D3DCompiler;
@@ -14,10 +13,6 @@ using SRPCommon.Scripting;
 using SRPCommon.UserProperties;
 using SRPCommon.Util;
 using SRPScripting;
-using System.Reactive;
-using System.Reactive.Subjects;
-using Castle.DynamicProxy;
-using System.Reactive.Linq;
 
 namespace SRPRendering
 {
