@@ -10,6 +10,7 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using SRPCommon.Util;
 using ShaderEditorApp.Model;
+using SRPRendering;
 
 namespace ShaderEditorApp
 {
@@ -26,16 +27,20 @@ namespace ShaderEditorApp
 		private Workspace _workspace;
 		private WorkspaceViewModel _workspaceViewModel;
 		private RenderWindow renderWindow;
+		private RenderDevice _renderDevice;
 
-		private void Window_Initialized_1(object sender, EventArgs e)
+		private void Window_Initialized(object sender, EventArgs e)
 		{
+			// Initialise D3D device.
+			_renderDevice = new RenderDevice();
+
 			// Create render window and assign it to its host.
-			renderWindow = new RenderWindow();
+			renderWindow = new RenderWindow(_renderDevice.Device);
 			viewportFrame.SetRenderWindow(renderWindow);
 
 			OutputLogger.Instance.AddTarget(outputWindow);
 
-			_workspace = new Workspace(renderWindow.Device);
+			_workspace = new Workspace(_renderDevice.Device);
 			_workspaceViewModel = new WorkspaceViewModel(_workspace, renderWindow);
 
 			renderWindow.ScriptControl = _workspace.ScriptRenderControl;
@@ -74,6 +79,11 @@ namespace ShaderEditorApp
 					}
 				}
 			}
+		}
+
+		private void Window_Closed(object sender, EventArgs e)
+		{
+			_renderDevice.Dispose();
 		}
 
 		void CompositionTarget_Rendering(object sender, EventArgs e)

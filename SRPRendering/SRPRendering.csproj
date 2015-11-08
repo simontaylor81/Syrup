@@ -104,6 +104,7 @@
     <Compile Include="BasicShaders.cs" />
     <Compile Include="ConstantBuffer.cs" />
     <Compile Include="DepthBuffer.cs" />
+    <Compile Include="RenderDevice.cs" />
     <Compile Include="ScalarShaderVariableUserProperty.cs" />
     <Compile Include="FullscreenQuad.cs" />
     <Compile Include="GlobalResources.cs" />

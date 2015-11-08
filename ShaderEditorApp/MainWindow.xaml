@@ -14,7 +14,9 @@
         mc:Ignorable="d"
         x:Class="ShaderEditorApp.MainWindow"
         Name="mainWindow"
-        Title="SRP" Width="1200" Height="800" Initialized="Window_Initialized_1">
+        Title="SRP" Width="1200" Height="800"
+        Initialized="Window_Initialized"
+        Closed="Window_Closed">
     
     <Window.Resources>
         <!-- Style for document containers in the main dock control. -->

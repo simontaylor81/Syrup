@@ -22,7 +22,7 @@ namespace ShaderEditorApp.View
 		private List<IDisposable> resources = new List<IDisposable>();
 		private List<IDisposable> sizeDependentResources = new List<IDisposable>();
 
-		private SlimDX.Direct3D11.Device device;
+		private SlimDX.Direct3D11.Device _device;
 		private SlimDX.DXGI.SwapChain swapChain;
 		private RenderTargetView renderTarget;
 
@@ -30,7 +30,7 @@ namespace ShaderEditorApp.View
 		private Camera camera;
 
 		// TODO: Refactor so the device isn't owned by the viewport.
-		public SlimDX.Direct3D11.Device Device => device;
+		public SlimDX.Direct3D11.Device Device => _device;
 
 		// Should we render every frame?
 		public bool RealTimeMode { get; set; }
@@ -52,15 +52,17 @@ namespace ShaderEditorApp.View
 
 		public ViewportViewModel ViewportViewModel { get; }
 
-		public RenderWindow()
+		public RenderWindow(SlimDX.Direct3D11.Device device)
 		{
+			_device = device;
+
 			// Create camera.
 			ViewportViewModel = new ViewportViewModel();
 			camera = new Camera(this, ViewportViewModel);
 
 			MouseClick += RenderWindow_MouseClick;
 
-			// Initialise D3D11 Device & swap chain.
+			// Initialise D3D11 swap chain.
 			var description = new SwapChainDescription()
 			{
 				BufferCount = 1,
@@ -73,21 +75,11 @@ namespace ShaderEditorApp.View
 				SwapEffect = SwapEffect.Discard
 			};
 
-			var deviceCreationFlags = DeviceCreationFlags.None;
-#if DEBUG
-			deviceCreationFlags |= DeviceCreationFlags.Debug;
-#endif
-
-			// If you get a debug-only crash here, make sure you have the debug D3D dlls installed
-			// ("Graphics Tools" under Optional Features in Windows 10).
-			SlimDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, deviceCreationFlags, description, out device, out swapChain);
-
-			resources.Add(device);
+			swapChain = new SwapChain(device.Factory, device, description);
 			resources.Add(swapChain);
 
 			// prevent DXGI handling of alt+enter, which doesn't work properly with Winforms
-			using (var factory = swapChain.GetParent<Factory>())
-				factory.SetWindowAssociation(Handle, WindowAssociationFlags.IgnoreAltEnter);
+			device.Factory.SetWindowAssociation(Handle, WindowAssociationFlags.IgnoreAltEnter);
 
 			this.SizeChanged += OnResize;
 		}
@@ -101,11 +93,11 @@ namespace ShaderEditorApp.View
 
 			swapChain.ResizeBuffers(2, 0, 0, Format.R8G8B8A8_UNorm, SwapChainFlags.AllowModeSwitch);
 			using (var resource = SlimDX.Direct3D11.Resource.FromSwapChain<Texture2D>(swapChain, 0))
-				renderTarget = new RenderTargetView(device, resource);
+				renderTarget = new RenderTargetView(_device, resource);
 			sizeDependentResources.Add(renderTarget);
 
 			// Create depth/stencil buffer texture.
-			depthBuffer = new DepthBuffer(device, Width, Height);
+			depthBuffer = new DepthBuffer(_device, Width, Height);
 
 			sizeDependentResources.Add(depthBuffer);
 		}
@@ -132,7 +124,7 @@ namespace ShaderEditorApp.View
 
 		private void Render()
 		{
-			var context = device.ImmediateContext;
+			var context = _device.ImmediateContext;
 
 			// Clear depth buffer.
 			context.ClearDepthStencilView(depthBuffer.DSV, DepthStencilClearFlags.Depth, 1.0f, 0);
@@ -185,5 +177,4 @@ namespace ShaderEditorApp.View
 			Focus();
 		}
 	}
-
 }
