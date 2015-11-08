@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Drawing;
 
 using SlimDX;
 using SlimDX.DXGI;
 using SlimDX.Direct3D11;
-using SlimDX.D3DCompiler;
 
 using SRPRendering;
 using ShaderEditorApp.ViewModel;
@@ -22,18 +20,17 @@ namespace ShaderEditorApp.View
 		private List<IDisposable> resources = new List<IDisposable>();
 		private List<IDisposable> sizeDependentResources = new List<IDisposable>();
 
-		private SlimDX.Direct3D11.Device _device;
-		private SlimDX.DXGI.SwapChain swapChain;
+		private readonly SlimDX.Direct3D11.Device _device;
+		private readonly SlimDX.DXGI.SwapChain swapChain;
+
+		private readonly WorkspaceViewModel _workspaceVM;
+
 		private RenderTargetView renderTarget;
+		private DepthBuffer depthBuffer;
 
 		private ScriptRenderControl scriptControl;
 		private Camera camera;
 
-		// TODO: Refactor so the device isn't owned by the viewport.
-		public SlimDX.Direct3D11.Device Device => _device;
-
-		// Should we render every frame?
-		public bool RealTimeMode { get; set; }
 		private bool bNeedsRepaint = false;
 
 		internal ScriptRenderControl ScriptControl
@@ -52,10 +49,11 @@ namespace ShaderEditorApp.View
 
 		public ViewportViewModel ViewportViewModel { get; }
 
-		public RenderWindow(SlimDX.Direct3D11.Device device)
+		public RenderWindow(SlimDX.Direct3D11.Device device, WorkspaceViewModel workspaceVM)
 		{
 			_device = device;
-
+			_workspaceVM = workspaceVM;
+		
 			// Create camera.
 			ViewportViewModel = new ViewportViewModel();
 			camera = new Camera(this, ViewportViewModel);
@@ -82,6 +80,9 @@ namespace ShaderEditorApp.View
 			device.Factory.SetWindowAssociation(Handle, WindowAssociationFlags.IgnoreAltEnter);
 
 			this.SizeChanged += OnResize;
+
+			// Redraw viewports when required.
+			_workspaceVM.Workspace.RedrawRequired.Subscribe(_ => Invalidate());
 		}
 
 		private void OnResize(object sender, EventArgs e)
@@ -101,9 +102,6 @@ namespace ShaderEditorApp.View
 
 			sizeDependentResources.Add(depthBuffer);
 		}
-
-		private DepthBuffer depthBuffer;
-
 
 		protected override void Dispose(bool disposing)
 		{
@@ -150,7 +148,7 @@ namespace ShaderEditorApp.View
 
 		public void Tick()
 		{
-			if (bNeedsRepaint || RealTimeMode)
+			if (bNeedsRepaint || _workspaceVM.RealTimeMode)
 			{
 				bNeedsRepaint = false;
 				Render();

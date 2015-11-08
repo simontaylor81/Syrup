@@ -20,10 +20,9 @@ namespace ShaderEditorApp.ViewModel
 	// ViewModel for the application workspace, containing documents, docking windows, etc.
 	public class WorkspaceViewModel : ReactiveObject
 	{
-		public WorkspaceViewModel(Workspace _workspace, RenderWindow renderWindow)
+		public WorkspaceViewModel(Workspace _workspace)
 		{
 			Workspace = _workspace;
-			_renderWindow = renderWindow;
 			OpenDocumentSet = new OpenDocumentSetViewModel(this);
 
 			// Create menu bar
@@ -154,13 +153,12 @@ namespace ShaderEditorApp.ViewModel
 
 		public Workspace Workspace { get; }
 		public OpenDocumentSetViewModel OpenDocumentSet { get; }
-		private readonly RenderWindow _renderWindow;
 
-		// TODO: Make observable?
+		private bool _realTimeMode;
 		public bool RealTimeMode
 		{
-			get { return _renderWindow != null && _renderWindow.RealTimeMode; }
-			set { _renderWindow.RealTimeMode = value; }
+			get { return _realTimeMode; }
+			set { this.RaiseAndSetIfChanged(ref _realTimeMode, value); }
 		}
 
 		// Commands that we expose to the view.

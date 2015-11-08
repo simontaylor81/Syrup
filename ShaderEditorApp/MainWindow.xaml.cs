@@ -34,21 +34,17 @@ namespace ShaderEditorApp
 			// Initialise D3D device.
 			_renderDevice = new RenderDevice();
 
+			// Create workspace and corresponding view model.
+			_workspace = new Workspace(_renderDevice.Device);
+			_workspaceViewModel = new WorkspaceViewModel(_workspace);
+
 			// Create render window and assign it to its host.
-			renderWindow = new RenderWindow(_renderDevice.Device);
+			renderWindow = new RenderWindow(_renderDevice.Device, _workspaceViewModel);
 			viewportFrame.SetRenderWindow(renderWindow);
 
 			OutputLogger.Instance.AddTarget(outputWindow);
 
-			_workspace = new Workspace(_renderDevice.Device);
-			_workspaceViewModel = new WorkspaceViewModel(_workspace, renderWindow);
-
 			renderWindow.ScriptControl = _workspace.ScriptRenderControl;
-
-			// Redraw viewports when required.
-			// TODO: Better way to hook this up?
-			_workspace.RedrawRequired.Subscribe(_ => renderWindow.Invalidate());
-
 
 			DataContext = _workspaceViewModel;
 
