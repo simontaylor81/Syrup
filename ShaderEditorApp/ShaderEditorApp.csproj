@@ -182,7 +182,6 @@
       <DependentUpon>ProjectBrowser.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\Project\ProjectViewModel.cs" />
-    <Compile Include="MVVMUtil\ViewModelBase.cs" />
     <Compile Include="Selectors.cs" />
     <Compile Include="ViewModel\IHierarchicalBrowserNodeViewModel.cs" />
     <Compile Include="ViewModel\PropertyViewModel.cs" />

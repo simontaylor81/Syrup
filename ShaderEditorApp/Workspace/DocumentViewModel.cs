@@ -9,11 +9,12 @@ using ShaderEditorApp.MVVMUtil;
 using ICSharpCode.AvalonEdit.Document;
 using Microsoft.Win32;
 using System.Windows;
+using ReactiveUI;
 
 namespace ShaderEditorApp.ViewModel
 {
 	// ViewModel class representing an open document.
-	public class DocumentViewModel : ViewModelBase
+	public class DocumentViewModel : ReactiveObject, IDisposable
 	{
 		// Create a new (empty) document.
 		public DocumentViewModel(OpenDocumentSetViewModel openDocumentSet)
@@ -89,10 +90,8 @@ namespace ShaderEditorApp.ViewModel
 			return false;
 		}
 
-		protected override void OnDispose()
+		public void Dispose()
 		{
-			base.OnDispose();
-
 			if (watcher != null)
 			{
 				watcher.Changed -= FileChanged;
@@ -102,7 +101,7 @@ namespace ShaderEditorApp.ViewModel
 		}
 
 		// Name of the file.
-		public override string DisplayName
+		public string DisplayName
 		{
 			get
 			{
@@ -117,15 +116,15 @@ namespace ShaderEditorApp.ViewModel
 		}
 		
 		// Path of the document on disk.
-		private string filePath_;
+		private string _filePath;
 		public string FilePath
 		{
-			get { return filePath_; }
+			get { return _filePath; }
 			private set
 			{
-				if (value != filePath_)
+				if (value != _filePath)
 				{
-					filePath_ = value;
+					_filePath = value;
 
 					// (Re-)create the file watcher.
 					if (watcher != null)
@@ -133,14 +132,14 @@ namespace ShaderEditorApp.ViewModel
 						watcher.Dispose();
 					}
 
-					watcher = new FileSystemWatcher(Path.GetDirectoryName(filePath_), Path.GetFileName(filePath_));
+					watcher = new FileSystemWatcher(Path.GetDirectoryName(_filePath), Path.GetFileName(_filePath));
 					watcher.NotifyFilter = NotifyFilters.LastWrite;
 					watcher.IncludeSubdirectories = false;
 					watcher.Changed += FileChanged;
 					watcher.EnableRaisingEvents = true;
 
-					OnPropertyChanged();
-					OnPropertyChanged("DisplayName");
+					this.RaisePropertyChanged();
+					this.RaisePropertyChanged(nameof(DisplayName));
 				}
 			}
 		}
@@ -169,8 +168,8 @@ namespace ShaderEditorApp.ViewModel
 				if (value != bDirty_)
 				{
 					bDirty_ = value;
-					OnPropertyChanged();
-					OnPropertyChanged("DisplayName");
+					this.RaisePropertyChanged();
+					this.RaisePropertyChanged(nameof(DisplayName));
 				}
 			}
 		}

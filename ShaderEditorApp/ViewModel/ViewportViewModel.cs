@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReactiveUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ShaderEditorApp.ViewModel
 {
-	public class ViewportViewModel : MVVMUtil.ViewModelBase
+	public class ViewportViewModel : ReactiveObject
 	{
 		public enum CameraMode
 		{
@@ -18,18 +19,11 @@ namespace ShaderEditorApp.ViewModel
 		public IEnumerable<CameraMode> CameraModes => Enum.GetValues(typeof(CameraMode)).OfType<CameraMode>();
 
 		// The currently selected camera mode.
-		private CameraMode selectedCameraMode = CameraMode.Orbit;
+		private CameraMode _selectedCameraMode = CameraMode.Orbit;
 		public CameraMode SelectedCameraMode
 		{
-			get { return selectedCameraMode; }
-			set
-			{
-				if (value != selectedCameraMode)
-				{
-					selectedCameraMode = value;
-					OnPropertyChanged();
-				}
-			}
+			get { return _selectedCameraMode; }
+			set { this.RaiseAndSetIfChanged(ref _selectedCameraMode, value); }
 		}
 	}
 }

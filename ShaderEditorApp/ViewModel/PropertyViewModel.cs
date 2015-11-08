@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using ShaderEditorApp.MVVMUtil;
-using System.Diagnostics;
-using SlimDX;
 using SRPCommon.UserProperties;
+using ReactiveUI;
 
 namespace ShaderEditorApp.ViewModel
 {
 	// Represents a property that can be displayed and edited in the properties window.
 	// Properties have a type, a name and a value.
-	public abstract class PropertyViewModel : ViewModelBase
+	public abstract class PropertyViewModel : ReactiveObject
 	{
 		protected PropertyViewModel(IUserProperty property)
 		{
@@ -20,6 +18,7 @@ namespace ShaderEditorApp.ViewModel
 			IsReadOnly = property.IsReadOnly;
 		}
 
+		public string DisplayName { get; }
 		public bool IsReadOnly { get; }
 	}
 }
