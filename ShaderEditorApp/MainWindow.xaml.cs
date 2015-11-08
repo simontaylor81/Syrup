@@ -44,8 +44,6 @@ namespace ShaderEditorApp
 
 			OutputLogger.Instance.AddTarget(outputWindow);
 
-			renderWindow.ScriptControl = _workspace.ScriptRenderControl;
-
 			DataContext = _workspaceViewModel;
 
 			viewportFrame.DataContext = renderWindow.ViewportViewModel;
@@ -79,6 +77,7 @@ namespace ShaderEditorApp
 
 		private void Window_Closed(object sender, EventArgs e)
 		{
+			_workspace.Dispose();
 			_renderDevice.Dispose();
 		}
 

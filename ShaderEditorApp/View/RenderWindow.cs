@@ -28,24 +28,9 @@ namespace ShaderEditorApp.View
 		private RenderTargetView renderTarget;
 		private DepthBuffer depthBuffer;
 
-		private ScriptRenderControl scriptControl;
 		private Camera camera;
 
 		private bool bNeedsRepaint = false;
-
-		internal ScriptRenderControl ScriptControl
-		{
-			get { return scriptControl; }
-			set
-			{
-				// Only do this once.
-				System.Diagnostics.Debug.Assert(scriptControl == null);
-				System.Diagnostics.Debug.Assert(value != null);
-
-				scriptControl = value;
-				resources.Add(value);
-			}
-		}
 
 		public ViewportViewModel ViewportViewModel { get; }
 
@@ -140,8 +125,7 @@ namespace ShaderEditorApp.View
 				depthBuffer
 				);
 
-			if (scriptControl != null)
-				scriptControl.Render(context, viewInfo);
+			_workspaceVM.Workspace.ScriptRenderControl?.Render(context, viewInfo);
 
 			swapChain.Present(0, PresentFlags.None);
 		}

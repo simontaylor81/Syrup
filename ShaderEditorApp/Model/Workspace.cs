@@ -20,7 +20,7 @@ using System.Windows;
 namespace ShaderEditorApp.Model
 {
 	// Class for handling the workspace of the app (i.e. the central point of control).
-	public class Workspace : ReactiveObject, IWorkspace
+	public class Workspace : ReactiveObject, IWorkspace, IDisposable
 	{
 		public Workspace(SlimDX.Direct3D11.Device d3dDevice)
 		{
@@ -29,6 +29,11 @@ namespace ShaderEditorApp.Model
 			ScriptRenderControl = new ScriptRenderControl(this, d3dDevice, scripting);
 			scripting.RenderInterface = ScriptRenderControl.ScriptInterface;
 			ScriptRenderControl.RedrawRequired.Subscribe(_redrawRequired);
+		}
+
+		public void Dispose()
+		{
+			ScriptRenderControl.Dispose();
 		}
 
 		// Open the project with the given path.
