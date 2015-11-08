@@ -122,6 +122,7 @@
     <Compile Include="SceneMeshCache.cs" />
     <Compile Include="ScriptInterfaceExtensions.cs" />
     <Compile Include="ScriptRenderContext.cs" />
+    <Compile Include="SyrupRenderer.cs" />
     <Compile Include="ScriptRenderControl.cs" />
     <Compile Include="Shader.cs" />
     <Compile Include="ShaderCache.cs" />

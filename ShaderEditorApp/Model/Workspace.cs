@@ -22,18 +22,18 @@ namespace ShaderEditorApp.Model
 	// Class for handling the workspace of the app (i.e. the central point of control).
 	public class Workspace : ReactiveObject, IWorkspace, IDisposable
 	{
-		public Workspace(SlimDX.Direct3D11.Device d3dDevice)
+		public Workspace(RenderDevice device)
 		{
 			// Create classes that handle scripting.
 			scripting = new Scripting(this);
-			ScriptRenderControl = new ScriptRenderControl(this, d3dDevice, scripting);
-			scripting.RenderInterface = ScriptRenderControl.ScriptInterface;
-			ScriptRenderControl.RedrawRequired.Subscribe(_redrawRequired);
+			Renderer = new SyrupRenderer(this, device, scripting);
+			scripting.RenderInterface = Renderer.ScriptInterface;
+			Renderer.RedrawRequired.Subscribe(_redrawRequired);
 		}
 
 		public void Dispose()
 		{
-			ScriptRenderControl.Dispose();
+			Renderer.Dispose();
 		}
 
 		// Open the project with the given path.
@@ -86,7 +86,7 @@ namespace ShaderEditorApp.Model
 			if (newScene != null)
 			{
 				CurrentScene = newScene;
-				ScriptRenderControl.Scene = CurrentScene;
+				Renderer.Scene = CurrentScene;
 
 				// Unsubscribe from previous scene.
 				if (sceneChangeSubscription != null)
@@ -146,7 +146,7 @@ namespace ShaderEditorApp.Model
 		}
 
 		// Rendering/script related stuff.
-		public ScriptRenderControl ScriptRenderControl { get; }
+		public SyrupRenderer Renderer { get; }
 		private readonly Scripting scripting;
 
 		private Scene _currentScene;

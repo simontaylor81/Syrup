@@ -125,7 +125,7 @@ namespace ShaderEditorApp.View
 				depthBuffer
 				);
 
-			_workspaceVM.Workspace.ScriptRenderControl?.Render(context, viewInfo);
+			_workspaceVM.Workspace.Renderer?.Render(context, viewInfo);
 
 			swapChain.Present(0, PresentFlags.None);
 		}

@@ -22,152 +22,56 @@ using System.Reactive.Linq;
 namespace SRPRendering
 {
 	// Class that takes commands from the script and controls the rendering.
-	public class ScriptRenderControl : IDisposable, IPropertySource, IRenderInterface
+	class ScriptRenderControl : IDisposable, IRenderInterface
 	{
-		public ScriptRenderControl(IWorkspace workspace, Device device, Scripting scripting)
+		public ScriptRenderControl(IWorkspace workspace, RenderDevice device)
 		{
-			this.workspace = workspace;
-			this.device = device;
-
-			PropertiesChanged = Observable.FromEventPattern(properties, nameof(properties.CollectionChanged))
-				.Select(evt => properties);
-
-			// Generate wrapper proxy using Castle Dynamic Proxy to avoid direct script access to our internals.
-			ScriptInterface = new ProxyGenerator().CreateInterfaceProxyWithTarget<IRenderInterface>(this);
-
-			// Initialise basic resources.
-			_globalResources = new GlobalResources(device);
-			disposables.Add(_globalResources);
-
-			// Reset before script execution.
-			disposables.Add(scripting.PreExecute.Subscribe(PreExecuteScript));
-			disposables.Add(scripting.ExecutionComplete.Subscribe(ExecutionComplete));
-
-			overlayRenderer = new OverlayRenderer(_globalResources);
+			_workspace = workspace;
+			_device = device;
 		}
 
-		private void PreExecuteScript(Script script)
-		{
-			Reset();
-			_currentScript = script;
-		}
-
-		private void Reset()
+		public void Reset()
 		{
 			frameCallback = null;
 
 			// Clear shaders array. Don't need to dispose as they're held by the cache.
 			shaders.Clear();
-			properties.Clear();
-			userVariables.Clear();
+			_userVariables.Clear();
 
 			// Clear render target descriptors and dispose the actual render targets.
 			DisposableUtil.DisposeList(renderTargets);
 			DisposableUtil.DisposeList(textures);
-
-			// Reset output logger so warnings are written again.
-			OutputLogger.Instance.ResetLogOnce();
 		}
 
-		private void ExecutionComplete(bool bSuccess)
+		// Get the list of properties for a script run. Call after script execution.
+		public IEnumerable<IUserProperty> GetProperties()
 		{
-			bScriptRenderError = false;
+			// Group variables by name so we don't create duplicate entries with the same name.
+			// Don't add bound variables, not event as read-only
+			// (as they're too slow to update every time we render the frame).
+			var variablesByName = from shader in shaders
+									from variable in shader.Variables
+									where variable.Bind == null
+									group variable by variable.Name;
 
-			var script = _currentScript;
-			_currentScript = null;
-
-			try
-			{
-				// Group variables by name so we don't create duplicate entries with the same name.
-				// Don't add bound variables, not event as read-only
-				// (as they're too slow to update every time we render the frame).
-				var variablesByName = from shader in shaders
-									  from variable in shader.Variables
-									  where variable.Bind == null
-									  group variable by variable.Name;
-
-				// Add shader variable property to the list for each unique name.
-				foreach (var variableGroup in variablesByName)
-				{
-					properties.Add(ShaderVariable.CreateUserProperty(variableGroup));
-				}
-			}
-			catch (ScriptException ex)
-			{
-				ScriptHelper.Instance.LogScriptError(ex);
-				bScriptExecutionError = true;
-				return;
-			}
+			// Add shader variable property to the list for each unique name.
+			var result = variablesByName
+				.Select(variableGroup => ShaderVariable.CreateUserProperty(variableGroup));
 
 			// Add user variables too.
-			foreach (var userVar in userVariables)
-			{
-				properties.Add(userVar);
-			}
+			result = result.Concat(_userVariables);
 
-			foreach (var property in properties)
-			{
-				IUserProperty prevProperty;
-				if (script.UserProperties.TryGetValue(property.Name, out prevProperty))
-				{
-					// Copy value from existing property.
-					property.TryCopyFrom(prevProperty);
-				}
-
-				// Save this property for next time.
-				script.UserProperties[property.Name] = property;
-			}
-
-			// When a property changes, redraw the viewports.
-			foreach (var property in properties)
-			{
-				disposables.Add(property.Subscribe(_ => FireRedrawRequired()));
-			}
-
-			bScriptExecutionError = !bSuccess;
+			// Use ToList to reify the enumerable, forcing a single enumeration and any exceptions to be thrown.
+			return result.ToList();
 		}
 
-		public IObservable<Unit> RedrawRequired => _redrawRequired;
-		private readonly Subject<Unit> _redrawRequired = new Subject<Unit>();
-		private bool _bIgnoreRedrawRequests;
-
-		private void FireRedrawRequired()
-		{
-			if (!this._bIgnoreRedrawRequests)
-			{
-				_redrawRequired.OnNext(Unit.Default);
-			}
-		}
-
-		public Scene Scene
-		{
-			get { return baseScene; }
-			set
-			{
-				if (baseScene != value)
-				{
-					baseScene = value;
-
-					// Dispose of the old scene.
-					DisposableUtil.SafeDispose(scene);
-
-					// Create new one.
-					scene = new RenderScene(baseScene, device, _globalResources);
-
-					// Missing scene can cause rendering to fail -- give it another try with the new one.
-					bScriptRenderError = false;
-					FireRedrawRequired();
-				}
-			}
-		}
+		// IScriptRenderInterface implementation.
 
 		// Set the master per-frame callback that lets the script control rendering.
 		public void SetFrameCallback(FrameCallback callback)
 		{
 			frameCallback = callback;
 		}
-
-		// IScriptRenderInterface implementation.
 
 		public object CompileShader(
 			string filename, string entryPoint, string profile, IDictionary<string, object> defines)
@@ -181,7 +85,7 @@ namespace SRPRendering
 				.Select(define => new ShaderMacro(define.Key, define.Value.ToString()))
 				.ToArray();
 
-			var shader = _globalResources.ShaderCache.GetShader(path, entryPoint, profile, FindShader, macros);
+			var shader = _device.GlobalResources.ShaderCache.GetShader(path, entryPoint, profile, FindShader, macros);
 			shaders.Add(shader);
 
 			// Set up auto variable binds for this shader.
@@ -193,7 +97,7 @@ namespace SRPRendering
 		// Lookup a shader filename in the project to retrieve the full path.
 		private string FindShader(string name)
 		{
-			var path = workspace.FindProjectFile(name);
+			var path = _workspace.FindProjectFile(name);
 			if (path == null)
 			{
 				throw new ScriptException("Could not find shader file: " + name);
@@ -278,7 +182,7 @@ namespace SRPRendering
 				.Select(shader => shader.FindResourceVariable(varName))
 				.Where(shader => shader != null);
 
-			Texture fallbackTexture = _globalResources.ErrorTexture;
+			Texture fallbackTexture = _device.GlobalResources.ErrorTexture;
 
 			// Ugh, Castle DynamicProxy doesn't pass through the null default value, so detect it.
 			if (fallback == System.Reflection.Missing.Value)
@@ -373,7 +277,7 @@ namespace SRPRendering
 		// Add a user variable.
 		private dynamic AddUserVar<T>(UserVariable<T> userVar)
 		{
-			userVariables.Add(userVar);
+			_userVariables.Add(userVar);
 			return userVar.GetFunction();
 		}
 		#endregion
@@ -388,14 +292,14 @@ namespace SRPRendering
 		// Create a 2D texture of the given size and format, and fill it with the given data.
 		public object CreateTexture2D(int width, int height, Format format, dynamic contents)
 		{
-			textures.Add(Texture.CreateFromScript(device, width, height, format, contents));
+			textures.Add(Texture.CreateFromScript(_device.Device, width, height, format, contents));
 			return new TextureHandle(textures.Count - 1);
 		}
 
 		// Load a texture from disk.
 		public object LoadTexture(string path)
 		{
-			textures.Add(Texture.LoadFromFile(device, workspace.GetAbsolutePath(path)));
+			textures.Add(Texture.LoadFromFile(_device.Device, _workspace.GetAbsolutePath(path)));
 			return new TextureHandle(textures.Count - 1);
 		}
 
@@ -403,64 +307,34 @@ namespace SRPRendering
 		{
 			Reset();
 
-			disposables.Dispose();
-
-			inputLayoutCache.Dispose();
 			shaders.Clear();
-			DisposableUtil.SafeDispose(scene);
 
 			DisposableUtil.DisposeList(renderTargets);
 
-			device = null;
+			_device = null;
 		}
 
-		public void Render(DeviceContext deviceContext, ViewInfo viewInfo)
+		public void Render(DeviceContext deviceContext, ViewInfo viewInfo, RenderScene renderScene)
 		{
-			// Bail if there was a problem with the scripts.
-			if (HasScriptError)
-				return;
-
-			// Don't redraw viewports because of internal shader variable changes (e.g. bindings).
-			_bIgnoreRedrawRequests = true;
-
 			// Create render targets if necessary.
 			UpdateRenderTargets(viewInfo.ViewportWidth, viewInfo.ViewportHeight);
 
-			try
+			// Always clear the back buffer to black to avoid the script having to do so for trivial stuff.
+			deviceContext.ClearRenderTargetView(viewInfo.BackBuffer, new Color4(0));
+
+			// Let the script do its thing.
+			if (frameCallback != null)
 			{
-				// Always clear the back buffer to black to avoid the script having to do so for trivial stuff.
-				deviceContext.ClearRenderTargetView(viewInfo.BackBuffer, new Color4(0));
+				var renderContext = new ScriptRenderContext(
+					deviceContext,
+					viewInfo,
+					renderScene,
+					shaders,
+					(from desc in renderTargets select desc.renderTarget).ToArray(),
+					_device.GlobalResources);
 
-				// Let the script do its thing.
-				if (frameCallback != null)
-				{
-					var renderContext = new ScriptRenderContext(
-						deviceContext,
-						viewInfo,
-						scene,
-						shaders,
-						(from desc in renderTargets select desc.renderTarget).ToArray(),
-						_globalResources);
-
-					frameCallback(renderContext);
-				}
+				frameCallback(renderContext);
 			}
-			catch (Exception ex)
-			{
-				ScriptHelper.Instance.LogScriptError(ex);
-
-				// Remember that the script fails so we don't just fail over and over.
-				bScriptRenderError = true;
-			}
-
-			// Make sure we're rendering to the back buffer before rendering the overlay.
-			deviceContext.OutputMerger.SetTargets(viewInfo.DepthBuffer.DSV, viewInfo.BackBuffer);
-			deviceContext.Rasterizer.SetViewports(new Viewport(0.0f, 0.0f, viewInfo.ViewportWidth, viewInfo.ViewportHeight));
-
-			// Render the overlay.
-			overlayRenderer.Draw(deviceContext, scene, viewInfo);
-
-			_bIgnoreRedrawRequests = false;
 		}
 
 		private void UpdateRenderTargets(int viewportWidth, int viewportHeight)
@@ -476,7 +350,7 @@ namespace SRPRendering
 					// Don't forget to release the old one.
 					desc.renderTarget?.Dispose();
 
-					desc.renderTarget = new RenderTarget(device, width, height);
+					desc.renderTarget = new RenderTarget(_device.Device, width, height);
 				}
 			}
 		}
@@ -513,15 +387,15 @@ namespace SRPRendering
 		{
 			if (handle == BlackTexture)
 			{
-				return _globalResources.BlackTexture;
+				return _device.GlobalResources.BlackTexture;
 			}
 			else if (handle == WhiteTexture)
 			{
-				return _globalResources.WhiteTexture;
+				return _device.GlobalResources.WhiteTexture;
 			}
 			else if (handle == DefaultNormalTexture)
 			{
-				return _globalResources.DefaultNormalTexture;
+				return _device.GlobalResources.DefaultNormalTexture;
 			}
 			else if (handle is TextureHandle)
 			{
@@ -540,21 +414,15 @@ namespace SRPRendering
 		public object DepthBuffer => DepthBufferHandle.Default;
 		public object NoDepthBuffer => DepthBufferHandle.NoDepthBuffer;
 
-		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
-		public IRenderInterface ScriptInterface { get; }
-
 		// These don't need to be anything, we're just going to use them with reference equality checks.
 		public object BlackTexture { get; } = new object();
 		public object WhiteTexture { get; } = new object();
 		public object DefaultNormalTexture { get; } = new object();
 
-		private ObservableCollection<IUserProperty> properties = new ObservableCollection<IUserProperty>();
-		public ObservableCollection<IUserProperty> Properties => properties;
-		IEnumerable<IUserProperty> IPropertySource.Properties => properties;
 
-		public IObservable<IEnumerable<IUserProperty>> PropertiesChanged { get; }
+		public Scene Scene { get; set; }
 
-		private Device device;
+		private RenderDevice _device;
 
 		// Resource arrays.
 		private List<IShader> shaders = new List<IShader>();
@@ -568,36 +436,10 @@ namespace SRPRendering
 		// Master callback that we call each frame.
 		private FrameCallback frameCallback;
 
-		private InputLayoutCache inputLayoutCache = new InputLayoutCache();
-
-		// Miscellaneous shared resources.
-		private IGlobalResources _globalResources;
-
 		// Pointer back to the workspace. Needed so we can access the project to get shaders from.
-		private IWorkspace workspace;
-
-		private bool bScriptExecutionError = false;		// True if there was a problem executing the script
-		private bool bScriptRenderError = false;        // True if there was a script error while rendering
-
-		// If true, previous rendering failed with a script problem, so we don't keep re-running until the script is fixed & re-run.
-		public bool HasScriptError => bScriptExecutionError || bScriptRenderError;
+		private IWorkspace _workspace;
 
 		// User variables.
-		private List<IUserProperty> userVariables = new List<IUserProperty>();
-
-		// Object that handles rendering the viewport overlay.
-		private OverlayRenderer overlayRenderer;
-
-		// Renderer representation of the scene we're currently rendering
-		private RenderScene scene;
-
-		// Original scene data the above was created from.
-		private Scene baseScene;
-
-		// Script currently being executed.
-		private Script _currentScript;
-
-		// List of things to dispose.
-		private CompositeDisposable disposables = new CompositeDisposable();
+		private List<IUserProperty> _userVariables = new List<IUserProperty>();
 	}
 }

@@ -17,7 +17,7 @@ namespace SRPTests.TestRenderer
 {
 	class TestRenderer : IDisposable
 	{
-		private readonly Device device;
+		private readonly RenderDevice device;
 		private readonly Texture2D renderTargetTexture;
 		private readonly RenderTargetView renderTarget;
 		private readonly DepthBuffer depthBuffer;
@@ -27,7 +27,7 @@ namespace SRPTests.TestRenderer
 		private readonly int _width = 256;
 		private readonly int _height = 256;
 
-		public Device Device => device;
+		public RenderDevice Device => device;
 
 		public TestRenderer(int width, int height)
 		{
@@ -35,7 +35,7 @@ namespace SRPTests.TestRenderer
 			_height = height;
 
 			// Create a device without a swap chain for headless rendering.
-			device = new Device(DriverType.Hardware, DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport);
+			device = new RenderDevice();
 
 			// Create a render target to act as the back buffer.
 			var rtDesc = new Texture2DDescription()
@@ -50,21 +50,21 @@ namespace SRPTests.TestRenderer
 				CpuAccessFlags = CpuAccessFlags.None,
 				SampleDescription = new SlimDX.DXGI.SampleDescription(1, 0)
 			};
-			renderTargetTexture = new Texture2D(device, rtDesc);
+			renderTargetTexture = new Texture2D(device.Device, rtDesc);
 
 			// Create the render target view.
-			renderTarget = new RenderTargetView(device, renderTargetTexture);
+			renderTarget = new RenderTargetView(device.Device, renderTargetTexture);
 
 			// Create a staging texture to copy render target to.
 			rtDesc.BindFlags = BindFlags.None;
 			rtDesc.CpuAccessFlags = CpuAccessFlags.Read;
 			rtDesc.Usage = ResourceUsage.Staging;
-			stagingTexture = new Texture2D(device, rtDesc);
+			stagingTexture = new Texture2D(device.Device, rtDesc);
 
 			// Create a depth buffer.
-			depthBuffer = new DepthBuffer(device, _width, _height);
+			depthBuffer = new DepthBuffer(device.Device, _width, _height);
 
-			disposables = new CompositeDisposable(device, renderTarget, renderTargetTexture, depthBuffer, stagingTexture);
+			disposables = new CompositeDisposable(device.Device, renderTarget, renderTargetTexture, depthBuffer, stagingTexture);
 		}
 
 		public void Dispose()
@@ -72,11 +72,11 @@ namespace SRPTests.TestRenderer
 			disposables.Dispose();
 		}
 
-		public Bitmap Render(ScriptRenderControl src)
+		public Bitmap Render(SyrupRenderer sr)
 		{
-			Assert.NotNull(src);
+			Assert.NotNull(sr);
 
-			var context = device.ImmediateContext;
+			var context = device.Device.ImmediateContext;
 
 			// The SRC should clear the render target, so clear to a nice garish magenta so we detect if it doesn't.
 			context.ClearRenderTargetView(renderTarget, new Color4(1.0f, 1.0f, 0.0f, 1.0f));
@@ -98,7 +98,7 @@ namespace SRPTests.TestRenderer
 				depthBuffer
 				);
 
-			src.Render(context, viewInfo);
+			sr.Render(context, viewInfo);
 			context.Flush();
 
 			// Read back the render target and convert to bitmap.
@@ -115,7 +115,7 @@ namespace SRPTests.TestRenderer
 		// Read contents of backbuffer to into bitmap.
 		private System.Drawing.Bitmap ReadBackBufferBitmap()
 		{
-			var context = device.ImmediateContext;
+			var context = device.Device.ImmediateContext;
 
 			// Copy to staging resource.
 			context.CopyResource(renderTargetTexture, stagingTexture);

@@ -21,21 +21,19 @@ namespace SRPRendering
 	{
 		private List<PrimitiveProxy> primitiveProxies = new List<PrimitiveProxy>();
 		private readonly Dictionary<string, Texture> textures = new Dictionary<string, Texture>();
-		private readonly IGlobalResources _globalResources;
-		private readonly Device _device;
+		private readonly RenderDevice _device;
 		private readonly Scene _scene;
 		private readonly IDisposable _subscription;
 		private readonly SceneMeshCache _meshCache;
 
 		public IEnumerable<IPrimitive> Primitives => primitiveProxies;
 
-		public RenderScene(Scene scene, Device device, IGlobalResources globalResources)
+		public RenderScene(Scene scene, RenderDevice device)
 		{
 			_scene = scene;
 			_device = device;
-			_globalResources = globalResources;
 
-			_meshCache = new SceneMeshCache(device);
+			_meshCache = new SceneMeshCache(device.Device);
 
 			// Create proxies now, and when the scene changes.
 			CreateProxies();
@@ -65,8 +63,8 @@ namespace SRPRendering
 			else
 			{
 				// No texture found, so return error texture.
-				System.Diagnostics.Debug.Assert(_globalResources.ErrorTexture != null);
-				return _globalResources.ErrorTexture;
+				System.Diagnostics.Debug.Assert(_device.GlobalResources.ErrorTexture != null);
+				return _device.GlobalResources.ErrorTexture;
 			}
 		}
 
@@ -110,11 +108,11 @@ namespace SRPRendering
 					break;
 
 				case PrimitiveType.Cube:
-					mesh = _globalResources.CubeMesh;
+					mesh = _device.GlobalResources.CubeMesh;
 					break;
 
 				case PrimitiveType.Plane:
-					mesh = _globalResources.PlaneMesh;
+					mesh = _device.GlobalResources.PlaneMesh;
 					break;
 			}
 
@@ -132,7 +130,7 @@ namespace SRPRendering
 						{
 							try
 							{
-								textures.Add(file, Texture.LoadFromFile(_device, file));
+								textures.Add(file, Texture.LoadFromFile(_device.Device, file));
 							}
 #pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
 							catch (Exception)

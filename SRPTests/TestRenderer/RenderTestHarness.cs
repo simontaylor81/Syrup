@@ -16,7 +16,7 @@ namespace SRPTests.TestRenderer
 	{
 		private readonly TestRenderer _renderer;
 		private readonly TestWorkspace _workspace;
-		private readonly ScriptRenderControl _src;
+		private readonly SyrupRenderer _sr;
 		private readonly Scripting _scripting;
 		private readonly FermiumReporter _fermium;
 
@@ -28,15 +28,15 @@ namespace SRPTests.TestRenderer
 			_workspace = new TestWorkspace();
 			_scripting = new Scripting(_workspace);
 
-			// Create script render control to drive the rendering.
-			_src = new ScriptRenderControl(_workspace, _renderer.Device, _scripting);
-			_scripting.RenderInterface = _src.ScriptInterface;
+			// Create syrup renderer to drive the rendering.
+			_sr = new SyrupRenderer(_workspace, _renderer.Device, _scripting);
+			_scripting.RenderInterface = _sr.ScriptInterface;
 		}
 
 		public void Dispose()
 		{
 			_renderer.Dispose();
-			_src.Dispose();
+			_sr.Dispose();
 		}
 
 		[Theory]
@@ -52,12 +52,12 @@ namespace SRPTests.TestRenderer
 				// Execute the script.
 				await _scripting.RunScript(new Script(scriptFile));
 
-				Assert.False(_src.HasScriptError, "Error executing script");
+				Assert.False(_sr.HasScriptError, "Error executing script");
 
 				// Render it.
-				result = _renderer.Render(_src);
+				result = _renderer.Render(_sr);
 
-				Assert.False(_src.HasScriptError, "Error executing script render callback");
+				Assert.False(_sr.HasScriptError, "Error executing script render callback");
 
 				// Load the image to compare against.
 				var expectedImageFilename = Path.ChangeExtension(scriptFile, "png");

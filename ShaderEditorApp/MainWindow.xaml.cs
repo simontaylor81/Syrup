@@ -35,7 +35,7 @@ namespace ShaderEditorApp
 			_renderDevice = new RenderDevice();
 
 			// Create workspace and corresponding view model.
-			_workspace = new Workspace(_renderDevice.Device);
+			_workspace = new Workspace(_renderDevice);
 			_workspaceViewModel = new WorkspaceViewModel(_workspace);
 
 			// Create render window and assign it to its host.

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,6 +13,9 @@ namespace SRPRendering
 	public class RenderDevice : IDisposable
 	{
 		public Device Device { get; }
+		public IGlobalResources GlobalResources { get; }
+
+		private CompositeDisposable _disposables = new CompositeDisposable();
 
 		public RenderDevice()
 		{
@@ -24,11 +28,16 @@ namespace SRPRendering
 			// If you get a debug-only crash here, make sure you have the debug D3D dlls installed
 			// ("Graphics Tools" under Optional Features in Windows 10).
 			Device = new Device(DriverType.Hardware, deviceCreationFlags);
+			_disposables.Add(Device);
+
+			// Initialise basic resources.
+			GlobalResources = new GlobalResources(Device);
+			_disposables.Add(GlobalResources);
 		}
 
 		public void Dispose()
 		{
-			Device.Dispose();
+			_disposables.Dispose();
 		}
 	}
 }
