@@ -1,6 +1,5 @@
 ﻿using ReactiveUI;
 using ShaderEditorApp.Projects;
-using ShaderEditorApp.ViewModel;
 using SRPCommon.Interfaces;
 using SRPCommon.Scene;
 using SRPCommon.Scripting;
@@ -8,14 +7,11 @@ using SRPCommon.Util;
 using SRPRendering;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Subjects;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace ShaderEditorApp.Model
 {
@@ -40,6 +36,7 @@ namespace ShaderEditorApp.Model
 		public void OpenProject(string filename)
 		{
 			Project = Project.LoadFromFile(filename);
+			UserSettings.RecentProjects.AddFile(filename);
 		}
 
 		// Create a new project.
@@ -47,6 +44,7 @@ namespace ShaderEditorApp.Model
 		{
 			// Create a new project, and immediately save it to the given file.
 			Project = Project.CreateNew(filename);
+			UserSettings.RecentProjects.AddFile(filename);
 		}
 
 		// TODO: Fix async void nastiness.
@@ -155,6 +153,8 @@ namespace ShaderEditorApp.Model
 			get { return _currentScene; }
 			set { this.RaiseAndSetIfChanged(ref _currentScene, value); }
 		}
+
+		public UserSettings UserSettings { get; } = new UserSettings();
 
 		private IDisposable sceneChangeSubscription;
 

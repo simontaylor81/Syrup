@@ -162,6 +162,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\RecentFileList.cs" />
+    <Compile Include="Model\UserSettings.cs" />
     <Compile Include="Model\Workspace.cs" />
     <Compile Include="MVVMUtil\Converters.cs" />
     <Compile Include="MVVMUtil\NamedCommand.cs" />

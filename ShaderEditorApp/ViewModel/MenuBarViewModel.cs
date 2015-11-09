@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using ShaderEditorApp.ViewModel;
 using ShaderEditorApp.MVVMUtil;
 using System.Windows.Input;
+using ShaderEditorApp.Model;
+using ReactiveUI;
 
 namespace ShaderEditorApp.ViewModel
 {
@@ -34,6 +36,11 @@ namespace ShaderEditorApp.ViewModel
 					new NamedCommandMenuItemViewModel(workspace.SaveAllCmd) { Shortcut = "Ctrl+Shift+S" },
 					new NamedCommandMenuItemViewModel(workspace.SaveActiveDocumentAsCmd),
 					new NamedCommandMenuItemViewModel(workspace.CloseActiveDocumentCmd) { Shortcut = "Ctrl+F4" },
+
+					// Recently opened projects sub-menu.
+					new RecentFilesMenuItemViewModel(
+						"Recent projects", workspace.Workspace.UserSettings.RecentProjects, workspace.OpenProjectCmd),
+
 					new StaticMenuItemViewModel { Header = "Exit" }		// TODO!
 				),
 
@@ -66,6 +73,7 @@ namespace ShaderEditorApp.ViewModel
 		public virtual string Header { get; set; }
 		public virtual string Shortcut { get; set; }
 		public virtual ICommand Command => null;
+		public virtual object CommandParameter => null;
 		public virtual IEnumerable<MenuItemViewModel> Items => null;
 		public virtual bool IsCheckable => false;
 		public virtual bool IsChecked
@@ -94,10 +102,12 @@ namespace ShaderEditorApp.ViewModel
 	class CommandMenuItemViewModel : MenuItemViewModel
 	{
 		public override ICommand Command { get; }
+		public override object CommandParameter { get; }
 
-		public CommandMenuItemViewModel(ICommand command)
+		public CommandMenuItemViewModel(ICommand command, object parameter = null)
 		{
 			Command = command;
+			CommandParameter = parameter;
 		}
 	}
 
@@ -157,6 +167,23 @@ namespace ShaderEditorApp.ViewModel
 		{
 			_get = get;
 			_set = set;
+		}
+	}
+
+	// Menu item containing a list of recently opened files.
+	class RecentFilesMenuItemViewModel : MenuItemViewModel
+	{
+		private readonly IReactiveDerivedList<CommandMenuItemViewModel> _subitems;
+
+		public override IEnumerable<MenuItemViewModel> Items => _subitems;
+
+		public RecentFilesMenuItemViewModel(string header, RecentFileList recentFiles, ICommand openCommand)
+		{
+			Header = header;
+
+			// Create derived collection that mirrors the recent file list.
+			_subitems = recentFiles.Files.CreateDerivedCollection(
+				file => new CommandMenuItemViewModel(openCommand, file) { Header = file });
 		}
 	}
 }
