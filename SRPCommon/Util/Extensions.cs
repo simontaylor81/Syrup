@@ -16,6 +16,19 @@ namespace SRPCommon.Util
 		public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> source)
 			=> source ?? Enumerable.Empty<T>();
 
+		// Remove all items from a list that satisfy a predicate.
+		// Note: this already exists for List<T> (as RemoveAll) but not for IList<T>, infuriatingly.
+		public static void RemoveByPredicate<T>(this IList<T> list, Predicate<T> predicate)
+		{
+			for (int i = 0; i < list.Count; i++)
+			{
+				if (predicate(list[i]))
+				{
+					list.RemoveAt(i--);
+				}
+			}
+		}
+
 		// Start the observable with its default value.
 		public static IObservable<T> StartWithDefault<T>(this IObservable<T> source)
 			=> source.StartWith(default(T));

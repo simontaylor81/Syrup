@@ -1,4 +1,5 @@
 ﻿using ReactiveUI;
+using SRPCommon.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace ShaderEditorApp.Model
 		{
 			// Adding an already existing file moves it to the front of the list.
 			// Easiest way to do this is just to remove it first.
-			_files.Remove(filename);
+			_files.RemoveByPredicate(f => PathUtils.PathsEqual(f, filename));
 
 			// Add at front. This could be more efficient by conceptually reversing the
 			// list, but this is such a rare operation that it's not worth the hassle.

@@ -57,7 +57,7 @@ namespace ShaderEditorApp.ViewModel
 		public void OpenDocument(string path, bool bReload)
 		{
 			// Look for an already open document.
-			var document = documents.FirstOrDefault(doc => doc.FilePath == path);
+			var document = documents.FirstOrDefault(doc => PathUtils.PathsEqual(doc.FilePath, path));
 			if (document != null)
 			{
 				// Force reload if required.
