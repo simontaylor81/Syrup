@@ -29,6 +29,9 @@ namespace ShaderEditorApp.Model
 
 		public void Dispose()
 		{
+			// Save settings on exit.
+			UserSettings.Save();
+
 			Renderer.Dispose();
 		}
 

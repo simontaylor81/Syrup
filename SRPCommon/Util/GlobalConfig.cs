@@ -9,6 +9,9 @@ namespace SRPCommon.Util
 {
 	public static class GlobalConfig
 	{
+		// Application name to use for e.g. config file location.
+		public static string AppName => "Syrup";
+
 		// Base directory of the application (not the bin directory).
 		public static string BaseDir
 		{
@@ -34,6 +37,7 @@ namespace SRPCommon.Util
 				return _baseDir;
 			}
 		}
+
 		private static string _baseDir;
 	}
 }
