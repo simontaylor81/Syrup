@@ -240,6 +240,12 @@ namespace ShaderEditorApp.ViewModel
 			=> NamedCommand.LazyInit(ref saveAllCmd, "Save All",
 				param => OpenDocumentSet.SaveAllDirty());
 
+		// Command to exit the application.
+		private NamedCommand _exitCmd;
+		public NamedCommand ExitCmd
+			=> NamedCommand.LazyInit(ref _exitCmd, "Exit",
+				param => Application.Current.Shutdown());
+
 		#endregion
 	}
 }

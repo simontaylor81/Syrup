@@ -50,7 +50,7 @@ namespace ShaderEditorApp.ViewModel
 
 					SeparatorViewModel.Instance,
 
-					new StaticMenuItemViewModel { Header = "Exit" }		// TODO!
+					new NamedCommandMenuItemViewModel(workspace.ExitCmd) { Shortcut = "Alt+F4" }
 				),
 
 				// Edit menu
