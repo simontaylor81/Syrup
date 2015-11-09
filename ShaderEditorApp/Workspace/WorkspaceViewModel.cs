@@ -63,12 +63,12 @@ namespace ShaderEditorApp.ViewModel
 
 			// Project view model tracks the underlying project.
 			_projectViewModel = _workspace.WhenAnyValue(x => x.Project)
-				.Select(project => new ProjectViewModel(project, this))
+				.Select(project => project != null ? new ProjectViewModel(project, this) : null)
 				.ToProperty(this, x => x.ProjectViewModel);
 
 			// Scene view model tracks the underlying scene.
 			_sceneViewModel = _workspace.WhenAnyValue(x => x.CurrentScene)
-				.Select(scene => new SceneViewModel(scene))
+				.Select(scene => scene != null ? new SceneViewModel(scene) : null)
 				.ToProperty(this, x => x.SceneViewModel);
 		}
 
