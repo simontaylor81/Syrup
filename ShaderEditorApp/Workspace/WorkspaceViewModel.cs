@@ -40,16 +40,19 @@ namespace ShaderEditorApp.ViewModel
 			}
 
 			{
-				// Combine sources of properties into a single observable.
-				var propertySources = Observable.Merge(
-					this.WhenAny(x => x.FocusPropertySource, x => x.FocusPropertySource.Properties, (x, y) => Unit.Default),
-					_workspace.Renderer.PropertiesObservable.Select(_ => Unit.Default));
+				// Stream of properties from the focused window, or null if there is no focus property source.
+				var focusProperties = this.WhenAnyValue(
+						x => x.FocusPropertySource, x => x.FocusPropertySource.Properties,
+						(source, props) => source != null ? props : null)
+					.StartWithDefault();
+
+				// Use focussed window if it's a property source, otherwise
+				// fallback on the render properties (i.e. shader and user variables).
+				var sourceProperties = focusProperties.CombineLatest(_workspace.Renderer.PropertiesObservable,
+					(focusProps, rendererProps) => focusProps ?? rendererProps);
 
 				// Convert that into a stream of property view model lists.
-				_properties = propertySources
-					// Use focussed window if it's a property source, otherwise
-					// fallback on the render properties (i.e. shader and user variables).
-					.Select(x => FocusPropertySource != null ? FocusPropertySource.Properties : _workspace.Renderer.Properties)
+				_properties = sourceProperties
 					.Select(x => x
 						// Create viewmodels for each property.
 						.EmptyIfNull()
