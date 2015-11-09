@@ -39,6 +39,12 @@ namespace SRPRendering
 			_disposables.Add(scripting.ExecutionComplete.Subscribe(ExecutionComplete));
 
 			_overlayRenderer = new OverlayRenderer(device.GlobalResources);
+
+			// Merge together change events of all current properties and fire redraw.
+			_disposables.Add(PropertiesObservable
+				.Select(props => props.Merge())
+				.Switch()
+				.Subscribe(_redrawRequired));
 		}
 
 		private void PreExecuteScript(Script script)
@@ -90,27 +96,14 @@ namespace SRPRendering
 				script.UserProperties[property.Name] = property;
 			}
 
-			// When a property changes, redraw the viewports.
-			foreach (var property in Properties)
-			{
-				_disposables.Add(property.Subscribe(_ => FireRedrawRequired()));
-			}
-
 			bScriptExecutionError = !bSuccess;
 		}
 
-		public IObservable<Unit> RedrawRequired => _redrawRequired;
+		// Fire redraw when it's requested, except when disallowed.
+		public IObservable<Unit> RedrawRequired => _redrawRequired.Where(_ => !_bIgnoreRedrawRequests);
+
 		private readonly Subject<Unit> _redrawRequired = new Subject<Unit>();
 		private bool _bIgnoreRedrawRequests;
-
-		// TODO: Make better.
-		private void FireRedrawRequired()
-		{
-			if (!this._bIgnoreRedrawRequests)
-			{
-				_redrawRequired.OnNext(Unit.Default);
-			}
-		}
 
 		public Scene Scene
 		{
@@ -130,7 +123,7 @@ namespace SRPRendering
 
 					// Missing scene can cause rendering to fail -- give it another try with the new one.
 					bScriptRenderError = false;
-					FireRedrawRequired();
+					_redrawRequired.OnNext(Unit.Default);
 				}
 			}
 		}
