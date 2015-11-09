@@ -27,8 +27,8 @@ namespace ShaderEditorApp.ViewModel
 		}
 
 		// Create a document backed by a file.
-		public DocumentViewModel(OpenDocumentSetViewModel workspace, string path)
-			: this(workspace)
+		public DocumentViewModel(OpenDocumentSetViewModel openDocumentSet, string path)
+			: this(openDocumentSet)
 		{
 			FilePath = path;
 
@@ -58,6 +58,10 @@ namespace ShaderEditorApp.ViewModel
 				// TODO: Async?
 				File.WriteAllText(FilePath, Contents);
 				IsDirty = false;
+
+				// Add to recent file list.
+				_openDocumentSet.WorkspaceVM.Workspace.UserSettings.RecentFiles.AddFile(FilePath);
+				_openDocumentSet.WorkspaceVM.Workspace.UserSettings.Save();
 
 				// Re-enable the watcher.
 				watcher.EnableRaisingEvents = true;

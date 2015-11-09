@@ -55,6 +55,7 @@
             <Setter Property="InputGestureText" Value="{Binding Shortcut}" />
             <Setter Property="Command" Value="{Binding Command}" />
             <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
+            <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
             <Setter Property="IsCheckable" Value="{Binding IsCheckable}" />
             <Setter Property="IsChecked" Value="{Binding IsChecked}" />
         </Style>

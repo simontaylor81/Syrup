@@ -13,7 +13,7 @@ namespace ShaderEditorApp.Model
 		private ReactiveList<string> _files = new ReactiveList<string>();
 
 		// The list of files to display. This is capped to MaxSize.
-		public IEnumerable<string> Files => _files;
+		public IReadOnlyReactiveList<string> Files => _files;
 
 		// The maxium size the file list can grow to.
 		private int _maxSize;

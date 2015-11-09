@@ -8,6 +8,8 @@ using ShaderEditorApp.MVVMUtil;
 using System.Windows.Input;
 using ShaderEditorApp.Model;
 using ReactiveUI;
+using System.Reactive.Linq;
+using SRPCommon.Util;
 
 namespace ShaderEditorApp.ViewModel
 {
@@ -37,9 +39,11 @@ namespace ShaderEditorApp.ViewModel
 					new NamedCommandMenuItemViewModel(workspace.SaveActiveDocumentAsCmd),
 					new NamedCommandMenuItemViewModel(workspace.CloseActiveDocumentCmd) { Shortcut = "Ctrl+F4" },
 
-					// Recently opened projects sub-menu.
+					// Recently opened projects and files sub-menus.
 					new RecentFilesMenuItemViewModel(
-						"Recent projects", workspace.Workspace.UserSettings.RecentProjects, workspace.OpenProjectCmd),
+						"Recent Projects", "No Projects", workspace.Workspace.UserSettings.RecentProjects, workspace.OpenProjectCmd),
+					new RecentFilesMenuItemViewModel(
+						"Recent Files", "No Files", workspace.Workspace.UserSettings.RecentFiles, workspace.OpenDocumentCmd),
 
 					new StaticMenuItemViewModel { Header = "Exit" }		// TODO!
 				),
@@ -68,10 +72,11 @@ namespace ShaderEditorApp.ViewModel
 
 	// Base class for items on the menu.
 	// Most things do nothing, but should be defined anyway to avoid spurious binding error messages in the log.
-	public abstract class MenuItemViewModel
+	public abstract class MenuItemViewModel : ReactiveObject
 	{
 		public virtual string Header { get; set; }
 		public virtual string Shortcut { get; set; }
+		public virtual bool IsEnabled { get; set; } = true;
 		public virtual ICommand Command => null;
 		public virtual object CommandParameter => null;
 		public virtual IEnumerable<MenuItemViewModel> Items => null;
@@ -173,17 +178,27 @@ namespace ShaderEditorApp.ViewModel
 	// Menu item containing a list of recently opened files.
 	class RecentFilesMenuItemViewModel : MenuItemViewModel
 	{
-		private readonly IReactiveDerivedList<CommandMenuItemViewModel> _subitems;
+		private ObservableAsPropertyHelper<IEnumerable<MenuItemViewModel>> _subitems;
+		public override IEnumerable<MenuItemViewModel> Items => _subitems.Value;
 
-		public override IEnumerable<MenuItemViewModel> Items => _subitems;
-
-		public RecentFilesMenuItemViewModel(string header, RecentFileList recentFiles, ICommand openCommand)
+		public RecentFilesMenuItemViewModel(string header, string noFilesText, RecentFileList recentFiles, ICommand openCommand)
 		{
 			Header = header;
 
-			// Create derived collection that mirrors the recent file list.
-			_subitems = recentFiles.Files.CreateDerivedCollection(
-				file => new CommandMenuItemViewModel(openCommand, file) { Header = file });
+			// Sub menu to display when there are no recent files.
+			var emptyMenu = new[]
+			{
+				new StaticMenuItemViewModel() { Header = noFilesText, IsEnabled = false }
+			};
+
+			// Build new list when the underlying file list changes.
+			// Can't use CreateDerivedList as we want to display the "no items" item when it's empty.
+			_subitems = recentFiles.Files.Changed
+				.StartWithDefault()
+				.Select(_ => recentFiles.Files.Any()
+					? recentFiles.Files.Select(file => (MenuItemViewModel)new CommandMenuItemViewModel(openCommand, file) { Header = file })
+					: emptyMenu)
+				.ToProperty(this, x => x.Items);
 		}
 	}
 }

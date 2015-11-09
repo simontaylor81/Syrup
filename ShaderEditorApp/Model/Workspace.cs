@@ -40,6 +40,7 @@ namespace ShaderEditorApp.Model
 		{
 			Project = Project.LoadFromFile(filename);
 			UserSettings.RecentProjects.AddFile(filename);
+			UserSettings.Save();
 		}
 
 		// Create a new project.
@@ -48,6 +49,7 @@ namespace ShaderEditorApp.Model
 			// Create a new project, and immediately save it to the given file.
 			Project = Project.CreateNew(filename);
 			UserSettings.RecentProjects.AddFile(filename);
+			UserSettings.Save();
 		}
 
 		// TODO: Fix async void nastiness.

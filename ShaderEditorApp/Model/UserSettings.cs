@@ -14,6 +14,7 @@ namespace ShaderEditorApp.Model
 	public class UserSettings
 	{
 		public RecentFileList RecentProjects { get; } = new RecentFileList(10);
+		public RecentFileList RecentFiles { get; } = new RecentFileList(10);
 
 		private string Filename => Path.Combine(
 			Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

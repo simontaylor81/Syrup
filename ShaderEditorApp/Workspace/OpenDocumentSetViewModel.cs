@@ -18,7 +18,7 @@ namespace ShaderEditorApp.ViewModel
 	{
 		public OpenDocumentSetViewModel(WorkspaceViewModel workspaceVM)
 		{
-			_workspaceVM = workspaceVM;
+			WorkspaceVM = workspaceVM;
 
 			// Create documents list, and wrap in a read-only wrapper.
 			documents = new ObservableCollection<DocumentViewModel>();
@@ -73,10 +73,11 @@ namespace ShaderEditorApp.ViewModel
 			else
 			{
 				OutputLogger.Instance.LogLine(LogCategory.Log, "File not found: " + path);
+				return;
 			}
 
 			// Make active document.
-			_workspaceVM.ActiveWindow = document;
+			WorkspaceVM.ActiveWindow = document;
 		}
 
 		// Open a document by asking the user for a file to open.
@@ -90,9 +91,9 @@ namespace ShaderEditorApp.ViewModel
 			{
 				dialog.InitialDirectory = Path.GetDirectoryName(ActiveDocument.FilePath);
 			}
-			else if (_workspaceVM.Workspace.Project != null)
+			else if (WorkspaceVM.Workspace.Project != null)
 			{
-				dialog.InitialDirectory = _workspaceVM.Workspace.Project.BasePath;
+				dialog.InitialDirectory = WorkspaceVM.Workspace.Project.BasePath;
 			}
 
 			var result = dialog.ShowDialog();
@@ -100,6 +101,12 @@ namespace ShaderEditorApp.ViewModel
 			{
 				// Force a reload if the document is already loaded.
 				OpenDocument(dialog.FileName, true);
+
+				// Add to recent file list.
+				// Only do this for explicit open operations otherwise the list gets
+				// swamped just opening a project.
+				WorkspaceVM.Workspace.UserSettings.RecentFiles.AddFile(dialog.FileName);
+				WorkspaceVM.Workspace.UserSettings.Save();
 			}
 		}
 
@@ -108,7 +115,7 @@ namespace ShaderEditorApp.ViewModel
 		{
 			var document = new DocumentViewModel(this);
 			documents.Add(document);
-			_workspaceVM.ActiveWindow = document;
+			WorkspaceVM.ActiveWindow = document;
 		}
 
 		public void CloseDocument(DocumentViewModel document)
@@ -184,7 +191,7 @@ namespace ShaderEditorApp.ViewModel
 		// List of documents that have been externally modified.
 		private HashSet<DocumentViewModel> modifiedDocuments = new HashSet<DocumentViewModel>();
 
-		private readonly WorkspaceViewModel _workspaceVM;
+		public WorkspaceViewModel WorkspaceVM { get; }
 		private bool isAppForeground;
 	}
 }
