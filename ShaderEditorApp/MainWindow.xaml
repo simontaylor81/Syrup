@@ -44,24 +44,9 @@
         <!-- Selector that picks the data template for docked elements. -->
         <srp:PaneTemplateSelector x:Key="PaneTemplateSelector"
                                   DocumentTemplate="{StaticResource DocumentPaneTemplate}"/>
-        
-        <!-- Data template for menu bar items. -->
-        <HierarchicalDataTemplate x:Key="MenuBarTemplate" ItemsSource="{Binding Items}">
-            <TextBlock Text="{Binding Header}"/>
-        </HierarchicalDataTemplate>
-
-        <!-- Style for menu bar items. -->
-        <Style x:Key="MenuBarStyle" TargetType="{x:Type MenuItem}">
-            <Setter Property="InputGestureText" Value="{Binding Shortcut}" />
-            <Setter Property="Command" Value="{Binding Command}" />
-            <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
-            <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
-            <Setter Property="IsCheckable" Value="{Binding IsCheckable}" />
-            <Setter Property="IsChecked" Value="{Binding IsChecked}" />
-        </Style>
 
     </Window.Resources>
-    
+
     <!-- Keyboard shortcuts. TODO: these should be configurable somehow. -->
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RunActiveScriptCmd}"/>
@@ -83,8 +68,24 @@
 
         <!-- Main menu bar -->
         <Menu Grid.Row="0" ItemsSource="{Binding MenuBar.Items}"
-              ItemTemplate="{StaticResource MenuBarTemplate}"
-              ItemContainerStyle="{StaticResource MenuBarStyle}" />
+              UsesItemContainerTemplate="True">
+            <Menu.Resources>
+                <ItemContainerTemplate  DataType="{x:Type vm:MenuItemViewModel}">
+                    <MenuItem UsesItemContainerTemplate="True"
+                              ItemsSource="{Binding Items}"
+                              Header="{Binding Header}"
+                              InputGestureText="{Binding Shortcut}"
+                              Command="{Binding Command}"
+                              CommandParameter="{Binding CommandParameter}"
+                              IsEnabled="{Binding IsEnabled}"
+                              IsCheckable="{Binding IsCheckable}"
+                              IsChecked="{Binding IsChecked}" />
+                </ItemContainerTemplate>
+                <ItemContainerTemplate DataType="{x:Type vm:SeparatorViewModel}">
+                    <Separator />
+                </ItemContainerTemplate>
+            </Menu.Resources>
+        </Menu>
 
         <avalondock:DockingManager x:Name="dockManager" Grid.Row="1"
                                    LayoutItemContainerStyleSelector="{StaticResource PaneStyleSelector}"

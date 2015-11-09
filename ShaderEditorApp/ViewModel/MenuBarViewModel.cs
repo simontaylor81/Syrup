@@ -16,11 +16,12 @@ namespace ShaderEditorApp.ViewModel
 	// View model for the main menu bar of the application.
 	public class MenuBarViewModel : ReactiveUI.ReactiveObject
 	{
-		public IEnumerable<MenuItemViewModel> Items { get; }
+		// Items that make up the menu. Untyped to allow menu items and separators.
+		public IEnumerable<object> Items { get; }
 
 		public MenuBarViewModel(WorkspaceViewModel workspace)
 		{
-			Items = new[]
+			Items = new object[]
 			{
 				// File menu
 				StaticMenuItemViewModel.Create("File",
@@ -39,11 +40,15 @@ namespace ShaderEditorApp.ViewModel
 					new NamedCommandMenuItemViewModel(workspace.SaveActiveDocumentAsCmd),
 					new NamedCommandMenuItemViewModel(workspace.CloseActiveDocumentCmd) { Shortcut = "Ctrl+F4" },
 
+					SeparatorViewModel.Instance,
+
 					// Recently opened projects and files sub-menus.
 					new RecentFilesMenuItemViewModel(
 						"Recent Projects", "No Projects", workspace.Workspace.UserSettings.RecentProjects, workspace.OpenProjectCmd),
 					new RecentFilesMenuItemViewModel(
 						"Recent Files", "No Files", workspace.Workspace.UserSettings.RecentFiles, workspace.OpenDocumentCmd),
+
+					SeparatorViewModel.Instance,
 
 					new StaticMenuItemViewModel { Header = "Exit" }		// TODO!
 				),
@@ -52,6 +57,7 @@ namespace ShaderEditorApp.ViewModel
 				StaticMenuItemViewModel.Create("Edit",
 					new RoutedCommandMenuItemViewModel(ApplicationCommands.Undo),
 					new RoutedCommandMenuItemViewModel(ApplicationCommands.Redo),
+					SeparatorViewModel.Instance,
 					new RoutedCommandMenuItemViewModel(ApplicationCommands.Cut),
 					new RoutedCommandMenuItemViewModel(ApplicationCommands.Copy),
 					new RoutedCommandMenuItemViewModel(ApplicationCommands.Paste)
@@ -79,7 +85,7 @@ namespace ShaderEditorApp.ViewModel
 		public virtual bool IsEnabled { get; set; } = true;
 		public virtual ICommand Command => null;
 		public virtual object CommandParameter => null;
-		public virtual IEnumerable<MenuItemViewModel> Items => null;
+		public virtual IEnumerable<object> Items => null;
 		public virtual bool IsCheckable => false;
 		public virtual bool IsChecked
 		{
@@ -88,14 +94,20 @@ namespace ShaderEditorApp.ViewModel
 		}
 	}
 
+	// Class reprsenting a separator in the menu.
+	public class SeparatorViewModel
+	{
+		public static SeparatorViewModel Instance { get; } = new SeparatorViewModel();
+	}
+
 	// A simple static menu item, potentially with sub-items.
 	class StaticMenuItemViewModel : MenuItemViewModel
 	{
-		private IEnumerable<MenuItemViewModel> _items;
-		public override IEnumerable<MenuItemViewModel> Items => _items;
+		private IEnumerable<object> _items;
+		public override IEnumerable<object> Items => _items;
 
 		// Helpers for creating one with a list of sub-items.
-		public static StaticMenuItemViewModel Create(string header, params MenuItemViewModel[] subItems)
+		public static StaticMenuItemViewModel Create(string header, params object[] subItems)
 			=> new StaticMenuItemViewModel
 				{
 					Header = header,
@@ -178,15 +190,15 @@ namespace ShaderEditorApp.ViewModel
 	// Menu item containing a list of recently opened files.
 	class RecentFilesMenuItemViewModel : MenuItemViewModel
 	{
-		private ObservableAsPropertyHelper<IEnumerable<MenuItemViewModel>> _subitems;
-		public override IEnumerable<MenuItemViewModel> Items => _subitems.Value;
+		private ObservableAsPropertyHelper<IEnumerable<object>> _subitems;
+		public override IEnumerable<object> Items => _subitems.Value;
 
 		public RecentFilesMenuItemViewModel(string header, string noFilesText, RecentFileList recentFiles, ICommand openCommand)
 		{
 			Header = header;
 
 			// Sub menu to display when there are no recent files.
-			var emptyMenu = new[]
+			var emptyMenu = new object[]
 			{
 				new StaticMenuItemViewModel() { Header = noFilesText, IsEnabled = false }
 			};
@@ -196,7 +208,7 @@ namespace ShaderEditorApp.ViewModel
 			_subitems = recentFiles.Files.Changed
 				.StartWithDefault()
 				.Select(_ => recentFiles.Files.Any()
-					? recentFiles.Files.Select(file => (MenuItemViewModel)new CommandMenuItemViewModel(openCommand, file) { Header = file })
+					? recentFiles.Files.Select(file => (object)new CommandMenuItemViewModel(openCommand, file) { Header = file })
 					: emptyMenu)
 				.ToProperty(this, x => x.Items);
 		}
