@@ -43,7 +43,7 @@ namespace ShaderEditorApp.ViewModel
 				// Combine sources of properties into a single observable.
 				var propertySources = Observable.Merge(
 					this.WhenAny(x => x.FocusPropertySource, x => x.FocusPropertySource.Properties, (x, y) => Unit.Default),
-					_workspace.Renderer.PropertiesChanged.Select(_ => Unit.Default));
+					_workspace.Renderer.PropertiesObservable.Select(_ => Unit.Default));
 
 				// Convert that into a stream of property view model lists.
 				_properties = propertySources

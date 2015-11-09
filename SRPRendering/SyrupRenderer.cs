@@ -27,9 +27,6 @@ namespace SRPRendering
 			_workspace = workspace;
 			_device = device;
 
-			PropertiesChanged = Observable.FromEventPattern(_properties, nameof(_properties.CollectionChanged))
-				.Select(evt => _properties);
-
 			// Create object for interacting with script.
 			_scriptRenderControl = new ScriptRenderControl(workspace, device);
 			_disposables.Add(_scriptRenderControl);
@@ -53,7 +50,7 @@ namespace SRPRendering
 		private void Reset()
 		{
 			_scriptRenderControl.Reset();
-			_properties.Clear();
+			Properties = null;
 
 			// Reset output logger so warnings are written again.
 			OutputLogger.Instance.ResetLogOnce();
@@ -69,14 +66,7 @@ namespace SRPRendering
 			try
 			{
 				// Get properties from script render control.
-				var newProperties = _scriptRenderControl.GetProperties();
-
-				// Add to list.
-				// TODO: No need for this to be an observable collection.
-				foreach (var prop in newProperties)
-				{
-					_properties.Add(prop);
-				}
+				Properties = _scriptRenderControl.GetProperties();
 			}
 			catch (ScriptException ex)
 			{
@@ -85,7 +75,9 @@ namespace SRPRendering
 				return;
 			}
 
-			foreach (var property in _properties)
+			// Attempt to copy over previous property values so they're not reset every
+			// time the user re-runs the script.
+			foreach (var property in Properties)
 			{
 				IUserProperty prevProperty;
 				if (script.UserProperties.TryGetValue(property.Name, out prevProperty))
@@ -99,7 +91,7 @@ namespace SRPRendering
 			}
 
 			// When a property changes, redraw the viewports.
-			foreach (var property in _properties)
+			foreach (var property in Properties)
 			{
 				_disposables.Add(property.Subscribe(_ => FireRedrawRequired()));
 			}
@@ -192,11 +184,24 @@ namespace SRPRendering
 		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
 		public IRenderInterface ScriptInterface { get; }
 
-		private ObservableCollection<IUserProperty> _properties = new ObservableCollection<IUserProperty>();
-		public ObservableCollection<IUserProperty> Properties => _properties;
-		IEnumerable<IUserProperty> IPropertySource.Properties => _properties;
+		// User properties exposed by the script.
+		private IEnumerable<IUserProperty> _properties = Enumerable.Empty<IUserProperty>();
+		public IEnumerable<IUserProperty> Properties
+		{
+			get { return _properties; }
+			private set
+			{
+				if (_properties != value)
+				{
+					_properties = value.EmptyIfNull();
+					_propertiesSubject.OnNext(_properties);
+				}
+			}
+		}
 
-		public IObservable<IEnumerable<IUserProperty>> PropertiesChanged { get; }
+		// Observable that fires whenever the set of user properties changes.
+		private Subject<IEnumerable<IUserProperty>> _propertiesSubject = new Subject<IEnumerable<IUserProperty>>();
+		public IObservable<IEnumerable<IUserProperty>> PropertiesObservable => _propertiesSubject;
 
 		private RenderDevice _device;
 
