@@ -38,6 +38,9 @@ namespace ShaderEditorApp
 			_workspace = new Workspace(_renderDevice);
 			_workspaceViewModel = new WorkspaceViewModel(_workspace);
 
+			// Close ourselves when the Exit command is triggered.
+			_workspaceViewModel.ExitCmd.Subscribe(_ => Close());
+
 			// Create render window and assign it to its host.
 			renderWindow = new RenderWindow(_renderDevice.Device, _workspaceViewModel);
 			viewportFrame.SetRenderWindow(renderWindow);

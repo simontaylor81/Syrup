@@ -241,10 +241,8 @@ namespace ShaderEditorApp.ViewModel
 				param => OpenDocumentSet.SaveAllDirty());
 
 		// Command to exit the application.
-		private NamedCommand _exitCmd;
-		public NamedCommand ExitCmd
-			=> NamedCommand.LazyInit(ref _exitCmd, "Exit",
-				param => Application.Current.Shutdown());
+		// Command actually does nothing. It's up to th new to subscribe to it and do the actual exiting.
+		public IReactiveCommand<object> ExitCmd { get; } = ReactiveCommand.Create();
 
 		#endregion
 	}

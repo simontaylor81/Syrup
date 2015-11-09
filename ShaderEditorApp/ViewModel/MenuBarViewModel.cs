@@ -27,7 +27,7 @@ namespace ShaderEditorApp.ViewModel
 				StaticMenuItemViewModel.Create("File",
 					// New submenu
 					StaticMenuItemViewModel.Create("New",
-						new CommandMenuItemViewModel(workspace.NewProjectCmd) { Header ="Project", Shortcut = "Ctrl+Shift+N" },
+						new CommandMenuItemViewModel(workspace.NewProjectCmd) { Header = "Project", Shortcut = "Ctrl+Shift+N" },
 						new CommandMenuItemViewModel(workspace.NewDocumentCmd) { Header = "Document", Shortcut = "Ctrl+N" }),
 
 					// Open submenu
@@ -50,7 +50,7 @@ namespace ShaderEditorApp.ViewModel
 
 					SeparatorViewModel.Instance,
 
-					new NamedCommandMenuItemViewModel(workspace.ExitCmd) { Shortcut = "Alt+F4" }
+					new CommandMenuItemViewModel(workspace.ExitCmd) { Header = "Exit", Shortcut = "Alt+F4" }
 				),
 
 				// Edit menu
