@@ -1,15 +1,21 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-using ShaderEditorApp.ViewModel;
-using ShaderEditorApp.View;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
-using SRPCommon.Util;
+using ReactiveUI;
 using ShaderEditorApp.Model;
+using ShaderEditorApp.View;
+using ShaderEditorApp.ViewModel;
+using SRPCommon.Util;
 using SRPRendering;
 
 namespace ShaderEditorApp
@@ -29,6 +35,8 @@ namespace ShaderEditorApp
 		private RenderWindow renderWindow;
 		private RenderDevice _renderDevice;
 
+		private bool isCloseAllowed = false;
+
 		private void Window_Initialized(object sender, EventArgs e)
 		{
 			// Initialise D3D device.
@@ -36,7 +44,7 @@ namespace ShaderEditorApp
 
 			// Create workspace and corresponding view model.
 			_workspace = new Workspace(_renderDevice);
-			_workspaceViewModel = new WorkspaceViewModel(_workspace);
+			_workspaceViewModel = new WorkspaceViewModel(_workspace, new WpfUserPrompt());
 
 			// Close ourselves when the Exit command is triggered.
 			_workspaceViewModel.ExitCmd.Subscribe(_ => Close());
@@ -74,6 +82,38 @@ namespace ShaderEditorApp
 						// Open other files as documents.
 						_workspaceViewModel.OpenDocumentSet.OpenDocument(filename, false);
 					}
+				}
+			}
+		}
+
+		// Notification that the window is about to closed, allowing cancellation.
+		private async void Window_Closing(object sender, CancelEventArgs e)
+		{
+			// If closing has already been allowed, do it.
+			if (isCloseAllowed)
+			{
+				return;
+			}
+
+			// Notify the view model that we're closing, and ask if we're allowed.
+			var task = _workspaceViewModel.OnExit();
+
+			// If the task completed immediatly (no actual async stuff required),
+			// then just use the standard cancel mechanism.
+			if (task.IsCompleted)
+			{
+				e.Cancel = !task.Result;
+			}
+			else
+			{
+				// This event isn't really async, so always cancel, then re-fire closed if-and-when confirmed.
+				e.Cancel = true;
+
+				if (await task)
+				{
+					// Closing is now allowed. Mark it as such and re-trigger closing process.
+					isCloseAllowed = true;
+					Close();
 				}
 			}
 		}

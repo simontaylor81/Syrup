@@ -14,15 +14,17 @@ using System.Reactive;
 using ReactiveUI;
 using System.Reactive.Linq;
 using ShaderEditorApp.Model;
+using System.Threading.Tasks;
 
 namespace ShaderEditorApp.ViewModel
 {
 	// ViewModel for the application workspace, containing documents, docking windows, etc.
 	public class WorkspaceViewModel : ReactiveObject
 	{
-		public WorkspaceViewModel(Workspace _workspace)
+		public WorkspaceViewModel(Workspace workspace, IUserPrompt userPrompt)
 		{
-			Workspace = _workspace;
+			Workspace = workspace;
+			_userPrompt = userPrompt;
 			OpenDocumentSet = new OpenDocumentSetViewModel(this);
 
 			// Create menu bar
@@ -48,7 +50,7 @@ namespace ShaderEditorApp.ViewModel
 
 				// Use focussed window if it's a property source, otherwise
 				// fallback on the render properties (i.e. shader and user variables).
-				var sourceProperties = focusProperties.CombineLatest(_workspace.Renderer.PropertiesObservable,
+				var sourceProperties = focusProperties.CombineLatest(workspace.Renderer.PropertiesObservable,
 					(focusProps, rendererProps) => focusProps ?? rendererProps);
 
 				// Convert that into a stream of property view model lists.
@@ -62,14 +64,47 @@ namespace ShaderEditorApp.ViewModel
 			}
 
 			// Project view model tracks the underlying project.
-			_projectViewModel = _workspace.WhenAnyValue(x => x.Project)
+			_projectViewModel = workspace.WhenAnyValue(x => x.Project)
 				.Select(project => project != null ? new ProjectViewModel(project, this) : null)
 				.ToProperty(this, x => x.ProjectViewModel);
 
 			// Scene view model tracks the underlying scene.
-			_sceneViewModel = _workspace.WhenAnyValue(x => x.CurrentScene)
+			_sceneViewModel = workspace.WhenAnyValue(x => x.CurrentScene)
 				.Select(scene => scene != null ? new SceneViewModel(scene) : null)
 				.ToProperty(this, x => x.SceneViewModel);
+		}
+
+		// Called when the app is about to exit. Returns true to allow exit to proceed, false to cancel.
+		public async Task<bool> OnExit()
+		{
+			var unsavedFiles = OpenDocumentSet.Documents
+				.Where(d => d.IsDirty)
+				.Select(d => d.FilePath);
+
+			if (Workspace.Project.IsDirty)
+			{
+				unsavedFiles = unsavedFiles.Concat(EnumerableEx.Return(Workspace.Project.FilePath));
+			}
+
+			if (unsavedFiles.Any())
+			{
+				var message = "The following files are unsaved:\n  "
+					+ string.Join("\n  ", unsavedFiles)
+					+ "\n\nWould you like to save them?";
+
+				// Ask the user if they want to save.
+				var result = await _userPrompt.ShowYesNoCancel(message);
+
+				if (result == UserPromptResult.Yes)
+				{
+					// Save stuff. Allow exit if the save succeeded.
+					return SaveAllDirty();
+				}
+
+				return result != UserPromptResult.Cancel;
+			}
+
+			return true;
 		}
 
 		// Open a project by asking the user for a project file to open.
@@ -115,7 +150,7 @@ namespace ShaderEditorApp.ViewModel
 		private async void RunActiveScript()
 		{
 			// Save all so we running the latest contents.
-			if (!OpenDocumentSet.SaveAllDirty())
+			if (!SaveAllDirty())
 			{
 				// Save failed (likely Save As cancelled). Abort.
 				return;
@@ -129,6 +164,17 @@ namespace ShaderEditorApp.ViewModel
 			{
 				await Workspace.RerunLastScript();
 			}
+		}
+
+		// Saves all dirty documents, plus the project if it is dirty.
+		private bool SaveAllDirty()
+		{
+			if (Workspace.Project.IsDirty)
+			{
+				Workspace.Project.Save();
+			}
+
+			return OpenDocumentSet.SaveAllDirty();
 		}
 
 		// Property that tracks the active window, document or otherwise.
@@ -163,6 +209,8 @@ namespace ShaderEditorApp.ViewModel
 			get { return _realTimeMode; }
 			set { this.RaiseAndSetIfChanged(ref _realTimeMode, value); }
 		}
+
+		private readonly IUserPrompt _userPrompt;
 
 		// Commands that we expose to the view.
 		#region Commands
@@ -238,7 +286,7 @@ namespace ShaderEditorApp.ViewModel
 		private NamedCommand saveAllCmd;
 		public INamedCommand SaveAllCmd
 			=> NamedCommand.LazyInit(ref saveAllCmd, "Save All",
-				param => OpenDocumentSet.SaveAllDirty());
+				param => SaveAllDirty());
 
 		// Command to exit the application.
 		// Command actually does nothing. It's up to th new to subscribe to it and do the actual exiting.

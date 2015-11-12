@@ -101,6 +101,7 @@ namespace ShaderEditorApp.Projects
 		}
 
 		// Public properties.
+		public string FilePath => filename;
 		public string Name => Path.GetFileNameWithoutExtension(filename);
 		public string BasePath => Path.GetDirectoryName(filename);
 

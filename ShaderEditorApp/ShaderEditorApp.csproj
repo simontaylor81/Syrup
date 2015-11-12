@@ -166,6 +166,7 @@
     <Compile Include="Model\UserSettings.cs" />
     <Compile Include="Model\Workspace.cs" />
     <Compile Include="MVVMUtil\Converters.cs" />
+    <Compile Include="MVVMUtil\IUserPrompt.cs" />
     <Compile Include="MVVMUtil\NamedCommand.cs" />
     <Compile Include="MVVMUtil\RelayCommand.cs" />
     <Compile Include="OutputWindow.xaml.cs">
@@ -208,6 +209,7 @@
     <Compile Include="View\ViewportFrame.xaml.cs">
       <DependentUpon>ViewportFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\WpfUserPrompt.cs" />
     <Compile Include="Workspace\DocumentViewModel.cs" />
     <Compile Include="Workspace\OpenDocumentSetViewModel.cs" />
     <Compile Include="Workspace\WorkspaceViewModel.cs" />

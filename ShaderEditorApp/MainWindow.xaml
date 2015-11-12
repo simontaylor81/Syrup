@@ -1,5 +1,4 @@
-﻿<Window
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -16,7 +15,8 @@
         Name="mainWindow"
         Title="SRP" Width="1200" Height="800"
         Initialized="Window_Initialized"
-        Closed="Window_Closed">
+        Closed="Window_Closed"
+        Closing="Window_Closing">
     
     <Window.Resources>
         <!-- Style for document containers in the main dock control. -->
