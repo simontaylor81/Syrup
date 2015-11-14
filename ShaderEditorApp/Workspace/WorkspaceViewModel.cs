@@ -29,9 +29,6 @@ namespace ShaderEditorApp.ViewModel
 			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
 			OpenDocumentSet = new OpenDocumentSetViewModel(this);
 
-			// Create menu bar
-			MenuBar = new MenuBarViewModel(this);
-
 			{
 				// Get properties from active window if it's a property source.
 				// Technically this doesn't need to be a property as it's not used by anything
@@ -74,6 +71,27 @@ namespace ShaderEditorApp.ViewModel
 			_sceneViewModel = workspace.WhenAnyValue(x => x.CurrentScene)
 				.Select(scene => scene != null ? new SceneViewModel(scene) : null)
 				.ToProperty(this, x => x.SceneViewModel);
+
+			// Create commands.
+			{
+				var openProjectCommand = ReactiveCommand.Create();
+				openProjectCommand.Subscribe(param =>
+				{
+					if (param is string)
+					{
+						Workspace.OpenProject((string)param);
+					}
+					else
+					{
+						OpenProjectPrompt();
+					}
+				});
+				OpenProject = new CommandViewModel("Open Project", "Project", openProjectCommand);
+			}
+
+			// Create menu bar
+			// Must be after the commands are created, for obvious reasons.
+			MenuBar = new MenuBarViewModel(this);
 		}
 
 		// Called when the app is about to exit. Returns true to allow exit to proceed, false to cancel.
@@ -218,6 +236,7 @@ namespace ShaderEditorApp.ViewModel
 		#region Commands
 
 		// Command to open a project (given a file path prompts the user unless path given).
+		public CommandViewModel OpenProject { get; }
 		private RelayCommand openProjectCmd;
 		public ICommand OpenProjectCmd
 		{

@@ -181,6 +181,7 @@
     <Compile Include="SampleData\DummyViewModels.cs" />
     <Compile Include="Services\WpfIsForegroundService.cs" />
     <Compile Include="ViewModel\ChoicePropertyViewModel.cs" />
+    <Compile Include="ViewModel\CommandViewModel.cs" />
     <Compile Include="ViewModel\IHierarchicalBrowserRootViewModel.cs" />
     <Compile Include="ViewModel\MenuBarViewModel.cs" />
     <Compile Include="ViewModel\Project\ProjectFolderViewModel.cs" />

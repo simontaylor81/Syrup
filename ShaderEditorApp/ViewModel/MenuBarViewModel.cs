@@ -32,7 +32,7 @@ namespace ShaderEditorApp.ViewModel
 
 					// Open submenu
 					StaticMenuItemViewModel.Create("Open",
-						new CommandMenuItemViewModel(workspace.OpenProjectCmd) { Header = "Project", Shortcut = "Ctrl+Shift+O" },
+						new CommandViewModelMenuItemViewModel(workspace.OpenProject) { Shortcut = "Ctrl+Shift+O" },
 						new CommandMenuItemViewModel(workspace.OpenDocumentCmd) { Header = "Document", Shortcut = "Ctrl+O" }),
 
 					new NamedCommandMenuItemViewModel(workspace.SaveActiveDocumentCmd) { Shortcut = "Ctrl+S" },
@@ -139,6 +139,21 @@ namespace ShaderEditorApp.ViewModel
 		public NamedCommandMenuItemViewModel(INamedCommand command)
 		{
 			_command = command;
+		}
+	}
+
+	// Menu item with an associated command view model.
+	// TODO: Rename.
+	class CommandViewModelMenuItemViewModel : MenuItemViewModel
+	{
+		private readonly CommandViewModel _commandVM;
+
+		public override string Header => _commandVM.MenuHeader;
+		public override ICommand Command => _commandVM.Command;
+
+		public CommandViewModelMenuItemViewModel(CommandViewModel commandVM)
+		{
+			_commandVM = commandVM;
 		}
 	}
 
