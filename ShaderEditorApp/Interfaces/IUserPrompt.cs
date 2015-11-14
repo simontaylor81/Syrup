@@ -21,5 +21,6 @@ namespace ShaderEditorApp.Interfaces
 	{
 		// Show a Yes-No-Cancel prompt.
 		Task<UserPromptResult> ShowYesNoCancel(string message);
+		Task<UserPromptResult> ShowYesNo(string message);
 	}
 }

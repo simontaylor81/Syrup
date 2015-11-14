@@ -21,6 +21,15 @@ namespace ShaderEditorApp.Services
 			return Task.FromResult(_mbResultToUserPromptResult[result]);
 		}
 
+		// Show Yes-No message box.
+		public Task<UserPromptResult> ShowYesNo(string message)
+		{
+			var result = MessageBox.Show(message, GlobalConfig.AppName, MessageBoxButton.YesNo);
+
+			// WPF message boxes are blocking, so no need for any async shenanigans.
+			return Task.FromResult(_mbResultToUserPromptResult[result]);
+		}
+
 		private static Dictionary<MessageBoxResult, UserPromptResult> _mbResultToUserPromptResult = new Dictionary<MessageBoxResult, UserPromptResult>
 		{
 			{ MessageBoxResult.OK, UserPromptResult.Ok },

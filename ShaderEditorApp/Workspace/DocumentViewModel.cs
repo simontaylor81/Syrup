@@ -14,6 +14,7 @@ using ShaderEditorApp.Interfaces;
 using System.Reactive.Linq;
 using System.Diagnostics;
 using Splat;
+using System.Reactive;
 
 namespace ShaderEditorApp.ViewModel
 {
@@ -21,7 +22,7 @@ namespace ShaderEditorApp.ViewModel
 	public class DocumentViewModel : ReactiveObject, IDisposable
 	{
 		// Create a new (empty) document.
-		public DocumentViewModel(OpenDocumentSetViewModel openDocumentSet, IIsForegroundService isForeground = null)
+		public DocumentViewModel(OpenDocumentSetViewModel openDocumentSet, IUserPrompt userPrompt = null, IIsForegroundService isForeground = null)
 		{
 			_openDocumentSet = openDocumentSet;
 			Document = new TextDocument();
@@ -29,6 +30,7 @@ namespace ShaderEditorApp.ViewModel
 			// Dirty when document changes.
 			Document.TextChanged += (o, e) => IsDirty = true;
 
+			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
 			_isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
 		}
 
@@ -173,30 +175,31 @@ namespace ShaderEditorApp.ViewModel
 					.Where(x => x == true)
 					.ObserveOn(RxApp.MainThreadScheduler)
 					.FirstAsync())
-				.Subscribe(_ =>
+				// User SelectMany as a kind of 'SubscribeAsync'.
+				.SelectMany(async _ =>
 				{
 					// We should be now foreground and on the main thread, so we can post the notification.
-					ShowChangeNotification();
+					await ShowChangeNotification();
 
 					// Re-enable notifications now that we're done.
 					_disableModificationNotifications = false;
-				},
-				ex =>
+					return Unit.Default;
+				})
+				.Subscribe(_ => { }, ex =>
 				{
-					// Should not happen.
+					// Catch exceptions. Should not happen.
 					Debug.WriteLine("Exception thrown during file change notification.");
 					Debug.WriteLine(ex);
 				});
 		}
 
 		// Show a notification to the user that the file has changed.
-		private void ShowChangeNotification()
+		private async Task ShowChangeNotification()
 		{
 			// Prompt to reload.
-			var result = MessageBox.Show(
-				string.Format("{0} was modified by an external program. Would you like to reload it?", Path.GetFileName(FilePath)),
-				"SRP", MessageBoxButton.YesNo);
-			if (result == MessageBoxResult.Yes)
+			var result = await _userPrompt.ShowYesNo(
+				$"{Path.GetFileName(FilePath)} was modified by an external program. Would you like to reload it?");
+			if (result == UserPromptResult.Yes)
 			{
 				LoadContents();
 			}
@@ -253,6 +256,7 @@ namespace ShaderEditorApp.ViewModel
 		private bool _disableModificationNotifications = false;
 
 		private readonly IIsForegroundService _isForeground;
+		private readonly IUserPrompt _userPrompt;
 
 		// Command to close this document.
 		private RelayCommand closeCmd;
