@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using ShaderEditorApp.MVVMUtil;
 using ICSharpCode.AvalonEdit.Document;
 using Microsoft.Win32;
-using System.Windows;
 using ReactiveUI;
 using ShaderEditorApp.Interfaces;
-using System.Reactive.Linq;
-using System.Diagnostics;
 using Splat;
-using System.Reactive;
 
 namespace ShaderEditorApp.ViewModel
 {
@@ -39,6 +34,8 @@ namespace ShaderEditorApp.ViewModel
 			: this(openDocumentSet)
 		{
 			FilePath = path;
+
+			Close = CommandUtil.Create(_ => _openDocumentSet.CloseDocument(this));
 
 			// Load the contents of the file into memory.
 			LoadContents();
@@ -259,18 +256,6 @@ namespace ShaderEditorApp.ViewModel
 		private readonly IUserPrompt _userPrompt;
 
 		// Command to close this document.
-		private RelayCommand closeCmd;
-
-		public ICommand CloseCmd
-		{
-			get
-			{
-				if (closeCmd == null)
-				{
-					closeCmd = new RelayCommand(param => _openDocumentSet.CloseDocument(this));
-				}
-				return closeCmd;
-			}
-		}
+		public ReactiveCommand<object> Close { get; }
 	}
 }
