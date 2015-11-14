@@ -74,51 +74,51 @@ namespace ShaderEditorApp.ViewModel
 
 			// Create commands.
 			{
-				OpenProject = new CommandViewModel("Open Project", ReactiveCommand.Create(), menuHeader: "Project",
+				OpenProject = new CommandViewModel("Open Project", ReactiveCommand.Create(), menuHeader: "_Project",
 					keyGesture: new KeyGesture(Key.O, ModifierKeys.Control | ModifierKeys.Shift));
 				OpenProject.Command.Subscribe(param => OpenProjectPrompt());
 
 				OpenProjectFile = ReactiveCommand.Create();
 				OpenProjectFile.Subscribe(param => Workspace.OpenProject((string)param));
 
-				NewProject = new CommandViewModel("New Project", ReactiveCommand.Create(), menuHeader: "Project",
+				NewProject = new CommandViewModel("New Project", ReactiveCommand.Create(), menuHeader: "_Project",
 					keyGesture: new KeyGesture(Key.N, ModifierKeys.Control | ModifierKeys.Shift));
 				NewProject.Command.Subscribe(param => NewProjectImpl());
 
-				OpenDocument = new CommandViewModel("Open Document", ReactiveCommand.Create(), menuHeader: "Document",
+				OpenDocument = new CommandViewModel("Open Document", ReactiveCommand.Create(), menuHeader: "_Document",
 					keyGesture: new KeyGesture(Key.O, ModifierKeys.Control));
 				OpenDocument.Command.Subscribe(param => OpenDocumentSet.OpenDocumentPrompt());
 
 				OpenDocumentFile = ReactiveCommand.Create();
 				OpenDocumentFile.Subscribe(param => OpenDocumentSet.OpenDocument((string)param, false));
 
-				NewDocument = new CommandViewModel("New Document", ReactiveCommand.Create(), menuHeader: "Document",
+				NewDocument = new CommandViewModel("New Document", ReactiveCommand.Create(), menuHeader: "_Document",
 					keyGesture: new KeyGesture(Key.N, ModifierKeys.Control));
 				NewDocument.Command.Subscribe(param => OpenDocumentSet.NewDocument());
 
 				var hasActiveDocument = this.WhenAnyValue(x => x.OpenDocumentSet.ActiveDocument)
 					.Select(doc => doc != null);
 
-				CloseActiveDocument = new CommandViewModel("Close", ReactiveCommand.Create(hasActiveDocument),
+				CloseActiveDocument = new CommandViewModel("Close", ReactiveCommand.Create(hasActiveDocument), menuHeader: "_Close",
 					keyGesture: new KeyGesture(Key.F4, ModifierKeys.Control));
 				CloseActiveDocument.Command.Subscribe(param => OpenDocumentSet.CloseDocument(OpenDocumentSet.ActiveDocument));
 
-				SaveActiveDocument = new CommandViewModel("Save", ReactiveCommand.Create(hasActiveDocument),
+				SaveActiveDocument = new CommandViewModel("Save", ReactiveCommand.Create(hasActiveDocument), menuHeader: "_Save",
 					keyGesture: new KeyGesture(Key.S, ModifierKeys.Control));
 				SaveActiveDocument.Command.Subscribe(param => OpenDocumentSet.ActiveDocument.Save());
 
-				SaveActiveDocumentAs = new CommandViewModel("Save As", ReactiveCommand.Create(hasActiveDocument));
+				SaveActiveDocumentAs = new CommandViewModel("Save As", ReactiveCommand.Create(hasActiveDocument), menuHeader: "Save _As");
 				SaveActiveDocumentAs.Command.Subscribe(param => OpenDocumentSet.ActiveDocument.SaveAs());
 
-				SaveAll = new CommandViewModel("Save All", ReactiveCommand.Create(),
+				SaveAll = new CommandViewModel("Save All", ReactiveCommand.Create(), menuHeader: "Save A_ll",
 					keyGesture: new KeyGesture(Key.S, ModifierKeys.Control | ModifierKeys.Shift));
 				SaveAll.Command.Subscribe(param => SaveAllDirty());
 
-				RunActiveScript = new CommandViewModel("Run Current Script", ReactiveCommand.Create(),
+				RunActiveScript = new CommandViewModel("Run Current Script", ReactiveCommand.Create(), menuHeader: "_Run",
 					keyGesture: new KeyGesture(Key.F5));
 				RunActiveScript.Command.Subscribe(param => RunActiveScriptImpl());
 
-				Exit = new CommandViewModel("Exit", ReactiveCommand.Create(),
+				Exit = new CommandViewModel("Exit", ReactiveCommand.Create(), menuHeader: "E_xit",
 					keyGesture: new KeyGesture(Key.F4, ModifierKeys.Alt));
 
 				// Add commands with a key binding to the big list. Don't include Exit -- it's binding is part of Windows.

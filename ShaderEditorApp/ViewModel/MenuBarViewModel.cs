@@ -24,14 +24,14 @@ namespace ShaderEditorApp.ViewModel
 			Items = new object[]
 			{
 				// File menu
-				StaticMenuItem.Create("File",
+				StaticMenuItem.Create("_File",
 					// New submenu
-					StaticMenuItem.Create("New",
+					StaticMenuItem.Create("_New",
 						new CommandViewModelMenuItem(workspace.NewProject),
 						new CommandViewModelMenuItem(workspace.NewDocument)),
 
 					// Open submenu
-					StaticMenuItem.Create("Open",
+					StaticMenuItem.Create("_Open",
 						new CommandViewModelMenuItem(workspace.OpenProject),
 						new CommandViewModelMenuItem(workspace.OpenDocument)),
 
@@ -44,9 +44,9 @@ namespace ShaderEditorApp.ViewModel
 
 					// Recently opened projects and files sub-menus.
 					new RecentFilesMenuItem(
-						"Recent Projects", "No Projects", workspace.Workspace.UserSettings.RecentProjects, workspace.OpenProjectFile),
+						"Recent Pro_jects", "No Projects", workspace.Workspace.UserSettings.RecentProjects, workspace.OpenProjectFile),
 					new RecentFilesMenuItem(
-						"Recent Files", "No Files", workspace.Workspace.UserSettings.RecentFiles, workspace.OpenDocumentFile),
+						"Recent _Files", "No Files", workspace.Workspace.UserSettings.RecentFiles, workspace.OpenDocumentFile),
 
 					SeparatorViewModel.Instance,
 
@@ -54,7 +54,7 @@ namespace ShaderEditorApp.ViewModel
 				),
 
 				// Edit menu
-				StaticMenuItem.Create("Edit",
+				StaticMenuItem.Create("_Edit",
 					new RoutedCommandMenuItemViewModel(ApplicationCommands.Undo),
 					new RoutedCommandMenuItemViewModel(ApplicationCommands.Redo),
 					SeparatorViewModel.Instance,
@@ -64,12 +64,12 @@ namespace ShaderEditorApp.ViewModel
 				),
 
 				// View menu
-				StaticMenuItem.Create("View",
+				StaticMenuItem.Create("_View",
 					new CheckableMenuItem("Real-Time Mode", () => workspace.RealTimeMode, x => workspace.RealTimeMode = x)
 				),
 
 				// Run menu
-				StaticMenuItem.Create("Run",
+				StaticMenuItem.Create("_Run",
 					new CommandViewModelMenuItem(workspace.RunActiveScript)
 				)
 			};
