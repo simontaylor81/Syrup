@@ -22,7 +22,7 @@ namespace ShaderEditorApp.ViewModel.Scene
 
 		private SRPCommon.Scene.Scene Scene { get; }
 
-		public IEnumerable<ICommand> Commands { get; }
+		public IEnumerable<object> MenuItems { get; }
 
 		public IEnumerable<IUserProperty> UserProperties => Enumerable.Empty<IUserProperty>();
 
@@ -42,12 +42,12 @@ namespace ShaderEditorApp.ViewModel.Scene
 			_children = scene.Primitives.CreateDerivedCollection(prim => ScenePrimitiveViewModel.Create(prim, scene));
 
 			// Create commands.
-			Commands = new[]
+			MenuItems = new[]
 			{
-				NamedCommand.CreateReactive("Add Cube", _ => AddCube()),
-				NamedCommand.CreateReactive("Add Sphere", _ => AddSphere()),
-				NamedCommand.CreateReactive("Add Plane", _ => AddPlane()),
-				NamedCommand.CreateReactive("Save", _ => scene.Save())
+				new CommandMenuItem(new CommandViewModel("Add Cube", CommandUtil.Create(_ => AddCube()))),
+				new CommandMenuItem(new CommandViewModel("Add Sphere", CommandUtil.Create(_ => AddSphere()))),
+				new CommandMenuItem(new CommandViewModel("Add Plane", CommandUtil.Create(_ => AddPlane()))),
+				new CommandMenuItem(new CommandViewModel("Save", CommandUtil.Create(_ => scene.Save())))
 			};
 		}
 

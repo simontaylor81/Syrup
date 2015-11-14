@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using Microsoft.Win32;
-using ShaderEditorApp.MVVMUtil;
 using SRPCommon.UserProperties;
 using System.Windows.Input;
 using ShaderEditorApp.Projects;
@@ -24,10 +23,22 @@ namespace ShaderEditorApp.ViewModel.Projects
 			// Build the list of child items.
 			CreateChildrenProperty();
 
-			AddSubFolder = NamedCommand.CreateReactive("Add Folder", _ => folder.AddFolder("NewFolder"));
+			// Create commands.
+			AddExisting = CommandUtil.Create(_ => AddExistingFile());
+			AddNewFile = CommandUtil.Create(_ => AddNewFileImpl());
+			AddNewScene = CommandUtil.Create(_ => AddNewSceneImpl());
+			AddSubFolder = CommandUtil.Create(_ => folder.AddFolder("NewFolder"));
+			Remove = CommandUtil.Create(_ => RemoveFromProject());
 
-			// Add commands.
-			Commands = new NamedCommand[] { AddExistingCmd, AddNewCmd, AddNewSceneCmd, AddSubFolder, RemoveCmd };
+			// Add commands to list.
+			MenuItems = new object[]
+			{
+				new CommandMenuItem(new CommandViewModel("Add Existing File", AddExisting)),
+				new CommandMenuItem(new CommandViewModel("Add New File", AddNewFile)),
+				new CommandMenuItem(new CommandViewModel("Add New Scene", AddNewScene)),
+				new CommandMenuItem(new CommandViewModel("Add Folder", AddSubFolder)),
+				new CommandMenuItem(new CommandViewModel("Remove", Remove)),
+			};
 
 			// User-facing properties.
 			var nameProp = new MutableScalarProperty<string>("Folder Name", folder.Name);
@@ -70,7 +81,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 		}
 
 		// Add a new item to the project.
-		private void AddNewFile()
+		private void AddNewFileImpl()
 		{
 			var dialog = new SaveFileDialog();
 			dialog.Filter = FileFilterNew;
@@ -88,7 +99,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 		}
 
 		// Add a new scene file to the project.
-		private void AddNewScene()
+		private void AddNewSceneImpl()
 		{
 			var dialog = new SaveFileDialog();
 			dialog.Filter = "Scene files|*.srpscene";
@@ -169,9 +180,9 @@ namespace ShaderEditorApp.ViewModel.Projects
 		#region IHierarchicalBrowserNodeViewModel interface
 
 		/// <summary>
-		/// Commnads that can be executed on this node (used for drop-down menu).
+		/// Menu items for the drop-down menu.
 		/// </summary>
-		public IEnumerable<ICommand> Commands { get; protected set; }
+		public IEnumerable<object> MenuItems { get; protected set; }
 
 		/// <summary>
 		/// Set of properties that this node exposes.
@@ -195,33 +206,19 @@ namespace ShaderEditorApp.ViewModel.Projects
 		#region Commands
 
 		// Command to add an existing file from disk to the project.
-		private NamedCommand addExistingCmd;
-		public NamedCommand AddExistingCmd
-			=> NamedCommand.LazyInit(ref addExistingCmd, "Add Existing File", (param) => AddExistingFile());
+		public ReactiveCommand<object> AddExisting { get; }
 
 		// Command to add a new file to the project.
-		private NamedCommand addNewCmd;
-		public NamedCommand AddNewCmd
-			=> NamedCommand.LazyInit(ref addNewCmd, "Add New File", (param) => AddNewFile());
+		public ReactiveCommand<object> AddNewFile { get; }
 
 		// Command to add a new scene to the project.
-		private NamedCommand addNewSceneCmd;
-		public NamedCommand AddNewSceneCmd
-		{
-			get
-			{
-				return NamedCommand.LazyInit(ref addNewSceneCmd, "Add New Scene",
-						(param) => AddNewScene());
-			}
-		}
+		public ReactiveCommand<object> AddNewScene { get; }
 
 		// Command to add a subfolder to this folder.
-		public NamedCommand AddSubFolder { get; }
+		public ReactiveCommand<object> AddSubFolder { get; }
 
 		// Command to remove the folder from the project.
-		private NamedCommand removeCmd;
-		public NamedCommand RemoveCmd
-			=> NamedCommand.LazyInit(ref removeCmd, "Remove", (param) => RemoveFromProject());
+		public ReactiveCommand<object> Remove { get; }
 
 		#endregion
 

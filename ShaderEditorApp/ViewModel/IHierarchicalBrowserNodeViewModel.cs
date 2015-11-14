@@ -17,9 +17,9 @@ namespace ShaderEditorApp.ViewModel
 		string DisplayName { get; }
 
 		/// <summary>
-		/// Commnads that can be executed on this node (used for drop-down menu).
+		/// Menu items for the the node's drop-down menu. Untyped to allow separators too.
 		/// </summary>
-		IEnumerable<ICommand> Commands { get; }
+		IEnumerable<object> MenuItems { get; }
 
 		/// <summary>
 		/// Set of properties that this node exposes.

@@ -17,8 +17,18 @@ namespace ShaderEditorApp.ViewModel.Projects
 		public ProjectViewModel(Project project, WorkspaceViewModel workspace)
 			: base(project.RootFolder, project, workspace)
 		{
+			// Create save command.
+			Save = CommandUtil.Create(_ => SaveImpl());
+
 			// Can't remove the project itself, but you can save it.
-			Commands = new [] { SaveCmd, AddExistingCmd, AddNewCmd, AddNewSceneCmd, AddSubFolder };
+			MenuItems = new object[]
+			{
+				new CommandMenuItem(new CommandViewModel("Save", Save)),
+				new CommandMenuItem(new CommandViewModel("Add Existing File", AddExisting)),
+				new CommandMenuItem(new CommandViewModel("Add New File", AddNewFile)),
+				new CommandMenuItem(new CommandViewModel("Add New Scene", AddNewScene)),
+				new CommandMenuItem(new CommandViewModel("Add Folder", AddSubFolder)),
+			};
 
 			// We don't have any properties of our own.
 			UserProperties = null;
@@ -60,7 +70,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 			set { this.RaiseAndSetIfChanged(ref activeItem, value); }
 		}
 
-		private void Save()
+		private void SaveImpl()
 		{
 			// Set list of open documents so they can be restored next time.
 			Project.SavedOpenDocuments = from doc in WorkspaceVM.OpenDocumentSet.Documents select doc.FilePath;
@@ -136,20 +146,6 @@ namespace ShaderEditorApp.ViewModel.Projects
 		public IEnumerable<IHierarchicalBrowserNodeViewModel> RootNodes => new[] { this };
 
 		// Command to save the project.
-		private NamedCommand saveCmd;
-		public NamedCommand SaveCmd
-		{
-			get
-			{
-				if (saveCmd == null)
-				{
-					saveCmd = new NamedCommand("Save", new RelayCommand(
-						(param) => Save()
-						//(param) => Project.IsDirty
-						));
-				}
-				return saveCmd;
-			}
-		}
+		public ReactiveCommand<object> Save { get; }
 	}
 }

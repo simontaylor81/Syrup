@@ -20,7 +20,7 @@ namespace ShaderEditorApp.ViewModel.Scene
 
 		public virtual string DisplayName => _primitive.Type.ToString();
 
-		public IEnumerable<ICommand> Commands { get; }
+		public IEnumerable<object> MenuItems { get; }
 
 		public IEnumerable<IUserProperty> UserProperties => _primitive.UserProperties;
 
@@ -52,9 +52,9 @@ namespace ShaderEditorApp.ViewModel.Scene
 			_primitive = primitive;
 
 			// Create commands.
-			Commands = new[]
+			MenuItems = new[]
 			{
-				NamedCommand.CreateReactive("Remove", _ => scene.RemovePrimitive(_primitive))
+				new CommandMenuItem(new CommandViewModel("Remove", CommandUtil.Create(_ => scene.RemovePrimitive(_primitive))))
 			};
 		}
 	}

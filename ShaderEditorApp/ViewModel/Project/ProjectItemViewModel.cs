@@ -31,44 +31,36 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 		private void CreateCommands()
 		{
-			// Create appropriate default command.
+			// Create commands.
+			Open = CommandUtil.Create(_ => _workspaceVM.OpenDocumentSet.OpenDocument(item.AbsolutePath, false));
+			SetAsCurrent = CommandUtil.Create(_ => _workspaceVM.Workspace.SetCurrentScene(item.AbsolutePath));
+			Remove = CommandUtil.Create(_ => RemoveFromProject());
+			Run = CommandUtil.Create(_ => _workspaceVM.Workspace.RunScriptFile(item.AbsolutePath));
+
+			// Build list context menu items.
+			var menuItems = new List<object>();
+
 			if (item.Type == ProjectItemType.Scene)
 			{
-				// Default command for scenes is to open it and make it the current scene for the workspace.
-				_defaultCmd = NamedCommand.CreateReactive("Set as Current", _ => _workspaceVM.Workspace.SetCurrentScene(item.AbsolutePath));
+				// Scenes are set as current.
+				menuItems.Add(new CommandMenuItem(new CommandViewModel("Set as Current", SetAsCurrent)));
 			}
 			else
 			{
-				// Default for everything else is to open the item.s
-				_defaultCmd = NamedCommand.CreateReactive("Open", _ => _workspaceVM.OpenDocumentSet.OpenDocument(item.AbsolutePath, false));
+				// Everything else is just opened.
+				menuItems.Add(new CommandMenuItem(new CommandViewModel("Open", Open)));
 			}
 
-			// Command to remove the item from the scene.
-			var removeCmd = NamedCommand.CreateReactive("Remove", _ => RemoveFromProject());
-
-			// Default set of commands for an item.
-			var commands = new List<ICommand>
-				{
-					_defaultCmd,
-					removeCmd,
-				};
+			// Everything can be removed.
+			menuItems.Add(new CommandMenuItem(new CommandViewModel("Remove", Remove)));
 
 			if (item.Type == ProjectItemType.Script)
 			{
 				// Scripts can be run.
-				commands.Add(NamedCommand.CreateReactive(
-					"Run",
-					_ => _workspaceVM.Workspace.RunScriptFile(item.AbsolutePath)));
-			}
-			else if (item.Type == ProjectItemType.Scene)
-			{
-				// Scenes can be set as the default scene.
-				commands.Add(NamedCommand.CreateReactive(
-					"Set as default",
-					_ => item.SetAsDefault()));
+				menuItems.Add(new CommandMenuItem(new CommandViewModel("Run", Run)));
 			}
 
-			Commands = commands;
+			MenuItems = menuItems;
 		}
 
 		// Create the user properties to display for the item.
@@ -97,10 +89,8 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 		#region IHierarchicalBrowserNodeViewModel interface
 
-		/// <summary>
-		/// Commnads that can be executed on this node (used for drop-down menu).
-		/// </summary>
-		public IEnumerable<ICommand> Commands { get; private set; }
+		// Menu items for the drop-down menu.
+		public IEnumerable<object> MenuItems { get; protected set; }
 
 		/// <summary>
 		/// Set of properties that this node exposes.
@@ -108,8 +98,8 @@ namespace ShaderEditorApp.ViewModel.Projects
 		public IEnumerable<IUserProperty> UserProperties { get; private set; }
 
 		// 'Default' command -- i.e. the one to execute when double clicking on the item.
-		public ICommand DefaultCmd => _defaultCmd;
-		private NamedCommand _defaultCmd;
+		// Default command for scenes is to open it and make it the current scene for the workspace.
+		public ICommand DefaultCmd => item.Type == ProjectItemType.Scene ? SetAsCurrent : Open;
 
 		// We don't have any children -- we're a leaf node.
 		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children => null;
@@ -119,6 +109,12 @@ namespace ShaderEditorApp.ViewModel.Projects
 		public bool IsDefault => _isDefault.Value;
 
 		#endregion
+
+		// Commands.
+		public ReactiveCommand<object> Open { get; private set; }
+		public ReactiveCommand<object> SetAsCurrent { get; private set; }
+		public ReactiveCommand<object> Remove { get; private set; }
+		public ReactiveCommand<object> Run { get; private set; }
 
 		public bool CanMoveTo(ProjectFolderViewModel targetFolder) => item.CanMoveTo(targetFolder.Folder);
 

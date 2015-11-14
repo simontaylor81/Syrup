@@ -184,6 +184,7 @@
     <Compile Include="ViewModel\CommandViewModel.cs" />
     <Compile Include="ViewModel\IHierarchicalBrowserRootViewModel.cs" />
     <Compile Include="ViewModel\MenuBarViewModel.cs" />
+    <Compile Include="ViewModel\MenuItemViewModels.cs" />
     <Compile Include="ViewModel\Project\ProjectFolderViewModel.cs" />
     <Compile Include="Projects\ProjectItem.cs" />
     <Compile Include="ViewModel\Project\ProjectItemViewModel.cs" />

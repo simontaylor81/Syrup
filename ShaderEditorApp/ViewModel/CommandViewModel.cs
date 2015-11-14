@@ -37,4 +37,15 @@ namespace ShaderEditorApp.ViewModel
 			KeyGesture = keyGesture;
 		}
 	}
+
+	// Simple helper that probably should have been in ReactiveUI.
+	public static class CommandUtil
+	{
+		public static ReactiveCommand<object> Create(Action<object> execute, IObservable<bool> canExecute = null)
+		{
+			var command = ReactiveCommand.Create(canExecute);
+			command.Subscribe(execute);
+			return command;
+		}
+	}
 }

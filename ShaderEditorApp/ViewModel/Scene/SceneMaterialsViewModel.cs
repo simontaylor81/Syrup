@@ -21,7 +21,7 @@ namespace ShaderEditorApp.ViewModel.Scene
 		public string DisplayName => "Materials";
 
 		private SRPCommon.Scene.Scene Scene { get; }
-		public IEnumerable<ICommand> Commands => Enumerable.Empty<ICommand>();
+		public IEnumerable<object> MenuItems => Enumerable.Empty<object>();
 		public IEnumerable<IUserProperty> UserProperties => Enumerable.Empty<IUserProperty>();
 
 		public ICommand DefaultCmd => null;

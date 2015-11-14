@@ -14,7 +14,7 @@ namespace ShaderEditorApp.ViewModel.Scene
 		public string DisplayName => _mat.Name;
 
 		public IEnumerable<IHierarchicalBrowserNodeViewModel> Children => null;
-		public IEnumerable<ICommand> Commands => Enumerable.Empty<ICommand>();
+		public IEnumerable<object> MenuItems => Enumerable.Empty<object>();
 		public ICommand DefaultCmd => null;
 		public bool IsDefault => false;
 
