@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Highlighting;
 using Microsoft.Win32;
 using ReactiveUI;
 using ShaderEditorApp.Interfaces;
@@ -27,6 +28,13 @@ namespace ShaderEditorApp.ViewModel
 
 			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
 			_isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
+
+			// Set syntax highlighting definition to use based on extension.
+			_syntaxHighlighting = this.WhenAnyValue(x => x.FilePath)
+				.Select(path => path != null
+					? HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(path))
+					: null)
+				.ToProperty(this, x => x.SyntaxHighlighting);
 		}
 
 		// Create a document backed by a file.
@@ -239,6 +247,9 @@ namespace ShaderEditorApp.ViewModel
 		// Start point and length of selection.
 		public int SelectionStart { get; set; }
 		public int SelectionLength { get; set; }
+
+		private ObservableAsPropertyHelper<IHighlightingDefinition> _syntaxHighlighting;
+		public IHighlightingDefinition SyntaxHighlighting => _syntaxHighlighting.Value;
 
 		// Back-pointer to the open document set we're in.
 		private readonly OpenDocumentSetViewModel _openDocumentSet;

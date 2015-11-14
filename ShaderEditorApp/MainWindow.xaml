@@ -30,6 +30,7 @@
         <DataTemplate x:Key="DocumentPaneTemplate">
             <avalonedit:TextEditor FontFamily="Consolas" FontSize="10pt" ShowLineNumbers="True"
                                    Document="{Binding Document}"
+                                   SyntaxHighlighting="{Binding SyntaxHighlighting}"
                                    Initialized="TextEditor_Initialized"/>
         </DataTemplate>
 

@@ -188,10 +188,6 @@ namespace ShaderEditorApp
 					documentViewModel.SelectionStart = textEditor.SelectionStart;
 					documentViewModel.SelectionLength = textEditor.SelectionLength;
 				};
-
-			// Set syntax highlighting definition to use.
-			textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(
-				System.IO.Path.GetExtension(documentViewModel.FilePath));
 		}
 	}
 }
