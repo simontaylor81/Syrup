@@ -91,6 +91,26 @@ namespace ShaderEditorApp.ViewModel
 
 				NewDocument = new CommandViewModel("New Document", "Document", ReactiveCommand.Create());
 				NewDocument.Command.Subscribe(param => OpenDocumentSet.NewDocument());
+
+				var hasActiveDocument = this.WhenAnyValue(x => x.OpenDocumentSet.ActiveDocument)
+					.Select(doc => doc != null);
+
+				CloseActiveDocument = new CommandViewModel("Close", ReactiveCommand.Create(hasActiveDocument));
+				CloseActiveDocument.Command.Subscribe(param => OpenDocumentSet.CloseDocument(OpenDocumentSet.ActiveDocument));
+
+				SaveActiveDocument = new CommandViewModel("Save", ReactiveCommand.Create(hasActiveDocument));
+				SaveActiveDocument.Command.Subscribe(param => OpenDocumentSet.ActiveDocument.Save());
+
+				SaveActiveDocumentAs = new CommandViewModel("Save As", ReactiveCommand.Create(hasActiveDocument));
+				SaveActiveDocumentAs.Command.Subscribe(param => OpenDocumentSet.ActiveDocument.SaveAs());
+
+				SaveAll = new CommandViewModel("Save All", ReactiveCommand.Create());
+				SaveAll.Command.Subscribe(param => SaveAllDirty());
+
+				RunActiveScript = new CommandViewModel("Run Current Script", ReactiveCommand.Create());
+				RunActiveScript.Command.Subscribe(param => RunActiveScriptImpl());
+
+				Exit = new CommandViewModel("Exit", ReactiveCommand.Create());
 			}
 
 			// Create menu bar
@@ -171,7 +191,7 @@ namespace ShaderEditorApp.ViewModel
 		}
 
 		// TODO: Fix async void nastiness.
-		private async void RunActiveScript()
+		private async void RunActiveScriptImpl()
 		{
 			// Save all so we running the latest contents.
 			if (!SaveAllDirty())
@@ -258,41 +278,23 @@ namespace ShaderEditorApp.ViewModel
 		public CommandViewModel NewDocument { get; }
 
 		// Command to close the currently active document.
-		private NamedCommand closeActiveDocumentCmd;
-		public INamedCommand CloseActiveDocumentCmd
-			=> NamedCommand.LazyInit(ref closeActiveDocumentCmd, "Close",
-				param => OpenDocumentSet.CloseDocument(OpenDocumentSet.ActiveDocument),
-				param => OpenDocumentSet.ActiveDocument != null);
+		public CommandViewModel CloseActiveDocument { get; }
 
 		// Command to save the currently active document.
-		private NamedCommand saveActiveDocumentCmd;
-		public INamedCommand SaveActiveDocumentCmd
-			=> NamedCommand.LazyInit(ref saveActiveDocumentCmd, "Save",
-				param => OpenDocumentSet.ActiveDocument.Save(),
-				param => OpenDocumentSet.ActiveDocument != null);
+		public CommandViewModel SaveActiveDocument { get; }
 
 		// Command to save the currently active document under a new filename.
-		private NamedCommand saveActiveDocumentAsCmd;
-		public INamedCommand SaveActiveDocumentAsCmd
-			=> NamedCommand.LazyInit(ref saveActiveDocumentAsCmd, "Save As",
-				param => OpenDocumentSet.ActiveDocument.SaveAs(),
-				param => OpenDocumentSet.ActiveDocument != null);
-
-		// Command to execute the currently active script document.
-		private NamedCommand runActiveScriptCmd;
-		public INamedCommand RunActiveScriptCmd
-			=> NamedCommand.LazyInit(ref runActiveScriptCmd, "Run Current Script",
-				param => RunActiveScript());
+		public CommandViewModel SaveActiveDocumentAs { get; }
 
 		// Command to save all (dirty) open documents.
-		private NamedCommand saveAllCmd;
-		public INamedCommand SaveAllCmd
-			=> NamedCommand.LazyInit(ref saveAllCmd, "Save All",
-				param => SaveAllDirty());
+		public CommandViewModel SaveAll { get; }
+
+		// Command to execute the currently active script document.
+		public CommandViewModel RunActiveScript { get; }
 
 		// Command to exit the application.
-		// Command actually does nothing. It's up to th new to subscribe to it and do the actual exiting.
-		public IReactiveCommand<object> ExitCmd { get; } = ReactiveCommand.Create();
+		// Command actually does nothing. It's up to the view to subscribe to it and do the actual exiting.
+		public CommandViewModel Exit { get; }
 
 		#endregion
 	}

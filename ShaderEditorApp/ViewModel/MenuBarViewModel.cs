@@ -35,10 +35,10 @@ namespace ShaderEditorApp.ViewModel
 						new CommandViewModelMenuItemViewModel(workspace.OpenProject) { Shortcut = "Ctrl+Shift+O" },
 						new CommandViewModelMenuItemViewModel(workspace.OpenDocument) { Shortcut = "Ctrl+O" }),
 
-					new NamedCommandMenuItemViewModel(workspace.SaveActiveDocumentCmd) { Shortcut = "Ctrl+S" },
-					new NamedCommandMenuItemViewModel(workspace.SaveAllCmd) { Shortcut = "Ctrl+Shift+S" },
-					new NamedCommandMenuItemViewModel(workspace.SaveActiveDocumentAsCmd),
-					new NamedCommandMenuItemViewModel(workspace.CloseActiveDocumentCmd) { Shortcut = "Ctrl+F4" },
+					new CommandViewModelMenuItemViewModel(workspace.SaveActiveDocument) { Shortcut = "Ctrl+S" },
+					new CommandViewModelMenuItemViewModel(workspace.SaveAll) { Shortcut = "Ctrl+Shift+S" },
+					new CommandViewModelMenuItemViewModel(workspace.SaveActiveDocumentAs),
+					new CommandViewModelMenuItemViewModel(workspace.CloseActiveDocument) { Shortcut = "Ctrl+F4" },
 
 					SeparatorViewModel.Instance,
 
@@ -50,7 +50,7 @@ namespace ShaderEditorApp.ViewModel
 
 					SeparatorViewModel.Instance,
 
-					new CommandMenuItemViewModel(workspace.ExitCmd) { Header = "Exit", Shortcut = "Alt+F4" }
+					new CommandViewModelMenuItemViewModel(workspace.Exit) { Shortcut = "Alt+F4" }
 				),
 
 				// Edit menu
@@ -70,7 +70,7 @@ namespace ShaderEditorApp.ViewModel
 
 				// Run menu
 				StaticMenuItemViewModel.Create("Run",
-					new NamedCommandMenuItemViewModel(workspace.RunActiveScriptCmd) { Shortcut = "F5" }
+					new CommandViewModelMenuItemViewModel(workspace.RunActiveScript) { Shortcut = "F5" }
 				)
 			};
 		}
