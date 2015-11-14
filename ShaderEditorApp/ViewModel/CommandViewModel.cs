@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using ReactiveUI;
 
 namespace ShaderEditorApp.ViewModel
@@ -21,18 +23,18 @@ namespace ShaderEditorApp.ViewModel
 		// The command itself.
 		public ReactiveCommand<object> Command { get; }
 
-		public CommandViewModel(string name, ReactiveCommand<object> command)
-		{
-			Name = name;
-			MenuHeader = name;
-			Command = command;
-		}
+		// Keyboard gesture.
+		public KeyGesture KeyGesture { get; }
 
-		public CommandViewModel(string name, string menuHeader, ReactiveCommand<object> command)
+		// Textual representation of the key gesture.
+		public string KeyGestureString => KeyGesture?.GetDisplayStringForCulture(CultureInfo.CurrentCulture);
+
+		public CommandViewModel(string name, ReactiveCommand<object> command, string menuHeader = null, KeyGesture keyGesture = null)
 		{
 			Name = name;
-			MenuHeader = menuHeader;
 			Command = command;
+			MenuHeader = menuHeader ?? name;
+			KeyGesture = keyGesture;
 		}
 	}
 }

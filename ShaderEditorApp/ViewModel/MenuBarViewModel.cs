@@ -27,18 +27,18 @@ namespace ShaderEditorApp.ViewModel
 				StaticMenuItemViewModel.Create("File",
 					// New submenu
 					StaticMenuItemViewModel.Create("New",
-						new CommandViewModelMenuItemViewModel(workspace.NewProject) { Shortcut = "Ctrl+Shift+N" },
-						new CommandViewModelMenuItemViewModel(workspace.NewDocument) { Shortcut = "Ctrl+N" }),
+						new CommandViewModelMenuItemViewModel(workspace.NewProject),
+						new CommandViewModelMenuItemViewModel(workspace.NewDocument)),
 
 					// Open submenu
 					StaticMenuItemViewModel.Create("Open",
-						new CommandViewModelMenuItemViewModel(workspace.OpenProject) { Shortcut = "Ctrl+Shift+O" },
-						new CommandViewModelMenuItemViewModel(workspace.OpenDocument) { Shortcut = "Ctrl+O" }),
+						new CommandViewModelMenuItemViewModel(workspace.OpenProject),
+						new CommandViewModelMenuItemViewModel(workspace.OpenDocument)),
 
-					new CommandViewModelMenuItemViewModel(workspace.SaveActiveDocument) { Shortcut = "Ctrl+S" },
-					new CommandViewModelMenuItemViewModel(workspace.SaveAll) { Shortcut = "Ctrl+Shift+S" },
+					new CommandViewModelMenuItemViewModel(workspace.SaveActiveDocument),
+					new CommandViewModelMenuItemViewModel(workspace.SaveAll),
 					new CommandViewModelMenuItemViewModel(workspace.SaveActiveDocumentAs),
-					new CommandViewModelMenuItemViewModel(workspace.CloseActiveDocument) { Shortcut = "Ctrl+F4" },
+					new CommandViewModelMenuItemViewModel(workspace.CloseActiveDocument),
 
 					SeparatorViewModel.Instance,
 
@@ -50,7 +50,7 @@ namespace ShaderEditorApp.ViewModel
 
 					SeparatorViewModel.Instance,
 
-					new CommandViewModelMenuItemViewModel(workspace.Exit) { Shortcut = "Alt+F4" }
+					new CommandViewModelMenuItemViewModel(workspace.Exit)
 				),
 
 				// Edit menu
@@ -70,7 +70,7 @@ namespace ShaderEditorApp.ViewModel
 
 				// Run menu
 				StaticMenuItemViewModel.Create("Run",
-					new CommandViewModelMenuItemViewModel(workspace.RunActiveScript) { Shortcut = "F5" }
+					new CommandViewModelMenuItemViewModel(workspace.RunActiveScript)
 				)
 			};
 		}
@@ -81,7 +81,7 @@ namespace ShaderEditorApp.ViewModel
 	public abstract class MenuItemViewModel : ReactiveObject
 	{
 		public virtual string Header { get; set; }
-		public virtual string Shortcut { get; set; }
+		public virtual string Shortcut => null;
 		public virtual bool IsEnabled { get; set; } = true;
 		public virtual ICommand Command => null;
 		public virtual object CommandParameter => null;
@@ -128,20 +128,6 @@ namespace ShaderEditorApp.ViewModel
 		}
 	}
 
-	// Menu item representing a named command, where the menu text comes from the name.
-	class NamedCommandMenuItemViewModel : MenuItemViewModel
-	{
-		private readonly INamedCommand _command;
-
-		public override string Header => _command.Name;
-		public override ICommand Command => _command;
-
-		public NamedCommandMenuItemViewModel(INamedCommand command)
-		{
-			_command = command;
-		}
-	}
-
 	// Menu item with an associated command view model.
 	// TODO: Rename.
 	class CommandViewModelMenuItemViewModel : MenuItemViewModel
@@ -150,6 +136,7 @@ namespace ShaderEditorApp.ViewModel
 
 		public override string Header => _commandVM.MenuHeader;
 		public override ICommand Command => _commandVM.Command;
+		public override string Shortcut => _commandVM.KeyGestureString;
 
 		public CommandViewModelMenuItemViewModel(CommandViewModel commandVM)
 		{
