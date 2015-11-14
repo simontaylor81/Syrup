@@ -12,10 +12,6 @@
 
     <UserControl.Resources>
 
-        <DataTemplate x:Key="CommandMenuItemTemplate" DataType="{x:Type mvvm:NamedCommand}">
-            <TextBlock Text="{Binding MenuHeader}"/>
-        </DataTemplate>
-
         <mvvm:BoolToBoldConverter x:Key="BoolToBoldConverter"/>
 
         <!-- Style to apply to the nodes. -->
@@ -25,7 +21,6 @@
             <!-- Each item has a context menu containing the commands exposed by the view model. -->
             <Setter Property="ContextMenu">
                 <Setter.Value>
-                    <!--<ContextMenu ItemsSource="{Binding Commands}" ItemTemplate="{StaticResource CommandMenuItemTemplate}"/>-->
                     <ContextMenu ItemsSource="{Binding MenuItems}"
                                  UsesItemContainerTemplate="True">
                         <ContextMenu.Resources>
