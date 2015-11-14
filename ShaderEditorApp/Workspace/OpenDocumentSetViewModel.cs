@@ -24,9 +24,6 @@ namespace ShaderEditorApp.ViewModel
 			documents = new ObservableCollection<DocumentViewModel>();
 			Documents = new ReadOnlyObservableCollection<DocumentViewModel>(documents);
 
-			Application.Current.Activated += (o, _e) => isAppForeground = true;
-			Application.Current.Deactivated += (o, _e) => isAppForeground = false;
-
 			// Active document is just the most recent active window that was a document.
 			_activeDocument = workspaceVM.WhenAnyValue(x => x.ActiveWindow)
 				.OfType<DocumentViewModel>()
@@ -47,11 +44,6 @@ namespace ShaderEditorApp.ViewModel
 					}
 				}
 			});
-		}
-
-		public void Tick()
-		{
-			CheckModifiedDocuments();
 		}
 
 		public void OpenDocument(string path, bool bReload)
@@ -145,42 +137,6 @@ namespace ShaderEditorApp.ViewModel
 			return result;
 		}
 
-		// Notification that a document has been modified, and might need to be reloaded. Thread-safe.
-		internal void AddModifiedDocument(DocumentViewModel document)
-		{
-			lock (modifiedDocuments)
-			{
-				modifiedDocuments.Add(document);
-			}
-		}
-
-		// If there are any externally-modified files, prompt to reload them.
-		private void CheckModifiedDocuments()
-		{
-			// Don't do anything if the app's not in the foreground.
-			if (!isAppForeground)
-				return;
-
-			DocumentViewModel[] docsToReload;
-			lock (modifiedDocuments)
-			{
-				docsToReload = modifiedDocuments.ToArray();
-				modifiedDocuments.Clear();
-			}
-
-			foreach (var document in docsToReload)
-			{
-				// Prompt to reload.
-				var result = MessageBox.Show(
-					string.Format("{0} was modified by an external program. Would you like to reload it?", Path.GetFileName(document.FilePath)),
-					"SRP", MessageBoxButton.YesNo);
-				if (result == MessageBoxResult.Yes)
-				{
-					document.LoadContents();
-				}
-			}
-		}
-
 		private ObservableCollection<DocumentViewModel> documents;
 		public ReadOnlyObservableCollection<DocumentViewModel> Documents { get; }
 
@@ -188,10 +144,6 @@ namespace ShaderEditorApp.ViewModel
 		private ObservableAsPropertyHelper<DocumentViewModel> _activeDocument;
 		public DocumentViewModel ActiveDocument => _activeDocument.Value;
 
-		// List of documents that have been externally modified.
-		private HashSet<DocumentViewModel> modifiedDocuments = new HashSet<DocumentViewModel>();
-
 		public WorkspaceViewModel WorkspaceVM { get; }
-		private bool isAppForeground;
 	}
 }

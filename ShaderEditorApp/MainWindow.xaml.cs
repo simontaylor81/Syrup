@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,8 +10,8 @@ using System.Windows.Media;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
-using ReactiveUI;
 using ShaderEditorApp.Model;
+using ShaderEditorApp.Services;
 using ShaderEditorApp.View;
 using ShaderEditorApp.ViewModel;
 using SRPCommon.Util;
@@ -127,7 +126,6 @@ namespace ShaderEditorApp
 		void CompositionTarget_Rendering(object sender, EventArgs e)
 		{
 			renderWindow.Tick();
-			_workspaceViewModel.OpenDocumentSet.Tick();
 		}
 
 		private void LoadSyntaxHighlightingDefinition(string language)

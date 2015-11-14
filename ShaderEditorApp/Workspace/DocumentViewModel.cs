@@ -10,6 +10,9 @@ using ICSharpCode.AvalonEdit.Document;
 using Microsoft.Win32;
 using System.Windows;
 using ReactiveUI;
+using ShaderEditorApp.Interfaces;
+using System.Reactive.Linq;
+using System.Diagnostics;
 
 namespace ShaderEditorApp.ViewModel
 {
@@ -24,6 +27,9 @@ namespace ShaderEditorApp.ViewModel
 
 			// Dirty when document changes.
 			Document.TextChanged += (o, e) => IsDirty = true;
+
+			// TEMP!
+			_isForeground = new Services.WpfIsForegroundService();
 		}
 
 		// Create a document backed by a file.
@@ -52,7 +58,7 @@ namespace ShaderEditorApp.ViewModel
 			if (!string.IsNullOrEmpty(FilePath))
 			{
 				// Disable file change notifications -- don't want to reload if we saved it ourselves!
-				watcher.EnableRaisingEvents = false;
+				_watcher.EnableRaisingEvents = false;
 
 				// Write contents of file to disk.
 				// TODO: Async?
@@ -64,7 +70,7 @@ namespace ShaderEditorApp.ViewModel
 				_openDocumentSet.WorkspaceVM.Workspace.UserSettings.Save();
 
 				// Re-enable the watcher.
-				watcher.EnableRaisingEvents = true;
+				_watcher.EnableRaisingEvents = true;
 				return true;
 			}
 			else
@@ -96,11 +102,11 @@ namespace ShaderEditorApp.ViewModel
 
 		public void Dispose()
 		{
-			if (watcher != null)
+			if (_watcher != null)
 			{
-				watcher.Changed -= FileChanged;
-				watcher.Dispose();
-				watcher = null;
+				_watcherSubscription.Dispose();
+				_watcher.Dispose();
+				_watcher = null;
 			}
 		}
 
@@ -131,16 +137,17 @@ namespace ShaderEditorApp.ViewModel
 					_filePath = value;
 
 					// (Re-)create the file watcher.
-					if (watcher != null)
+					if (_watcher != null)
 					{
-						watcher.Dispose();
+						_watcherSubscription.Dispose();
+						_watcher.Dispose();
 					}
 
-					watcher = new FileSystemWatcher(Path.GetDirectoryName(_filePath), Path.GetFileName(_filePath));
-					watcher.NotifyFilter = NotifyFilters.LastWrite;
-					watcher.IncludeSubdirectories = false;
-					watcher.Changed += FileChanged;
-					watcher.EnableRaisingEvents = true;
+					_watcher = new FileSystemWatcher(Path.GetDirectoryName(_filePath), Path.GetFileName(_filePath));
+					_watcher.NotifyFilter = NotifyFilters.LastWrite;
+					_watcher.IncludeSubdirectories = false;
+					SubscribeToWatcher();
+					_watcher.EnableRaisingEvents = true;
 
 					this.RaisePropertyChanged();
 					this.RaisePropertyChanged(nameof(DisplayName));
@@ -148,9 +155,51 @@ namespace ShaderEditorApp.ViewModel
 			}
 		}
 
-		void FileChanged(object sender, FileSystemEventArgs e)
+		private void SubscribeToWatcher()
 		{
-			_openDocumentSet.AddModifiedDocument(this);
+			// Convert notifications to observable.
+			var fileChanged = Observable.FromEventPattern(_watcher, nameof(_watcher.Changed));
+
+			_watcherSubscription = fileChanged
+				// FileSystemWatcher can send multiple events for the same conceptual operation,
+				// so we disable notifications whilst we're already showing one.
+				// I'm sure there's a more elegant way of doing this in Rx, but this does the job.
+				.Where(_ => !_disableModificationNotifications)
+				.Do(_ => _disableModificationNotifications = true)
+				// Each time we get a changed, wait until the app is foreground,
+				// dispatch back to main thread.
+				.SelectMany(_ => _isForeground.WhenAnyValue(x => x.IsAppForeground)
+					.StartWith(_isForeground.IsAppForeground)
+					.Where(x => x == true)
+					.ObserveOn(RxApp.MainThreadScheduler)
+					.FirstAsync())
+				.Subscribe(_ =>
+				{
+					// We should be now foreground and on the main thread, so we can post the notification.
+					ShowChangeNotification();
+
+					// Re-enable notifications now that we're done.
+					_disableModificationNotifications = false;
+				},
+				ex =>
+				{
+					// Should not happen.
+					Debug.WriteLine("Exception thrown during file change notification.");
+					Debug.WriteLine(ex);
+				});
+		}
+
+		// Show a notification to the user that the file has changed.
+		private void ShowChangeNotification()
+		{
+			// Prompt to reload.
+			var result = MessageBox.Show(
+				string.Format("{0} was modified by an external program. Would you like to reload it?", Path.GetFileName(FilePath)),
+				"SRP", MessageBoxButton.YesNo);
+			if (result == MessageBoxResult.Yes)
+			{
+				LoadContents();
+			}
 		}
 
 		// Contents of the document.
@@ -195,10 +244,19 @@ namespace ShaderEditorApp.ViewModel
 		private readonly OpenDocumentSetViewModel _openDocumentSet;
 
 		// Watcher to look for external modifications.
-		private FileSystemWatcher watcher;
+		private FileSystemWatcher _watcher;
+
+		// Subscription to watcher event.
+		private IDisposable _watcherSubscription;
+
+		// Switch to disable watcher notifications whilst we're displaying the message box.
+		private bool _disableModificationNotifications = false;
+
+		private readonly IIsForegroundService _isForeground;
 
 		// Command to close this document.
 		private RelayCommand closeCmd;
+
 		public ICommand CloseCmd
 		{
 			get

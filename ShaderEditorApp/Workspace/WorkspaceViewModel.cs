@@ -15,6 +15,7 @@ using ReactiveUI;
 using System.Reactive.Linq;
 using ShaderEditorApp.Model;
 using System.Threading.Tasks;
+using ShaderEditorApp.Interfaces;
 
 namespace ShaderEditorApp.ViewModel
 {

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using ShaderEditorApp.MVVMUtil;
+using ShaderEditorApp.Interfaces;
 using SRPCommon.Util;
 
-namespace ShaderEditorApp.View
+namespace ShaderEditorApp.Services
 {
 	// Class for showing user prompts using MessageBox.Show.
 	class WpfUserPrompt : IUserPrompt
