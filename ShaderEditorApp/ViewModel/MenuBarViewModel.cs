@@ -24,37 +24,37 @@ namespace ShaderEditorApp.ViewModel
 			Items = new object[]
 			{
 				// File menu
-				StaticMenuItemViewModel.Create("File",
+				StaticMenuItem.Create("File",
 					// New submenu
-					StaticMenuItemViewModel.Create("New",
-						new CommandViewModelMenuItemViewModel(workspace.NewProject),
-						new CommandViewModelMenuItemViewModel(workspace.NewDocument)),
+					StaticMenuItem.Create("New",
+						new CommandViewModelMenuItem(workspace.NewProject),
+						new CommandViewModelMenuItem(workspace.NewDocument)),
 
 					// Open submenu
-					StaticMenuItemViewModel.Create("Open",
-						new CommandViewModelMenuItemViewModel(workspace.OpenProject),
-						new CommandViewModelMenuItemViewModel(workspace.OpenDocument)),
+					StaticMenuItem.Create("Open",
+						new CommandViewModelMenuItem(workspace.OpenProject),
+						new CommandViewModelMenuItem(workspace.OpenDocument)),
 
-					new CommandViewModelMenuItemViewModel(workspace.SaveActiveDocument),
-					new CommandViewModelMenuItemViewModel(workspace.SaveAll),
-					new CommandViewModelMenuItemViewModel(workspace.SaveActiveDocumentAs),
-					new CommandViewModelMenuItemViewModel(workspace.CloseActiveDocument),
+					new CommandViewModelMenuItem(workspace.SaveActiveDocument),
+					new CommandViewModelMenuItem(workspace.SaveAll),
+					new CommandViewModelMenuItem(workspace.SaveActiveDocumentAs),
+					new CommandViewModelMenuItem(workspace.CloseActiveDocument),
 
 					SeparatorViewModel.Instance,
 
 					// Recently opened projects and files sub-menus.
-					new RecentFilesMenuItemViewModel(
+					new RecentFilesMenuItem(
 						"Recent Projects", "No Projects", workspace.Workspace.UserSettings.RecentProjects, workspace.OpenProjectFile),
-					new RecentFilesMenuItemViewModel(
+					new RecentFilesMenuItem(
 						"Recent Files", "No Files", workspace.Workspace.UserSettings.RecentFiles, workspace.OpenDocumentFile),
 
 					SeparatorViewModel.Instance,
 
-					new CommandViewModelMenuItemViewModel(workspace.Exit)
+					new CommandViewModelMenuItem(workspace.Exit)
 				),
 
 				// Edit menu
-				StaticMenuItemViewModel.Create("Edit",
+				StaticMenuItem.Create("Edit",
 					new RoutedCommandMenuItemViewModel(ApplicationCommands.Undo),
 					new RoutedCommandMenuItemViewModel(ApplicationCommands.Redo),
 					SeparatorViewModel.Instance,
@@ -64,13 +64,13 @@ namespace ShaderEditorApp.ViewModel
 				),
 
 				// View menu
-				StaticMenuItemViewModel.Create("View",
-					new CheckableMenuItemViewModel(() => workspace.RealTimeMode, x => workspace.RealTimeMode = x) { Header = "Real-Time Mode" }
+				StaticMenuItem.Create("View",
+					new CheckableMenuItem("Real-Time Mode", () => workspace.RealTimeMode, x => workspace.RealTimeMode = x)
 				),
 
 				// Run menu
-				StaticMenuItemViewModel.Create("Run",
-					new CommandViewModelMenuItemViewModel(workspace.RunActiveScript)
+				StaticMenuItem.Create("Run",
+					new CommandViewModelMenuItem(workspace.RunActiveScript)
 				)
 			};
 		}
@@ -80,7 +80,7 @@ namespace ShaderEditorApp.ViewModel
 	// Most things do nothing, but should be defined anyway to avoid spurious binding error messages in the log.
 	public abstract class MenuItemViewModel : ReactiveObject
 	{
-		public virtual string Header { get; set; }
+		public virtual string Header => null;
 		public virtual string Shortcut => null;
 		public virtual bool IsEnabled { get; set; } = true;
 		public virtual ICommand Command => null;
@@ -101,36 +101,25 @@ namespace ShaderEditorApp.ViewModel
 	}
 
 	// A simple static menu item, potentially with sub-items.
-	class StaticMenuItemViewModel : MenuItemViewModel
+	class StaticMenuItem : MenuItemViewModel
 	{
 		private IEnumerable<object> _items;
 		public override IEnumerable<object> Items => _items;
 
-		// Helpers for creating one with a list of sub-items.
-		public static StaticMenuItemViewModel Create(string header, params object[] subItems)
-			=> new StaticMenuItemViewModel
-				{
-					Header = header,
-					_items = subItems
-				};
-	}
+		public override string Header { get; }
 
-	// Menu item representing a simple command.
-	class CommandMenuItemViewModel : MenuItemViewModel
-	{
-		public override ICommand Command { get; }
-		public override object CommandParameter { get; }
-
-		public CommandMenuItemViewModel(ICommand command, object parameter = null)
+		public StaticMenuItem(string header)
 		{
-			Command = command;
-			CommandParameter = parameter;
+			Header = header;
 		}
+
+		// Helpers for creating one with a list of sub-items.
+		public static StaticMenuItem Create(string header, params object[] subItems)
+			=> new StaticMenuItem(header) { _items = subItems };
 	}
 
 	// Menu item with an associated command view model.
-	// TODO: Rename.
-	class CommandViewModelMenuItemViewModel : MenuItemViewModel
+	class CommandViewModelMenuItem : MenuItemViewModel
 	{
 		private readonly CommandViewModel _commandVM;
 
@@ -138,9 +127,25 @@ namespace ShaderEditorApp.ViewModel
 		public override ICommand Command => _commandVM.Command;
 		public override string Shortcut => _commandVM.KeyGestureString;
 
-		public CommandViewModelMenuItemViewModel(CommandViewModel commandVM)
+		public CommandViewModelMenuItem(CommandViewModel commandVM)
 		{
 			_commandVM = commandVM;
+		}
+	}
+
+	// Menu item representing a raw command on its own without associated view model.
+	class RawCommandMenuItem : MenuItemViewModel
+	{
+		public override ICommand Command { get; }
+		public override object CommandParameter { get; }
+
+		public override string Header { get; }
+
+		public RawCommandMenuItem(string header, ICommand command, object parameter = null)
+		{
+			Header = header;
+			Command = command;
+			CommandParameter = parameter;
 		}
 	}
 
@@ -168,11 +173,12 @@ namespace ShaderEditorApp.ViewModel
 	}
 
 	// Menu item that can be toggled on and off.
-	class CheckableMenuItemViewModel : MenuItemViewModel
+	class CheckableMenuItem : MenuItemViewModel
 	{
 		private readonly Func<bool> _get;
 		private readonly Action<bool> _set;
 
+		public override string Header { get; }
 		public override bool IsCheckable => true;
 
 		// TODO: Support change notification.
@@ -182,27 +188,30 @@ namespace ShaderEditorApp.ViewModel
 			set { _set(value); }
 		}
 
-		public CheckableMenuItemViewModel(Func<bool> get, Action<bool> set)
+		public CheckableMenuItem(string header, Func<bool> get, Action<bool> set)
 		{
+			Header = header;
 			_get = get;
 			_set = set;
 		}
 	}
 
 	// Menu item containing a list of recently opened files.
-	class RecentFilesMenuItemViewModel : MenuItemViewModel
+	class RecentFilesMenuItem : MenuItemViewModel
 	{
 		private ObservableAsPropertyHelper<IEnumerable<object>> _subitems;
 		public override IEnumerable<object> Items => _subitems.Value;
 
-		public RecentFilesMenuItemViewModel(string header, string noFilesText, RecentFileList recentFiles, ICommand openCommand)
+		public override string Header { get; }
+
+		public RecentFilesMenuItem(string header, string noFilesText, RecentFileList recentFiles, ICommand openCommand)
 		{
 			Header = header;
 
 			// Sub menu to display when there are no recent files.
 			var emptyMenu = new object[]
 			{
-				new StaticMenuItemViewModel() { Header = noFilesText, IsEnabled = false }
+				new StaticMenuItem(noFilesText) { IsEnabled = false }
 			};
 
 			// Build new list when the underlying file list changes.
@@ -210,7 +219,7 @@ namespace ShaderEditorApp.ViewModel
 			_subitems = recentFiles.Files.Changed
 				.StartWithDefault()
 				.Select(_ => recentFiles.Files.Any()
-					? recentFiles.Files.Select(file => (object)new CommandMenuItemViewModel(openCommand, file) { Header = file })
+					? recentFiles.Files.Select(file => (object)new RawCommandMenuItem(file, openCommand, file))
 					: emptyMenu)
 				.ToProperty(this, x => x.Items);
 		}
