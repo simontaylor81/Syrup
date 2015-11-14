@@ -16,16 +16,17 @@ using System.Reactive.Linq;
 using ShaderEditorApp.Model;
 using System.Threading.Tasks;
 using ShaderEditorApp.Interfaces;
+using Splat;
 
 namespace ShaderEditorApp.ViewModel
 {
 	// ViewModel for the application workspace, containing documents, docking windows, etc.
 	public class WorkspaceViewModel : ReactiveObject
 	{
-		public WorkspaceViewModel(Workspace workspace, IUserPrompt userPrompt)
+		public WorkspaceViewModel(Workspace workspace, IUserPrompt userPrompt = null)
 		{
 			Workspace = workspace;
-			_userPrompt = userPrompt;
+			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
 			OpenDocumentSet = new OpenDocumentSetViewModel(this);
 
 			// Create menu bar

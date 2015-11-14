@@ -43,7 +43,7 @@ namespace ShaderEditorApp
 
 			// Create workspace and corresponding view model.
 			_workspace = new Workspace(_renderDevice);
-			_workspaceViewModel = new WorkspaceViewModel(_workspace, new WpfUserPrompt());
+			_workspaceViewModel = new WorkspaceViewModel(_workspace);
 
 			// Close ourselves when the Exit command is triggered.
 			_workspaceViewModel.ExitCmd.Subscribe(_ => Close());

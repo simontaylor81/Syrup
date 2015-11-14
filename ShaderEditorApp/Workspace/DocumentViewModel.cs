@@ -13,6 +13,7 @@ using ReactiveUI;
 using ShaderEditorApp.Interfaces;
 using System.Reactive.Linq;
 using System.Diagnostics;
+using Splat;
 
 namespace ShaderEditorApp.ViewModel
 {
@@ -20,7 +21,7 @@ namespace ShaderEditorApp.ViewModel
 	public class DocumentViewModel : ReactiveObject, IDisposable
 	{
 		// Create a new (empty) document.
-		public DocumentViewModel(OpenDocumentSetViewModel openDocumentSet)
+		public DocumentViewModel(OpenDocumentSetViewModel openDocumentSet, IIsForegroundService isForeground = null)
 		{
 			_openDocumentSet = openDocumentSet;
 			Document = new TextDocument();
@@ -28,8 +29,7 @@ namespace ShaderEditorApp.ViewModel
 			// Dirty when document changes.
 			Document.TextChanged += (o, e) => IsDirty = true;
 
-			// TEMP!
-			_isForeground = new Services.WpfIsForegroundService();
+			_isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
 		}
 
 		// Create a document backed by a file.
