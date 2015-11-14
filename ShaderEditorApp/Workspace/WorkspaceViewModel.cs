@@ -74,19 +74,23 @@ namespace ShaderEditorApp.ViewModel
 
 			// Create commands.
 			{
-				var openProjectCommand = ReactiveCommand.Create();
-				openProjectCommand.Subscribe(param =>
-				{
-					if (param is string)
-					{
-						Workspace.OpenProject((string)param);
-					}
-					else
-					{
-						OpenProjectPrompt();
-					}
-				});
-				OpenProject = new CommandViewModel("Open Project", "Project", openProjectCommand);
+				OpenProject = new CommandViewModel("Open Project", "Project", ReactiveCommand.Create());
+				OpenProject.Command.Subscribe(param => OpenProjectPrompt());
+
+				OpenProjectFile = ReactiveCommand.Create();
+				OpenProjectFile.Subscribe(param => Workspace.OpenProject((string)param));
+
+				NewProject = new CommandViewModel("New Project", "Project", ReactiveCommand.Create());
+				NewProject.Command.Subscribe(param => NewProjectImpl());
+
+				OpenDocument = new CommandViewModel("Open Document", "Document", ReactiveCommand.Create());
+				OpenDocument.Command.Subscribe(param => OpenDocumentSet.OpenDocumentPrompt());
+
+				OpenDocumentFile = ReactiveCommand.Create();
+				OpenDocumentFile.Subscribe(param => OpenDocumentSet.OpenDocument((string)param, false));
+
+				NewDocument = new CommandViewModel("New Document", "Document", ReactiveCommand.Create());
+				NewDocument.Command.Subscribe(param => OpenDocumentSet.NewDocument());
 			}
 
 			// Create menu bar
@@ -147,7 +151,7 @@ namespace ShaderEditorApp.ViewModel
 		}
 
 		// Create a new project.
-		private void NewProject()
+		private void NewProjectImpl()
 		{
 			// Don't just create a project without a backing file, prompt the user to create one.
 			var dialog = new SaveFileDialog();
@@ -235,46 +239,23 @@ namespace ShaderEditorApp.ViewModel
 		// Commands that we expose to the view.
 		#region Commands
 
-		// Command to open a project (given a file path prompts the user unless path given).
+		// Command to prompt the user to select a project file to open, then open it.
 		public CommandViewModel OpenProject { get; }
-		private RelayCommand openProjectCmd;
-		public ICommand OpenProjectCmd
-		{
-			get
-			{
-				return RelayCommand.LazyInit(ref openProjectCmd, param =>
-					{
-						if (param is string)
-							Workspace.OpenProject((string)param);
-						else
-							OpenProjectPrompt();
-					});
-			}
-		}
+
+		// Command to open a specific project file, passed as a parameter.
+		public ReactiveCommand<object> OpenProjectFile { get; }
 
 		// Command to create a new project, closing the old one.
-		private RelayCommand newProjectCmd;
-		public ICommand NewProjectCmd => RelayCommand.LazyInit(ref newProjectCmd, param => NewProject());
+		public CommandViewModel NewProject { get; }
 
-		// Command to open a document (shows the open file dialog unless passed a string).
-		private RelayCommand openDocumentCmd;
-		public ICommand OpenDocumentCmd
-		{
-			get
-			{
-				return RelayCommand.LazyInit(ref openDocumentCmd, param =>
-					{
-						if (param is string)
-							OpenDocumentSet.OpenDocument((string)param, false);
-						else
-							OpenDocumentSet.OpenDocumentPrompt();
-					});
-			}
-		}
+		// Command to open a document (shows the open file dialog).
+		public CommandViewModel OpenDocument { get; }
+
+		// Command to open a specific document file, passed as a parameter.
+		public ReactiveCommand<object> OpenDocumentFile { get; }
 
 		// Command to create a new document.
-		private RelayCommand newDocumentCmd;
-		public ICommand NewDocumentCmd => RelayCommand.LazyInit(ref newDocumentCmd, param => OpenDocumentSet.NewDocument());
+		public CommandViewModel NewDocument { get; }
 
 		// Command to close the currently active document.
 		private NamedCommand closeActiveDocumentCmd;

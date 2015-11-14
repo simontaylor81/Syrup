@@ -19,16 +19,16 @@ namespace ShaderEditorApp.ViewModel
 		public string MenuHeader { get; }
 
 		// The command itself.
-		public IReactiveCommand Command { get; }
+		public ReactiveCommand<object> Command { get; }
 
-		public CommandViewModel(string name, IReactiveCommand command)
+		public CommandViewModel(string name, ReactiveCommand<object> command)
 		{
 			Name = name;
 			MenuHeader = name;
 			Command = command;
 		}
 
-		public CommandViewModel(string name, string menuHeader, IReactiveCommand command)
+		public CommandViewModel(string name, string menuHeader, ReactiveCommand<object> command)
 		{
 			Name = name;
 			MenuHeader = menuHeader;

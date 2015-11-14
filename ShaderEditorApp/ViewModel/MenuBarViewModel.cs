@@ -27,13 +27,13 @@ namespace ShaderEditorApp.ViewModel
 				StaticMenuItemViewModel.Create("File",
 					// New submenu
 					StaticMenuItemViewModel.Create("New",
-						new CommandMenuItemViewModel(workspace.NewProjectCmd) { Header = "Project", Shortcut = "Ctrl+Shift+N" },
-						new CommandMenuItemViewModel(workspace.NewDocumentCmd) { Header = "Document", Shortcut = "Ctrl+N" }),
+						new CommandViewModelMenuItemViewModel(workspace.NewProject) { Shortcut = "Ctrl+Shift+N" },
+						new CommandViewModelMenuItemViewModel(workspace.NewDocument) { Shortcut = "Ctrl+N" }),
 
 					// Open submenu
 					StaticMenuItemViewModel.Create("Open",
 						new CommandViewModelMenuItemViewModel(workspace.OpenProject) { Shortcut = "Ctrl+Shift+O" },
-						new CommandMenuItemViewModel(workspace.OpenDocumentCmd) { Header = "Document", Shortcut = "Ctrl+O" }),
+						new CommandViewModelMenuItemViewModel(workspace.OpenDocument) { Shortcut = "Ctrl+O" }),
 
 					new NamedCommandMenuItemViewModel(workspace.SaveActiveDocumentCmd) { Shortcut = "Ctrl+S" },
 					new NamedCommandMenuItemViewModel(workspace.SaveAllCmd) { Shortcut = "Ctrl+Shift+S" },
@@ -44,9 +44,9 @@ namespace ShaderEditorApp.ViewModel
 
 					// Recently opened projects and files sub-menus.
 					new RecentFilesMenuItemViewModel(
-						"Recent Projects", "No Projects", workspace.Workspace.UserSettings.RecentProjects, workspace.OpenProjectCmd),
+						"Recent Projects", "No Projects", workspace.Workspace.UserSettings.RecentProjects, workspace.OpenProjectFile),
 					new RecentFilesMenuItemViewModel(
-						"Recent Files", "No Files", workspace.Workspace.UserSettings.RecentFiles, workspace.OpenDocumentCmd),
+						"Recent Files", "No Files", workspace.Workspace.UserSettings.RecentFiles, workspace.OpenDocumentFile),
 
 					SeparatorViewModel.Instance,
 
