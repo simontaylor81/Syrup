@@ -29,7 +29,7 @@ ri.SetShaderResourceVariable(deferredPS, "GBuffer_Depth", ri.DepthBuffer)
 def InvSqrRadius(radius):
 	r = max(0.0001, radius)
 	return 1.0 / (r*r)
-lkewmfle
+
 showlights = ri.AddUserVar_Bool("Show lights?", False)
 
 
