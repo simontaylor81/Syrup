@@ -47,18 +47,6 @@
 
     </Window.Resources>
 
-    <!-- Keyboard shortcuts. TODO: these should be configurable somehow. -->
-    <Window.InputBindings>
-        <KeyBinding Key="F5" Command="{Binding RunActiveScriptCmd}"/>
-        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenDocumentCmd}"/>
-        <KeyBinding Key="O" Modifiers="Control+Shift" Command="{Binding OpenProjectCmd}"/>
-        <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewDocumentCmd}"/>
-        <KeyBinding Key="N" Modifiers="Control+Shift" Command="{Binding NewProjectCmd}"/>
-        <KeyBinding Key="F4" Modifiers="Control" Command="{Binding CloseActiveDocumentCmd}"/>
-        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveActiveDocumentCmd}"/>
-        <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAllCmd}"/>
-    </Window.InputBindings>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

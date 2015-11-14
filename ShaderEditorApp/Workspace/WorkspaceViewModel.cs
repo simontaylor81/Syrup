@@ -120,6 +120,12 @@ namespace ShaderEditorApp.ViewModel
 
 				Exit = new CommandViewModel("Exit", ReactiveCommand.Create(),
 					keyGesture: new KeyGesture(Key.F4, ModifierKeys.Alt));
+
+				// Add commands with a key binding to the big list. Don't include Exit -- it's binding is part of Windows.
+				KeyBoundCommands = new[]
+				{
+					OpenProject, NewProject, OpenDocument, NewDocument, CloseActiveDocument, SaveActiveDocument, SaveAll, RunActiveScript,
+				};
 			}
 
 			// Create menu bar
@@ -267,6 +273,9 @@ namespace ShaderEditorApp.ViewModel
 
 		// Commands that we expose to the view.
 		#region Commands
+
+		// List of all command with a key binding.
+		public IEnumerable<CommandViewModel> KeyBoundCommands { get; }
 
 		// Command to prompt the user to select a project file to open, then open it.
 		public CommandViewModel OpenProject { get; }

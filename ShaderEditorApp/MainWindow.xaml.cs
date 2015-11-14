@@ -5,11 +5,13 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using ReactiveUI;
 using ShaderEditorApp.Model;
 using ShaderEditorApp.Services;
 using ShaderEditorApp.View;
@@ -55,10 +57,15 @@ namespace ShaderEditorApp
 			OutputLogger.Instance.AddTarget(outputWindow);
 
 			DataContext = _workspaceViewModel;
-
 			viewportFrame.DataContext = renderWindow.ViewportViewModel;
 
 			CompositionTarget.Rendering += CompositionTarget_Rendering;
+
+			// Hook up key bindings (can't be data-bound unfortunately).
+			foreach (var cmd in _workspaceViewModel.KeyBoundCommands)
+			{
+				InputBindings.Add(new KeyBinding(cmd.Command, cmd.KeyGesture));
+			}
 
 			// Set up syntax highlighting for the editor control.
 			LoadSyntaxHighlightingDefinition("Python");
