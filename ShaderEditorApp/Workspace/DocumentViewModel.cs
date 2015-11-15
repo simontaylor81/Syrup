@@ -29,6 +29,10 @@ namespace ShaderEditorApp.ViewModel
 			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
 			_isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
 
+			// Update display name based on filename and dirtiness.
+			this.WhenAnyValue(x => x.FilePath, x => x.IsDirty, (filename, isDirty) => GetDisplayName(filename, isDirty))
+				.ToProperty(this, x => x.DisplayName, out _displayName);
+
 			// Set syntax highlighting definition to use based on extension.
 			_syntaxHighlighting = this.WhenAnyValue(x => x.FilePath)
 				.Select(path => path != null
@@ -155,43 +159,37 @@ namespace ShaderEditorApp.ViewModel
 			}
 		}
 
-		// Name of the file.
-		public string DisplayName
-		{
-			get
-			{
-				var result = Path.GetFileName(FilePath);
-
-				// Add asterisk to dirty files.
-				if (IsDirty)
-					result += "*";
-
-				return result;
-			}
-		}
+		// Name to display on the document tab.
+		private ObservableAsPropertyHelper<string> _displayName;
+		public string DisplayName => _displayName.Value;
 		
 		// Path of the document on disk.
 		private string _filePath;
 		public string FilePath
 		{
 			get { return _filePath; }
-			private set
-			{
-				if (value != _filePath)
-				{
-					_filePath = value;
-
-					this.RaisePropertyChanged();
-					this.RaisePropertyChanged(nameof(DisplayName));
-				}
-			}
+			private set { this.RaiseAndSetIfChanged(ref _filePath, value); }
 		}
 
-		private FileSystemWatcher CreateWatcher(string filename)
+		// Construct the name to display on the document tab.
+		private static string GetDisplayName(string filename, bool isDirty)
+		{
+			var result = !string.IsNullOrEmpty(filename) ? Path.GetFileName(filename) : "New file";
+
+			// Add asterisk to dirty files.
+			if (isDirty)
+			{
+				result += "*";
+			}
+
+			return result;
+		}
+
+		private static FileSystemWatcher CreateWatcher(string filename)
 		{
 			if (!string.IsNullOrEmpty(filename))
 			{
-				var watcher = new FileSystemWatcher(Path.GetDirectoryName(_filePath), Path.GetFileName(_filePath));
+				var watcher = new FileSystemWatcher(Path.GetDirectoryName(filename), Path.GetFileName(filename));
 				watcher.NotifyFilter = NotifyFilters.LastWrite;
 				watcher.IncludeSubdirectories = false;
 				watcher.EnableRaisingEvents = true;
@@ -232,19 +230,11 @@ namespace ShaderEditorApp.ViewModel
 		// AvalonEdit document object.
 		public TextDocument Document { get; }
 
-		private bool bDirty_ = false;
+		private bool _bDirty = false;
 		public bool IsDirty
 		{
-			get { return bDirty_; }
-			private set
-			{
-				if (value != bDirty_)
-				{
-					bDirty_ = value;
-					this.RaisePropertyChanged();
-					this.RaisePropertyChanged(nameof(DisplayName));
-				}
-			}
+			get { return _bDirty; }
+			private set { this.RaiseAndSetIfChanged(ref _bDirty, value); }
 		}
 
 		public bool IsScript => Path.GetExtension(FilePath).ToLowerInvariant() == ".py";
