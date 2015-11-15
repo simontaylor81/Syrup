@@ -35,6 +35,36 @@ namespace ShaderEditorApp.ViewModel
 					? HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(path))
 					: null)
 				.ToProperty(this, x => x.SyntaxHighlighting);
+
+			// Create modified notification command.
+			NotifyModified = ReactiveCommand.CreateAsyncTask(async _ =>
+			{
+				// Wait until the app is foreground, dispatch back to main thread.
+				await _isForeground.WhenAnyValue(x => x.IsAppForeground)
+					.StartWith(_isForeground.IsAppForeground)
+					.Where(x => x == true)
+					.ObserveOn(RxApp.MainThreadScheduler)
+					.FirstAsync();
+
+				// We should be now foreground and on the main thread, so we can post the notification.
+				await ShowChangeNotification();
+
+				return Unit.Default;
+			});
+
+			NotifyModified.ThrownExceptions.Subscribe(ex =>
+			{
+				// Catch exceptions. Should not happen.
+				Debug.WriteLine("Exception thrown during file change notification.");
+				Debug.WriteLine(ex);
+			});
+
+			// Notify the user when the file changes.
+			this.WhenAny(x => x.Watcher, x => GetWatcherChanged(x.Value))
+				.Switch()
+				.Where(_ => NotifyModified.CanExecute(null))
+				.SelectMany(_ => NotifyModified.ExecuteAsync())
+				.Subscribe();
 		}
 
 		// Create a document backed by a file.
@@ -65,7 +95,7 @@ namespace ShaderEditorApp.ViewModel
 			if (!string.IsNullOrEmpty(FilePath))
 			{
 				// Disable file change notifications -- don't want to reload if we saved it ourselves!
-				_watcher.EnableRaisingEvents = false;
+				Watcher.EnableRaisingEvents = false;
 
 				// Write contents of file to disk.
 				// TODO: Async?
@@ -77,7 +107,7 @@ namespace ShaderEditorApp.ViewModel
 				_openDocumentSet.WorkspaceVM.Workspace.UserSettings.Save();
 
 				// Re-enable the watcher.
-				_watcher.EnableRaisingEvents = true;
+				Watcher.EnableRaisingEvents = true;
 				return true;
 			}
 			else
@@ -111,7 +141,6 @@ namespace ShaderEditorApp.ViewModel
 		{
 			if (_watcher != null)
 			{
-				_watcherSubscription.Dispose();
 				_watcher.Dispose();
 				_watcher = null;
 			}
@@ -144,17 +173,16 @@ namespace ShaderEditorApp.ViewModel
 					_filePath = value;
 
 					// (Re-)create the file watcher.
-					if (_watcher != null)
+					if (Watcher != null)
 					{
-						_watcherSubscription.Dispose();
-						_watcher.Dispose();
+						Watcher.Dispose();
 					}
 
-					_watcher = new FileSystemWatcher(Path.GetDirectoryName(_filePath), Path.GetFileName(_filePath));
-					_watcher.NotifyFilter = NotifyFilters.LastWrite;
-					_watcher.IncludeSubdirectories = false;
-					SubscribeToWatcher();
-					_watcher.EnableRaisingEvents = true;
+					var watcher = new FileSystemWatcher(Path.GetDirectoryName(_filePath), Path.GetFileName(_filePath));
+					watcher.NotifyFilter = NotifyFilters.LastWrite;
+					watcher.IncludeSubdirectories = false;
+					watcher.EnableRaisingEvents = true;
+					Watcher = watcher;
 
 					this.RaisePropertyChanged();
 					this.RaisePropertyChanged(nameof(DisplayName));
@@ -162,40 +190,14 @@ namespace ShaderEditorApp.ViewModel
 			}
 		}
 
-		private void SubscribeToWatcher()
+		private IObservable<EventPattern<FileSystemEventArgs>> GetWatcherChanged(FileSystemWatcher watcher)
 		{
-			// Convert notifications to observable.
-			var fileChanged = Observable.FromEventPattern(_watcher, nameof(_watcher.Changed));
-
-			_watcherSubscription = fileChanged
-				// FileSystemWatcher can send multiple events for the same conceptual operation,
-				// so we disable notifications whilst we're already showing one.
-				// I'm sure there's a more elegant way of doing this in Rx, but this does the job.
-				.Where(_ => !_disableModificationNotifications)
-				.Do(_ => _disableModificationNotifications = true)
-				// Each time we get a changed, wait until the app is foreground,
-				// dispatch back to main thread.
-				.SelectMany(_ => _isForeground.WhenAnyValue(x => x.IsAppForeground)
-					.StartWith(_isForeground.IsAppForeground)
-					.Where(x => x == true)
-					.ObserveOn(RxApp.MainThreadScheduler)
-					.FirstAsync())
-				// User SelectMany as a kind of 'SubscribeAsync'.
-				.SelectMany(async _ =>
-				{
-					// We should be now foreground and on the main thread, so we can post the notification.
-					await ShowChangeNotification();
-
-					// Re-enable notifications now that we're done.
-					_disableModificationNotifications = false;
-					return Unit.Default;
-				})
-				.Subscribe(_ => { }, ex =>
-				{
-					// Catch exceptions. Should not happen.
-					Debug.WriteLine("Exception thrown during file change notification.");
-					Debug.WriteLine(ex);
-				});
+			if (watcher != null)
+			{
+				return Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
+					x => watcher.Changed += x, x => watcher.Changed -= x);
+			}
+			return Observable.Never<EventPattern<FileSystemEventArgs>>();
 		}
 
 		// Show a notification to the user that the file has changed.
@@ -256,17 +258,19 @@ namespace ShaderEditorApp.ViewModel
 
 		// Watcher to look for external modifications.
 		private FileSystemWatcher _watcher;
-
-		// Subscription to watcher event.
-		private IDisposable _watcherSubscription;
-
-		// Switch to disable watcher notifications whilst we're displaying the message box.
-		private bool _disableModificationNotifications = false;
+		private FileSystemWatcher Watcher
+		{
+			get { return _watcher; }
+			set { this.RaiseAndSetIfChanged(ref _watcher, value); }
+		}
 
 		private readonly IIsForegroundService _isForeground;
 		private readonly IUserPrompt _userPrompt;
 
 		// Command to close this document.
 		public ReactiveCommand<object> Close { get; }
+
+		// Command to notify the user about the document being externally modified.
+		private ReactiveCommand<Unit> NotifyModified { get; }
 	}
 }
