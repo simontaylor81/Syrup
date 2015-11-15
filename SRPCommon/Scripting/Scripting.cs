@@ -65,7 +65,17 @@ namespace SRPCommon.Scripting
 
 		private ScriptEngine CreatePythonEngine()
 		{
-			var runtimeSetup = Python.CreateRuntimeSetup(null);
+			var options = new Dictionary<string, object>
+			{
+				// Disable assembly loading hook. We don't need it, and it causes lots of
+				// spurious exception thrown messages in the debug out when trying to load assemblies using
+				// our 'project:' path prefix (assembly loading doesn't go through the PAL).
+				// (Note that the exceptions are a problem as such, they just clutter up the log, hiding
+				// important messages).
+				{ "NoAssemblyResolveHook", true },
+			};
+
+			var runtimeSetup = Python.CreateRuntimeSetup(options);
 			runtimeSetup.HostType = typeof(SRPScriptHost);
 			runtimeSetup.HostArguments = new[] { _pal };
 			var runtime = new ScriptRuntime(runtimeSetup);
