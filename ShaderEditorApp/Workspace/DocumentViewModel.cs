@@ -152,11 +152,7 @@ namespace ShaderEditorApp.ViewModel
 
 		public void Dispose()
 		{
-			if (_watcher != null)
-			{
-				_watcher.Dispose();
-				_watcher = null;
-			}
+			Watcher?.Dispose();
 		}
 
 		// Name to display on the document tab.
