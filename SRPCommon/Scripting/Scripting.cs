@@ -99,13 +99,10 @@ namespace SRPCommon.Scripting
 
 				_preExecute.OnNext(script);
 
-				// Get code to execute.
-				var code = await script.GetCodeAsync();
-
 				// Execute script on thread pool.
 				bool bSuccess = await Task.Run(() =>
 					{
-						var source = pythonEngine.CreateScriptSourceFromString(code, SourceCodeKind.Statements);
+						var source = pythonEngine.CreateScriptSourceFromFile(script.Filename);
 						return RunSource(source);
 					});
 
