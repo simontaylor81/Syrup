@@ -59,6 +59,15 @@ namespace ShaderEditorApp.ViewModel
 				Debug.WriteLine(ex);
 			});
 
+			// Create a new watcher when the filename changes.
+			this.WhenAnyValue(x => x.FilePath)
+				.Select(f => CreateWatcher(f))
+				.ToProperty(this, x => x.Watcher, out _watcher);
+
+			// Dispose previous watcher when setting a new one.
+			this.ObservableForProperty(x => x.Watcher, beforeChange: true)
+				.Subscribe(change => change.GetValue()?.Dispose());
+
 			// Notify the user when the file changes.
 			this.WhenAny(x => x.Watcher, x => GetWatcherChanged(x.Value))
 				.Switch()
@@ -172,22 +181,23 @@ namespace ShaderEditorApp.ViewModel
 				{
 					_filePath = value;
 
-					// (Re-)create the file watcher.
-					if (Watcher != null)
-					{
-						Watcher.Dispose();
-					}
-
-					var watcher = new FileSystemWatcher(Path.GetDirectoryName(_filePath), Path.GetFileName(_filePath));
-					watcher.NotifyFilter = NotifyFilters.LastWrite;
-					watcher.IncludeSubdirectories = false;
-					watcher.EnableRaisingEvents = true;
-					Watcher = watcher;
-
 					this.RaisePropertyChanged();
 					this.RaisePropertyChanged(nameof(DisplayName));
 				}
 			}
+		}
+
+		private FileSystemWatcher CreateWatcher(string filename)
+		{
+			if (!string.IsNullOrEmpty(filename))
+			{
+				var watcher = new FileSystemWatcher(Path.GetDirectoryName(_filePath), Path.GetFileName(_filePath));
+				watcher.NotifyFilter = NotifyFilters.LastWrite;
+				watcher.IncludeSubdirectories = false;
+				watcher.EnableRaisingEvents = true;
+				return watcher;
+			}
+			return null;
 		}
 
 		private IObservable<EventPattern<FileSystemEventArgs>> GetWatcherChanged(FileSystemWatcher watcher)
@@ -257,12 +267,8 @@ namespace ShaderEditorApp.ViewModel
 		private readonly OpenDocumentSetViewModel _openDocumentSet;
 
 		// Watcher to look for external modifications.
-		private FileSystemWatcher _watcher;
-		private FileSystemWatcher Watcher
-		{
-			get { return _watcher; }
-			set { this.RaiseAndSetIfChanged(ref _watcher, value); }
-		}
+		private ObservableAsPropertyHelper<FileSystemWatcher> _watcher;
+		private FileSystemWatcher Watcher => _watcher.Value;
 
 		private readonly IIsForegroundService _isForeground;
 		private readonly IUserPrompt _userPrompt;
