@@ -31,8 +31,13 @@ namespace ShaderEditorApp.Model
 			RunScript = ReactiveCommand.CreateAsyncTask(param => RunScriptImpl_DoNotCallDirectly((Script)param));
 
 			// Use CacheLatest so any subscriber will always get the most recent value.
-			CanRunScript = RunScript.CanExecuteObservable.CacheLatest(true);
-			IsScriptRunning = RunScript.IsExecuting.CacheLatest(false);
+			var canRunScript = RunScript.CanExecuteObservable.CacheLatest(true);
+			canRunScript.Connect();
+			CanRunScript = canRunScript;
+
+			var isScriptRunning = RunScript.IsExecuting.CacheLatest(false);
+			isScriptRunning.Connect();
+			IsScriptRunning = isScriptRunning;
 		}
 
 		public void Dispose()
