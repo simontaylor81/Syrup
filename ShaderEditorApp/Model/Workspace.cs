@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 
 namespace ShaderEditorApp.Model
 {
@@ -25,6 +26,13 @@ namespace ShaderEditorApp.Model
 			Renderer = new SyrupRenderer(this, device, scripting);
 			scripting.RenderInterface = Renderer.ScriptInterface;
 			Renderer.RedrawRequired.Subscribe(_redrawRequired);
+
+			// Create script execution commands.
+			RunScript = ReactiveCommand.CreateAsyncTask(param => RunScriptImpl_DoNotCallDirectly((Script)param));
+
+			// Use CacheLatest so any subscriber will always get the most recent value.
+			CanRunScript = RunScript.CanExecuteObservable.CacheLatest(true);
+			IsScriptRunning = RunScript.IsExecuting.CacheLatest(false);
 		}
 
 		public void Dispose()
@@ -52,11 +60,10 @@ namespace ShaderEditorApp.Model
 			UserSettings.Save();
 		}
 
-		// TODO: Fix async void nastiness.
-		internal async void RunScriptFile(string path)
+		public Task RunScriptFile(string path)
 		{
 			var script = _scripts.GetOrAdd(path, () => new Script(path));
-			await RunScript(script);
+			return RunScript.ExecuteAsyncTask(script);
 		}
 
 		// Re-run the script that was last run (if there was one).
@@ -64,11 +71,12 @@ namespace ShaderEditorApp.Model
 		{
 			if (_lastRunScript != null)
 			{
-				await RunScript(_lastRunScript);
+				await RunScript.ExecuteAsyncTask(_lastRunScript);
 			}
 		}
 
-		private async Task RunScript(Script script)
+		// Actually execute a script. Do not call this directly, use the RunScript command.
+		private async Task RunScriptImpl_DoNotCallDirectly(Script script)
 		{
 			_lastRunScript = script;
 
@@ -140,6 +148,7 @@ namespace ShaderEditorApp.Model
 					// Run startup scripts.
 					foreach (var script in value.StartupScripts)
 					{
+						// TODO: This is really bad, as you could have multiple scripts executing simultaneously!
 						RunScriptFile(script);
 					}
 
@@ -160,6 +169,15 @@ namespace ShaderEditorApp.Model
 		}
 
 		public UserSettings UserSettings { get; } = new UserSettings();
+
+		// Script execution command.
+		// We use ReactiveCommand instead of just an async function as it tracks
+		// when it's executing for us. Could do it by hand, but why bother?
+		private ReactiveCommand<Unit> RunScript { get; }
+
+		// Observables that indicate the state of script execution.
+		public IObservable<bool> CanRunScript { get; }
+		public IObservable<bool> IsScriptRunning { get; }
 
 		private IDisposable sceneChangeSubscription;
 

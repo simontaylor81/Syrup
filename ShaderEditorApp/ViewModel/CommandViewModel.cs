@@ -21,7 +21,7 @@ namespace ShaderEditorApp.ViewModel
 		public string MenuHeader { get; }
 
 		// The command itself.
-		public ReactiveCommand<object> Command { get; }
+		public IReactiveCommand Command { get; }
 
 		// Keyboard gesture.
 		public KeyGesture KeyGesture { get; }
@@ -29,7 +29,7 @@ namespace ShaderEditorApp.ViewModel
 		// Textual representation of the key gesture.
 		public string KeyGestureString => KeyGesture?.GetDisplayStringForCulture(CultureInfo.CurrentCulture);
 
-		public CommandViewModel(string name, ReactiveCommand<object> command, string menuHeader = null, KeyGesture keyGesture = null)
+		public CommandViewModel(string name, IReactiveCommand command, string menuHeader = null, KeyGesture keyGesture = null)
 		{
 			Name = name;
 			Command = command;

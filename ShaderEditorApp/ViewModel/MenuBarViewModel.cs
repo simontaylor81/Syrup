@@ -41,7 +41,7 @@ namespace ShaderEditorApp.ViewModel
 
 					SeparatorViewModel.Instance,
 
-					new CommandMenuItem(workspace.Exit)
+					new CommandMenuItem(workspace.ExitCommand)
 				),
 
 				// Edit menu

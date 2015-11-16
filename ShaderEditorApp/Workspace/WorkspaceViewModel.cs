@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
-using ShaderEditorApp.MVVMUtil;
 using ShaderEditorApp.View;
 using SRPCommon.UserProperties;
 using SRPCommon.Util;
@@ -72,53 +71,80 @@ namespace ShaderEditorApp.ViewModel
 				.Select(scene => scene != null ? new SceneViewModel(scene) : null)
 				.ToProperty(this, x => x.SceneViewModel);
 
+			// Status bar text, for now, prints whether the script is running.
+			Workspace.IsScriptRunning
+				.Select(isRunning => isRunning ? "Running script..." : "")
+				.ToProperty(this, x => x.StatusBarText, out _statusBarText);
+
 			// Create commands.
 			{
-				OpenProject = new CommandViewModel("Open Project", ReactiveCommand.Create(), menuHeader: "_Project",
+				OpenProject = new CommandViewModel(
+					"Open Project",
+					CommandUtil.Create(param => OpenProjectPrompt()),
+					menuHeader: "_Project",
 					keyGesture: new KeyGesture(Key.O, ModifierKeys.Control | ModifierKeys.Shift));
-				OpenProject.Command.Subscribe(param => OpenProjectPrompt());
 
 				OpenProjectFile = ReactiveCommand.Create();
 				OpenProjectFile.Subscribe(param => Workspace.OpenProject((string)param));
 
-				NewProject = new CommandViewModel("New Project", ReactiveCommand.Create(), menuHeader: "_Project",
+				NewProject = new CommandViewModel(
+					"New Project",
+					CommandUtil.Create(param => NewProjectImpl()),
+					menuHeader: "_Project",
 					keyGesture: new KeyGesture(Key.N, ModifierKeys.Control | ModifierKeys.Shift));
-				NewProject.Command.Subscribe(param => NewProjectImpl());
 
-				OpenDocument = new CommandViewModel("Open Document", ReactiveCommand.Create(), menuHeader: "_Document",
+				OpenDocument = new CommandViewModel(
+					"Open Document",
+					CommandUtil.Create(param => OpenDocumentSet.OpenDocumentPrompt()),
+					menuHeader: "_Document",
 					keyGesture: new KeyGesture(Key.O, ModifierKeys.Control));
-				OpenDocument.Command.Subscribe(param => OpenDocumentSet.OpenDocumentPrompt());
 
 				OpenDocumentFile = ReactiveCommand.Create();
 				OpenDocumentFile.Subscribe(param => OpenDocumentSet.OpenDocument((string)param, false));
 
-				NewDocument = new CommandViewModel("New Document", ReactiveCommand.Create(), menuHeader: "_Document",
+				NewDocument = new CommandViewModel(
+					"New Document",
+					CommandUtil.Create(param => OpenDocumentSet.NewDocument()),
+					menuHeader: "_Document",
 					keyGesture: new KeyGesture(Key.N, ModifierKeys.Control));
-				NewDocument.Command.Subscribe(param => OpenDocumentSet.NewDocument());
 
 				var hasActiveDocument = this.WhenAnyValue(x => x.OpenDocumentSet.ActiveDocument)
 					.Select(doc => doc != null);
 
-				CloseActiveDocument = new CommandViewModel("Close", ReactiveCommand.Create(hasActiveDocument), menuHeader: "_Close",
+				CloseActiveDocument = new CommandViewModel(
+					"Close",
+					CommandUtil.Create(param => OpenDocumentSet.CloseDocument(OpenDocumentSet.ActiveDocument), hasActiveDocument),
+					menuHeader: "_Close",
 					keyGesture: new KeyGesture(Key.F4, ModifierKeys.Control));
-				CloseActiveDocument.Command.Subscribe(param => OpenDocumentSet.CloseDocument(OpenDocumentSet.ActiveDocument));
 
-				SaveActiveDocument = new CommandViewModel("Save", ReactiveCommand.Create(hasActiveDocument), menuHeader: "_Save",
+				SaveActiveDocument = new CommandViewModel(
+					"Save",
+					CommandUtil.Create(param => OpenDocumentSet.ActiveDocument.Save(), hasActiveDocument),
+					menuHeader: "_Save",
 					keyGesture: new KeyGesture(Key.S, ModifierKeys.Control));
-				SaveActiveDocument.Command.Subscribe(param => OpenDocumentSet.ActiveDocument.Save());
 
-				SaveActiveDocumentAs = new CommandViewModel("Save As", ReactiveCommand.Create(hasActiveDocument), menuHeader: "Save _As");
-				SaveActiveDocumentAs.Command.Subscribe(param => OpenDocumentSet.ActiveDocument.SaveAs());
+				SaveActiveDocumentAs = new CommandViewModel(
+					"Save As",
+					CommandUtil.Create(param => OpenDocumentSet.ActiveDocument.SaveAs(), hasActiveDocument),
+					menuHeader: "Save _As");
 
-				SaveAll = new CommandViewModel("Save All", ReactiveCommand.Create(), menuHeader: "Save A_ll",
+				SaveAll = new CommandViewModel(
+					"Save All",
+					CommandUtil.Create(param => SaveAllDirty()),
+					menuHeader: "Save A_ll",
 					keyGesture: new KeyGesture(Key.S, ModifierKeys.Control | ModifierKeys.Shift));
-				SaveAll.Command.Subscribe(param => SaveAllDirty());
 
-				RunActiveScript = new CommandViewModel("Run Current Script", ReactiveCommand.Create(), menuHeader: "_Run",
+				RunActiveScript = new CommandViewModel(
+					"Run Current Script",
+					ReactiveCommand.CreateAsyncTask(Workspace.CanRunScript, _ => RunActiveScriptImpl()),
+					menuHeader: "_Run",
 					keyGesture: new KeyGesture(Key.F5));
-				RunActiveScript.Command.Subscribe(param => RunActiveScriptImpl());
 
-				Exit = new CommandViewModel("Exit", ReactiveCommand.Create(), menuHeader: "E_xit",
+				Exit = ReactiveCommand.Create();
+				ExitCommand = new CommandViewModel(
+					"Exit",
+					Exit,
+					menuHeader: "E_xit",
 					keyGesture: new KeyGesture(Key.F4, ModifierKeys.Alt));
 
 				// Add commands with a key binding to the big list. Don't include Exit -- it's binding is part of Windows.
@@ -205,8 +231,7 @@ namespace ShaderEditorApp.ViewModel
 			}
 		}
 
-		// TODO: Fix async void nastiness.
-		private async void RunActiveScriptImpl()
+		private async Task RunActiveScriptImpl()
 		{
 			// Save all so we running the latest contents.
 			if (!SaveAllDirty())
@@ -217,7 +242,7 @@ namespace ShaderEditorApp.ViewModel
 
 			if (OpenDocumentSet.ActiveDocument != null && OpenDocumentSet.ActiveDocument.IsScript)
 			{
-				Workspace.RunScriptFile(OpenDocumentSet.ActiveDocument.FilePath);
+				await Workspace.RunScriptFile(OpenDocumentSet.ActiveDocument.FilePath);
 			}
 			else
 			{
@@ -258,6 +283,9 @@ namespace ShaderEditorApp.ViewModel
 
 		private ObservableAsPropertyHelper<IEnumerable<PropertyViewModel>> _properties;
 		public IEnumerable<PropertyViewModel> Properties => _properties.Value;
+
+		private ObservableAsPropertyHelper<string> _statusBarText;
+		public string StatusBarText => _statusBarText.Value;
 
 		public Workspace Workspace { get; }
 		public OpenDocumentSetViewModel OpenDocumentSet { get; }
@@ -312,7 +340,8 @@ namespace ShaderEditorApp.ViewModel
 
 		// Command to exit the application.
 		// Command actually does nothing. It's up to the view to subscribe to it and do the actual exiting.
-		public CommandViewModel Exit { get; }
+		public ReactiveCommand<object> Exit { get; }
+		public CommandViewModel ExitCommand { get; }
 
 		#endregion
 	}

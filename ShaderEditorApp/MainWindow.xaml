@@ -146,7 +146,7 @@
         </avalondock:DockingManager>
 
         <StatusBar Grid.Row="2">
-            <StatusBarItem Content="Shader Prototyping Tool"/>
+            <StatusBarItem Content="{Binding StatusBarText}"/>
         </StatusBar>
     </Grid>
 </Window>
