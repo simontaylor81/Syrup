@@ -1,18 +1,17 @@
-﻿using ReactiveUI;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using ReactiveUI;
 using ShaderEditorApp.Projects;
 using SRPCommon.Interfaces;
 using SRPCommon.Scene;
 using SRPCommon.Scripting;
 using SRPCommon.Util;
 using SRPRendering;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Subjects;
-using System.Threading.Tasks;
-using System.Reactive.Linq;
 
 namespace ShaderEditorApp.Model
 {
@@ -25,7 +24,6 @@ namespace ShaderEditorApp.Model
 			scripting = new Scripting(this);
 			Renderer = new SyrupRenderer(this, device, scripting);
 			scripting.RenderInterface = Renderer.ScriptInterface;
-			Renderer.RedrawRequired.Subscribe(_redrawRequired);
 
 			// Create script execution commands.
 			RunScript = ReactiveCommand.CreateAsyncTask(param => RunScriptImpl_DoNotCallDirectly((Script)param));
@@ -38,6 +36,15 @@ namespace ShaderEditorApp.Model
 			var isScriptRunning = RunScript.IsExecuting.CacheLatest(false);
 			isScriptRunning.Connect();
 			IsScriptRunning = isScriptRunning;
+
+			// Redraw is required when we run a script, the scene changes, or the renderer says so.
+			var sceneChanged = this.WhenAnyValue(x => x.CurrentScene)
+				.Select(scene => scene != null ? scene.OnChanged : Observable.Empty<Unit>())
+				.Switch();
+			RedrawRequired = Observable.Merge(
+				RunScript,
+				sceneChanged,
+				Renderer.RedrawRequired);
 		}
 
 		public void Dispose()
@@ -81,14 +88,12 @@ namespace ShaderEditorApp.Model
 		}
 
 		// Actually execute a script. Do not call this directly, use the RunScript command.
-		private async Task RunScriptImpl_DoNotCallDirectly(Script script)
+		private Task RunScriptImpl_DoNotCallDirectly(Script script)
 		{
 			_lastRunScript = script;
 
 			// Asynchronously execute the script.
-			await scripting.RunScript(script);
-
-			_redrawRequired.OnNext(Unit.Default);
+			return scripting.RunScript(script);
 		}
 
 		// Do we have a scene loaded currently?
@@ -103,20 +108,8 @@ namespace ShaderEditorApp.Model
 			{
 				CurrentScene = newScene;
 				Renderer.Scene = CurrentScene;
-
-				// Unsubscribe from previous scene.
-				if (sceneChangeSubscription != null)
-				{
-					sceneChangeSubscription.Dispose();
-				}
-
-				// Redraw the scene when the scene changes.
-				sceneChangeSubscription = CurrentScene.OnChanged.Subscribe(_redrawRequired);
 			}
 		}
-
-		private Subject<Unit> _redrawRequired = new Subject<Unit>();
-		public IObservable<Unit> RedrawRequired => _redrawRequired;
 
 		public string FindProjectFile(string name)
 		{
@@ -184,7 +177,8 @@ namespace ShaderEditorApp.Model
 		public IObservable<bool> CanRunScript { get; }
 		public IObservable<bool> IsScriptRunning { get; }
 
-		private IDisposable sceneChangeSubscription;
+		// Observable that fires when the viewport should be redrawn.
+		public IObservable<Unit> RedrawRequired { get; }
 
 		// Previously run scripts.
 		private readonly Dictionary<string, Script> _scripts = new Dictionary<string, Script>();
