@@ -26,14 +26,14 @@ namespace ShaderEditorApp.Model
 			scripting.RenderInterface = Renderer.ScriptInterface;
 
 			// Create script execution commands.
-			RunScript = ReactiveCommand.CreateAsyncTask(param => RunScriptImpl_DoNotCallDirectly((Script)param));
+			RunScripts = ReactiveCommand.CreateAsyncTask(param => RunScriptImpl_DoNotCallDirectly((IEnumerable<Script>)param));
 
 			// Use CacheLatest so any subscriber will always get the most recent value.
-			var canRunScript = RunScript.CanExecuteObservable.CacheLatest(true);
+			var canRunScript = RunScripts.CanExecuteObservable.CacheLatest(true);
 			canRunScript.Connect();
 			CanRunScript = canRunScript;
 
-			var isScriptRunning = RunScript.IsExecuting.CacheLatest(false);
+			var isScriptRunning = RunScripts.IsExecuting.CacheLatest(false);
 			isScriptRunning.Connect();
 			IsScriptRunning = isScriptRunning;
 
@@ -42,7 +42,7 @@ namespace ShaderEditorApp.Model
 				.Select(scene => scene != null ? scene.OnChanged : Observable.Empty<Unit>())
 				.Switch();
 			RedrawRequired = Observable.Merge(
-				RunScript,
+				RunScripts,
 				sceneChanged,
 				Renderer.RedrawRequired);
 		}
@@ -72,10 +72,11 @@ namespace ShaderEditorApp.Model
 			UserSettings.Save();
 		}
 
+		// Run a single script file.
 		public Task RunScriptFile(string path)
 		{
 			var script = _scripts.GetOrAdd(path, () => new Script(path));
-			return RunScript.ExecuteAsyncTask(script);
+			return RunScripts.ExecuteAsyncTask(new[] { script });
 		}
 
 		// Re-run the script that was last run (if there was one).
@@ -83,17 +84,20 @@ namespace ShaderEditorApp.Model
 		{
 			if (_lastRunScript != null)
 			{
-				await RunScript.ExecuteAsyncTask(_lastRunScript);
+				await RunScripts.ExecuteAsyncTask(new[] { _lastRunScript });
 			}
 		}
 
-		// Actually execute a script. Do not call this directly, use the RunScript command.
-		private Task RunScriptImpl_DoNotCallDirectly(Script script)
+		// Actually execute one or more scripts. Do not call this directly, use the RunScript command.
+		private async Task RunScriptImpl_DoNotCallDirectly(IEnumerable<Script> scripts)
 		{
-			_lastRunScript = script;
+			foreach (var script in scripts)
+			{
+				_lastRunScript = script;
 
-			// Asynchronously execute the script.
-			return scripting.RunScript(script);
+				// Asynchronously execute the script.
+				await scripting.RunScript(script);
+			}
 		}
 
 		// Do we have a scene loaded currently?
@@ -143,6 +147,15 @@ namespace ShaderEditorApp.Model
 						SetCurrentScene(Project.DefaultScene.AbsolutePath);
 					}
 
+					// Get or add script objects for each startup script file.
+					var startupScripts = value.StartupScripts.Select(path => _scripts.GetOrAdd(path, () => new Script(path)));
+
+					// Run all startup scripts in a oner.
+					// We handle this together so that the async command runs only once,
+					// avoiding potential race conditions where another script could run inbetween two executions.
+					// This is fire-and-forget. Errors are handled by the usual script execution path.
+					RunScripts.ExecuteAsync(startupScripts);
+
 					// Run startup scripts.
 					foreach (var script in value.StartupScripts)
 					{
@@ -171,7 +184,7 @@ namespace ShaderEditorApp.Model
 		// Script execution command.
 		// We use ReactiveCommand instead of just an async function as it tracks
 		// when it's executing for us. Could do it by hand, but why bother?
-		private ReactiveCommand<Unit> RunScript { get; }
+		private ReactiveCommand<Unit> RunScripts { get; }
 
 		// Observables that indicate the state of script execution.
 		public IObservable<bool> CanRunScript { get; }
