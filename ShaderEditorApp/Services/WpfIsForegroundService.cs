@@ -19,17 +19,11 @@ namespace ShaderEditorApp.Services
 
 		public WpfIsForegroundService()
 		{
-			// Convert activated and deactivated events to observables.
-			var activated = Observable.FromEventPattern(h => Application.Current.Activated += h, h => Application.Current.Activated -= h);
-			var deactivated = Observable.FromEventPattern(h => Application.Current.Deactivated += h, h => Application.Current.Deactivated -= h);
-
+			// Merge activated and deactivated into bool stream.
 			_isForeground = Observable.Merge(
-				activated.Select(_ => true),
-				deactivated.Select(_ => false))
+				Application.Current.Events().Activated.Select(_ => true),
+				Application.Current.Events().Deactivated.Select(_ => false))
 				.ToProperty(this, x => x.IsAppForeground, false);
-
-			// TEMP
-			//this.WhenAnyValue(x => x.IsAppForeground).Subscribe(val => System.Diagnostics.Debug.WriteLine($"IsAppForeground = {val}"));
 		}
 	}
 }
