@@ -12,20 +12,16 @@ namespace ShaderEditorApp.View
 	// Class that handles camera controls for a viewport.
 	class Camera
 	{
-		public delegate void CameraMovedHandler(Camera camera);
-		public event CameraMovedHandler Moved;
-
 		public Camera(Control control, ViewportViewModel viewportViewModel)
 		{
+			_control = control;
+
 			// Hook the control's mouse events.
 			control.MouseMove += MouseMove;
 			control.MouseLeave += MouseLeave;
 			control.MouseUp += MouseUp;
 			control.MouseDown += MouseDown;
 			control.MouseWheel += MouseWheel;
-
-			// Register event to invalidate the control when the mouse moves.
-			Moved += (c) => { control.Invalidate(); };
 
 			ViewportViewModel = viewportViewModel;
 		}
@@ -86,7 +82,7 @@ namespace ShaderEditorApp.View
 				}
 
 				dragStart = e.Location;
-				Moved(this);
+				Moved();
 			}
 		}
 
@@ -192,7 +188,13 @@ namespace ShaderEditorApp.View
 			if (ViewportViewModel.SelectedCameraMode == ViewportViewModel.CameraMode.Orbit)
 				orbitRadius += deltaRadius;
 
-			Moved(this);
+			Moved();
+		}
+
+		// Invalidate the control when the camera moves.
+		private void Moved()
+		{
+			_control.Invalidate();
 		}
 
 		private Vector3 LookDir
@@ -223,5 +225,8 @@ namespace ShaderEditorApp.View
 		// Mouse handling variables.
 		private bool bDragging = false;
 		private Point dragStart = new Point();
+
+		// TODO: Refactor so we're independent of the windowing mechanism.
+		private readonly Control _control;
 	}
 }
