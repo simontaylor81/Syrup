@@ -78,18 +78,20 @@ namespace ShaderEditorApp.ViewModel
 
 			// Create commands.
 			{
+				// Changing project whilst running scripts would be bad, so we disallow that
+				// (plus the new project can run its own startup scripts).
+
 				OpenProject = new CommandViewModel(
 					"Open Project",
-					CommandUtil.Create(param => OpenProjectPrompt()),
+					CommandUtil.Create(param => OpenProjectPrompt(), Workspace.CanRunScript),
 					menuHeader: "_Project",
 					keyGesture: new KeyGesture(Key.O, ModifierKeys.Control | ModifierKeys.Shift));
 
-				OpenProjectFile = ReactiveCommand.Create();
-				OpenProjectFile.Subscribe(param => Workspace.OpenProject((string)param));
+				OpenProjectFile = CommandUtil.Create(param => Workspace.OpenProject((string)param), Workspace.CanRunScript);
 
 				NewProject = new CommandViewModel(
 					"New Project",
-					CommandUtil.Create(param => NewProjectImpl()),
+					CommandUtil.Create(param => NewProjectImpl(), Workspace.CanRunScript),
 					menuHeader: "_Project",
 					keyGesture: new KeyGesture(Key.N, ModifierKeys.Control | ModifierKeys.Shift));
 
