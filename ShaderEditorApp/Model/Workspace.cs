@@ -154,14 +154,8 @@ namespace ShaderEditorApp.Model
 					// We handle this together so that the async command runs only once,
 					// avoiding potential race conditions where another script could run inbetween two executions.
 					// This is fire-and-forget. Errors are handled by the usual script execution path.
-					RunScripts.ExecuteAsync(startupScripts);
-
-					// Run startup scripts.
-					foreach (var script in value.StartupScripts)
-					{
-						// TODO: This is really bad, as you could have multiple scripts executing simultaneously!
-						RunScriptFile(script);
-					}
+					// Must subscribe to force it to do something.
+					RunScripts.ExecuteAsync(startupScripts).Subscribe();
 
 					this.RaisePropertyChanged();
 				}
