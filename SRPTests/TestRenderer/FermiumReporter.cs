@@ -1,57 +1,52 @@
-﻿using Newtonsoft.Json;
-using SRPTests.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using SRPTests.Util;
 using Xunit;
 
 namespace SRPTests.TestRenderer
 {
 	// Fixture class for handling interaction with Fermium,
 	// including retrieving expected results and reporting results.
-	public class FermiumReporter : IDisposable
+	class FermiumReporter : ITestReporter
 	{
-		private readonly string _fermiumBaseUrl;
 		private readonly string _fermiumProjectUrl;
 		private readonly HttpClient _httpClient;
 		private bool _isBuildSuccess = true;
 
 		// Report builds to Fermium if we have a URL, and we're running in CI.
-		// For now, only enable in the dummy CI provider as we don't have a publically-accessible Fermium instance.
-		public bool IsEnabled => CIHelper.IsCI && !string.IsNullOrEmpty(_fermiumProjectUrl) && CIHelper.IsDummy;
+		public static bool CanUse => CIHelper.IsCI && !string.IsNullOrEmpty(BaseUrl);
+
+		private static string BaseUrl => Environment.GetEnvironmentVariable("SRP_FERMIUM_SERVER");
 
 		public FermiumReporter()
 		{
-			_fermiumBaseUrl = "http://localhost:65221";
-			//var server = Environment.GetEnvironmentVariable("SRP_FERMIUM_SERVER");
-			if (!string.IsNullOrEmpty(_fermiumBaseUrl))
-			{
-				if (!_fermiumBaseUrl.EndsWith("/", StringComparison.Ordinal))
-				{
-					_fermiumBaseUrl += "/";
-				}
+			Assert.True(CanUse);
 
-				// TODO: Configurable project name?
-				_fermiumProjectUrl = _fermiumBaseUrl + "api/projects/syrup/";
+			var baseUrl = BaseUrl;
+			if (!baseUrl.EndsWith("/", StringComparison.Ordinal))
+			{
+				baseUrl += "/";
 			}
 
-			if (IsEnabled)
-			{
-				_httpClient = new HttpClient();
-				Initialise().Wait();
-			}
+			// TODO: Configurable project name?
+			_fermiumProjectUrl = baseUrl + "api/projects/syrup/";
+
+			_httpClient = new HttpClient();
+			Initialise().Wait();
 		}
 
 		public void Dispose()
 		{
 			// Test run is over, so set success/failure.
-			if (IsEnabled)
-			{
-				SetBuildStatus().Wait();
-			}
+			SetBuildStatus().Wait();
 		}
 
 		private Task Initialise()
@@ -72,25 +67,20 @@ namespace SRPTests.TestRenderer
 				null);
 		}
 
-		public async Task TestComplete(string test, bool isSuccess, byte[] image)
+		public async Task TestCompleteAsync(string test, bool isSuccess, Bitmap result)
 		{
 			// Build failed if any tests failed.
 			_isBuildSuccess &= isSuccess;
 
-			if (IsEnabled)
-			{
-				await PostToFermium(
-					string.Format("builds/{0}/testruns/{1}", CIHelper.BuildNumber, test),
-					new { isSuccess = isSuccess, result = image})
-					.ConfigureAwait(false);
-			}
+			await PostToFermium(
+				string.Format("builds/{0}/testruns/{1}", CIHelper.BuildNumber, test),
+				new { isSuccess = isSuccess, result = BitmapToBytes(result) })
+				.ConfigureAwait(false);
 		}
 
 		// Helper to send a POST to Fermium with optional json-encoded body object.
 		private async Task PostToFermium(string path, object body)
 		{
-			Assert.True(IsEnabled);
-
 			HttpContent content = null;
 			if (body != null)
 			{
@@ -100,6 +90,22 @@ namespace SRPTests.TestRenderer
 			var response = await _httpClient.PostAsync(_fermiumProjectUrl + path, content)
 				.ConfigureAwait(false);
 			response.EnsureSuccessStatusCode();
+		}
+
+		// Convert an image to PNG-encoded byte array.
+		private byte[] BitmapToBytes(Bitmap bitmap)
+		{
+			byte[] result = null;
+			if (bitmap != null)
+			{
+				using (var stream = new MemoryStream())
+				{
+					bitmap.Save(stream, ImageFormat.Png);
+					result = stream.ToArray();
+				}
+			}
+
+			return result;
 		}
 	}
 }

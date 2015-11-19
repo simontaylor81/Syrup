@@ -104,10 +104,12 @@
     <Compile Include="ScriptHelperTests.cs" />
     <Compile Include="SerialisationUtilsTests.cs" />
     <Compile Include="TestRenderer\FermiumReporter.cs" />
+    <Compile Include="TestRenderer\FileSystemReporter.cs" />
     <Compile Include="TestRenderer\ImageComparison.cs" />
     <Compile Include="TestRenderer\RenderTestHarness.cs" />
     <Compile Include="TestRenderer\TestRenderer.cs" />
     <Compile Include="TestRenderer\TestReport.cs" />
+    <Compile Include="TestRenderer\TestReporter.cs" />
     <Compile Include="TestRenderer\TestWorkspace.cs" />
     <Compile Include="UnitTests\UserPropertyCopyFromTests.cs" />
     <Compile Include="UserVariableTests.cs" />

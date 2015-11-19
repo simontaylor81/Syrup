@@ -12,12 +12,15 @@ namespace SRPTests.TestRenderer
 	// Implementation of IWorkspace that finds test files.
 	class TestWorkspace : IWorkspace
 	{
+		private readonly string _baseDir;
 		private readonly Dictionary<string, string> _files;
 
-		public TestWorkspace()
+		public TestWorkspace(string baseDir)
 		{
+			_baseDir = baseDir;
+
 			// Find all files in the TestScripts dir.
-			_files = Directory.EnumerateFiles(Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts"), "*", SearchOption.AllDirectories)
+			_files = Directory.EnumerateFiles(_baseDir, "*", SearchOption.AllDirectories)
 				.ToDictionary(path => Path.GetFileName(path));
 		}
 
@@ -33,7 +36,11 @@ namespace SRPTests.TestRenderer
 
 		public string GetAbsolutePath(string path)
 		{
-			return path;
+			if (Path.IsPathRooted(path))
+			{
+				return path;
+			}
+			return Path.Combine(_baseDir, path);
 		}
 	}
 }

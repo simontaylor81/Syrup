@@ -12,20 +12,22 @@ using Xunit;
 
 namespace SRPTests.TestRenderer
 {
-	public class RenderTestHarness : IDisposable, IClassFixture<FermiumReporter>
+	public class RenderTestHarness : IDisposable, IClassFixture<TestReporter>
 	{
 		private readonly TestRenderer _renderer;
 		private readonly TestWorkspace _workspace;
 		private readonly SyrupRenderer _sr;
 		private readonly Scripting _scripting;
-		private readonly FermiumReporter _fermium;
+		private readonly TestReporter _reporter;
 
-		public RenderTestHarness(FermiumReporter fermium)
+		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
+
+		public RenderTestHarness(TestReporter reporter)
 		{
-			_fermium = fermium;
+			_reporter = reporter;
 
 			_renderer = new TestRenderer(64, 64);
-			_workspace = new TestWorkspace();
+			_workspace = new TestWorkspace(_baseDir);
 			_scripting = new Scripting(_workspace);
 
 			// Create syrup renderer to drive the rendering.
@@ -71,7 +73,7 @@ namespace SRPTests.TestRenderer
 			finally
 			{
 				// Report result to Fermium.
-				await _fermium.TestComplete(name, bSuccess, BitmapToBytes(result));
+				await _reporter.TestCompleteAsync(name, bSuccess, result);
 			}
 		}
 
@@ -79,26 +81,9 @@ namespace SRPTests.TestRenderer
 		{
 			get
 			{
-				var directory = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
-				return Directory.EnumerateFiles(directory, "*.py")
+				return Directory.EnumerateFiles(_baseDir, "*.py")
 					.Select(file => new[] { file });
 			}
-		}
-
-		// Convert an image to PNG-encoded byte array.
-		private byte[] BitmapToBytes(Bitmap bitmap)
-		{
-			byte[] result = null;
-			if (bitmap != null)
-			{
-				using (var stream = new MemoryStream())
-				{
-					bitmap.Save(stream, ImageFormat.Png);
-					result = stream.ToArray();
-				}
-			}
-
-			return result;
 		}
 	}
 }
