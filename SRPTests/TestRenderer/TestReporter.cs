@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SRPTests.Util;
 
 namespace SRPTests.TestRenderer
 {
@@ -27,9 +28,9 @@ namespace SRPTests.TestRenderer
 				// I should finish Fermium one of these days...
 				_impl = new FermiumReporter();
 			}
-			else
+			else if (!CIHelper.IsCI)
 			{
-				// Use simple file system writer.
+				// Use simple file system writer when running locally.
 				_impl = new FileSystemReporter();
 			}
 		}
