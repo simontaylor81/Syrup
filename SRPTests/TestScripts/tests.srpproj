@@ -8,10 +8,16 @@
       <include filename="Shaders/FullscreenTexture.hlsl" runAtStartup="false" />
       <include filename="Shaders/ConstantColour.hlsl" runAtStartup="false" />
     </folder>
+    <folder name="Textures">
+      <include filename="CreateTexture.py" runAtStartup="false" />
+      <include filename="CreateTextureCallback.py" runAtStartup="false" />
+      <include filename="TexturePng.py" runAtStartup="false" />
+      <include filename="TextureTga.py" runAtStartup="false" />
+      <include filename="TextureBmp.py" runAtStartup="false" />
+      <include filename="TextureJpeg.py" runAtStartup="false" />
+    </folder>
     <include filename="Clear.py" runAtStartup="false" />
     <include filename="Null.py" runAtStartup="false" />
-    <include filename="CreateTexture.py" runAtStartup="false" />
-    <include filename="CreateTextureCallback.py" runAtStartup="false" />
     <include filename="SimplePixelShader.py" runAtStartup="false" />
   </folder>
   <OpenDocuments>

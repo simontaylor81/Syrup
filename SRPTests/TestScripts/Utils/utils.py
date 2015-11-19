@@ -11,3 +11,9 @@ def TestTexture(tex, ri):
 		context.DrawFullscreenQuad(vs, ps)
 	
 	ri.SetFrameCallback(RenderFrame)
+
+
+# Test texture loading from file.
+def TestTextureFile(filename, ri):
+	tex = ri.LoadTexture(filename)
+	TestTexture(tex, ri)
