@@ -1,17 +1,11 @@
-﻿using SlimDX;
-using SlimDX.Direct3D11;
-using SlimDX.DXGI;
-using SRPRendering;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Drawing;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using SlimDX;
+using SlimDX.Direct3D11;
+using SRPRendering;
 using Xunit;
-using Device = SlimDX.Direct3D11.Device;
 
 namespace SRPTests.TestRenderer
 {
@@ -102,18 +96,11 @@ namespace SRPTests.TestRenderer
 			context.Flush();
 
 			// Read back the render target and convert to bitmap.
-			var bitmap = ReadBackBufferBitmap();
-
-			// Quick hack to write out the image to a file to see if it's working.
-			//bitmap.Save(System.IO.Path.Combine(
-			//	Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "TestRender.png"),
-			//	System.Drawing.Imaging.ImageFormat.Png);
-
-			return bitmap;
+			return ReadBackBufferBitmap();
 		}
 
 		// Read contents of backbuffer to into bitmap.
-		private System.Drawing.Bitmap ReadBackBufferBitmap()
+		private Bitmap ReadBackBufferBitmap()
 		{
 			var context = device.Device.ImmediateContext;
 
@@ -123,7 +110,7 @@ namespace SRPTests.TestRenderer
 			var dataBox = context.MapSubresource(stagingTexture, 0, 0, MapMode.Read, SlimDX.Direct3D11.MapFlags.None);
 			try
 			{
-				var result = new System.Drawing.Bitmap(_width, _height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+				var result = new Bitmap(_width, _height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 				var bits = result.LockBits(new System.Drawing.Rectangle(0, 0, _width, _height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 				var destPtr = bits.Scan0;
 
