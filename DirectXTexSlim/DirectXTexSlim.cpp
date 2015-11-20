@@ -53,6 +53,10 @@ void ScratchImage::GenerateMipMaps()
 	}
 
 	// TODO: Handle block compressed images.
+	if (DirectX::IsCompressed(scratchImage_->GetMetadata().format))
+	{
+		return;
+	}
 
 	auto newScratchImage = new DirectX::ScratchImage();
 	try
