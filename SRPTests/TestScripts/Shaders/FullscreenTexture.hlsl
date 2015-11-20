@@ -2,6 +2,8 @@
 
 Texture2D tex;
 
+float MipLevel;
+
 SamplerState mySampler
 {
     Filter = MIN_MAG_MIP_NEAREST;
@@ -29,4 +31,9 @@ PSIn FullscreenTexture_VS(float4 Pos : POSITION)
 float4 FullscreenTexture_PS(PSIn In) : SV_Target
 {
 	return tex.Sample(mySampler, In.UV);
+}
+
+float4 FullscreenTextureLevel_PS(PSIn In) : SV_Target
+{
+	return tex.SampleLevel(mySampler, In.UV, MipLevel);
 }

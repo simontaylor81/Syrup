@@ -9,6 +9,11 @@
       <include filename="Shaders/ConstantColour.hlsl" runAtStartup="false" />
     </folder>
     <folder name="Textures">
+      <folder name="Mipmaps">
+        <include filename="TextureMips_1.py" runAtStartup="false" />
+        <include filename="TextureMips_3.py" runAtStartup="false" />
+        <include filename="TextureMips_6.py" runAtStartup="false" />
+      </folder>
       <include filename="CreateTexture.py" runAtStartup="false" />
       <include filename="CreateTextureCallback.py" runAtStartup="false" />
       <include filename="TexturePng.py" runAtStartup="false" />
