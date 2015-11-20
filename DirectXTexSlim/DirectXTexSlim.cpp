@@ -44,6 +44,37 @@ Texture2D^ ScratchImage::CreateTexture(Device^ device)
 	return Texture2D::FromPointer(System::IntPtr(texture));
 }
 
+void ScratchImage::GenerateMipMaps()
+{
+	// TODO: Handle cubemaps, arrays, textures that already have mips.
+	if (scratchImage_->GetImageCount() != 1)
+	{
+		return;
+	}
+
+	// TODO: Handle block compressed images.
+
+	auto newScratchImage = new DirectX::ScratchImage();
+	try
+	{
+		auto hr = DirectX::GenerateMipMaps(
+			*scratchImage_->GetImage(0, 0, 0), (DWORD)DirectX::TEX_FILTER_FANT, 0, *newScratchImage);
+
+		Marshal::ThrowExceptionForHR(hr);
+
+		// Replace existing scratch image with the new one with mips.
+		delete scratchImage_;
+		scratchImage_ = newScratchImage;
+		newScratchImage = nullptr;
+	}
+	finally
+	{
+		// Free new scratch image if we didn't use it.
+		delete newScratchImage;
+	}
+
+}
+
 
 //--------------------------------------------------------------------------------------------------
 // Load an image from a DDS file.

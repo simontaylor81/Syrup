@@ -20,6 +20,9 @@ public:
 	// Create a SlimDX D3D11 texture from the image.
 	SlimDX::Direct3D11::Texture2D^ CreateTexture(SlimDX::Direct3D11::Device^ device);
 
+	// Generate mipmaps for this image.
+	void GenerateMipMaps();
+
 internal:
 	ScratchImage();
 	~ScratchImage();

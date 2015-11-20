@@ -42,6 +42,7 @@ namespace SRPRendering
 
 				// Load the texture itself using DirectXTex.
 				var image = LoadImage(filename);
+				image.GenerateMipMaps();
 				var texture2D = image.CreateTexture(device);
 
 				stopwatch.Stop();
