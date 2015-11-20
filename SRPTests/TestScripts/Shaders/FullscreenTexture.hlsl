@@ -1,6 +1,7 @@
 // Shaders for drawing a texture to the render target.
 
 Texture2D tex;
+TextureCube texCube;
 
 float MipLevel;
 
@@ -36,4 +37,21 @@ float4 FullscreenTexture_PS(PSIn In) : SV_Target
 float4 FullscreenTextureLevel_PS(PSIn In) : SV_Target
 {
 	return tex.SampleLevel(mySampler, In.UV, MipLevel);
+}
+
+float4 FullscreenTextureCube_PS(PSIn In) : SV_Target
+{
+	float pi = 3.14159;
+
+	// Uses some completely arbitrary projection to fit the whole
+	// cubemap on-screen somehow.
+	float2 screenPos = (2 * In.UV - 1);
+	float theta = screenPos.x * pi;
+	float phi = screenPos.y * pi / 2;
+	
+	float x = cos(theta) * cos(phi);
+	float y = sin(phi);
+	float z = sin(theta) * cos(phi);
+	
+	return texCube.Sample(mySampler, float3(x, y, z));
 }
