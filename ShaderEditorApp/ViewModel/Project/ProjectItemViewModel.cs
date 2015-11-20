@@ -39,8 +39,7 @@ namespace ShaderEditorApp.ViewModel.Projects
 			Remove = CommandUtil.Create(_ => RemoveFromProject());
 
 			Run = ReactiveCommand.CreateAsyncTask(
-				_workspaceVM.Workspace.CanRunScript
-					.Do(can => OutputLogger.Instance.LogLine(LogCategory.Log, $"CanRunScript: {can}")),
+				_workspaceVM.Workspace.CanRunScript,
 				_ => _workspaceVM.Workspace.RunScriptFile(item.AbsolutePath));
 
 			// Build list context menu items.
