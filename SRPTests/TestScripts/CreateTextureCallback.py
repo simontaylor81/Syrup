@@ -9,4 +9,4 @@ def getPixel(x, y):
 	
 tex = ri.CreateTexture2D(16, 16, Format.R8G8B8A8_UNorm, getPixel)
 
-utils.TestTexture(tex, ri)
+utils.TestTexture(ri, tex)

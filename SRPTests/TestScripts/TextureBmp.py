@@ -1,3 +1,3 @@
 # Test PNG texture load
 import utils
-utils.TestTextureFile('Assets/Textures/ThisIsATest.bmp', ri)
+utils.TestTextureFile(ri, 'Assets/Textures/ThisIsATest.bmp')

@@ -46,14 +46,16 @@ Texture2D^ ScratchImage::CreateTexture(Device^ device)
 
 void ScratchImage::GenerateMipMaps()
 {
-	// TODO: Handle cubemaps, arrays, textures that already have mips.
-	if (scratchImage_->GetImageCount() != 1)
+	auto metaData = scratchImage_->GetMetadata();
+	
+	// Skip images that already have mipmaps.
+	if (metaData.mipLevels > 1)
 	{
 		return;
 	}
 
-	// TODO: Handle block compressed images.
-	if (DirectX::IsCompressed(scratchImage_->GetMetadata().format))
+	// We can't generate mips for compressed formats, so skip those.
+	if (DirectX::IsCompressed(metaData.format))
 	{
 		return;
 	}
@@ -61,8 +63,8 @@ void ScratchImage::GenerateMipMaps()
 	auto newScratchImage = new DirectX::ScratchImage();
 	try
 	{
-		auto hr = DirectX::GenerateMipMaps(
-			*scratchImage_->GetImage(0, 0, 0), (DWORD)DirectX::TEX_FILTER_FANT, 0, *newScratchImage);
+		auto hr = DirectX::GenerateMipMaps(scratchImage_->GetImages(), scratchImage_->GetImageCount(),
+			metaData, (DWORD)DirectX::TEX_FILTER_FANT, 0, *newScratchImage);
 
 		Marshal::ThrowExceptionForHR(hr);
 

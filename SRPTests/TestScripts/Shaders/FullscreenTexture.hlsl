@@ -39,19 +39,30 @@ float4 FullscreenTextureLevel_PS(PSIn In) : SV_Target
 	return tex.SampleLevel(mySampler, In.UV, MipLevel);
 }
 
-float4 FullscreenTextureCube_PS(PSIn In) : SV_Target
+// Some completely arbitrary projection to fit the whole
+// cubemap on-screen somehow.
+float3 CubemapProjection(float2 screenPos)
 {
 	float pi = 3.14159;
 
-	// Uses some completely arbitrary projection to fit the whole
-	// cubemap on-screen somehow.
-	float2 screenPos = (2 * In.UV - 1);
 	float theta = screenPos.x * pi;
 	float phi = screenPos.y * pi / 2;
 	
 	float x = cos(theta) * cos(phi);
 	float y = sin(phi);
 	float z = sin(theta) * cos(phi);
-	
-	return texCube.Sample(mySampler, float3(x, y, z));
+
+	return float3(x, y, z);
+}
+
+float4 FullscreenTextureCube_PS(PSIn In) : SV_Target
+{
+	float3 v = CubemapProjection(2 * In.UV - 1);
+	return texCube.Sample(mySampler, v);
+}
+
+float4 FullscreenTextureCubeLevel_PS(PSIn In) : SV_Target
+{
+	float3 v = CubemapProjection(2 * In.UV - 1);
+	return texCube.SampleLevel(mySampler, v, MipLevel);
 }

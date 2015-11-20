@@ -1,39 +1,49 @@
 # Texture testing helper.
-def TestTexture(tex, ri):
+def TestTexture_Impl(ri, tex, psEntryPoint, texShaderVar, level = None):
 	# Compile shaders.
 	vs = ri.CompileShader("FullscreenTexture.hlsl", "FullscreenTexture_VS", "vs_4_0")
-	ps = ri.CompileShader("FullscreenTexture.hlsl", "FullscreenTexture_PS", "ps_4_0")
+	ps = ri.CompileShader("FullscreenTexture.hlsl", psEntryPoint, "ps_4_0")
 	
-	ri.SetShaderResourceVariable(ps, "tex", tex)
+	ri.SetShaderResourceVariable(ps, texShaderVar, tex)
+	
+	if level != None:
+		ri.SetShaderVariable(ps, "MipLevel", level)
 	
 	def RenderFrame(context):
 		# Draw the texture fullscreen.
 		context.DrawFullscreenQuad(vs, ps)
 	
 	ri.SetFrameCallback(RenderFrame)
+	
+def TestTexture(ri, tex):
+	TestTexture_Impl(ri, tex, "FullscreenTexture_PS", "tex")
+	
+def TestCubemap(ri, tex):
+	TestTexture_Impl(ri, tex, "FullscreenTextureCube_PS", "texCube")
 
-def TestTextureLevel(tex, level, ri):
-	# Compile shaders.
-	vs = ri.CompileShader("FullscreenTexture.hlsl", "FullscreenTexture_VS", "vs_4_0")
-	ps = ri.CompileShader("FullscreenTexture.hlsl", "FullscreenTextureLevel_PS", "ps_4_0")
+def TestTextureLevel(ri, tex, level):
+	TestTexture_Impl(ri, tex, "FullscreenTextureLevel_PS", "tex", level)
 	
-	ri.SetShaderResourceVariable(ps, "tex", tex)
-	ri.SetShaderVariable(ps, "MipLevel", level)
-	
-	def RenderFrame(context):
-		# Draw the texture fullscreen.
-		context.DrawFullscreenQuad(vs, ps)
-	
-	ri.SetFrameCallback(RenderFrame)
+def TestCubemapLevel(ri, tex, level):
+	TestTexture_Impl(ri, tex, "FullscreenTextureCubeLevel_PS", "texCube", level)
 
 
 # Test texture loading from file.
-def TestTextureFile(filename, ri):
+def TestTextureFile(ri, filename):
 	tex = ri.LoadTexture(filename)
-	TestTexture(tex, ri)
-
+	TestTexture(ri, tex)
 
 # Test texture mip-map generation by rendering a specific level.
-def TestTextureFileLevel(filename, level, ri):
+def TestTextureFileLevel(ri, filename, level):
 	tex = ri.LoadTexture(filename)
-	TestTextureLevel(tex, level, ri)
+	TestTextureLevel(ri, tex, level)
+
+# Test cubemap texture loading from file.
+def TestCubemapFile(ri, filename):
+	tex = ri.LoadTexture(filename)
+	TestCubemap(ri, tex)
+
+# Test cubemap texture loading from file.
+def TestCubemapFileLevel(ri, filename, level):
+	tex = ri.LoadTexture(filename)
+	TestCubemapLevel(ri, tex, level)

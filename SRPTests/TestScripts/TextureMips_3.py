@@ -1,3 +1,3 @@
-# Test PNG texture load
+# Test texture mipmap generation
 import utils
-utils.TestTextureFileLevel('Assets/Textures/ThisIsATest.png', 3, ri)
+utils.TestTextureFileLevel(ri, 'Assets/Textures/ThisIsATest.png', 3)
