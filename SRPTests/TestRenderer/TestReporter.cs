@@ -40,9 +40,12 @@ namespace SRPTests.TestRenderer
 			_impl?.Dispose();
 		}
 
-		public Task TestCompleteAsync(string name, bool bSucess, Bitmap result)
+		public async Task TestCompleteAsync(string name, bool bSucess, Bitmap result)
 		{
-			return _impl.TestCompleteAsync(name, bSucess, result);
+			if (_impl != null)
+			{
+				await _impl.TestCompleteAsync(name, bSucess, result);
+			}
 		}
 	}
 }
