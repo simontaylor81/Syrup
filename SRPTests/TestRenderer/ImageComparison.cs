@@ -26,16 +26,23 @@ namespace SRPTests.TestRenderer
 					AssertPixelsEqual(expected.GetPixel(x, y), actual.GetPixel(x, y), x, y);
 				}
 			}
-        }
+		}
 
 		// Custom equality assertion to allow the failing pixel to be reported.
 		private static void AssertPixelsEqual(Color expected, Color actual, int x, int y)
 		{
-			if (expected != actual)
+			// This is pretty hacky, but GPU variations mean that the results can
+			// come out slightly differently on different hardware.
+			if (!EqualTolerance(expected.R, actual.R, 1) ||
+				!EqualTolerance(expected.G, actual.G, 1) ||
+				!EqualTolerance(expected.B, actual.B, 1) ||
+				!EqualTolerance(expected.A, actual.A, 1))
 			{
 				throw new PixelEqualException(expected, actual, x, y);
 			}
 		}
+
+		private static bool EqualTolerance(int a, int b, int tolerance) => Math.Abs(a - b) <= tolerance;
 
 		// Special equality exception to allow us to report which pixel failed.
 		class PixelEqualException : AssertActualExpectedException
