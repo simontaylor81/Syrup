@@ -38,59 +38,67 @@ namespace SRPTests.Util
 		public async Task PublishArtefactAsync(string path)
 		{
 			Console.WriteLine("Publishing artefact {0}", path);
+			Console.WriteLine("APPVEYOR_API_URL = {0}", _appveyorApiUrl);
 
 			try
 			{
-				var jsonRequest = JsonConvert.SerializeObject(new
+				// Register the artefact, getting the upload URL.
+				var uploadUrl = await RegisterArtefact(path).ConfigureAwait(false);
+				if (uploadUrl == null)
 				{
-					path = Path.GetFullPath(path),
-					fileName = Path.GetFileName(path),
-					name = (string)null,
-				});
-
-				Console.WriteLine("APPVEYOR_API_URL = {0}", _appveyorApiUrl);
-				Console.WriteLine("jsonRequest = {0}", jsonRequest);
-
-				// PUT data to api URL to get where to upload the file to.
-				var response = await _httpClient.PostAsync(
-					_appveyorApiUrl + "api/artifacts",
-					new StringContent(jsonRequest, Encoding.UTF8, "application/json")
-					).ConfigureAwait(false);
-
-				if (!response.IsSuccessStatusCode)
-				{
-					await LogFailedHttpRequest(response, "getting artefact upload URL");
 					return;
 				}
 
-				var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-				var uploadUrl = JsonConvert.DeserializeObject<string>(responseString);
-
-				Console.WriteLine("responseString = {0}", responseString);
 				Console.WriteLine("uploadUrl = {0}", uploadUrl);
 
 				// Upload the file to the returned URL.
-				await UploadFile(uploadUrl, path);
+				await UploadFile(uploadUrl, path).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
+				// Catch and dump any exceptions, since we can't live-debug any of this.
 				Console.WriteLine("Error uploading artefact.");
 				Console.WriteLine(ex.Message);
 				Console.WriteLine(ex.StackTrace);
 			}
 		}
 
+		// Tell AppVeyor about an artefact, and get the URL to upload to.
+		private async Task<string> RegisterArtefact(string path)
+		{
+			var body = JsonConvert.SerializeObject(new
+			{
+				path = Path.GetFullPath(path),
+				fileName = Path.GetFileName(path),
+				name = (string)null,
+			});
+
+			// POST data to api URL to get where to upload the file to.
+			var response = await _httpClient.PostAsJsonAsync(_appveyorApiUrl + "api/artifacts", body)
+				.ConfigureAwait(false);
+
+			if (!response.IsSuccessStatusCode)
+			{
+				await LogFailedHttpRequest(response, "getting artefact upload URL");
+				return null;
+			}
+
+			// Get upload URL from response (simple JSON string).
+			var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+			return JsonConvert.DeserializeObject<string>(responseString);
+		}
+
 		// Upload an artefact file to the given URL.
-		private Task UploadFile(string url, string filename)
+		private Task UploadFile(string url, string path)
 		{
 			// Method is different if uploading to Google storage.
 			if (url.ToLowerInvariant().Contains("storage.googleapis.com"))
 			{
-				return UploadFileGoogleStorage(url, filename);
+				return UploadFileGoogleStorage(url, path);
 			}
 			else
 			{
-				return UploadFileWebClient(url, filename);
+				return UploadFileWebClient(url, path);
 			}
 		}
 
@@ -124,12 +132,10 @@ namespace SRPTests.Util
 		{
 			using (var fileStream = File.OpenRead(path))
 			{
-				// Get length of file for later.
-				var fileSize = fileStream.Length;
-
 				// PUT file contents to remote URL.
 				var content = new StreamContent(fileStream);
-				var response = await _httpClient.PutAsync(url, content);
+				var response = await _httpClient.PutAsync(url, content)
+					.ConfigureAwait(false);
 
 				if (!response.IsSuccessStatusCode)
 				{
@@ -139,12 +145,15 @@ namespace SRPTests.Util
 					return;
 				}
 
+				// File size is how many bytes we read from it.
+				var fileSize = fileStream.Position;
+
 				// 'Finalise' the upload by PUTing to the AppVeyor API again.
 				// PUT data to api URL to get where to upload the file to.
 				response = await _httpClient.PutAsJsonAsync(
 					_appveyorApiUrl + "api/artifacts",
-					new { fileName = Path.GetFileName(path), size = fileSize }
-					).ConfigureAwait(false);
+					new { fileName = Path.GetFileName(path), size = fileSize })
+					.ConfigureAwait(false);
 
 				if (!response.IsSuccessStatusCode)
 				{
