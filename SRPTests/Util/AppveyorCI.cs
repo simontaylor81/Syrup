@@ -52,7 +52,7 @@ namespace SRPTests.Util
 				Console.WriteLine("jsonRequest = {0}", jsonRequest);
 
 				// PUT data to api URL to get where to upload the file to.
-				var response = await _httpClient.PutAsync(
+				var response = await _httpClient.PostAsync(
 					_appveyorApiUrl + "api/artifacts",
 					new StringContent(jsonRequest, Encoding.UTF8, "application/json")
 					).ConfigureAwait(false);
