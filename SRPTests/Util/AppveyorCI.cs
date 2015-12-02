@@ -132,6 +132,9 @@ namespace SRPTests.Util
 		{
 			using (var fileStream = File.OpenRead(path))
 			{
+				// Get length of file for later.
+				var fileSize = fileStream.Length;
+
 				// PUT file contents to remote URL.
 				var content = new StreamContent(fileStream);
 				var response = await _httpClient.PutAsync(url, content)
@@ -144,9 +147,6 @@ namespace SRPTests.Util
 					// Fail silently -- don't want to fail the build for failed artefact upload.
 					return;
 				}
-
-				// File size is how many bytes we read from it.
-				var fileSize = fileStream.Position;
 
 				// 'Finalise' the upload by PUTing to the AppVeyor API again.
 				// PUT data to api URL to get where to upload the file to.
