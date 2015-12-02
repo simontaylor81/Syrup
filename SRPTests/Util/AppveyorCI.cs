@@ -66,12 +66,12 @@ namespace SRPTests.Util
 		// Tell AppVeyor about an artefact, and get the URL to upload to.
 		private async Task<string> RegisterArtefact(string path)
 		{
-			var body = JsonConvert.SerializeObject(new
+			var body = new
 			{
 				path = Path.GetFullPath(path),
 				fileName = Path.GetFileName(path),
 				name = (string)null,
-			});
+			};
 
 			// POST data to api URL to get where to upload the file to.
 			var response = await _httpClient.PostAsJsonAsync(_appveyorApiUrl + "api/artifacts", body)
