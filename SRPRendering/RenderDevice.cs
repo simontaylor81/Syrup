@@ -23,7 +23,7 @@ namespace SRPRendering
 
 		private CompositeDisposable _disposables = new CompositeDisposable();
 
-		public RenderDevice()
+		public RenderDevice(bool useWarp = false)
 		{
 			var deviceCreationFlags = DeviceCreationFlags.None;
 #if DEBUG
@@ -33,7 +33,7 @@ namespace SRPRendering
 
 			// If you get a debug-only crash here, make sure you have the debug D3D dlls installed
 			// ("Graphics Tools" under Optional Features in Windows 10).
-			Device = new Device(DriverType.Hardware, deviceCreationFlags);
+			Device = new Device(useWarp ? DriverType.Warp : DriverType.Hardware, deviceCreationFlags);
 			_disposables.Add(Device);
 
 			// Lazily get adapter from DXGI device.

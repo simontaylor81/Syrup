@@ -29,7 +29,8 @@ namespace SRPTests.TestRenderer
 			_height = height;
 
 			// Create a device without a swap chain for headless rendering.
-			device = new RenderDevice();
+			// Use WARP software rasterizer to avoid per-GPU differences.
+			device = new RenderDevice(useWarp: true);
 
 			// Create a render target to act as the back buffer.
 			var rtDesc = new Texture2DDescription()
