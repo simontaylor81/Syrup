@@ -337,7 +337,7 @@ namespace SRPRendering
 				int height = desc.GetHeight(viewportHeight);
 
 				// If there's no resource, or it's the wrong size, create a new one.
-				if (desc.renderTarget == null || desc.renderTarget.Width != width || desc.renderTarget.Width != width)
+				if (desc.renderTarget == null || desc.renderTarget.Width != width || desc.renderTarget.Height != height)
 				{
 					// Don't forget to release the old one.
 					desc.renderTarget?.Dispose();
