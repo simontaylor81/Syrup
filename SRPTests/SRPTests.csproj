@@ -108,7 +108,7 @@
     <Compile Include="TestRenderer\ImageComparison.cs" />
     <Compile Include="TestRenderer\RenderTestHarness.cs" />
     <Compile Include="TestRenderer\TestRenderer.cs" />
-    <Compile Include="TestRenderer\TestReport.cs" />
+    <Compile Include="TestRenderer\HtmlReporter.cs" />
     <Compile Include="TestRenderer\TestReporter.cs" />
     <Compile Include="TestRenderer\TestWorkspace.cs" />
     <Compile Include="UnitTests\UserPropertyCopyFromTests.cs" />

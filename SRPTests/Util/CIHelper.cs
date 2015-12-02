@@ -69,5 +69,5 @@ namespace SRPTests.Util
 
 		// Publish an artefact to the CI server.
 		Task PublishArtefactAsync(string path);
-    }
+	}
 }

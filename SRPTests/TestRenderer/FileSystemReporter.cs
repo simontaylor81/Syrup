@@ -18,7 +18,7 @@ namespace SRPTests.TestRenderer
 			Directory.CreateDirectory(_outDir);
 		}
 
-		public Task TestCompleteAsync(string name, bool bSucess, Bitmap result)
+		public Task TestCompleteAsync(string name, bool bSuccess, Bitmap result)
 		{
 			// Save to output directory.
 			result.Save(Path.Combine(_outDir, name + ".png"), ImageFormat.Png);

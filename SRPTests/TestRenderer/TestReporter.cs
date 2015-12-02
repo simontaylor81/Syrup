@@ -11,7 +11,7 @@ namespace SRPTests.TestRenderer
 	// Interface for a test reporter implementation.
 	interface ITestReporter : IDisposable
 	{
-		Task TestCompleteAsync(string name, bool bSucess, Bitmap result);
+		Task TestCompleteAsync(string name, bool bSuccess, Bitmap result);
 	}
 
 	// Fixture class for reporting test results. Doesn't do the actual reporting,
@@ -28,7 +28,13 @@ namespace SRPTests.TestRenderer
 				// I should finish Fermium one of these days...
 				_impl = new FermiumReporter();
 			}
-			else if (!CIHelper.IsCI)
+			else if (CIHelper.IsCI)
+			{
+				// Write to dirty html file in CI if we don't have Fermium
+				// (which we don't, cause I haven't written it yet).
+				_impl = new HtmlReporter();
+			}
+			else
 			{
 				// Use simple file system writer when running locally.
 				_impl = new FileSystemReporter();
@@ -40,11 +46,11 @@ namespace SRPTests.TestRenderer
 			_impl?.Dispose();
 		}
 
-		public async Task TestCompleteAsync(string name, bool bSucess, Bitmap result)
+		public async Task TestCompleteAsync(string name, bool bSuccess, Bitmap result)
 		{
 			if (_impl != null)
 			{
-				await _impl.TestCompleteAsync(name, bSucess, result);
+				await _impl.TestCompleteAsync(name, bSuccess, result);
 			}
 		}
 	}
