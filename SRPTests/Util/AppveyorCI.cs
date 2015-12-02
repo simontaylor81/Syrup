@@ -68,12 +68,14 @@ namespace SRPTests.Util
 					await wc.UploadFileTaskAsync(new Uri(uploadUrl), path).ConfigureAwait(false);
 				}
 			}
-			catch (WebException ex) when (ex.Response != null)
+			catch (WebException ex) when (ex.Response is HttpWebResponse)
 			{
-				Console.WriteLine("Error uploading artefact.");
-				Console.WriteLine($"Status code: {ex.Status.ToString()}");
+				var response = (HttpWebResponse)ex.Response;
 
-				using (var reader = new StreamReader(ex.Response.GetResponseStream()))
+				Console.WriteLine("Error uploading artefact.");
+				Console.WriteLine($"Status code: {response.StatusCode}");
+
+				using (var reader = new StreamReader(response.GetResponseStream()))
 				{
 					Console.WriteLine("Reponse:");
 					Console.WriteLine(reader.ReadToEnd());
