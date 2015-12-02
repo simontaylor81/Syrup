@@ -31,13 +31,16 @@ namespace SRPTests.Util
 		public string Version => Environment.GetEnvironmentVariable("APPVEYOR_BUILD_VERSION");
 		public string Commit => Environment.GetEnvironmentVariable("APPVEYOR_REPO_COMMIT");
 
+		private string _appveyorApiUrl = Environment.GetEnvironmentVariable("APPVEYOR_API_URL");
+
+		private HttpClient _httpClient = new HttpClient();
+
 		public async Task PublishArtefactAsync(string path)
 		{
 			Console.WriteLine("Publishing artefact {0}", path);
 
 			try
 			{
-				var appveyorApiUrl = Environment.GetEnvironmentVariable("APPVEYOR_API_URL");
 				var jsonRequest = JsonConvert.SerializeObject(new
 				{
 					path = Path.GetFullPath(path),
@@ -45,16 +48,20 @@ namespace SRPTests.Util
 					name = (string)null,
 				});
 
-				Console.WriteLine("APPVEYOR_API_URL = {0}", appveyorApiUrl);
+				Console.WriteLine("APPVEYOR_API_URL = {0}", _appveyorApiUrl);
 				Console.WriteLine("jsonRequest = {0}", jsonRequest);
 
 				// PUT data to api URL to get where to upload the file to.
-				var httpClient = new HttpClient();
-				var response = await httpClient.PostAsync(
-					appveyorApiUrl + "api/artifacts",
+				var response = await _httpClient.PutAsync(
+					_appveyorApiUrl + "api/artifacts",
 					new StringContent(jsonRequest, Encoding.UTF8, "application/json")
 					).ConfigureAwait(false);
-				response.EnsureSuccessStatusCode();
+
+				if (!response.IsSuccessStatusCode)
+				{
+					await LogFailedHttpRequest(response, "getting artefact upload URL");
+					return;
+				}
 
 				var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 				var uploadUrl = JsonConvert.DeserializeObject<string>(responseString);
@@ -63,9 +70,37 @@ namespace SRPTests.Util
 				Console.WriteLine("uploadUrl = {0}", uploadUrl);
 
 				// Upload the file to the returned URL.
+				await UploadFile(uploadUrl, path);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Error uploading artefact.");
+				Console.WriteLine(ex.Message);
+			}
+		}
+
+		// Upload an artefact file to the given URL.
+		private Task UploadFile(string url, string filename)
+		{
+			// Method is different if uploading to Google storage.
+			if (url.ToLowerInvariant().Contains("storage.googleapis.com"))
+			{
+				return UploadFileGoogleStorage(url, filename);
+			}
+			else
+			{
+				return UploadFileWebClient(url, filename);
+			}
+		}
+
+		// Upload file using WebClient.
+		private async Task UploadFileWebClient(string url, string path)
+		{
+			try
+			{
 				using (var wc = new WebClient())
 				{
-					await wc.UploadFileTaskAsync(new Uri(uploadUrl), path).ConfigureAwait(false);
+					await wc.UploadFileTaskAsync(new Uri(url), path).ConfigureAwait(false);
 				}
 			}
 			catch (WebException ex) when (ex.Response is HttpWebResponse)
@@ -81,11 +116,47 @@ namespace SRPTests.Util
 					Console.WriteLine(reader.ReadToEnd());
 				}
 			}
-			catch (Exception ex)
+		}
+
+		// Upload a file to Google storage.
+		private async Task UploadFileGoogleStorage(string url, string path)
+		{
+			using (var fileStream = File.OpenRead(path))
 			{
-				Console.WriteLine("Error uploading artefact.");
-				Console.WriteLine(ex.Message);
+				// PUT file contents to remote URL.
+				var content = new StreamContent(fileStream);
+				var response = await _httpClient.PutAsync(url, content);
+
+				if (!response.IsSuccessStatusCode)
+				{
+					await LogFailedHttpRequest(response, "uploading artefact to Google storage");
+
+					// Fail silently -- don't want to fail the build for failed artefact upload.
+					return;
+				}
+
+				// 'Finalise' the upload by PUTing to the AppVeyor API again.
+				// PUT data to api URL to get where to upload the file to.
+				response = await _httpClient.PutAsJsonAsync(
+					_appveyorApiUrl + "api/artifacts",
+					new { fileName = Path.GetFileName(path), size = fileStream.Length }
+					).ConfigureAwait(false);
+
+				if (!response.IsSuccessStatusCode)
+				{
+					await LogFailedHttpRequest(response, "getting artefact upload URL");
+					return;
+				}
 			}
+		}
+
+		// Helper to log info about a failed rest call.
+		private async Task LogFailedHttpRequest(HttpResponseMessage response, string desc)
+		{
+			Console.WriteLine($"Error {desc}.");
+			Console.WriteLine($"Status code: {response.StatusCode}");
+			Console.WriteLine("Response:");
+			Console.WriteLine(await response.Content.ReadAsStringAsync());
 		}
 	}
 }
