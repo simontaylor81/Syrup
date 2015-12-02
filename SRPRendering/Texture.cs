@@ -38,15 +38,15 @@ namespace SRPRendering
 		{
 			try
 			{
-				var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+				//var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
 				// Load the texture itself using DirectXTex.
 				var image = LoadImage(filename);
 				image.GenerateMipMaps();
 				var texture2D = image.CreateTexture(device);
 
-				stopwatch.Stop();
-				Console.WriteLine("Loading {0} took {1} ms.", System.IO.Path.GetFileName(filename), stopwatch.ElapsedMilliseconds);
+				//stopwatch.Stop();
+				//Console.WriteLine("Loading {0} took {1} ms.", System.IO.Path.GetFileName(filename), stopwatch.ElapsedMilliseconds);
 
 				// Create the SRV.
 				var srv = new ShaderResourceView(device, texture2D);
