@@ -77,7 +77,7 @@ namespace ShaderEditorApp.View
 				obj.Dispose();
 			sizeDependentResources.Clear();
 
-			swapChain.ResizeBuffers(2, 0, 0, Format.R8G8B8A8_UNorm, SwapChainFlags.AllowModeSwitch);
+			swapChain.ResizeBuffers(0, 0, 0, Format.Unknown, SwapChainFlags.AllowModeSwitch);
 			using (var resource = SlimDX.Direct3D11.Resource.FromSwapChain<Texture2D>(swapChain, 0))
 				renderTarget = new RenderTargetView(_device, resource);
 			sizeDependentResources.Add(renderTarget);
