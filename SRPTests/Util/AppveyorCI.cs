@@ -76,6 +76,7 @@ namespace SRPTests.Util
 			{
 				Console.WriteLine("Error uploading artefact.");
 				Console.WriteLine(ex.Message);
+				Console.WriteLine(ex.StackTrace);
 			}
 		}
 
