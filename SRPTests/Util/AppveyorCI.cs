@@ -124,6 +124,9 @@ namespace SRPTests.Util
 		{
 			using (var fileStream = File.OpenRead(path))
 			{
+				// Get length of file for later.
+				var fileSize = fileStream.Length;
+
 				// PUT file contents to remote URL.
 				var content = new StreamContent(fileStream);
 				var response = await _httpClient.PutAsync(url, content);
@@ -140,7 +143,7 @@ namespace SRPTests.Util
 				// PUT data to api URL to get where to upload the file to.
 				response = await _httpClient.PutAsJsonAsync(
 					_appveyorApiUrl + "api/artifacts",
-					new { fileName = Path.GetFileName(path), size = fileStream.Length }
+					new { fileName = Path.GetFileName(path), size = fileSize }
 					).ConfigureAwait(false);
 
 				if (!response.IsSuccessStatusCode)
