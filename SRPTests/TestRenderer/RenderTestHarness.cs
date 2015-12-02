@@ -22,6 +22,8 @@ namespace SRPTests.TestRenderer
 
 		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
 
+		private static bool bLoggedDevice = false;
+
 		public RenderTestHarness(TestReporter reporter)
 		{
 			_reporter = reporter;
@@ -29,6 +31,14 @@ namespace SRPTests.TestRenderer
 			_renderer = new TestRenderer(64, 64);
 			_workspace = new TestWorkspace(_baseDir);
 			_scripting = new Scripting(_workspace);
+
+			// Minor hack to avoid spamming the log with device names.
+			if (!bLoggedDevice)
+			{
+				// Write adapter description to the console, since it can affect results.
+				Console.WriteLine($"RenderTestHarness: Using device '{_renderer.Device.Adapter.ToString()}'");
+				bLoggedDevice = true;
+			}
 
 			// Create syrup renderer to drive the rendering.
 			_sr = new SyrupRenderer(_workspace, _renderer.Device, _scripting);

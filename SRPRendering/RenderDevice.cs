@@ -5,6 +5,9 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
+using SlimDX.DXGI;
+
+using Device = SlimDX.Direct3D11.Device;
 
 namespace SRPRendering
 {
@@ -14,6 +17,9 @@ namespace SRPRendering
 	{
 		public Device Device { get; }
 		public IGlobalResources GlobalResources { get; }
+
+		public Adapter Adapter => _adapter.Value;
+		private Lazy<Adapter> _adapter;
 
 		private CompositeDisposable _disposables = new CompositeDisposable();
 
@@ -29,6 +35,9 @@ namespace SRPRendering
 			// ("Graphics Tools" under Optional Features in Windows 10).
 			Device = new Device(DriverType.Hardware, deviceCreationFlags);
 			_disposables.Add(Device);
+
+			// Lazily get adapter from DXGI device.
+			_adapter = new Lazy<Adapter>(() => new SlimDX.DXGI.Device(Device).Adapter);
 
 			// Initialise basic resources.
 			GlobalResources = new GlobalResources(Device);
