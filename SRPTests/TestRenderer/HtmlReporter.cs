@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reactive.Disposables;
 
 namespace SRPTests.TestRenderer
 {
@@ -45,19 +46,28 @@ namespace SRPTests.TestRenderer
 			{
 				writer.WriteLine("<!DOCTYPE html>");
 				writer.WriteLine("<html lang=\"en\">");
-				writer.WriteLine("<head>");
-				writer.WriteLine("<meta charset=\"utf-8\">");
-				writer.WriteLine("<title>Test Report</title>");
-				writer.WriteLine("</head>");
-				writer.WriteLine("<body>");
 
-				foreach (var result in results)
+				using (WriteTag(writer, "head"))
 				{
-					WriteResult(result, writer);
+					writer.WriteLine("<meta charset=\"utf-8\">");
+					writer.WriteLine("<title>Test Report</title>");
 				}
 
-				writer.WriteLine("</body>");
-				writer.WriteLine("</head>");
+				using (WriteTag(writer, "body"))
+				{
+					using (WriteTag(writer, "table"))
+					{
+						using (WriteTag(writer, "tr"))
+						{
+							writer.WriteLine("<th>Test</th><th>Outcome</th><th>Result</th>");
+						}
+
+						foreach (var result in results)
+						{
+							WriteResult(result, writer);
+						}
+					}
+				}
 			}
 
 			Console.WriteLine("Wrote test report to {0}", Path.GetFullPath(filename));
@@ -68,20 +78,22 @@ namespace SRPTests.TestRenderer
 
 		private void WriteResult(TestResult result, StreamWriter writer)
 		{
-			writer.WriteLine("<div>");
-			writer.WriteLine("{0} - {1}", result.name, result.bSuccess ? "Success" : "Failure");
-
-			if (result.resultImage != null)
+			using (WriteTag(writer, "tr"))
 			{
-				writer.WriteLine("<img width=\"{0}\" height=\"{1}\" src=\"{2}\" />",
-					result.resultImage.Width,
-					result.resultImage.Height,
-					ToBase64(result.resultImage));
-			}
+				writer.WriteLine($"<td>{result.name}</td>");
+				writer.WriteLine("<td>{0}</td>", result.bSuccess ? "Success" : "Failure");
 
-			writer.WriteLine("</div>");
+				if (result.resultImage != null)
+				{
+					writer.WriteLine("<td><img width=\"{0}\" height=\"{1}\" src=\"{2}\" /></td>",
+						result.resultImage.Width,
+						result.resultImage.Height,
+						ToBase64(result.resultImage));
+				}
+			}
 		}
 
+		// PNG compress an image and convert it to a HTML base-64 embedded URL.
 		private string ToBase64(Bitmap bitmap)
 		{
 			using (var stream = new MemoryStream())
@@ -90,6 +102,13 @@ namespace SRPTests.TestRenderer
 				var base64 = Convert.ToBase64String(stream.GetBuffer());
 				return "data:image/png;base64," + base64;
 			}
+		}
+
+		// Simple HTML tag writing helper.
+		private IDisposable WriteTag(TextWriter writer, string tag)
+		{
+			writer.WriteLine($"<{tag}>");
+			return Disposable.Create(() => writer.WriteLine($"</{tag}>"));
 		}
 	}
 }
