@@ -15,6 +15,8 @@
         <include filename="TextureMips_6.py" runAtStartup="false" />
         <include filename="CubeMips_3.py" runAtStartup="false" />
         <include filename="CubeMips_6.py" runAtStartup="false" />
+        <include filename="CreateTextureMips.py" runAtStartup="false" />
+        <include filename="CreateTextureNoMips.py" runAtStartup="false" />
       </folder>
       <include filename="CreateTexture.py" runAtStartup="false" />
       <include filename="CreateTextureCallback.py" runAtStartup="false" />
