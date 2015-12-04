@@ -1,4 +1,4 @@
-# Test script-created texture mip generation
+﻿# Test script-created texture mip generation
 
 from SRPScripting import *
 import utils
@@ -14,6 +14,6 @@ def getPixel(x, y):
 	set = x+1 == y or (w - x - 1) == y
 	return col1 if set else col2
 	
-tex = ri.CreateTexture2D(w, h, Format.R8G8B8A8_UNorm, getPixel, True)
+tex = ri.CreateTexture2D(w, h, Format.R8G8B8A8_UNorm, getPixel, generateMips)
 
 utils.TestTextureLevel(ri, tex, 1)

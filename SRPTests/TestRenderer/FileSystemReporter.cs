@@ -20,8 +20,12 @@ namespace SRPTests.TestRenderer
 
 		public Task TestCompleteAsync(string name, bool bSuccess, Bitmap result)
 		{
-			// Save to output directory.
-			result.Save(Path.Combine(_outDir, name + ".png"), ImageFormat.Png);
+			// Result may be null if we failed before even getting to the rendering.
+			if (result != null)
+			{
+				// Save to output directory.
+				result.Save(Path.Combine(_outDir, name + ".png"), ImageFormat.Png);
+			}
 
 			return Task.Delay(0);
 		}

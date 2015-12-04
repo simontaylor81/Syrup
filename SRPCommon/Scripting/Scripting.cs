@@ -103,7 +103,7 @@ namespace SRPCommon.Scripting
 				bool bSuccess = await Task.Run(() =>
 					{
 						var source = pythonEngine.CreateScriptSourceFromFile(script.Filename);
-						return RunSource(source);
+						return RunSource(source, script.GlobalVariables);
 					});
 
 				_executionComplete.OnNext(bSuccess);
@@ -111,7 +111,7 @@ namespace SRPCommon.Scripting
 			}
 		}
 
-		private bool RunSource(ScriptSource source)
+		private bool RunSource(ScriptSource source, IDictionary<string, object> globals)
 		{
 			// Clear any cached modules (user may have edited them).
 			pythonEngine.GetSysModule().GetVariable("modules").Clear();
@@ -120,6 +120,12 @@ namespace SRPCommon.Scripting
 			Debug.Assert(RenderInterface != null);
 			var pythonScope = pythonEngine.CreateScope();
 			pythonScope.SetVariable("ri", RenderInterface);
+
+			// Set any given global variables too.
+			foreach (var global in globals)
+			{
+				pythonScope.SetVariable(global.Key, global.Value);
+			}
 
 			try
 			{

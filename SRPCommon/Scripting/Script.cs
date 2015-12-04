@@ -11,6 +11,9 @@ namespace SRPCommon.Scripting
 
 		public IDictionary<string, IUserProperty> UserProperties { get; } = new Dictionary<string, IUserProperty>();
 
+		// Global variables to set before execution. Only used by auto testing.
+		public IDictionary<string, object> GlobalVariables { get; } = new Dictionary<string, object>();
+
 		public Script(string filename)
 		{
 			Filename = filename;

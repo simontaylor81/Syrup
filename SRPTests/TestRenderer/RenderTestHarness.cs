@@ -21,6 +21,7 @@ namespace SRPTests.TestRenderer
 		private readonly TestReporter _reporter;
 
 		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
+		private static readonly string _testDefinitionFile = Path.Combine(_baseDir, "tests.json");
 
 		private static bool bLoggedDevice = false;
 
@@ -53,16 +54,15 @@ namespace SRPTests.TestRenderer
 
 		[Theory]
 		[MemberData("ScriptFiles")]
-		public async Task RenderScript(string scriptFile)
+		public async Task RenderScript(string name, Script script)
 		{
 			bool bSuccess = false;
 			Bitmap result = null;
-			var name = Path.GetFileNameWithoutExtension(scriptFile);
 
 			try
 			{
 				// Execute the script.
-				await _scripting.RunScript(new Script(scriptFile));
+				await _scripting.RunScript(script);
 
 				Assert.False(_sr.HasScriptError, "Error executing script");
 
@@ -72,7 +72,7 @@ namespace SRPTests.TestRenderer
 				Assert.False(_sr.HasScriptError, "Error executing script render callback");
 
 				// Load the image to compare against.
-				var expectedImageFilename = Path.ChangeExtension(scriptFile, "png");
+				var expectedImageFilename = Path.Combine(_baseDir, name + ".png");
 				Assert.True(File.Exists(expectedImageFilename), "No expected image to compare against.");
 				var expected = new Bitmap(expectedImageFilename);
 
@@ -87,13 +87,6 @@ namespace SRPTests.TestRenderer
 			}
 		}
 
-		public static IEnumerable<object[]> ScriptFiles
-		{
-			get
-			{
-				return Directory.EnumerateFiles(_baseDir, "*.py")
-					.Select(file => new[] { file });
-			}
-		}
+		public static IEnumerable<object[]> ScriptFiles => TestDefinitions.Load(_testDefinitionFile);
 	}
 }
