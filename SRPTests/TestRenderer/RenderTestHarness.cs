@@ -21,6 +21,7 @@ namespace SRPTests.TestRenderer
 		private readonly TestReporter _reporter;
 
 		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
+		private static readonly string _expectedResultDir = Path.Combine(_baseDir, "ExpectedResults");
 		private static readonly string _testDefinitionFile = Path.Combine(_baseDir, "tests.json");
 
 		private static bool bLoggedDevice = false;
@@ -72,7 +73,7 @@ namespace SRPTests.TestRenderer
 				Assert.False(_sr.HasScriptError, "Error executing script render callback");
 
 				// Load the image to compare against.
-				var expectedImageFilename = Path.Combine(_baseDir, name + ".png");
+				var expectedImageFilename = Path.Combine(_expectedResultDir, name + ".png");
 				Assert.True(File.Exists(expectedImageFilename), "No expected image to compare against.");
 				var expected = new Bitmap(expectedImageFilename);
 
