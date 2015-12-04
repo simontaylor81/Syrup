@@ -135,4 +135,28 @@ ScratchImage^ DirectXTex::LoadFromTGAFile(String^ filename)
 	return image;
 }
 
+//--------------------------------------------------------------------------------------------------
+// Create a 2D texture from raw pixel data.
+//--------------------------------------------------------------------------------------------------
+ScratchImage^ DirectXTexSlim::DirectXTex::Create2D(SlimDX::DataRectangle^ data, int width, int height, SlimDX::DXGI::Format format)
+{
+	// Construct Image representation.
+	DirectX::Image image;
+	image.width = width;
+	image.height = height;
+	image.format = static_cast<DXGI_FORMAT>(format);
+	image.rowPitch = data->Pitch;
+	image.slicePitch = 0;
+	image.pixels = static_cast<uint8_t*>(data->Data->DataPointer.ToPointer());
+
+	// Create scrath image from the Image.
+	auto result = gcnew ScratchImage();
+	auto hr = result->GetScratchImage()->InitializeFromImage(image);
+
+	// Throw on failure.
+	Marshal::ThrowExceptionForHR(hr);
+
+	return result;
+}
+
 }

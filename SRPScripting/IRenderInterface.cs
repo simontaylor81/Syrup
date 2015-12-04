@@ -29,7 +29,7 @@ namespace SRPScripting
 		object CreateRenderTarget();
 
 		// Create a 2D texture of the given size and format, and fill it with the given data.
-		object CreateTexture2D(int width, int height, Format format, dynamic contents);
+		object CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false);
 
 		// Load a texture from a file.
 		object LoadTexture(string path);

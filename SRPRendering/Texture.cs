@@ -82,25 +82,24 @@ namespace SRPRendering
 		}
 
 		// Create a texture with data from script.
-		public static Texture CreateFromScript(Device device, int width, int height, Format format, dynamic contents)
+		public static Texture CreateFromScript(
+			Device device, int width, int height, Format format, dynamic contents, bool generateMips = false)
 		{
-			// Build texture descriptor.
-			var desc = new Texture2DDescription()
-				{
-					Width = width,
-					Height = height,
-					Format = format.ToDXGI(),
-					MipLevels = 1,		// TODO: generate mips?
-					ArraySize = 1,
-					BindFlags = BindFlags.ShaderResource,
-					SampleDescription = new SlimDX.DXGI.SampleDescription(1, 0)
-				};
-
 			// Construct data stream from script data.
 			var initialData = new DataRectangle(width * format.Size(), GetStreamFromDynamic(contents, width, height, format));
 
+			// Create DirectXTex representation (so we can apply the same operations as images loaded
+			// from disk, e.g. mip generation).
+			var image = DirectXTex.Create2D(initialData, width, height, format.ToDXGI());
+
+			// Generate mipmaps if desired.
+			if (generateMips)
+			{
+				image.GenerateMipMaps();
+			}
+
 			// Create the actual texture resource.
-			var texture2D = new Texture2D(device, desc, initialData);
+			var texture2D = image.CreateTexture(device);
 
 			// Create the SRV.
 			var srv = new ShaderResourceView(device, texture2D);

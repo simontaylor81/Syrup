@@ -285,9 +285,9 @@ namespace SRPRendering
 		}
 
 		// Create a 2D texture of the given size and format, and fill it with the given data.
-		public object CreateTexture2D(int width, int height, Format format, dynamic contents)
+		public object CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false)
 		{
-			textures.Add(Texture.CreateFromScript(_device.Device, width, height, format, contents));
+			textures.Add(Texture.CreateFromScript(_device.Device, width, height, format, contents, generateMips));
 			return new TextureHandle(textures.Count - 1);
 		}
 

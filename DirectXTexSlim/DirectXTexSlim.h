@@ -41,6 +41,8 @@ public:
 	static ScratchImage^ LoadFromDDSFile(String^ filename);
 	static ScratchImage^ LoadFromWICFile(String^ filename);
 	static ScratchImage^ LoadFromTGAFile(String^ filename);
+
+	static ScratchImage^ Create2D(SlimDX::DataRectangle^ data, int width, int height, SlimDX::DXGI::Format format);
 };
 
 }
