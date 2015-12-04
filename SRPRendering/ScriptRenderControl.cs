@@ -294,8 +294,20 @@ namespace SRPRendering
 		// Load a texture from disk.
 		public object LoadTexture(string path)
 		{
-			textures.Add(Texture.LoadFromFile(_device.Device, _workspace.GetAbsolutePath(path)));
-			return new TextureHandle(textures.Count - 1);
+			var absPath = _workspace.GetAbsolutePath(path);
+			try
+			{
+				textures.Add(Texture.LoadFromFile(_device.Device, absPath));
+				return new TextureHandle(textures.Count - 1);
+			}
+			catch (FileNotFoundException ex)
+			{
+				throw new ScriptException("Could not file texture file: " + absPath, ex);
+			}
+			catch (Exception ex)
+			{
+				throw new ScriptException("Error loading texture file: " + absPath, ex);
+			}
 		}
 
 		public void Dispose()
