@@ -1,3 +1,12 @@
+# Register a test setting with a default value.
+# Basically, this checks if we have a global variable,
+# and if not add one with the default value. Allows test scripts
+# with inputs from the test system to still be run in the editor.
+def TestSetting(key, default, globalsDict):
+	if key not in globalsDict:
+		globalsDict[key] = default
+
+
 # Texture testing helper.
 def TestTexture_Impl(ri, tex, psEntryPoint, texShaderVar, level = None):
 	# Compile shaders.

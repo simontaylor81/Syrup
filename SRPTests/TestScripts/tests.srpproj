@@ -9,22 +9,13 @@
       <include filename="Shaders/ConstantColour.hlsl" runAtStartup="false" />
     </folder>
     <folder name="Textures">
-      <folder name="Mipmaps">
-        <include filename="TextureMips_1.py" runAtStartup="false" />
-        <include filename="TextureMips_3.py" runAtStartup="false" />
-        <include filename="TextureMips_6.py" runAtStartup="false" />
-        <include filename="CubeMips_3.py" runAtStartup="false" />
-        <include filename="CubeMips_6.py" runAtStartup="false" />
-        <include filename="CreateTextureMips.py" runAtStartup="false" />
-        <include filename="CreateTextureNoMips.py" runAtStartup="false" />
-      </folder>
       <include filename="CreateTexture.py" runAtStartup="false" />
       <include filename="CreateTextureCallback.py" runAtStartup="false" />
-      <include filename="TexturePng.py" runAtStartup="false" />
-      <include filename="TextureTga.py" runAtStartup="false" />
-      <include filename="TextureBmp.py" runAtStartup="false" />
-      <include filename="TextureJpeg.py" runAtStartup="false" />
       <include filename="TextureCubemap.py" runAtStartup="false" />
+      <include filename="CreateTextureMips.py" runAtStartup="false" />
+      <include filename="TextureMips.py" runAtStartup="false" />
+      <include filename="LoadTexture.py" runAtStartup="false" />
+      <include filename="CubeMips.py" runAtStartup="false" />
     </folder>
     <include filename="Clear.py" runAtStartup="false" />
     <include filename="Null.py" runAtStartup="false" />

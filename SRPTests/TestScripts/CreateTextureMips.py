@@ -1,7 +1,9 @@
-﻿# Test script-created texture mip generation
+# Test script-created texture mip generation
 
 from SRPScripting import *
 import utils
+
+utils.TestSetting('generateMips', True, globals())
 
 col1 = (0, 0, 0, 1)
 col2 = (1, 1, 1, 1)
