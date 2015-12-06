@@ -10,6 +10,7 @@ namespace SRPRendering
 	// Encapsulation of a D3D render target.
 	class RenderTarget : IDisposable
 	{
+		public Texture2D Texture2D => texture;
 		public RenderTargetView RTV => rtv;
 		public ShaderResourceView SRV => srv;
 

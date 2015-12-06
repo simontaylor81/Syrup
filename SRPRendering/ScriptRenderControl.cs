@@ -23,6 +23,8 @@ namespace SRPRendering
 		{
 			_workspace = workspace;
 			_device = device;
+
+			_mipGenerator = new MipGenerator(device);
 		}
 
 		public void Reset()
@@ -292,12 +294,32 @@ namespace SRPRendering
 		}
 
 		// Load a texture from disk.
-		public object LoadTexture(string path)
+		public object LoadTexture(string path, object generateMips = null)
 		{
 			var absPath = _workspace.GetAbsolutePath(path);
+
+			// Ugh, Castle DynamicProxy doesn't pass through the null default value, so detect it.
+			if (generateMips == System.Reflection.Missing.Value)
+			{
+				generateMips = null;
+			}
+
+			var generateMipsSimple = generateMips == null || generateMips.Equals(true);
+			var generateMipsCustom = generateMips is string;
+
+			// TEMP
+			generateMipsSimple |= generateMipsCustom;
+
 			try
 			{
-				textures.Add(Texture.LoadFromFile(_device.Device, absPath));
+				var texture = Texture.LoadFromFile(_device.Device, absPath, generateMipsSimple);
+
+				if (generateMipsCustom)
+				{
+					_mipGenerator.Generate(texture);
+				}
+
+				textures.Add(texture);
 				return new TextureHandle(textures.Count - 1);
 			}
 			catch (FileNotFoundException ex)
@@ -315,8 +337,8 @@ namespace SRPRendering
 			Reset();
 
 			shaders.Clear();
-
 			DisposableUtil.DisposeList(renderTargets);
+			_mipGenerator.Dispose();
 
 			_device = null;
 		}
@@ -445,5 +467,7 @@ namespace SRPRendering
 
 		// User variables.
 		private List<IUserProperty> _userVariables = new List<IUserProperty>();
+
+		private readonly MipGenerator _mipGenerator;
 	}
 }

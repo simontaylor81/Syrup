@@ -16,6 +16,7 @@
       <include filename="TextureMips.py" runAtStartup="false" />
       <include filename="LoadTexture.py" runAtStartup="false" />
       <include filename="CubeMips.py" runAtStartup="false" />
+      <include filename="CustomMips.py" runAtStartup="false" />
     </folder>
     <include filename="Clear.py" runAtStartup="false" />
     <include filename="Null.py" runAtStartup="false" />
@@ -25,5 +26,6 @@
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Utils\utils.py" />
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\TextureCubemap.py" />
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Shaders\FullscreenTexture.hlsl" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CustomMips.py" />
   </OpenDocuments>
 </project>

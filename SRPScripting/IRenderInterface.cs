@@ -32,7 +32,7 @@ namespace SRPScripting
 		object CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false);
 
 		// Load a texture from a file.
-		object LoadTexture(string path);
+		object LoadTexture(string path, object generateMips = null);
 
 		void BindShaderVariable(dynamic shader, string var, ShaderVariableBindSource source);
 		void BindShaderVariableToMaterial(dynamic shader, string var, string param);

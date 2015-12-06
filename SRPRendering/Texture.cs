@@ -34,7 +34,7 @@ namespace SRPRendering
 		// Create a texture from a file.
 		// TODO: Not sure if this is the best strategy long term.
 		// Probably want to separate import from render resource creation.
-		public static Texture LoadFromFile(Device device, string filename)
+		public static Texture LoadFromFile(Device device, string filename, bool generateMips)
 		{
 			try
 			{
@@ -42,7 +42,12 @@ namespace SRPRendering
 
 				// Load the texture itself using DirectXTex.
 				var image = LoadImage(filename);
-				image.GenerateMipMaps();
+
+				if (generateMips)
+				{
+					image.GenerateMipMaps();
+				}
+
 				var texture2D = image.CreateTexture(device);
 
 				//stopwatch.Stop();

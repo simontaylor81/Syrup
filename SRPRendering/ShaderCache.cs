@@ -36,6 +36,8 @@ namespace SRPRendering
 		public IShader GetShader(string filename, string entryPoint, string profile,
 			Func<string, string> includeLookup, ShaderMacro[] defines)
 		{
+			defines = defines ?? new ShaderMacro[0];
+
 			// Look in the dictionary to see if we already have this file.
 			var key = new ShaderCacheKey(filename, entryPoint, profile, defines);
 			ShaderCacheEntry existingEntry;
