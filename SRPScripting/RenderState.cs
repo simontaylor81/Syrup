@@ -197,18 +197,19 @@ namespace SRPScripting
 							TextureAddressMode addressMode = TextureAddressMode.Wrap)
 		{
 			this.filter = filter;
+			this.addressMode = addressMode;
 		}
 
 		// Easy accessors for some common use cases.
-		public static SamplerState LinearWrap { get { return linearWrap_; } }
-		public static SamplerState LinearClamp { get { return linearClamp_; } }
-		public static SamplerState PointWrap { get { return pointWrap_; } }
-		public static SamplerState PointClamp { get { return pointClamp_; } }
+		public static SamplerState LinearWrap => _linearWrap;
+		public static SamplerState LinearClamp => _linearClamp;
+		public static SamplerState PointWrap => _pointWrap;
+		public static SamplerState PointClamp => _pointClamp;
 
-		private static SamplerState linearWrap_ = new SamplerState(TextureFilter.Linear, TextureAddressMode.Wrap);
-		private static SamplerState linearClamp_ = new SamplerState(TextureFilter.Linear, TextureAddressMode.Clamp);
-		private static SamplerState pointWrap_ = new SamplerState(TextureFilter.Point, TextureAddressMode.Wrap);
-		private static SamplerState pointClamp_ = new SamplerState(TextureFilter.Point, TextureAddressMode.Clamp);
+		private static SamplerState _linearWrap = new SamplerState(TextureFilter.Linear, TextureAddressMode.Wrap);
+		private static SamplerState _linearClamp = new SamplerState(TextureFilter.Linear, TextureAddressMode.Clamp);
+		private static SamplerState _pointWrap = new SamplerState(TextureFilter.Point, TextureAddressMode.Wrap);
+		private static SamplerState _pointClamp = new SamplerState(TextureFilter.Point, TextureAddressMode.Clamp);
 
 		public readonly TextureFilter filter;
 		public readonly TextureAddressMode addressMode;
