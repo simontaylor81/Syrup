@@ -32,6 +32,8 @@ namespace SRPRendering
 			// TODO: Insert custom sampling code here.
 			var pixelShader = _device.GlobalResources.ShaderCache.GetShader(
 				RenderUtils.GetShaderFilename("GenMipsPS.hlsl"), "Main", "ps_4_0", RenderUtils.GetShaderFilename, null);
+			var texVariable = pixelShader.FindResourceVariable("tex");
+			var destMipVariable = pixelShader.FindVariable("DestMip");
 
 			var texDesc = texture.Texture2D.Description;
 			int mipWidth = texDesc.Width >> 1;
@@ -44,37 +46,23 @@ namespace SRPRendering
 				var context = _device.Device.ImmediateContext;
 
 				// Set common state.
-				context.Rasterizer.State = _device.GlobalResources.RastStateCache.Get(RastState.Default.ToD3D11());
-				context.OutputMerger.DepthStencilState = _device.GlobalResources.DepthStencilStateCache.Get(DepthStencilState.DisableDepth.ToD3D11());
-				context.OutputMerger.BlendState = _device.GlobalResources.BlendStateCache.Get(BlendState.NoBlending.ToD3D11());
+				SetCommonState(context);
+				pixelShader.Set(context);
+				context.OutputMerger.SetTargets(renderTarget.RTV);
 
-				// Set input layout
-				context.InputAssembler.InputLayout = _device.GlobalResources.InputLayoutCache.GetInputLayout(
-					_device.Device, _vertexShader.Signature, FullscreenQuad.InputElements);
-
-				var texVariable = pixelShader.FindResourceVariable("tex");
 				if (texVariable != null)
 				{
 					texVariable.Resource = texture.SRV;
 					texVariable.Sampler = _device.GlobalResources.SamplerStateCache.Get(SamplerState.LinearClamp.ToD3D11());
 				}
 
-				var destMipVariable = pixelShader.FindVariable("DestMip");
-
 				int mip = 1;
 				while (mipWidth > 0 && mipHeight > 0)
 				{
-					context.OutputMerger.SetTargets(renderTarget.RTV);
 					context.Rasterizer.SetViewports(new SlimDX.Direct3D11.Viewport(0, 0, mipWidth, mipHeight));
 
-					if (destMipVariable != null)
-					{
-						destMipVariable.Set(mip);
-					}
+					destMipVariable?.Set(mip);
 					pixelShader.UpdateVariables(context, null, null, null, null);
-
-					_vertexShader.Set(context);
-					pixelShader.Set(context);
 
 					// Render 'fullscreen' quad to downsample the mip.
 					_device.GlobalResources.FullscreenQuad.Draw(context);
@@ -88,6 +76,20 @@ namespace SRPRendering
 					mip++;
 				}
 			}
+		}
+
+		// Set render state that is always the same, independent of shader, texture, etc.
+		private void SetCommonState(SlimDX.Direct3D11.DeviceContext context)
+		{
+			context.Rasterizer.State = _device.GlobalResources.RastStateCache.Get(RastState.Default.ToD3D11());
+			context.OutputMerger.DepthStencilState = _device.GlobalResources.DepthStencilStateCache.Get(DepthStencilState.DisableDepth.ToD3D11());
+			context.OutputMerger.BlendState = _device.GlobalResources.BlendStateCache.Get(BlendState.NoBlending.ToD3D11());
+
+			// Set input layout
+			context.InputAssembler.InputLayout = _device.GlobalResources.InputLayoutCache.GetInputLayout(
+				_device.Device, _vertexShader.Signature, FullscreenQuad.InputElements);
+
+			_vertexShader.Set(context);
 		}
 
 		public void Dispose()

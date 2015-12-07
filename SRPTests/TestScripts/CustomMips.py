@@ -2,4 +2,4 @@
 import utils
 
 tex = ri.LoadTexture('Assets/Textures/ThisIsATest.png', generateMips = '')
-utils.TestTextureLevel(ri, tex, 1)
+utils.TestTextureLevel(ri, tex, 2)
