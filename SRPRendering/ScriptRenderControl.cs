@@ -376,7 +376,8 @@ namespace SRPRendering
 					// Don't forget to release the old one.
 					desc.renderTarget?.Dispose();
 
-					desc.renderTarget = new RenderTarget(_device.Device, width, height);
+					// TODO: Custom format
+					desc.renderTarget = new RenderTarget(_device.Device, width, height, SlimDX.DXGI.Format.R8G8B8A8_UNorm);
 				}
 			}
 		}

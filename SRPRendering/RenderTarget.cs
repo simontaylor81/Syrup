@@ -17,14 +17,14 @@ namespace SRPRendering
 		public int Width => texture.Description.Width;
 		public int Height => texture.Description.Height;
 
-		public RenderTarget(Device device, int width, int height)
+		public RenderTarget(Device device, int width, int height, SlimDX.DXGI.Format format)
 		{
 			// Create the texture itself.
 			var desc = new Texture2DDescription()
 				{
 					Width = width,
 					Height = height,
-					Format = SlimDX.DXGI.Format.R8G8B8A8_UNorm,		// TODO
+					Format = format,
 					MipLevels = 1,
 					ArraySize = 1,
 					BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource,
