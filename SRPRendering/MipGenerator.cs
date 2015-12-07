@@ -51,6 +51,14 @@ namespace SRPRendering
 			context.InputAssembler.InputLayout = _device.GlobalResources.InputLayoutCache.GetInputLayout(
 				_device.Device, _vertexShader.Signature, FullscreenQuad.InputElements);
 
+			var texVariable = pixelShader.FindResourceVariable("tex");
+			if (texVariable != null)
+			{
+				texVariable.Resource = texture.SRV;
+				texVariable.Sampler = _device.GlobalResources.SamplerStateCache.Get(SamplerState.LinearClamp.ToD3D11());
+				texVariable.SetToDevice(context);
+			}
+
 			int mip = 1;
 			while (mipWidth > 0 && mipHeight > 0)
 			{
