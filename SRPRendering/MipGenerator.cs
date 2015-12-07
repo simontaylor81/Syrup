@@ -26,6 +26,8 @@ namespace SRPRendering
 		// Do the generation.
 		public void Generate(Texture texture)
 		{
+			// TODO: Skip and warn if texture is compressed.
+
 			// Compile pixel shader.
 			// TODO: Insert custom sampling code here.
 			var pixelShader = _device.GlobalResources.ShaderCache.GetShader(
@@ -54,7 +56,7 @@ namespace SRPRendering
 				if (texVariable != null)
 				{
 					texVariable.Resource = texture.SRV;
-					texVariable.Sampler = _device.GlobalResources.SamplerStateCache.Get(SamplerState.PointClamp.ToD3D11());
+					texVariable.Sampler = _device.GlobalResources.SamplerStateCache.Get(SamplerState.LinearClamp.ToD3D11());
 					texVariable.SetToDevice(context);
 				}
 

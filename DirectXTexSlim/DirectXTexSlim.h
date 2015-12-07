@@ -23,6 +23,9 @@ public:
 	// Generate mipmaps for this image.
 	void GenerateMipMaps();
 
+	// Create an empty mip chain for this image.
+	void CreateEmptyMipChain();
+
 internal:
 	ScratchImage();
 	~ScratchImage();

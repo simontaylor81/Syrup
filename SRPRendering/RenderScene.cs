@@ -131,7 +131,7 @@ namespace SRPRendering
 							try
 							{
 								// Always generate mips for scene textures (for now, at least).
-								textures.Add(file, Texture.LoadFromFile(_device.Device, file, true));
+								textures.Add(file, Texture.LoadFromFile(_device.Device, file, MipGenerationMode.Full));
 							}
 #pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
 							catch (Exception)

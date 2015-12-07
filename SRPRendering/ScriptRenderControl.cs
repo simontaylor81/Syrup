@@ -304,18 +304,23 @@ namespace SRPRendering
 				generateMips = null;
 			}
 
-			var generateMipsSimple = generateMips == null || generateMips.Equals(true);
-			var generateMipsCustom = generateMips is string;
-
-			// TEMP
-			generateMipsSimple |= generateMipsCustom;
+			MipGenerationMode mipGenerationMode = MipGenerationMode.None;
+			if (generateMips == null || generateMips.Equals(true))
+			{
+				mipGenerationMode = MipGenerationMode.Full;
+			}
+			else if (generateMips is string)
+			{
+				mipGenerationMode = MipGenerationMode.CreateOnly;
+			}
 
 			try
 			{
-				var texture = Texture.LoadFromFile(_device.Device, absPath, generateMipsSimple);
+				var texture = Texture.LoadFromFile(_device.Device, absPath, mipGenerationMode);
 
-				if (generateMipsCustom)
+				if (mipGenerationMode == MipGenerationMode.CreateOnly)
 				{
+					// Generate custom mips.
 					_mipGenerator.Generate(texture);
 				}
 

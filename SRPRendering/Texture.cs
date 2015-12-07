@@ -13,6 +13,13 @@ using SRPCommon.Scripting;
 
 namespace SRPRendering
 {
+	public enum MipGenerationMode
+	{
+		None,		// Create texture without mipchain
+		Full,		// Generate full mipchain
+		CreateOnly,	// Create the mip chain, but don't put any data in it.
+	}
+
 	public class Texture : IDisposable
 	{
 		public Texture2D Texture2D { get; }
@@ -34,7 +41,7 @@ namespace SRPRendering
 		// Create a texture from a file.
 		// TODO: Not sure if this is the best strategy long term.
 		// Probably want to separate import from render resource creation.
-		public static Texture LoadFromFile(Device device, string filename, bool generateMips)
+		public static Texture LoadFromFile(Device device, string filename, MipGenerationMode mipGenerationMode)
 		{
 			try
 			{
@@ -43,9 +50,13 @@ namespace SRPRendering
 				// Load the texture itself using DirectXTex.
 				var image = LoadImage(filename);
 
-				if (generateMips)
+				if (mipGenerationMode == MipGenerationMode.Full)
 				{
 					image.GenerateMipMaps();
+				}
+				else if (mipGenerationMode == MipGenerationMode.CreateOnly)
+				{
+					image.CreateEmptyMipChain();
 				}
 
 				var texture2D = image.CreateTexture(device);

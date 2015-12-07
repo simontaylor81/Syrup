@@ -7,5 +7,5 @@ SamplerState mySampler;
 float4 Main(VSToPs In) : SV_Target
 {
 	float2 uv = In.UV;
-	return tex.Sample(mySampler, uv);
+	return tex.SampleLevel(mySampler, uv, 0);
 }
