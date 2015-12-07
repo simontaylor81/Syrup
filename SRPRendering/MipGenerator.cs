@@ -57,14 +57,21 @@ namespace SRPRendering
 				{
 					texVariable.Resource = texture.SRV;
 					texVariable.Sampler = _device.GlobalResources.SamplerStateCache.Get(SamplerState.LinearClamp.ToD3D11());
-					texVariable.SetToDevice(context);
 				}
+
+				var destMipVariable = pixelShader.FindVariable("DestMip");
 
 				int mip = 1;
 				while (mipWidth > 0 && mipHeight > 0)
 				{
 					context.OutputMerger.SetTargets(renderTarget.RTV);
 					context.Rasterizer.SetViewports(new SlimDX.Direct3D11.Viewport(0, 0, mipWidth, mipHeight));
+
+					if (destMipVariable != null)
+					{
+						destMipVariable.Set(mip);
+					}
+					pixelShader.UpdateVariables(context, null, null, null, null);
 
 					_vertexShader.Set(context);
 					pixelShader.Set(context);
