@@ -7,6 +7,7 @@
     <folder name="Shaders">
       <include filename="Shaders/FullscreenTexture.hlsl" runAtStartup="false" />
       <include filename="Shaders/ConstantColour.hlsl" runAtStartup="false" />
+      <include filename="Shaders/CustomDownsample.hlsl" runAtStartup="false" />
     </folder>
     <folder name="Textures">
       <include filename="CreateTexture.py" runAtStartup="false" />
@@ -27,5 +28,6 @@
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\TextureCubemap.py" />
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Shaders\FullscreenTexture.hlsl" />
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CustomMips.py" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Shaders\CustomDownsample.hlsl" />
   </OpenDocuments>
 </project>

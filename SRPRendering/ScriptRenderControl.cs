@@ -24,7 +24,7 @@ namespace SRPRendering
 			_workspace = workspace;
 			_device = device;
 
-			_mipGenerator = new MipGenerator(device);
+			_mipGenerator = new MipGenerator(device, workspace);
 		}
 
 		public void Reset()
@@ -321,7 +321,7 @@ namespace SRPRendering
 				if (mipGenerationMode == MipGenerationMode.CreateOnly)
 				{
 					// Generate custom mips.
-					_mipGenerator.Generate(texture);
+					_mipGenerator.Generate(texture, generateMips as string);
 				}
 
 				textures.Add(texture);

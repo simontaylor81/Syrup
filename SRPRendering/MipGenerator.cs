@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
+using SRPCommon.Interfaces;
 using SRPScripting;
 
 namespace SRPRendering
@@ -12,11 +14,13 @@ namespace SRPRendering
 	class MipGenerator : IDisposable
 	{
 		private readonly RenderDevice _device;
+		private readonly IWorkspace _workspace;
 		private readonly IShader _vertexShader;
 
-		public MipGenerator(RenderDevice device)
+		public MipGenerator(RenderDevice device, IWorkspace workspace)
 		{
 			_device = device;
+			_workspace = workspace;
 
 			// Compile vertex shader.
 			_vertexShader = device.GlobalResources.ShaderCache.GetShader(
@@ -24,15 +28,34 @@ namespace SRPRendering
 		}
 
 		// Do the generation.
-		public void Generate(Texture texture)
+		public void Generate(Texture texture, string shaderFile)
 		{
 			// TODO: Skip and warn if texture is compressed.
 
+			// Custom include handler to include the special custom code from the script.
+			Func<string, string> includeHandler = filename =>
+			{
+				// Handle system includes first, otherwise project files could accidentally override them.
+				var systemFile = RenderUtils.GetShaderFilename(filename);
+				if (File.Exists(systemFile))
+				{
+					return systemFile;
+				}
+
+				// Is it the special include?
+				if (filename == "_scriptDownsample")
+				{
+					filename = shaderFile;
+				}
+
+				// Look for the file in the project.
+				return _workspace.FindProjectFile(filename);
+			};
+
 			// Compile pixel shader.
-			// TODO: Insert custom sampling code here.
 			var pixelShader = _device.GlobalResources.ShaderCache.GetShader(
-				RenderUtils.GetShaderFilename("GenMipsPS.hlsl"), "Main", "ps_4_0", RenderUtils.GetShaderFilename, null);
-			var texVariable = pixelShader.FindResourceVariable("tex");
+				RenderUtils.GetShaderFilename("GenMipsPS.hlsl"), "Main", "ps_4_0", includeHandler, null);
+			var texVariable = pixelShader.FindResourceVariable("Texture");
 			var destMipVariable = pixelShader.FindVariable("DestMip");
 
 			var texDesc = texture.Texture2D.Description;
