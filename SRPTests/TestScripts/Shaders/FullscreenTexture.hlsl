@@ -5,12 +5,7 @@ TextureCube texCube;
 
 float MipLevel;
 
-SamplerState mySampler
-{
-    Filter = MIN_MAG_MIP_NEAREST;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
+SamplerState mySampler;
 
 struct PSIn
 {

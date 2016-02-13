@@ -2,9 +2,12 @@
 
 #include "GenMipsCommon.hlsl"
 
-// The texture we're downsampling, and a sampler to read it.
+// The texture we're downsampling.
 Texture2D Texture;
-SamplerState Sampler;
+
+// Samplers that the user code can use.
+SamplerState LinearSampler;
+SamplerState PointSampler;
 
 // The mip that is being generated.
 int DestMip;

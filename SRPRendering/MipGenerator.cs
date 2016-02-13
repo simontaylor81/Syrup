@@ -55,7 +55,6 @@ namespace SRPRendering
 			// Compile pixel shader.
 			var pixelShader = _device.GlobalResources.ShaderCache.GetShader(
 				RenderUtils.GetShaderFilename("GenMipsPS.hlsl"), "Main", "ps_4_0", includeHandler, null);
-			var texVariable = pixelShader.FindResourceVariable("Texture");
 			var destMipVariable = pixelShader.FindVariable("DestMip");
 
 			var texDesc = texture.Texture2D.Description;
@@ -73,11 +72,7 @@ namespace SRPRendering
 				pixelShader.Set(context);
 				context.OutputMerger.SetTargets(renderTarget.RTV);
 
-				if (texVariable != null)
-				{
-					texVariable.Resource = texture.SRV;
-					texVariable.Sampler = _device.GlobalResources.SamplerStateCache.Get(SamplerState.LinearClamp.ToD3D11());
-				}
+				BindResources(pixelShader, texture);
 
 				int mip = 1;
 				while (mipWidth > 0 && mipHeight > 0)
@@ -115,6 +110,32 @@ namespace SRPRendering
 			_vertexShader.Set(context);
 		}
 
+		// Bind texture and samplers.
+		private void BindResources(IShader ps, Texture texture)
+		{
+			// Bind the texture itself.
+			var texVariable = ps.FindResourceVariable("Texture");
+			if (texVariable != null)
+			{
+				texVariable.Resource = texture.SRV;
+			}
+
+			// Bind samplers.
+			SetSampler(ps, "LinearSampler", SamplerState.LinearClamp);
+			SetSampler(ps, "PointSampler", SamplerState.PointClamp);
+		}
+
+		// Simpler helper for setting samplers by name using a state from the cache.
+		private void SetSampler(IShader shader, string name, SamplerState state)
+		{
+			var sampler = shader.FindSamplerVariable(name);
+			if (sampler != null)
+			{
+				sampler.State = _device.GlobalResources.SamplerStateCache.Get(state.ToD3D11());
+			}
+		}
+
+		// TODO: Remove if this turns out to be unnecesary.
 		public void Dispose()
 		{
 		}

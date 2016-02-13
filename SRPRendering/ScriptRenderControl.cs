@@ -5,8 +5,6 @@ using System.Linq;
 using System.Reactive.Linq;
 
 using SlimDX;
-using SlimDX.D3DCompiler;
-using SlimDX.Direct3D11;
 using SRPCommon.Interfaces;
 using SRPCommon.Scene;
 using SRPCommon.Scripting;
@@ -79,7 +77,7 @@ namespace SRPRendering
 
 			var macros = defines
 				.EmptyIfNull()
-				.Select(define => new ShaderMacro(define.Key, define.Value.ToString()))
+				.Select(define => new SlimDX.D3DCompiler.ShaderMacro(define.Key, define.Value.ToString()))
 				.ToArray();
 
 			var shader = _device.GlobalResources.ShaderCache.GetShader(path, entryPoint, profile, FindShader, macros);
@@ -174,10 +172,9 @@ namespace SRPRendering
 
 		public void BindShaderResourceToMaterial(object handleOrHandles, string varName, string paramName, object fallback = null)
 		{
-			var shaders = GetShaders(handleOrHandles);
-			var variables = shaders
+			var variables = GetShaders(handleOrHandles)
 				.Select(shader => shader.FindResourceVariable(varName))
-				.Where(shader => shader != null);
+				.Where(variable => variable != null);
 
 			Texture fallbackTexture = _device.GlobalResources.ErrorTexture;
 
@@ -209,10 +206,9 @@ namespace SRPRendering
 
 		public void SetShaderResourceVariable(object handleOrHandles, string varName, object value)
 		{
-			var shaders = GetShaders(handleOrHandles);
-			var variables = shaders
+			var variables = GetShaders(handleOrHandles)
 				.Select(shader => shader.FindResourceVariable(varName))
-				.Where(shader => shader != null);
+				.Where(variable => variable != null);
 
 			var texture = GetTexture(value);
 			var renderTargetHandle = value as RenderTargetHandle;
@@ -245,6 +241,22 @@ namespace SRPRendering
 				{
 					throw new ScriptException("Invalid parameter for shader resource variable value.");
 				}
+			}
+		}
+
+		public void SetShaderSamplerState(object handleOrHandles, string samplerName, SamplerState state)
+		{
+			var variables = GetShaders(handleOrHandles)
+				.Select(shader => shader.FindSamplerVariable(samplerName))
+				.Where(variable => variable != null);
+
+			foreach (var variable in variables)
+			{
+				if (variable.Bind != null)
+				{
+					throw new ScriptException("Attempting to bind already bound shader sampler: " + samplerName);
+				}
+				variable.Bind = new ShaderSamplerVariableBindDirect(state);
 			}
 		}
 
@@ -348,7 +360,7 @@ namespace SRPRendering
 			_device = null;
 		}
 
-		public void Render(DeviceContext deviceContext, ViewInfo viewInfo, RenderScene renderScene)
+		public void Render(SlimDX.Direct3D11.DeviceContext deviceContext, ViewInfo viewInfo, RenderScene renderScene)
 		{
 			// Create render targets if necessary.
 			UpdateRenderTargets(viewInfo.ViewportWidth, viewInfo.ViewportHeight);

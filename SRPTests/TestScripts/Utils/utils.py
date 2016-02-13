@@ -1,3 +1,5 @@
+from SRPScripting import *
+
 # Register a test setting with a default value.
 # Basically, this checks if we have a global variable,
 # and if not add one with the default value. Allows test scripts
@@ -14,6 +16,7 @@ def TestTexture_Impl(ri, tex, psEntryPoint, texShaderVar, level = None):
 	ps = ri.CompileShader("FullscreenTexture.hlsl", psEntryPoint, "ps_4_0")
 	
 	ri.SetShaderResourceVariable(ps, texShaderVar, tex)
+	ri.SetShaderSamplerState(ps, "mySampler", SamplerState.PointClamp)
 	
 	if level != None:
 		ri.SetShaderVariable(ps, "MipLevel", level)

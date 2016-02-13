@@ -34,13 +34,14 @@ namespace SRPScripting
 		// Load a texture from a file.
 		object LoadTexture(string path, object generateMips = null);
 
-		void BindShaderVariable(dynamic shader, string var, ShaderVariableBindSource source);
-		void BindShaderVariableToMaterial(dynamic shader, string var, string param);
-		void SetShaderVariable(dynamic shader, string var, dynamic value);
-		void ShaderVariableIsScriptOverride(dynamic shader, string var);
+		void BindShaderVariable(object shader, string var, ShaderVariableBindSource source);
+		void BindShaderVariableToMaterial(object shader, string var, string param);
+		void SetShaderVariable(object shader, string var, dynamic value);
+		void ShaderVariableIsScriptOverride(object shader, string var);
 
-		void BindShaderResourceToMaterial(dynamic shader, string var, string param, object fallback = null);
-		void SetShaderResourceVariable(dynamic shader, string var, object value);
+		void BindShaderResourceToMaterial(object shader, string var, string param, object fallback = null);
+		void SetShaderResourceVariable(object shader, string var, object value);
+		void SetShaderSamplerState(object shader, string samplerName, SamplerState state);
 
 		#region User Variables
 		dynamic AddUserVar_Float(string name, float defaultValue);

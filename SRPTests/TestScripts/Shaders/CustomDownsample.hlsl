@@ -1,5 +1,5 @@
 
 float4 Sample(float2 uv)
 {
-	return Texture.SampleLevel(Sampler, uv, DestMip - 1);
+	return Texture.SampleLevel(LinearSampler, uv, DestMip - 1);
 }

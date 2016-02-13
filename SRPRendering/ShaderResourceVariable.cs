@@ -16,7 +16,6 @@ namespace SRPRendering
 		string Name { get; }
 
 		ShaderResourceView Resource { get; set; }
-		SamplerState Sampler { get; set; }
 
 		IShaderResourceVariableBind Bind { get; set; }
 
@@ -31,7 +30,6 @@ namespace SRPRendering
 		// IShaderVariable interface.
 		public string Name { get; }
 		public ShaderResourceView Resource { get; set; }
-		public SamplerState Sampler { get; set; }
 
 		public IShaderResourceVariableBind Bind { get; set; }
 
@@ -41,17 +39,14 @@ namespace SRPRendering
 			{
 				case ShaderFrequency.Vertex:
 					context.VertexShader.SetShaderResource(Resource, slot);
-					context.VertexShader.SetSampler(Sampler, slot);
 					break;
 
 				case ShaderFrequency.Pixel:
 					context.PixelShader.SetShaderResource(Resource, slot);
-					context.PixelShader.SetSampler(Sampler, slot);
 					break;
 
 				case ShaderFrequency.Compute:
 					context.ComputeShader.SetShaderResource(Resource, slot);
-					context.ComputeShader.SetSampler(Sampler, slot);
 					break;
 			}
 		}
