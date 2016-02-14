@@ -50,7 +50,7 @@ namespace SRPRendering
 				var hash = ComputeHash(existingEntry.shader.IncludedFiles.StartWith(filename));
 
 				// Compare the hashes.
-				if (existingEntry.hash.SequenceEqual(hash))
+				if (hash != null && existingEntry.hash.SequenceEqual(hash))
 				{
 					// Cache hit -- return existing shader.
 					existingEntry.shader.Reset();
@@ -84,6 +84,13 @@ namespace SRPRendering
 			// Hash each file
 			foreach (var filename in filenames)
 			{
+				if (!File.Exists(filename))
+				{
+					// File that was previously included no longer exists.
+					// Something must have changed!
+					return null;
+				}
+
 				using (var stream = File.OpenRead(filename))
 				{
 					// Stream through file building up hash.
