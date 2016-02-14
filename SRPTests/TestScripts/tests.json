@@ -51,7 +51,17 @@
     "script": "CreateTextureMips.py",
     "name": "CreateTextureMips_{generateMips}",
     "vars": {
-      "generateMips": [true, false]
+      "generateMips": [ true, false ]
+    }
+  },
+
+  // Tests for custom shader-driven mip generation.
+  {
+    "script": "CustomMips.py",
+    "name": "CustomMips_2D_{sampler}_{mip}",
+    "vars": {
+      "sampler": [ "linear", "point" ],
+      "mip": [ 1, 2 ]
     }
   }
 ]

@@ -7,7 +7,8 @@
     <folder name="Shaders">
       <include filename="Shaders/FullscreenTexture.hlsl" runAtStartup="false" />
       <include filename="Shaders/ConstantColour.hlsl" runAtStartup="false" />
-      <include filename="Shaders/CustomDownsample.hlsl" runAtStartup="false" />
+      <include filename="Shaders/CustomDownsample_2D_Linear.hlsl" runAtStartup="false" />
+      <include filename="Shaders/CustomDownsample_2D_Point.hlsl" runAtStartup="false" />
     </folder>
     <folder name="Textures">
       <include filename="CreateTexture.py" runAtStartup="false" />
