@@ -10,6 +10,7 @@ using SlimDX.Direct3D11;
 using Buffer = SlimDX.Direct3D11.Buffer;
 using SRPCommon.Util;
 using SRPCommon.Scripting;
+using System.Text.RegularExpressions;
 
 namespace SRPRendering
 {
@@ -116,7 +117,26 @@ namespace SRPRendering
 			}
 			catch (CompilationException ex)
 			{
-				OutputLogger.Instance.Log(LogCategory.ShaderCompile, ex.Message);
+				// The shader compiler error messages contain the name used to
+				// include the file, rather than the full path, so we convert them back
+				// with some regex fun.
+
+				var filenameRegex = new Regex(@"^(.*)(\([0-9]+,[0-9]+\))", RegexOptions.Multiline);
+
+				MatchEvaluator replacer = match =>
+				{
+					// If the filename is the original input filename, use that,
+					// otherwise run it through the include lookup function again.
+					var file = match.Groups[1].Value;
+					var path = file == filename ? file : includeLookup(file);
+
+					// Add back the line an column numbers.
+					return path + match.Groups[2];
+				};
+
+				var message = filenameRegex.Replace(ex.Message, replacer);
+
+				OutputLogger.Instance.Log(LogCategory.ShaderCompile, message);
 				throw new ScriptException("Shader compilation failed.", ex);
 			}
 		}
