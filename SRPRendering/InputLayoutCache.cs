@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using SlimDX.D3DCompiler;
@@ -19,7 +20,7 @@ namespace SRPRendering
 		public InputLayout GetInputLayout(Device device, ShaderSignature shaderSignature, InputElement[] inputElements)
 		{
 			InputLayout result;
-			var key = new Key() { shaderSignature = shaderSignature, inputElements = inputElements };
+			var key = new Key(shaderSignature, inputElements);
 
 			// Check the cache for an appropriate input layout.
 			if (entries.TryGetValue(key, out result))
@@ -51,12 +52,28 @@ namespace SRPRendering
 
 		private struct Key : IEquatable<Key>
 		{
-			public ShaderSignature shaderSignature;
-			public InputElement[] inputElements;
+			public readonly ShaderSignature shaderSignature;
+			public readonly InputElement[] inputElements;
+
+			public Key(ShaderSignature shaderSignature, InputElement[] inputElements)
+			{
+				this.shaderSignature = shaderSignature;
+				this.inputElements = inputElements;
+			}
 
 			public bool Equals(Key other)
-				=> shaderSignature == other.shaderSignature &&
+				=> object.ReferenceEquals(shaderSignature, other.shaderSignature) &&
 					inputElements.SequenceEqual(other.inputElements);
+
+			public override int GetHashCode()
+			{
+				// Don't use default hash function because it uses the internal hash
+				// of ShaderSignature, which can crash if it's been disposed.
+				return inputElements.Aggregate(
+					RuntimeHelpers.GetHashCode(shaderSignature),
+					(hash, element) => hash ^ element.GetHashCode()
+					);
+			}
 		}
 
 		private Dictionary<Key, InputLayout> entries = new Dictionary<Key, InputLayout>();

@@ -63,6 +63,10 @@ namespace SRPRendering
 					// Hashes don't match, so must recompile.
 					// Must dispose the existing shader.
 					existingEntry.shader.Dispose();
+
+					// Explicitly remove the entry from the cache, as the re-compilation
+					// might fail, and we don't want a stale reference in the cache.
+					cache.Remove(key);
 				}
 			}
 
