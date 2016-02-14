@@ -31,11 +31,11 @@ namespace SRPCommon.Scripting
 
 		// Events fired before and after script execution.
 		public IObservable<Script> PreExecute => _preExecute;
-		public IObservable<bool> ExecutionComplete => _executionComplete;
+		public IObservable<Exception> ExecutionComplete => _executionComplete;
 
 		// Subjects for the above.
 		private Subject<Script> _preExecute = new Subject<Script>();
-		private Subject<bool> _executionComplete = new Subject<bool>();
+		private Subject<Exception> _executionComplete = new Subject<Exception>();
 
 		private const string _projectPathPrefix = "project:";
 
@@ -100,18 +100,29 @@ namespace SRPCommon.Scripting
 				_preExecute.OnNext(script);
 
 				// Execute script on thread pool.
-				bool bSuccess = await Task.Run(() =>
-					{
-						var source = pythonEngine.CreateScriptSourceFromFile(script.Filename);
-						return RunSource(source, script.GlobalVariables);
-					});
+				try
+				{
+					await Task.Run(() =>
+						{
+							var source = pythonEngine.CreateScriptSourceFromFile(script.Filename);
+							RunSource(source, script.GlobalVariables);
+						});
 
-				_executionComplete.OnNext(bSuccess);
-				bInProgress = false;
+					_executionComplete.OnNext(null);
+				}
+				catch (Exception ex)
+				{
+					_executionComplete.OnNext(ex);
+					throw;
+				}
+				finally
+				{
+					bInProgress = false;
+				}
 			}
 		}
 
-		private bool RunSource(ScriptSource source, IDictionary<string, object> globals)
+		private void RunSource(ScriptSource source, IDictionary<string, object> globals)
 		{
 			// Clear any cached modules (user may have edited them).
 			pythonEngine.GetSysModule().GetVariable("modules").Clear();
@@ -130,7 +141,6 @@ namespace SRPCommon.Scripting
 			try
 			{
 				source.Execute(pythonScope);
-				return true;
 			}
 			catch (Exception ex)
 			{
@@ -139,7 +149,7 @@ namespace SRPCommon.Scripting
 				OutputLogger.Instance.LogLine(LogCategory.Script, "Script execution failed.");
 				OutputLogger.Instance.LogLine(LogCategory.Script, error);
 
-				return false;
+				throw;
 			}
 		}
 

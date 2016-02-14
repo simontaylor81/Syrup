@@ -62,7 +62,7 @@ namespace SRPRendering
 			OutputLogger.Instance.ResetLogOnce();
 		}
 
-		private void ExecutionComplete(bool bSuccess)
+		private void ExecutionComplete(Exception exception)
 		{
 			bScriptRenderError = false;
 
@@ -96,7 +96,7 @@ namespace SRPRendering
 				script.UserProperties[property.Name] = property;
 			}
 
-			bScriptExecutionError = !bSuccess;
+			bScriptExecutionError = exception != null;
 		}
 
 		// Fire redraw when it's requested, except when disallowed.

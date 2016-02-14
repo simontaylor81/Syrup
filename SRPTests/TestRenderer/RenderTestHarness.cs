@@ -65,6 +65,7 @@ namespace SRPTests.TestRenderer
 				// Execute the script.
 				await _scripting.RunScript(script);
 
+				// This should never fire, as the exception should propagate out of RunScript.
 				Assert.False(_sr.HasScriptError, "Error executing script");
 
 				// Render it.

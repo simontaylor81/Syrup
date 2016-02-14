@@ -95,8 +95,18 @@ namespace ShaderEditorApp.Model
 			{
 				_lastRunScript = script;
 
-				// Asynchronously execute the script.
-				await scripting.RunScript(script);
+				try
+				{
+					// Asynchronously execute the script.
+					await scripting.RunScript(script);
+				}
+#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
+				catch
+#pragma warning restore RECS0022 // A catch clause that catches System.Exception and has an empty body
+				{
+					// We don't care about exceptions, they're handled internally.
+					// They're only surfaced to get good callstacks in the test harness.
+				}
 			}
 		}
 
