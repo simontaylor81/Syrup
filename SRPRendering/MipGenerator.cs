@@ -86,7 +86,8 @@ namespace SRPRendering
 					_device.GlobalResources.FullscreenQuad.Draw(context);
 
 					// Copy result back to the mip chain of the source texture.
-					context.CopySubresourceRegion(renderTarget.Texture2D, 0, texture.Texture2D, mip, 0, 0, 0);
+					var region = new SlimDX.Direct3D11.ResourceRegion(0, 0, 0, mipWidth, mipHeight, 1);
+					context.CopySubresourceRegion(renderTarget.Texture2D, 0, region, texture.Texture2D, mip, 0, 0, 0);
 
 					// Move to the next mip.
 					mipWidth >>= 1;
