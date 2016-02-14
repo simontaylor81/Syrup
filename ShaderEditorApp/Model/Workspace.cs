@@ -117,7 +117,7 @@ namespace ShaderEditorApp.Model
 
 		public string FindProjectFile(string name)
 		{
-			var shaderFileItem = Project.AllItems.FirstOrDefault(item => item.Name == name);
+			var shaderFileItem = Project.AllItems.FirstOrDefault(item => string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase));
 			return shaderFileItem != null ? shaderFileItem.AbsolutePath : null;
 		}
 
