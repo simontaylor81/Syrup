@@ -326,18 +326,10 @@ namespace SRPRendering
 				mipGenerationMode = MipGenerationMode.CreateOnly;
 			}
 
+			Texture texture;
 			try
 			{
-				var texture = Texture.LoadFromFile(_device.Device, absPath, mipGenerationMode);
-
-				if (mipGenerationMode == MipGenerationMode.CreateOnly)
-				{
-					// Generate custom mips.
-					_mipGenerator.Generate(texture, generateMips as string);
-				}
-
-				textures.Add(texture);
-				return new TextureHandle(textures.Count - 1);
+				texture = Texture.LoadFromFile(_device.Device, absPath, mipGenerationMode);
 			}
 			catch (FileNotFoundException ex)
 			{
@@ -347,6 +339,17 @@ namespace SRPRendering
 			{
 				throw new ScriptException("Error loading texture file: " + absPath, ex);
 			}
+
+			// We want mip generation errors to be reported directly, so this is
+			// outside the above try-catch.
+			if (mipGenerationMode == MipGenerationMode.CreateOnly)
+			{
+				// Generate custom mips.
+				_mipGenerator.Generate(texture, generateMips as string);
+			}
+
+			textures.Add(texture);
+			return new TextureHandle(textures.Count - 1);
 		}
 
 		public void Dispose()

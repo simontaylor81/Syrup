@@ -137,7 +137,7 @@ namespace SRPRendering
 				var message = filenameRegex.Replace(ex.Message, replacer);
 
 				OutputLogger.Instance.Log(LogCategory.ShaderCompile, message);
-				throw new ScriptException("Shader compilation failed.", ex);
+				throw new ScriptException("Shader compilation failed. See Shader Compilation log for details.", ex);
 			}
 		}
 
