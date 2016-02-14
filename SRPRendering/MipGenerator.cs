@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 using SRPCommon.Interfaces;
+using SRPCommon.Scripting;
 using SRPScripting;
 
 namespace SRPRendering
@@ -30,6 +31,15 @@ namespace SRPRendering
 		// Do the generation.
 		public void Generate(Texture texture, string shaderFile)
 		{
+			// Check that the shader file actually exists.
+			// Do this now rather than letter the shader compiler handle it so
+			// the user doesn't get a cryptic error message about '_scriptDownsample'.
+			var resolvedShaderPath = _workspace.FindProjectFile(shaderFile);
+			if (resolvedShaderPath == null || !File.Exists(resolvedShaderPath))
+			{
+				throw new ScriptException("Cannot find mip generation shader file: " + shaderFile);
+			}
+
 			// TODO: Skip and warn if texture is compressed.
 
 			// Custom include handler to include the special custom code from the script.
@@ -45,7 +55,7 @@ namespace SRPRendering
 				// Is it the special include?
 				if (filename == "_scriptDownsample")
 				{
-					filename = shaderFile;
+					return resolvedShaderPath;
 				}
 
 				// Look for the file in the project.
