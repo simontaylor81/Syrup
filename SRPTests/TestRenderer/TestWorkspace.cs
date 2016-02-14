@@ -21,7 +21,7 @@ namespace SRPTests.TestRenderer
 
 			// Find all files in the TestScripts dir.
 			_files = Directory.EnumerateFiles(_baseDir, "*", SearchOption.AllDirectories)
-				.ToDictionary(path => Path.GetFileName(path));
+				.ToDictionary(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase);
 		}
 
 		public string FindProjectFile(string name)
