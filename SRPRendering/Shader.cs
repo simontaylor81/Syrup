@@ -22,6 +22,12 @@ namespace SRPRendering
 		MAX
 	}
 
+	public struct IncludedFile
+	{
+		public string SourceName;		// Original name from the #include line.
+		public string ResolvedFile;		// File path that it was resolved to.
+	}
+
 	public interface IShader : IDisposable
 	{
 		// Bind the shader to the device.
@@ -51,7 +57,7 @@ namespace SRPRendering
 		ShaderFrequency Frequency { get; }
 
 		// List of files that were included by this shader.
-		IEnumerable<string> IncludedFiles { get; }
+		IEnumerable<IncludedFile> IncludedFiles { get; }
 	}
 
 	class Shader : IShader
@@ -67,7 +73,7 @@ namespace SRPRendering
 				using (var bytecode = ShaderBytecode.CompileFromFile(filename, entryPoint,
 					profile, ShaderFlags.None, EffectFlags.None, defines, includeHandler))
 				{
-					IncludedFiles = includeHandler != null ? includeHandler.IncludedFiles : Enumerable.Empty<string>();
+					IncludedFiles = includeHandler != null ? includeHandler.IncludedFiles : Enumerable.Empty<IncludedFile>();
 
 					// Create the shader object of the appropriate type.
 					switch (profile.Substring(0, 2))
@@ -283,7 +289,7 @@ namespace SRPRendering
 		public ShaderFrequency Frequency => _frequency;
 
 		// List of files that were included by this shader.
-		public IEnumerable<string> IncludedFiles { get; }
+		public IEnumerable<IncludedFile> IncludedFiles { get; }
 
 		// Constant buffer info.
 		private ConstantBuffer[] _cbuffers;
@@ -300,8 +306,8 @@ namespace SRPRendering
 		{
 			private Func<string, string> includeLookup;
 
-			private List<string> _includedFiles = new List<string>();
-			public IEnumerable<string> IncludedFiles => _includedFiles;
+			private List<IncludedFile> _includedFiles = new List<IncludedFile>();
+			public IEnumerable<IncludedFile> IncludedFiles => _includedFiles;
 
 			public IncludeLookup(Func<string, string> includeLookup)
 			{
@@ -318,7 +324,7 @@ namespace SRPRendering
 				stream = new FileStream(path, FileMode.Open);
 
 				// Remember that we included this file.
-				_includedFiles.Add(path);
+				_includedFiles.Add(new IncludedFile { SourceName = filename, ResolvedFile = path });
 			}
 
 			public void Close(Stream stream)

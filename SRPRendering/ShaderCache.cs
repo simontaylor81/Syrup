@@ -47,10 +47,12 @@ namespace SRPRendering
 				// Whilst this isn't the same as the current set, at least one of them
 				// must have changed in order for the set to change, so this is sufficient
 				// to detect changes.
-				var hash = ComputeHash(existingEntry.shader.IncludedFiles.StartWith(filename));
+				var hash = ComputeHash(GetAllPaths(filename, existingEntry.shader));
 
-				// Compare the hashes.
-				if (hash != null && existingEntry.hash.SequenceEqual(hash))
+				// Compare the hashes and includes.
+				if (hash != null &&
+					existingEntry.hash.SequenceEqual(hash) &&
+					IncludesEqual(existingEntry.shader.IncludedFiles, includeLookup))
 				{
 					// Cache hit -- return existing shader.
 					existingEntry.shader.Reset();
@@ -67,9 +69,15 @@ namespace SRPRendering
 			// If we go this far, either the shader is not present or had a hash mismatch,
 			// so, we compile a new shader.
 			var shader = new Shader(device, filename, entryPoint, profile, includeLookup, defines);
-			cache[key] = new ShaderCacheEntry(shader, ComputeHash(shader.IncludedFiles.StartWith(filename)));
+			cache[key] = new ShaderCacheEntry(shader, ComputeHash(GetAllPaths(filename, shader)));
 
 			return shader;
+		}
+
+		private IEnumerable<string> GetAllPaths(string baseFile, IShader shader)
+		{
+			return shader.IncludedFiles.Select(f => f.ResolvedFile)
+				.StartWith(baseFile);
 		}
 
 		// Compute combined hash for a set of files.
@@ -105,6 +113,15 @@ namespace SRPRendering
 			// Finalise hash.
 			algorithm.TransformFinalBlock(new byte[0], 0, 0);
 			return algorithm.Hash;
+		}
+
+		// Check that the set of included files still generates the same set.
+		// Detects changes in the include lookup function (important for custom mip generation which
+		// uses a custom include lookup which can change based on script input).
+		private bool IncludesEqual(IEnumerable<IncludedFile> includedFiles, Func<string, string> includeLookup)
+		{
+			return includedFiles
+				.All(f => string.Equals(f.ResolvedFile, includeLookup(f.SourceName), StringComparison.OrdinalIgnoreCase));
 		}
 
 		private Device device;
