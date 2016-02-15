@@ -63,5 +63,12 @@
       "sampler": [ "linear", "point" ],
       "mip": [ 1, 2 ]
     }
+  },
+  {
+    "script": "CustomCubeMips.py",
+    "name": "CustomMips_Cube_{mip}",
+    "vars": {
+      "mip": [ 1, 2 ]
+    }
   }
 ]

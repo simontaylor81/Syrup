@@ -5,9 +5,15 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
+using SlimDX.D3DCompiler;
+using SlimDX.Direct3D11;
 using SRPCommon.Interfaces;
 using SRPCommon.Scripting;
 using SRPScripting;
+
+using DepthStencilState = SRPScripting.DepthStencilState;
+using SamplerState = SRPScripting.SamplerState;
+using BlendState = SRPScripting.BlendState;
 
 namespace SRPRendering
 {
@@ -25,7 +31,11 @@ namespace SRPRendering
 
 			// Compile vertex shader.
 			_vertexShader = device.GlobalResources.ShaderCache.GetShader(
-				RenderUtils.GetShaderFilename("GenMipsVS.hlsl"), "Main", "vs_4_0", RenderUtils.GetShaderFilename, null);
+				RenderUtils.GetShaderFilename("GenMipsVS.hlsl"),
+				"Main",
+				"vs_4_0",
+				RenderUtils.GetShaderFilename,
+				null);
 		}
 
 		// Do the generation.
@@ -41,6 +51,10 @@ namespace SRPRendering
 			}
 
 			// TODO: Skip and warn if texture is compressed.
+
+			var isCubemap = (texture.Texture2D.Description.OptionFlags & ResourceOptionFlags.TextureCube) != 0;
+			var numMips = texture.Texture2D.Description.MipLevels;
+			var numArraySlices = texture.Texture2D.Description.ArraySize;
 
 			// Custom include handler to include the special custom code from the script.
 			Func<string, string> includeHandler = filename =>
@@ -64,14 +78,15 @@ namespace SRPRendering
 
 			// Compile pixel shader.
 			var pixelShader = _device.GlobalResources.ShaderCache.GetShader(
-				RenderUtils.GetShaderFilename("GenMipsPS.hlsl"), "Main", "ps_4_0", includeHandler, null);
+				RenderUtils.GetShaderFilename("GenMipsPS.hlsl"), "Main", "ps_4_0", includeHandler, GetDefines(isCubemap));
 			var destMipVariable = pixelShader.FindVariable("DestMip");
+			var arraySliceVariable = pixelShader.FindVariable("ArraySlice");
 
 			var texDesc = texture.Texture2D.Description;
 			int mipWidth = texDesc.Width >> 1;
 			int mipHeight = texDesc.Height >> 1;
 
-			// Allocate intermediate render target is big enough for the first mip.
+			// Allocate intermediate render target big enough for the first mip.
 			using (var renderTarget = new RenderTarget(_device.Device, mipWidth, mipHeight, texture.SRV.Description.Format))
 			{
 				// Use immediate context for drawing.
@@ -87,17 +102,24 @@ namespace SRPRendering
 				int mip = 1;
 				while (mipWidth > 0 && mipHeight > 0)
 				{
-					context.Rasterizer.SetViewports(new SlimDX.Direct3D11.Viewport(0, 0, mipWidth, mipHeight));
+					context.Rasterizer.SetViewports(new Viewport(0, 0, mipWidth, mipHeight));
 
 					destMipVariable?.Set(mip);
-					pixelShader.UpdateVariables(context, null, null, null, null);
 
-					// Render 'fullscreen' quad to downsample the mip.
-					_device.GlobalResources.FullscreenQuad.Draw(context);
+					// Loop through each array slice in the texture (includes cube faces).
+					for (int arraySlice = 0; arraySlice < numArraySlices; arraySlice++)
+					{
+						arraySliceVariable?.Set(arraySlice);
+						pixelShader.UpdateVariables(context, null, null, null, null);
 
-					// Copy result back to the mip chain of the source texture.
-					var region = new SlimDX.Direct3D11.ResourceRegion(0, 0, 0, mipWidth, mipHeight, 1);
-					context.CopySubresourceRegion(renderTarget.Texture2D, 0, region, texture.Texture2D, mip, 0, 0, 0);
+						// Render 'fullscreen' quad to downsample the mip.
+						_device.GlobalResources.FullscreenQuad.Draw(context);
+
+						// Copy result back to the mip chain of the source texture.
+						var region = new ResourceRegion(0, 0, 0, mipWidth, mipHeight, 1);
+						var subresource = Resource.CalculateSubresourceIndex(mip, arraySlice, numMips);
+						context.CopySubresourceRegion(renderTarget.Texture2D, 0, region, texture.Texture2D, subresource, 0, 0, 0);
+					}
 
 					// Move to the next mip.
 					mipWidth >>= 1;
@@ -108,7 +130,7 @@ namespace SRPRendering
 		}
 
 		// Set render state that is always the same, independent of shader, texture, etc.
-		private void SetCommonState(SlimDX.Direct3D11.DeviceContext context)
+		private void SetCommonState(DeviceContext context)
 		{
 			context.Rasterizer.State = _device.GlobalResources.RastStateCache.Get(RastState.Default.ToD3D11());
 			context.OutputMerger.DepthStencilState = _device.GlobalResources.DepthStencilStateCache.Get(DepthStencilState.DisableDepth.ToD3D11());
@@ -144,6 +166,12 @@ namespace SRPRendering
 			{
 				sampler.State = _device.GlobalResources.SamplerStateCache.Get(state.ToD3D11());
 			}
+		}
+
+		// Get defines for shader compilation
+		private ShaderMacro[] GetDefines(bool isCubemap)
+		{
+			return new[] { new ShaderMacro("SRP_MIPGEN_2D", isCubemap ? "0" : "1") };
 		}
 
 		// TODO: Remove if this turns out to be unnecesary.

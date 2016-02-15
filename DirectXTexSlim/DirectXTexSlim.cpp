@@ -100,7 +100,16 @@ void ScratchImage::CreateEmptyMipChain()
 	auto newScratchImage = new DirectX::ScratchImage();
 	try
 	{
-		auto hr = newScratchImage->Initialize2D(metaData.format, metaData.width, metaData.height, metaData.arraySize, 0);
+		HRESULT hr;
+		if (metaData.miscFlags & DirectX::TEX_MISC_TEXTURECUBE)
+		{
+			hr = newScratchImage->InitializeCube(metaData.format, metaData.width, metaData.height, metaData.arraySize / 6, 0);
+		}
+		else
+		{
+			hr = newScratchImage->Initialize2D(metaData.format, metaData.width, metaData.height, metaData.arraySize, 0);
+		}
+			
 		Marshal::ThrowExceptionForHR(hr);
 
 		// Copy each array entry.
@@ -124,7 +133,7 @@ void ScratchImage::CreateEmptyMipChain()
 			}
 		}
 
-		// Replace existing scratch image with the new one with mips.
+		// Replace existing scratch image with the new one (the one with mips).
 		delete scratchImage_;
 		scratchImage_ = newScratchImage;
 		newScratchImage = nullptr;

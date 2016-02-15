@@ -9,6 +9,7 @@
       <include filename="Shaders/ConstantColour.hlsl" runAtStartup="false" />
       <include filename="Shaders/CustomDownsample_2D_Linear.hlsl" runAtStartup="false" />
       <include filename="Shaders/CustomDownsample_2D_Point.hlsl" runAtStartup="false" />
+      <include filename="Shaders/CustomDownsample_Cube.hlsl" runAtStartup="false" />
     </folder>
     <folder name="Textures">
       <include filename="CreateTexture.py" runAtStartup="false" />
@@ -19,6 +20,7 @@
       <include filename="LoadTexture.py" runAtStartup="false" />
       <include filename="CubeMips.py" runAtStartup="false" />
       <include filename="CustomMips.py" runAtStartup="false" />
+      <include filename="CustomCubeMips.py" runAtStartup="false" />
     </folder>
     <include filename="Clear.py" runAtStartup="false" />
     <include filename="Null.py" runAtStartup="false" />
@@ -26,9 +28,8 @@
   </folder>
   <OpenDocuments>
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Utils\utils.py" />
-    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\TextureCubemap.py" />
-    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Shaders\FullscreenTexture.hlsl" />
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CustomMips.py" />
-    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Shaders\CustomDownsample.hlsl" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CustomCubeMips.py" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Shaders\CustomDownsample_Cube.hlsl" />
   </OpenDocuments>
 </project>
