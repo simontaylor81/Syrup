@@ -41,6 +41,11 @@ namespace SRPRendering
 		// Do the generation.
 		public void Generate(Texture texture, string shaderFile)
 		{
+			if (SlimDXUtils.IsCompressed(texture.Texture2D.Description.Format))
+			{
+				throw new ScriptException("Cannot generate mips for a compressed texture");
+			}
+
 			// Check that the shader file actually exists.
 			// Do this now rather than letter the shader compiler handle it so
 			// the user doesn't get a cryptic error message about '_scriptDownsample'.
@@ -49,8 +54,6 @@ namespace SRPRendering
 			{
 				throw new ScriptException("Cannot find mip generation shader file: " + shaderFile);
 			}
-
-			// TODO: Skip and warn if texture is compressed.
 
 			var isCubemap = (texture.Texture2D.Description.OptionFlags & ResourceOptionFlags.TextureCube) != 0;
 			var numMips = texture.Texture2D.Description.MipLevels;
