@@ -358,7 +358,6 @@ namespace SRPRendering
 
 			shaders.Clear();
 			DisposableUtil.DisposeList(renderTargets);
-			_mipGenerator.Dispose();
 
 			_device = null;
 		}

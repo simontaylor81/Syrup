@@ -18,7 +18,7 @@ using BlendState = SRPScripting.BlendState;
 namespace SRPRendering
 {
 	// Class used to generate texture mip maps using custom shader code.
-	class MipGenerator : IDisposable
+	class MipGenerator
 	{
 		private readonly RenderDevice _device;
 		private readonly IWorkspace _workspace;
@@ -172,11 +172,6 @@ namespace SRPRendering
 		private ShaderMacro[] GetDefines(bool isCubemap)
 		{
 			return new[] { new ShaderMacro("SRP_MIPGEN_2D", isCubemap ? "0" : "1") };
-		}
-
-		// TODO: Remove if this turns out to be unnecesary.
-		public void Dispose()
-		{
 		}
 	}
 }
