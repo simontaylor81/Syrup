@@ -10,7 +10,7 @@ namespace SRPTests.TestRenderer
 	class FileSystemReporter : ITestReporter
 	{
 		// Write results to temp directory.
-		private readonly string _outDir = Path.Combine(Path.GetTempPath(), "SyrupTestOutput");
+		private readonly string _outDir = Path.Combine(Path.GetTempPath(), "ShaderUnitOutput");
 
 		public FileSystemReporter()
 		{
@@ -34,6 +34,16 @@ namespace SRPTests.TestRenderer
 		{
 			// Write something to the log so the user knows where to find the images.
 			Console.WriteLine($"Result images written to {_outDir}");
+		}
+
+		public Task InitialiseAsync()
+		{
+			return Task.Delay(0);
+		}
+
+		public Task DisposeAsync()
+		{
+			return Task.Delay(0);
 		}
 	}
 }

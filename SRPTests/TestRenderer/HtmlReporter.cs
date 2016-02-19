@@ -38,7 +38,7 @@ namespace SRPTests.TestRenderer
 		private void GenerateReport()
 		{
 			// Write to temp directory.
-			var outDir = Path.Combine(Path.GetTempPath(), "SyrupTestOutput");
+			var outDir = Path.Combine(Path.GetTempPath(), "ShaderUnitOutput");
 			Directory.CreateDirectory(outDir);
 			var filename = Path.Combine(outDir, "SRPTestReport.html");
 
@@ -109,6 +109,16 @@ namespace SRPTests.TestRenderer
 		{
 			writer.WriteLine($"<{tag}>");
 			return Disposable.Create(() => writer.WriteLine($"</{tag}>"));
+		}
+
+		public Task InitialiseAsync()
+		{
+			return Task.Delay(0);
+		}
+
+		public Task DisposeAsync()
+		{
+			return Task.Delay(0);
 		}
 	}
 }

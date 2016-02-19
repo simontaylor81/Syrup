@@ -107,5 +107,15 @@ namespace SRPTests.TestRenderer
 
 			return result;
 		}
+
+		public Task InitialiseAsync()
+		{
+			return Task.Delay(0);
+		}
+
+		public Task DisposeAsync()
+		{
+			return Task.Delay(0);
+		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -9,9 +10,11 @@ using SRPTests.Util;
 namespace SRPTests.TestRenderer
 {
 	// Interface for a test reporter implementation.
-	interface ITestReporter : IDisposable
+	interface ITestReporter
 	{
+		Task InitialiseAsync();
 		Task TestCompleteAsync(string name, bool bSuccess, Bitmap result);
+		Task DisposeAsync();
 	}
 
 	// Fixture class for reporting test results. Doesn't do the actual reporting,
@@ -19,6 +22,24 @@ namespace SRPTests.TestRenderer
 	public class TestReporter : ITestReporter
 	{
 		private readonly ITestReporter _impl;
+
+		public static TestReporter Instance { get; private set; }
+
+		internal static Task StaticInitAsync()
+		{
+			Trace.Assert(Instance == null);
+			Instance = new TestReporter();
+			return Instance.InitialiseAsync();
+		}
+
+		internal static async Task StaticDisposeAsync()
+		{
+			if (Instance != null)
+			{
+				await Instance.DisposeAsync();
+				Instance = null;
+			}
+		}
 
 		public TestReporter()
 		{
@@ -41,9 +62,20 @@ namespace SRPTests.TestRenderer
 			}
 		}
 
-		public void Dispose()
+		public async Task InitialiseAsync()
 		{
-			_impl?.Dispose();
+			if (_impl != null)
+			{
+				await _impl.InitialiseAsync();
+			}
+		}
+
+		public async Task DisposeAsync()
+		{
+			if (_impl != null)
+			{
+				await _impl.DisposeAsync();
+			}
 		}
 
 		public async Task TestCompleteAsync(string name, bool bSuccess, Bitmap result)

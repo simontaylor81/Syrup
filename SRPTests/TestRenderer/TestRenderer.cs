@@ -59,7 +59,7 @@ namespace SRPTests.TestRenderer
 			// Create a depth buffer.
 			depthBuffer = new DepthBuffer(device.Device, _width, _height);
 
-			disposables = new CompositeDisposable(device.Device, renderTarget, renderTargetTexture, depthBuffer, stagingTexture);
+			disposables = new CompositeDisposable(device, renderTarget, renderTargetTexture, depthBuffer, stagingTexture);
 		}
 
 		public void Dispose()

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using SRPScripting;
 
 namespace SRPTests.TestRenderer
 {
@@ -25,6 +26,8 @@ namespace SRPTests.TestRenderer
 		private static readonly string _testDefinitionFile = Path.Combine(_baseDir, "tests.json");
 
 		private static bool bLoggedDevice = false;
+
+		public IRenderInterface RenderInterface => _sr.ScriptInterface;
 
 		public RenderTestHarness(TestReporter reporter)
 		{
@@ -53,25 +56,18 @@ namespace SRPTests.TestRenderer
 			_sr.Dispose();
 		}
 
-		[Theory]
-		[MemberData("ScriptFiles")]
-		public async Task RenderScript(string name, Script script)
+		public async Task Go(string name)
 		{
 			bool bSuccess = false;
 			Bitmap result = null;
 
 			try
 			{
-				// Execute the script.
-				await _scripting.RunScript(script);
-
 				// This should never fire, as the exception should propagate out of RunScript.
 				Assert.False(_sr.HasScriptError, "Error executing script");
 
 				// Render it.
 				result = _renderer.Render(_sr);
-
-				Assert.False(_sr.HasScriptError, "Error executing script render callback");
 
 				// Load the image to compare against.
 				var expectedImageFilename = Path.Combine(_expectedResultDir, name + ".png");
@@ -84,11 +80,9 @@ namespace SRPTests.TestRenderer
 			}
 			finally
 			{
-				// Report result to Fermium.
+				// Report result.
 				await _reporter.TestCompleteAsync(name, bSuccess, result);
 			}
 		}
-
-		public static IEnumerable<object[]> ScriptFiles => TestDefinitions.Load(_testDefinitionFile);
 	}
 }
