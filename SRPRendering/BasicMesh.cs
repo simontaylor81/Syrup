@@ -4,7 +4,6 @@ using SRPCommon.Scene;
 using SlimDX;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
-using Buffer = SlimDX.Direct3D11.Buffer;
 
 namespace SRPRendering
 {

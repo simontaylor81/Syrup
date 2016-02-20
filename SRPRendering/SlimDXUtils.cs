@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SlimDX.D3DCompiler;
 using SlimDX.DXGI;
 
 namespace SRPRendering
@@ -41,6 +42,20 @@ namespace SRPRendering
 			}
 
 			return false;
+		}
+
+		// Get all constant buffers from shader reflection.
+		public static IEnumerable<SlimDX.D3DCompiler.ConstantBuffer> GetConstantBuffers(this ShaderReflection shaderReflection)
+		{
+			return Enumerable.Range(0, shaderReflection.Description.ConstantBuffers)
+				.Select(i => shaderReflection.GetConstantBuffer(i));
+		}
+
+		// Get all bound resources from shader reflection.
+		public static IEnumerable<InputBindingDescription> GetBoundResources(this ShaderReflection shaderReflection)
+		{
+			return Enumerable.Range(0, shaderReflection.Description.BoundResources)
+				.Select(i => shaderReflection.GetResourceBindingDescription(i));
 		}
 	}
 }

@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using SlimDX;
 using SlimDX.Direct3D11;
-using Buffer = SlimDX.Direct3D11.Buffer;
 
 namespace SRPRendering
 {
@@ -27,7 +26,7 @@ namespace SRPRendering
 			vertexStream.Position = 0;
 
 			// Create the vertex buffer.
-			vertexBuffer = new Buffer(device, vertexStream, vertexBufferSize,
+			vertexBuffer = new SlimDX.Direct3D11.Buffer(device, vertexStream, vertexBufferSize,
 				ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
 		}
 
@@ -52,6 +51,6 @@ namespace SRPRendering
 
 		private int VertexStride => Marshal.SizeOf(typeof(Vector4));
 
-		private Buffer vertexBuffer;
+		private SlimDX.Direct3D11.Buffer vertexBuffer;
 	}
 }

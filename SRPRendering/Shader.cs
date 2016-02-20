@@ -7,7 +7,6 @@ using System.IO;
 using SlimDX;
 using SlimDX.D3DCompiler;
 using SlimDX.Direct3D11;
-using Buffer = SlimDX.Direct3D11.Buffer;
 using SRPCommon.Util;
 using SRPCommon.Scripting;
 using System.Text.RegularExpressions;
@@ -49,6 +48,9 @@ namespace SRPRendering
 
 		// Find a sample variable by name.
 		IShaderSamplerVariable FindSamplerVariable(string name);
+
+		// Find a UAV variable by name.
+		IShaderUavVariable FindUavVariable(string name);
 
 		// Input signature. Vertex shader only.
 		ShaderSignature Signature { get; }
@@ -102,14 +104,14 @@ namespace SRPRendering
 					using (var reflection = new ShaderReflection(bytecode))
 					{
 						// Gether constant buffers.
-						_cbuffers = (from i in Enumerable.Range(0, reflection.Description.ConstantBuffers)
-									select new ConstantBuffer(device, reflection.GetConstantBuffer(i))
-								   ).ToArray();
-						_cbuffers_buffers = (from cbuffer in _cbuffers select cbuffer.Buffer).ToArray();
+						_cbuffers = reflection.GetConstantBuffers()
+							.Where(cbuffer => cbuffer.Description.Type == ConstantBufferType.ConstantBuffer)
+							.Select(cbuffer => new ConstantBuffer(device, cbuffer))
+							.ToArray();
+						_cbuffers_buffers = _cbuffers.Select(cbuffer => cbuffer.Buffer).ToArray();
 
 						// Gather resource and sampler inputs.
-						var boundResources = Enumerable.Range(0, reflection.Description.BoundResources)
-							.Select(i => reflection.GetResourceBindingDescription(i));
+						var boundResources = reflection.GetBoundResources();
 						_resourceVariables = boundResources
 							.Where(desc => desc.Type == ShaderInputType.Texture)		// TODO: Support more types.
 							.Select(desc => new ShaderResourceVariable(desc, Frequency))
@@ -117,6 +119,10 @@ namespace SRPRendering
 						_samplerVariables = boundResources
 							.Where(desc => desc.Type == ShaderInputType.Sampler)
 							.Select(desc => new ShaderSamplerVariable(desc, Frequency))
+							.ToArray();
+						_uavVariables = boundResources
+							.Where(desc => IsUav(desc.Type))		// TODO: Support more types.
+							.Select(desc => new ShaderUavVariable(desc, Frequency))
 							.ToArray();
 					}
 				}
@@ -146,6 +152,12 @@ namespace SRPRendering
 				throw new ScriptException("Shader compilation failed. See Shader Compilation log for details.", ex);
 			}
 		}
+
+		private bool IsUav(ShaderInputType type) =>
+			type == (ShaderInputType)4 ||   // D3D_SIT_UAV_RWTYPED, not in SlimDX for some reason.
+			type == ShaderInputType.RWStructured ||
+			type == ShaderInputType.RWStructuredWithCounter ||
+			type == ShaderInputType.RWByteAddress;
 
 		public void Dispose()
 		{
@@ -227,6 +239,12 @@ namespace SRPRendering
 				}
 				samplerVariable.SetToDevice(context);
 			}
+
+			// And UAVs.
+			foreach (var uavVariable in _uavVariables)
+			{
+				uavVariable.SetToDevice(context);
+			}
 		}
 
 		// Reset to the same state as immediately after compile.
@@ -246,7 +264,7 @@ namespace SRPRendering
 				}
 			}
 
-			// Do the same for resource and sampler variables.
+			// Do the same for resource, sampler and UAV variables.
 			foreach (var resourceVariable in _resourceVariables)
 			{
 				resourceVariable.Resource = null;
@@ -257,6 +275,11 @@ namespace SRPRendering
 			{
 				samplerVariable.State = null;
 				samplerVariable.Bind = null;
+			}
+
+			foreach (var uavVariable in _uavVariables)
+			{
+				uavVariable.UAV = null;
 			}
 		}
 
@@ -276,6 +299,10 @@ namespace SRPRendering
 		public IShaderSamplerVariable FindSamplerVariable(string name)
 			=> _samplerVariables.FirstOrDefault(v => v.Name == name);
 
+		// Find a UAV variable by name.
+		public IShaderUavVariable FindUavVariable(string name)
+			=> _uavVariables.FirstOrDefault(v => v.Name == name);
+
 		// Actual shader. Only one of these is non-null.
 		private VertexShader _vertexShader;
 		private PixelShader _pixelShader;
@@ -293,13 +320,16 @@ namespace SRPRendering
 
 		// Constant buffer info.
 		private ConstantBuffer[] _cbuffers;
-		private Buffer[] _cbuffers_buffers;
+		private SlimDX.Direct3D11.Buffer[] _cbuffers_buffers;
 
 		// Resource variable info.
 		private ShaderResourceVariable[] _resourceVariables;
 
 		// Sampler input info.
 		private ShaderSamplerVariable[] _samplerVariables;
+
+		// UAV variable info.
+		private ShaderUavVariable[] _uavVariables;
 
 		// Class for handling include file lookups.
 		private class IncludeLookup : Include

@@ -37,6 +37,10 @@ namespace SRPScripting
 			IEnumerable<object> renderTargets = null,
 			IDictionary<string, dynamic> shaderVariableOverrides = null);
 
+		// Dispatch a compute shader.
+		void Dispatch(dynamic shader, int numGroupsX, int numGroupsY, int numGroupsZ,
+			IDictionary<string, dynamic> shaderVariableOverrides = null);
+
 		// Clear render targets.
 		void Clear(dynamic colour, IEnumerable<object> renderTargets = null);
 

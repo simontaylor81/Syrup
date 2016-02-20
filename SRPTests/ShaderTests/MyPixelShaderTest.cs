@@ -30,7 +30,6 @@ namespace SRPTests.ShaderTests
 			CompareImage(result);
 		}
 
-		[Test]
 		[TestCase(0, 1, 0, 1)]
 		[TestCase(0, 0, 1, 1)]
 		public void MyParameterisedTest(float r, float g, float b, float a)

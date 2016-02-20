@@ -36,6 +36,7 @@ namespace SRPRendering
 			// Clear render target descriptors and dispose the actual render targets.
 			DisposableUtil.DisposeList(renderTargets);
 			DisposableUtil.DisposeList(textures);
+			DisposableUtil.DisposeList(_buffers);
 		}
 
 		// Get the list of properties for a script run. Call after script execution.
@@ -211,6 +212,7 @@ namespace SRPRendering
 				.Where(variable => variable != null);
 
 			var texture = GetTexture(value);
+			var buffer = value as Buffer;
 			var renderTargetHandle = value as RenderTargetHandle;
 
 			foreach (var variable in variables)
@@ -223,6 +225,10 @@ namespace SRPRendering
 				if (texture != null)
 				{
 					variable.Bind = new TextureShaderResourceVariableBind(texture);
+				}
+				else if (buffer != null)
+				{
+					variable.Bind = new BufferShaderResourceVariableBind(buffer);
 				}
 				else if (renderTargetHandle != null)
 				{
@@ -241,6 +247,29 @@ namespace SRPRendering
 				{
 					throw new ScriptException("Invalid parameter for shader resource variable value.");
 				}
+			}
+		}
+
+		public void SetShaderUavVariable(object handleOrHandles, string varName, IBuffer value)
+		{
+			var variables = GetShaders(handleOrHandles)
+				.Select(shader => shader.FindUavVariable(varName))
+				.Where(variable => variable != null);
+
+			var buffer = value as Buffer;
+			if (buffer == null)
+			{
+				throw new ScriptException("Invalid buffer for UAV");
+			}
+
+			foreach (var variable in variables)
+			{
+				if (variable.UAV != null)
+				{
+					throw new ScriptException("Attempting to set an already set shader variable: " + varName);
+				}
+
+				variable.UAV = buffer.UAV;
 			}
 		}
 
@@ -350,6 +379,13 @@ namespace SRPRendering
 
 			textures.Add(texture);
 			return new TextureHandle(textures.Count - 1);
+		}
+
+		// Create a buffer of the given size and format, and fill it with the given data.
+		public IBuffer CreateBuffer(int sizeInBytes, dynamic contents, bool uav = false)
+		{
+			_buffers.Add(new Buffer(_device.Device, sizeInBytes, uav));
+			return _buffers[_buffers.Count - 1];
 		}
 
 		public void Dispose()
@@ -475,6 +511,7 @@ namespace SRPRendering
 
 		// Script-generated resources.
 		private List<Texture> textures = new List<Texture>();
+		private List<Buffer> _buffers = new List<Buffer>();
 
 		// List of render targets and their descritors.
 		private List<RenderTargetDescriptor> renderTargets = new List<RenderTargetDescriptor>();
