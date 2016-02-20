@@ -111,6 +111,7 @@
     <Compile Include="ShaderTests\MyPixelShaderTest.cs" />
     <Compile Include="TestRenderer\FermiumReporter.cs" />
     <Compile Include="TestRenderer\FileSystemReporter.cs" />
+    <Compile Include="TestRenderer\ImageAssert.cs" />
     <Compile Include="TestRenderer\ImageComparison.cs" />
     <Compile Include="TestRenderer\RenderFact.cs" />
     <Compile Include="TestRenderer\RenderFactDiscoverer.cs" />

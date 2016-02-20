@@ -57,6 +57,14 @@ namespace SRPTests.TestRenderer
 			await base.BeforeTestAssemblyFinishedAsync();
 		}
 
+		protected override IMessageBus CreateMessageBus()
+		{
+			return new DelegatingMessageBus(base.CreateMessageBus(), msg =>
+			{
+				Console.WriteLine(msg.ToString());
+			});
+		}
+
 		protected override Task<RunSummary> RunTestCollectionAsync(IMessageBus messageBus, ITestCollection testCollection, IEnumerable<IXunitTestCase> testCases, CancellationTokenSource cancellationTokenSource)
 		{
 			return new RenderTestCollectionRunner(

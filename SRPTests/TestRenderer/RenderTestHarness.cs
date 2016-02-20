@@ -75,7 +75,7 @@ namespace SRPTests.TestRenderer
 				var expected = new Bitmap(expectedImageFilename);
 
 				// Compare the images.
-				ImageComparison.AssertImagesEqual(expected, result);
+				AssertEx.ImagesEqual(expected, result);
 				bSuccess = true;
 			}
 			finally
