@@ -9,26 +9,12 @@ using SRPTests.TestRenderer;
 
 namespace SRPTests.ShaderTests
 {
-	public class MyPixelShaderTest : IDisposable
+	public class MyPixelShaderTest : RenderTestBase
 	{
-		private readonly RenderTestContext _context;
-		private readonly RenderTestHarness _renderHarness;
-
-		public MyPixelShaderTest()
-		{
-			_renderHarness = new RenderTestHarness();
-			//_context = context;
-		}
-
-		public void Dispose()
-		{
-			_renderHarness.Dispose();
-		}
-
 		[Test]
-		public async Task MyTest()
+		public void MyTest()
 		{
-			var ri = _renderHarness.RenderInterface;
+			var ri = RenderHarness.RenderInterface;
 
 			var vs = ri.CompileShader("ConstantColour.hlsl", "VS", "vs_4_0");
 			var ps = ri.CompileShader("ConstantColour.hlsl", "PS", "ps_4_0");
@@ -40,15 +26,16 @@ namespace SRPTests.ShaderTests
 				context.DrawFullscreenQuad(vs, ps);
 			});
 
-			await _renderHarness.Go($"MyPixelShaderTest");
+			var result = RenderHarness.RenderImage();
+			CompareImage(result);
 		}
 
 		[Test]
 		[TestCase(0, 1, 0, 1)]
 		[TestCase(0, 0, 1, 1)]
-		public async Task MyParameterisedTest(float r, float g, float b, float a)
+		public void MyParameterisedTest(float r, float g, float b, float a)
 		{
-			var ri = _renderHarness.RenderInterface;
+			var ri = RenderHarness.RenderInterface;
 
 			var vs = ri.CompileShader("ConstantColour.hlsl", "VS", "vs_4_0");
 			var ps = ri.CompileShader("ConstantColour.hlsl", "PS", "ps_4_0");
@@ -60,7 +47,8 @@ namespace SRPTests.ShaderTests
 				context.DrawFullscreenQuad(vs, ps);
 			});
 
-			await _renderHarness.Go($"MyPixelShaderTest2");
+			var result = RenderHarness.RenderImage();
+			CompareImage(result);
 		}
 	}
 }

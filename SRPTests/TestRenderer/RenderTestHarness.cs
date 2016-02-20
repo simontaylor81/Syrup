@@ -21,7 +21,6 @@ namespace SRPTests.TestRenderer
 		private readonly Scripting _scripting;
 
 		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
-		private static readonly string _expectedResultDir = Path.Combine(_baseDir, "ExpectedResults");
 		private static readonly string _testDefinitionFile = Path.Combine(_baseDir, "tests.json");
 
 		private static bool bLoggedDevice = false;
@@ -53,35 +52,13 @@ namespace SRPTests.TestRenderer
 			_sr.Dispose();
 		}
 
-		public async Task Go(string name)
+		public Bitmap RenderImage()
 		{
-			bool bSuccess = false;
-			Bitmap result = null;
+			// This should never fire, as the exception should propagate out of RunScript.
+			Assert.That(_sr.HasScriptError, Is.False, "Error executing script");
 
-			name = TestContext.CurrentContext.Test.Name;
-
-			try
-			{
-				// This should never fire, as the exception should propagate out of RunScript.
-				Assert.That(_sr.HasScriptError, Is.False, "Error executing script");
-
-				// Render it.
-				result = _renderer.Render(_sr);
-
-				// Load the image to compare against.
-				var expectedImageFilename = Path.Combine(_expectedResultDir, name + ".png");
-				Assert.True(File.Exists(expectedImageFilename), "No expected image to compare against.");
-				var expected = new Bitmap(expectedImageFilename);
-
-				// Compare the images.
-				AssertEx.ImagesEqual(expected, result);
-				bSuccess = true;
-			}
-			finally
-			{
-				// Report result.
-				await TestReporter.Instance.TestCompleteAsync(name, bSuccess, result);
-			}
+			// Render it.
+			return _renderer.Render(_sr);
 		}
 	}
 }
