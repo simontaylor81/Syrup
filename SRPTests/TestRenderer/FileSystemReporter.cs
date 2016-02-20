@@ -12,10 +12,11 @@ namespace SRPTests.TestRenderer
 		// Write results to temp directory.
 		private readonly string _outDir = Path.Combine(Path.GetTempPath(), "ShaderUnitOutput");
 
-		public FileSystemReporter()
+		public Task InitialiseAsync()
 		{
 			// Make sure the output directory exists.
 			Directory.CreateDirectory(_outDir);
+			return Task.Delay(0);
 		}
 
 		public Task TestCompleteAsync(string name, bool bSuccess, Bitmap result)
@@ -30,19 +31,10 @@ namespace SRPTests.TestRenderer
 			return Task.Delay(0);
 		}
 
-		public void Dispose()
+		public Task DisposeAsync()
 		{
 			// Write something to the log so the user knows where to find the images.
 			Console.WriteLine($"Result images written to {_outDir}");
-		}
-
-		public Task InitialiseAsync()
-		{
-			return Task.Delay(0);
-		}
-
-		public Task DisposeAsync()
-		{
 			return Task.Delay(0);
 		}
 	}

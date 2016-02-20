@@ -8,18 +8,17 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
 using SRPScripting;
+using NUnit.Framework;
 
 namespace SRPTests.TestRenderer
 {
-	public class RenderTestHarness : IDisposable, IClassFixture<TestReporter>
+	public class RenderTestHarness : IDisposable
 	{
 		private readonly TestRenderer _renderer;
 		private readonly TestWorkspace _workspace;
 		private readonly SyrupRenderer _sr;
 		private readonly Scripting _scripting;
-		private readonly TestReporter _reporter;
 
 		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
 		private static readonly string _expectedResultDir = Path.Combine(_baseDir, "ExpectedResults");
@@ -29,10 +28,8 @@ namespace SRPTests.TestRenderer
 
 		public IRenderInterface RenderInterface => _sr.ScriptInterface;
 
-		public RenderTestHarness(TestReporter reporter)
+		public RenderTestHarness()
 		{
-			_reporter = reporter;
-
 			_renderer = new TestRenderer(64, 64);
 			_workspace = new TestWorkspace(_baseDir);
 			_scripting = new Scripting(_workspace);
@@ -61,10 +58,12 @@ namespace SRPTests.TestRenderer
 			bool bSuccess = false;
 			Bitmap result = null;
 
+			name = TestContext.CurrentContext.Test.Name;
+
 			try
 			{
 				// This should never fire, as the exception should propagate out of RunScript.
-				Assert.False(_sr.HasScriptError, "Error executing script");
+				Assert.That(_sr.HasScriptError, Is.False, "Error executing script");
 
 				// Render it.
 				result = _renderer.Render(_sr);
@@ -81,7 +80,7 @@ namespace SRPTests.TestRenderer
 			finally
 			{
 				// Report result.
-				await _reporter.TestCompleteAsync(name, bSuccess, result);
+				await TestReporter.Instance.TestCompleteAsync(name, bSuccess, result);
 			}
 		}
 	}

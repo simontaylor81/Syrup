@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
 using SlimDX;
 using SRPTests.TestRenderer;
-using Xunit;
 
 namespace SRPTests.ShaderTests
 {
-	public class MyPixelShaderTest : IDisposable, IClassFixture<TestReporter>
+	public class MyPixelShaderTest : IDisposable
 	{
 		private readonly RenderTestContext _context;
 		private readonly RenderTestHarness _renderHarness;
 
-		public MyPixelShaderTest(TestReporter reporter, RenderTestContext context)
+		public MyPixelShaderTest()
 		{
-			_renderHarness = new RenderTestHarness(reporter);
-			_context = context;
+			_renderHarness = new RenderTestHarness();
+			//_context = context;
 		}
 
 		public void Dispose()
@@ -25,8 +25,8 @@ namespace SRPTests.ShaderTests
 			_renderHarness.Dispose();
 		}
 
-		[RenderFact]
-		public async Task MyFact()
+		[Test]
+		public async Task MyTest()
 		{
 			var ri = _renderHarness.RenderInterface;
 
@@ -43,10 +43,10 @@ namespace SRPTests.ShaderTests
 			await _renderHarness.Go($"MyPixelShaderTest");
 		}
 
-		[RenderTheory]
-		[InlineData(0, 1, 0, 1)]
-		[InlineData(0, 0, 1, 1)]
-		public async Task MyTheory(float r, float g, float b, float a)
+		[Test]
+		[TestCase(0, 1, 0, 1)]
+		[TestCase(0, 0, 1, 1)]
+		public async Task MyParameterisedTest(float r, float g, float b, float a)
 		{
 			var ri = _renderHarness.RenderInterface;
 

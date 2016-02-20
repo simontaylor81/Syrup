@@ -29,10 +29,16 @@ namespace SRPTests.TestRenderer
 			return Task.Delay(0);
 		}
 
-		public void Dispose()
+		public Task InitialiseAsync()
+		{
+			return Task.Delay(0);
+		}
+
+		public Task DisposeAsync()
 		{
 			// Write the report on clean up.
 			GenerateReport();
+			return Task.Delay(0);
 		}
 
 		private void GenerateReport()
@@ -109,16 +115,6 @@ namespace SRPTests.TestRenderer
 		{
 			writer.WriteLine($"<{tag}>");
 			return Disposable.Create(() => writer.WriteLine($"</{tag}>"));
-		}
-
-		public Task InitialiseAsync()
-		{
-			return Task.Delay(0);
-		}
-
-		public Task DisposeAsync()
-		{
-			return Task.Delay(0);
 		}
 	}
 }

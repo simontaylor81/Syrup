@@ -14,7 +14,7 @@ namespace SRPTests.TestRenderer
 		public RenderTestContext()
 		{
 			Trace.Assert(TestReporter.Instance != null);
-			RenderTestHarness = new RenderTestHarness(TestReporter.Instance);
+			RenderTestHarness = new RenderTestHarness();
 		}
 	}
 }

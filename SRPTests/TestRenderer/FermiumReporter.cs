@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -9,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SRPTests.Util;
-using Xunit;
 
 namespace SRPTests.TestRenderer
 {
@@ -28,7 +28,7 @@ namespace SRPTests.TestRenderer
 
 		public FermiumReporter()
 		{
-			Assert.True(CanUse);
+			Trace.Assert(CanUse);
 
 			var baseUrl = BaseUrl;
 			if (!baseUrl.EndsWith("/", StringComparison.Ordinal))
@@ -40,16 +40,9 @@ namespace SRPTests.TestRenderer
 			_fermiumProjectUrl = baseUrl + "api/projects/syrup/";
 
 			_httpClient = new HttpClient();
-			Initialise().Wait();
 		}
 
-		public void Dispose()
-		{
-			// Test run is over, so set success/failure.
-			SetBuildStatus().Wait();
-		}
-
-		private Task Initialise()
+		public Task InitialiseAsync()
 		{
 			// Add the new build to Fermium.
 			return PostToFermium("builds", new
@@ -58,6 +51,12 @@ namespace SRPTests.TestRenderer
 				version = CIHelper.Version,
 				commit = CIHelper.Commit,
 			});
+		}
+
+		public Task DisposeAsync()
+		{
+			// Test run is over, so set success/failure.
+			return SetBuildStatus();
 		}
 
 		private Task SetBuildStatus()
@@ -106,16 +105,6 @@ namespace SRPTests.TestRenderer
 			}
 
 			return result;
-		}
-
-		public Task InitialiseAsync()
-		{
-			return Task.Delay(0);
-		}
-
-		public Task DisposeAsync()
-		{
-			return Task.Delay(0);
 		}
 	}
 }

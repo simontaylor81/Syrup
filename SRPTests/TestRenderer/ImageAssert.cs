@@ -4,8 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xunit;
-using Xunit.Sdk;
+using NUnit.Framework;
 
 namespace SRPTests.TestRenderer
 {
@@ -14,9 +13,9 @@ namespace SRPTests.TestRenderer
 		// Assert two bitmaps are binary identical.
 		public static void ImagesEqual(Bitmap expected, Bitmap actual)
 		{
-			Assert.Equal(expected.Width, actual.Width);
-			Assert.Equal(expected.Height, actual.Height);
-			Assert.Equal(expected.PixelFormat, actual.PixelFormat);
+			Assert.That(actual.Width, Is.EqualTo(expected.Width));
+			Assert.That(actual.Height, Is.EqualTo(expected.Height));
+			Assert.That(actual.PixelFormat, Is.EqualTo(expected.PixelFormat));
 
 			// Check pixels one by one.
 			for (int y = 0; y < expected.Height; y++)
@@ -38,19 +37,21 @@ namespace SRPTests.TestRenderer
 				!EqualTolerance(expected.B, actual.B, 1) ||
 				!EqualTolerance(expected.A, actual.A, 1))
 			{
-				throw new PixelEqualException(expected, actual, x, y);
+				// TODO
+				//throw new PixelEqualException(expected, actual, x, y);
+				throw new Exception("Image mismatch");
 			}
 		}
 
 		private static bool EqualTolerance(int a, int b, int tolerance) => Math.Abs(a - b) <= tolerance;
 
 		// Special equality exception to allow us to report which pixel failed.
-		class PixelEqualException : AssertActualExpectedException
-		{
-			public PixelEqualException(Color expected, Color actual, int x, int y)
-				: base(expected, actual, string.Format("Pixel mismatch at ({0}, {1})", x, y))
-			{
-			}
-		}
+		//class PixelEqualException : AssertActualExpectedException
+		//{
+		//	public PixelEqualException(Color expected, Color actual, int x, int y)
+		//		: base(expected, actual, string.Format("Pixel mismatch at ({0}, {1})", x, y))
+		//	{
+		//	}
+		//}
 	}
 }

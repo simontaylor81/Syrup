@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using SlimDX;
 using SlimDX.Direct3D11;
 using SRPRendering;
-using Xunit;
 
 namespace SRPTests.TestRenderer
 {
@@ -69,7 +69,7 @@ namespace SRPTests.TestRenderer
 
 		public Bitmap Render(SyrupRenderer sr)
 		{
-			Assert.NotNull(sr);
+			Trace.Assert(sr != null);
 
 			var context = device.Device.ImmediateContext;
 

@@ -5,7 +5,12 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using SRPTests.Util;
+
+// In reality, this would have to go in the test assembly.
+[assembly: SRPTests.TestRenderer.UseTestReporter]
 
 namespace SRPTests.TestRenderer
 {
@@ -84,6 +89,25 @@ namespace SRPTests.TestRenderer
 			{
 				await _impl.TestCompleteAsync(name, bSuccess, result);
 			}
+		}
+	}
+
+	// Class for handling initialisation and disposal of the reporter.
+	[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
+	public class UseTestReporterAttribute : Attribute, ITestAction
+	{
+		public ActionTargets Targets => ActionTargets.Suite;
+
+		public void BeforeTest(ITest test)
+		{
+			// TODO: Async?
+			TestReporter.StaticInitAsync().Wait();
+		}
+
+		public void AfterTest(ITest test)
+		{
+			// TODO: Async?
+			TestReporter.StaticDisposeAsync().Wait();
 		}
 	}
 }
