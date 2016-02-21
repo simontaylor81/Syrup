@@ -18,7 +18,6 @@ namespace SRPCommon.Scripting
 		public static ScriptHelper Instance => instance;
 
 		public ScriptEngine Engine { get; set; }
-		public ObjectOperations Operations => Engine.Operations;
 
 		// If x is a function, execute it and return the result. Otherwise just return x.
 		public object ResolveFunction(object x)
@@ -129,13 +128,13 @@ namespace SRPCommon.Scripting
 			}
 		}
 
-		private bool CanConvert<T>(object x)
+		public static bool CanConvert<T>(object x)
 		{
 			T dummy;
 			return TryConvert(x, out dummy);
 		}
 
-		private bool TryConvert<T>(object x, out T result)
+		public static bool TryConvert<T>(object x, out T result)
 		{
 			try
 			{
