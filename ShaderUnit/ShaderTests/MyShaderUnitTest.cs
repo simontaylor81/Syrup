@@ -45,5 +45,40 @@ namespace SRPTests.ShaderTests
 			var result = RenderHarness.ExecuteShaderFunction<Vector4>("UnitTests.hlsl", "NoParams_ReturnFloat4");
 			Assert.That(result, Is.EqualTo(new Vector4(11.0f, 12.0f, 13.0f, 14.0f)));
 		}
+
+		[Test]
+		public void OneFloatParam()
+		{
+			var result = RenderHarness.ExecuteShaderFunction<float>("UnitTests.hlsl", "OneFloatParam", 12.0f);
+			Assert.That(result, Is.EqualTo(13.0f));
+		}
+
+		[Test]
+		public void TwoFloatParams()
+		{
+			var result = RenderHarness.ExecuteShaderFunction<float>("UnitTests.hlsl", "TwoFloatParams", 12.0f, 13.0f);
+			Assert.That(result, Is.EqualTo(25.0f));
+		}
+
+		[Test]
+		public void OneFloat2Param()
+		{
+			var result = RenderHarness.ExecuteShaderFunction<float>("UnitTests.hlsl", "OneFloat2Param", new Vector2(1.0f, 2.0f));
+			Assert.That(result, Is.EqualTo(5.0f));
+		}
+
+		[Test]
+		public void OneFloat3Param()
+		{
+			var result = RenderHarness.ExecuteShaderFunction<float>("UnitTests.hlsl", "OneFloat3Param", new Vector3(1.0f, 2.0f, 3.0f));
+			Assert.That(result, Is.EqualTo(14.0f));
+		}
+
+		[Test]
+		public void OneFloat4Param()
+		{
+			var result = RenderHarness.ExecuteShaderFunction<float>("UnitTests.hlsl", "OneFloat4Param", new Vector4(1.0f, 2.0f, 3.0f, 4.0f));
+			Assert.That(result, Is.EqualTo(30.0f));
+		}
 	}
 }
