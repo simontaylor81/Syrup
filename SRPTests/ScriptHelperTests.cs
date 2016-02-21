@@ -30,14 +30,14 @@ namespace SRPTests
 		[InlineData(12, "lambda: 12")]
 		public void ResolveFunctionValid(object expected, string expression)
 		{
-			Assert.Equal(expected, ScriptHelper.Instance.ResolveFunction(GetPythonValue(expression)));
+			Assert.Equal(expected, ScriptHelper.ResolveFunction(GetPythonValue(expression)));
 		}
 
 		[Theory]
 		[InlineData("lambda x: x")]		// Functions must have zero arguments.
 		public void ResolveFunctionInvalid(string expression)
 		{
-			Assert.Throws<ScriptException>(() => ScriptHelper.Instance.ResolveFunction(GetPythonValue(expression)));
+			Assert.Throws<ScriptException>(() => ScriptHelper.ResolveFunction(GetPythonValue(expression)));
 		}
 
 		[Fact]
@@ -80,7 +80,7 @@ namespace SRPTests
 		public void CheckConvertibleFloatValid(string expression)
 		{
 			// Valid calls complete silently without an exception.
-			ScriptHelper.Instance.CheckConvertibleFloat(GetPythonValue(expression), "");
+			ScriptHelper.CheckConvertibleFloat(GetPythonValue(expression), "");
 		}
 
 		[Theory]
@@ -91,7 +91,7 @@ namespace SRPTests
 		public void CheckConvertibleFloatListValid(string expression, int numComponents)
 		{
 			// Valid calls complete silently without an exception.
-			ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue(expression), numComponents, "");
+			ScriptHelper.CheckConvertibleFloatList(GetPythonValue(expression), numComponents, "");
 		}
 
 		[Theory]
@@ -104,7 +104,7 @@ namespace SRPTests
 
 			// Invalid calls should throw ScriptException
 			// For some reason the compiler gets confused about these lambdas, hence the explicit cast to Action.
-			var ex = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloat(GetPythonValue(expression), desc)));
+			var ex = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.CheckConvertibleFloat(GetPythonValue(expression), desc)));
 
 			// Exception should contain the description in its message.
 			Assert.Contains(desc, ex.Message);
@@ -122,7 +122,7 @@ namespace SRPTests
 
 			// Invalid calls should throw ScriptException
 			// For some reason the compiler gets confused about these lambdas, hence the explicit cast to Action.
-			var ex = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.Instance.CheckConvertibleFloatList(GetPythonValue(expression), numComponents, desc)));
+			var ex = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.CheckConvertibleFloatList(GetPythonValue(expression), numComponents, desc)));
 
 			// Exception should contain the description in its message.
 			Assert.Contains(desc, ex.Message);

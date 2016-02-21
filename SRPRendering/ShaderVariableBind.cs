@@ -95,7 +95,7 @@ namespace SRPRendering
 			{
 				// Check that the script gave us the correct type.
 				int numComponents = variable.VariableType.Columns * variable.VariableType.Rows;
-				ScriptHelper.Instance.CheckConvertibleFloatList(value, numComponents,
+				ScriptHelper.CheckConvertibleFloatList(value, numComponents,
 					String.Format("Value for shader variable '{0}'", variable.Name));
 			}
 			else
@@ -110,7 +110,7 @@ namespace SRPRendering
 			try
 			{
 				// If the script gave us a function, call it.
-				dynamic val = ScriptHelper.Instance.ResolveFunction(value);
+				dynamic val = ScriptHelper.ResolveFunction(value);
 				variable.SetFromDynamic(val);
 			}
 			catch (ScriptException ex)

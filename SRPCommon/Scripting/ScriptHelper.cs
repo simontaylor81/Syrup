@@ -13,14 +13,10 @@ using Microsoft.CSharp.RuntimeBinder;
 
 namespace SRPCommon.Scripting
 {
-	public class ScriptHelper
+	public static class ScriptHelper
 	{
-		public static ScriptHelper Instance => instance;
-
-		public ScriptEngine Engine { get; set; }
-
 		// If x is a function, execute it and return the result. Otherwise just return x.
-		public object ResolveFunction(object x)
+		public static object ResolveFunction(object x)
 		{
 			Func<object> func;
 			if (x != null && TryConvert(x, out func))
@@ -78,7 +74,7 @@ namespace SRPCommon.Scripting
 		}
 
 		// Helper functions that determine if the given dynamic can be converted to a specific type.
-		public void CheckConvertibleFloat(object x, string description)
+		public static void CheckConvertibleFloat(object x, string description)
 		{
 			if (x == null || (!CanConvert<float>(x) && !CanConvert<Func<float>>(x)))
 			{
@@ -89,7 +85,7 @@ namespace SRPCommon.Scripting
 			}
 		}
 
-		public void CheckConvertibleFloatList(dynamic x, int numComponents, string description)
+		public static void CheckConvertibleFloatList(dynamic x, int numComponents, string description)
 		{
 			if (numComponents == 1)
 			{
@@ -149,7 +145,5 @@ namespace SRPCommon.Scripting
 				return false;
 			}
 		}
-
-		private static ScriptHelper instance = new ScriptHelper();
 	}
 }
