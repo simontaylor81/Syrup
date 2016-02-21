@@ -1,12 +1,11 @@
-﻿using Microsoft.CSharp.RuntimeBinder;
-using Microsoft.Scripting;
-using SlimDX;
-using SRPCommon.Scripting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SlimDX;
+using SRPCommon.Scripting;
+using SRPTests.Util;
 using Xunit;
 
 namespace SRPTests
@@ -14,13 +13,13 @@ namespace SRPTests
 	// Tests for SRPCommon.Scripting.ScriptHelper
 	public class ScriptHelperTests
 	{
-		private readonly Scripting scripting;
+		private readonly ScriptTestHelper _scriptTestHelper;
 
 		// Common initialisation
 		public ScriptHelperTests()
 		{
 			// Create Scripting object, which initialises the script engine.
-			scripting = new Scripting(null);
+			_scriptTestHelper = new ScriptTestHelper();
 		}
 
 		[Theory]
@@ -30,46 +29,46 @@ namespace SRPTests
 		[InlineData(12, "lambda: 12")]
 		public void ResolveFunctionValid(object expected, string expression)
 		{
-			Assert.Equal(expected, ScriptHelper.ResolveFunction(GetPythonValue(expression)));
+			Assert.Equal(expected, ScriptHelper.ResolveFunction(_scriptTestHelper.GetPythonValue(expression)));
 		}
 
 		[Theory]
 		[InlineData("lambda x: x")]		// Functions must have zero arguments.
 		public void ResolveFunctionInvalid(string expression)
 		{
-			Assert.Throws<ScriptException>(() => ScriptHelper.ResolveFunction(GetPythonValue(expression)));
+			Assert.Throws<ScriptException>(() => ScriptHelper.ResolveFunction(_scriptTestHelper.GetPythonValue(expression)));
 		}
 
 		[Fact]
 		public void TestGuardedCast()
 		{
 			// Test valid casts.
-			Assert.Equal(3.142f, ScriptHelper.GuardedCast<float>(GetPythonValue("3.142")));
-			Assert.Equal("str", ScriptHelper.GuardedCast<string>(GetPythonValue("'str'")));
+			Assert.Equal(3.142f, ScriptHelper.GuardedCast<float>(_scriptTestHelper.GetPythonValue("3.142")));
+			Assert.Equal("str", ScriptHelper.GuardedCast<string>(_scriptTestHelper.GetPythonValue("'str'")));
 
 			// Invalid casts should through the correct ScriptException.
 			Assert.Throws<ScriptException>(() => ScriptHelper.GuardedCast<float>(null));
-			Assert.Throws<ScriptException>(() => ScriptHelper.GuardedCast<float>(GetPythonValue("'str'")));
+			Assert.Throws<ScriptException>(() => ScriptHelper.GuardedCast<float>(_scriptTestHelper.GetPythonValue("'str'")));
 		}
 
 		[Fact]
 		public void TestConversions()
 		{
 			// Test regular functioning of each function.
-			Assert.Equal(new Vector2(1.1f, 2.0f), ScriptHelper.ConvertToVector2(GetPythonValue("(1.1, 2)")));
-			Assert.Equal(new Vector3(1.1f, 2.0f, 3.0f), ScriptHelper.ConvertToVector3(GetPythonValue("(1.1, 2, 3)")));
-			Assert.Equal(new Vector4(1.1f, 2.0f, 3.0f, 4.0f), ScriptHelper.ConvertToVector4(GetPythonValue("(1.1, 2, 3, 4)")));
-			Assert.Equal(new Color3(1.1f, 2.0f, 3.0f), ScriptHelper.ConvertToColor3(GetPythonValue("(1.1, 2, 3)")));
-			Assert.Equal(new Color4(4.0f, 1.1f, 2.0f, 3.0f), ScriptHelper.ConvertToColor4(GetPythonValue("(1.1, 2, 3, 4)")));
+			Assert.Equal(new Vector2(1.1f, 2.0f), ScriptHelper.ConvertToVector2(_scriptTestHelper.GetPythonValue("(1.1, 2)")));
+			Assert.Equal(new Vector3(1.1f, 2.0f, 3.0f), ScriptHelper.ConvertToVector3(_scriptTestHelper.GetPythonValue("(1.1, 2, 3)")));
+			Assert.Equal(new Vector4(1.1f, 2.0f, 3.0f, 4.0f), ScriptHelper.ConvertToVector4(_scriptTestHelper.GetPythonValue("(1.1, 2, 3, 4)")));
+			Assert.Equal(new Color3(1.1f, 2.0f, 3.0f), ScriptHelper.ConvertToColor3(_scriptTestHelper.GetPythonValue("(1.1, 2, 3)")));
+			Assert.Equal(new Color4(4.0f, 1.1f, 2.0f, 3.0f), ScriptHelper.ConvertToColor4(_scriptTestHelper.GetPythonValue("(1.1, 2, 3, 4)")));
 
 			// Python lists should work too.
-			Assert.Equal(new Vector4(1.1f, 2.0f, 3.0f, 4.0f), ScriptHelper.ConvertToVector4(GetPythonValue("[1.1, 2, 3, 4]")));
+			Assert.Equal(new Vector4(1.1f, 2.0f, 3.0f, 4.0f), ScriptHelper.ConvertToVector4(_scriptTestHelper.GetPythonValue("[1.1, 2, 3, 4]")));
 
 			// Test various invalid values
-			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToVector2(GetPythonValue("1")));
-			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToVector3(GetPythonValue("lambda: 7")));
-			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToVector4(GetPythonValue("(1,2,3)")));
-			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToColor3(GetPythonValue("('', '', '')")));
+			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToVector2(_scriptTestHelper.GetPythonValue("1")));
+			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToVector3(_scriptTestHelper.GetPythonValue("lambda: 7")));
+			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToVector4(_scriptTestHelper.GetPythonValue("(1,2,3)")));
+			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToColor3(_scriptTestHelper.GetPythonValue("('', '', '')")));
 			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToColor4(null));
 		}
 
@@ -80,7 +79,7 @@ namespace SRPTests
 		public void CheckConvertibleFloatValid(string expression)
 		{
 			// Valid calls complete silently without an exception.
-			ScriptHelper.CheckConvertibleFloat(GetPythonValue(expression), "");
+			ScriptHelper.CheckConvertibleFloat(_scriptTestHelper.GetPythonValue(expression), "");
 		}
 
 		[Theory]
@@ -91,7 +90,7 @@ namespace SRPTests
 		public void CheckConvertibleFloatListValid(string expression, int numComponents)
 		{
 			// Valid calls complete silently without an exception.
-			ScriptHelper.CheckConvertibleFloatList(GetPythonValue(expression), numComponents, "");
+			ScriptHelper.CheckConvertibleFloatList(_scriptTestHelper.GetPythonValue(expression), numComponents, "");
 		}
 
 		[Fact]
@@ -122,7 +121,7 @@ namespace SRPTests
 
 			// Invalid calls should throw ScriptException
 			// For some reason the compiler gets confused about these lambdas, hence the explicit cast to Action.
-			var ex = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.CheckConvertibleFloat(GetPythonValue(expression), desc)));
+			var ex = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.CheckConvertibleFloat(_scriptTestHelper.GetPythonValue(expression), desc)));
 
 			// Exception should contain the description in its message.
 			Assert.Contains(desc, ex.Message);
@@ -140,17 +139,10 @@ namespace SRPTests
 
 			// Invalid calls should throw ScriptException
 			// For some reason the compiler gets confused about these lambdas, hence the explicit cast to Action.
-			var ex = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.CheckConvertibleFloatList(GetPythonValue(expression), numComponents, desc)));
+			var ex = Assert.Throws<ScriptException>((Action)(() => ScriptHelper.CheckConvertibleFloatList(_scriptTestHelper.GetPythonValue(expression), numComponents, desc)));
 
 			// Exception should contain the description in its message.
 			Assert.Contains(desc, ex.Message);
-		}
-
-		// Helper for getting the value of some inline python code.
-		private dynamic GetPythonValue(string expression)
-		{
-			var source = scripting.PythonEngine.CreateScriptSourceFromString(expression, SourceCodeKind.Expression);
-			return source.Execute();
 		}
 	}
 }

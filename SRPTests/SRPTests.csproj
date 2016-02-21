@@ -120,11 +120,13 @@
     <Compile Include="TestRenderer\HtmlReporter.cs" />
     <Compile Include="TestRenderer\TestReporter.cs" />
     <Compile Include="TestRenderer\TestWorkspace.cs" />
+    <Compile Include="UnitTests\BufferTests.cs" />
     <Compile Include="UnitTests\UserPropertyCopyFromTests.cs" />
     <Compile Include="UserVariableTests.cs" />
     <Compile Include="Util\AppveyorCI.cs" />
     <Compile Include="Util\CIHelper.cs" />
     <Compile Include="Util\DummyCIProvider.cs" />
+    <Compile Include="Util\ScriptTestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -382,9 +382,9 @@ namespace SRPRendering
 		}
 
 		// Create a buffer of the given size and format, and fill it with the given data.
-		public IBuffer CreateBuffer(int sizeInBytes, dynamic contents, bool uav = false)
+		public IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents, bool uav = false)
 		{
-			_buffers.Add(new Buffer(_device.Device, sizeInBytes, uav));
+			_buffers.Add(Buffer.CreateDynamic(_device.Device, sizeInBytes, uav, format, contents));
 			return _buffers[_buffers.Count - 1];
 		}
 

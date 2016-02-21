@@ -102,7 +102,7 @@ namespace SRPRendering
 			Device device, int width, int height, Format format, dynamic contents, bool generateMips = false)
 		{
 			// Construct data stream from script data.
-			var initialData = new DataRectangle(width * format.Size(), GetStreamFromDynamic(contents, width, height, format));
+			var initialData = new DataRectangle(width * format.Size(), DynamicStream.CreateStream2D(contents, width, height, format));
 
 			// Create DirectXTex representation (so we can apply the same operations as images loaded
 			// from disk, e.g. mip generation).
@@ -124,121 +124,5 @@ namespace SRPRendering
 		}
 
 		private delegate dynamic TexelCallback(int x, int y);
-
-		// Create a SlimDX raw data stream based on the given dynamic object.
-		private static DataStream GetStreamFromDynamic(dynamic contents, int width, int height, Format format)
-		{
-			var stream = new DataStream(width * height * format.Size(), true, true);
-
-			// For some reason it won't dynamically overload on the delegate type,
-			// so we have to convert it by hand.
-			TexelCallback callback;
-			if (ScriptHelper.TryConvert<TexelCallback>(contents, out callback))
-			{
-				FillStream(callback, stream, width, height, format);
-			}
-			else
-			{
-				FillStream(contents, stream, width, height, format);
-			}
-
-			// Reset position
-			stream.Position = 0;
-			return stream;
-		}
-
-		// Fill a data stream from a dynamic enumerable.
-		private static void FillStream(IEnumerable<dynamic> enumerable, DataStream stream, int width, int height, Format format)
-		{
-			foreach (var element in enumerable.Take(width * height))
-			{
-				WriteDynamic(stream, element, format);
-			}
-		}
-
-		// Fill a data stream from a function taking x & y coordinates.
-		private static void FillStream(TexelCallback fn, DataStream stream, int width, int height, Format format)
-		{
-			for (int y = 0; y < height; y++)
-			{
-				for (int x = 0; x < width; x++)
-				{
-					var element = fn(x, y);
-					WriteDynamic(stream, element, format);
-				}
-			}
-		}
-
-		private static void WriteDynamic(DataStream stream, dynamic element, Format format)
-		{
-			switch (format)
-			{
-				case Format.R32G32B32A32_Float:
-				case Format.R32G32B32_Float:
-					for (int i = 0; i < format.NumComponents(); i++)
-						stream.Write((float)element[i]);
-					break;
-
-				case Format.R16G16B16A16_Float:
-					for (int i = 0; i < format.NumComponents(); i++)
-						stream.Write<Half>(new Half((float)element[i]));
-					break;
-
-				case Format.R16G16B16A16_UNorm:
-					for (int i = 0; i < format.NumComponents(); i++)
-						stream.Write((ushort)ToUNorm(element[i], 65535.0f));
-					break;
-
-				case Format.R8G8B8A8_UNorm:
-				case Format.R8G8B8A8_UNorm_SRGB:
-					for (int i = 0; i < format.NumComponents(); i++)
-						stream.Write((byte)ToUNorm((float)element[i], 255.0f));
-					break;
-
-				case Format.R8G8B8A8_UInt:
-					for (int i = 0; i < format.NumComponents(); i++)
-						stream.Write<byte>(element[i]);
-					break;
-
-				//case Format.R8G8B8A8_SNorm:
-				//	break;
-
-				case Format.R8G8B8A8_SInt:
-					for (int i = 0; i < format.NumComponents(); i++)
-						stream.Write<sbyte>(element[i]);
-					break;
-
-				case Format.R32_Float:
-					stream.Write((float)element);
-					break;
-
-				case Format.R16_Float:
-					stream.Write<Half>(new Half((float)element));
-					break;
-
-				case Format.R8_UNorm:
-					stream.Write((byte)ToUNorm((float)element, 255.0f));
-					break;
-
-				case Format.R8_UInt:
-					stream.Write<byte>(element);
-					break;
-
-				//case Format.R8_SNorm:
-				//	break;
-
-				case Format.R8_SInt:
-					stream.Write<sbyte>(element);
-					break;
-
-				default:
-					throw new ScriptException("Unsuported format: " + format.ToString());
-			}
-		}
-
-		private static uint ToUNorm(float value, float max)
-		{
-			return (uint)(Math.Max(0.0f, Math.Min(1.0f, value)) * max);
-		}
 	}
 }

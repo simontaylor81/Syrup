@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using SlimDX;
 using SlimDX.Direct3D11;
 using SRPScripting;
 
@@ -16,7 +17,15 @@ namespace SRPRendering
 		public ShaderResourceView SRV { get; }
 		public UnorderedAccessView UAV { get; }
 
-		public Buffer(Device device, int sizeInBytes, bool uav)
+		// Create with initial contents from dynamic (list or callback function).
+		// Currently only supports single-element buffers, not structured buffers.
+		public static Buffer CreateDynamic(Device device, int sizeInBytes, bool uav, Format format, dynamic contents)
+		{
+			DataStream initialData = contents != null ? DynamicStream.CreateStream1D(contents, sizeInBytes / format.Size(), format) : null;
+			return new Buffer(device, sizeInBytes, uav, initialData);
+		}
+
+		public Buffer(Device device, int sizeInBytes, bool uav, DataStream initialData)
 		{
 			var desc = new BufferDescription();
 
@@ -32,7 +41,7 @@ namespace SRPRendering
 				desc.BindFlags |= BindFlags.UnorderedAccess;
 			}
 
-			_buffer = new SlimDX.Direct3D11.Buffer(device, desc);
+			_buffer = new SlimDX.Direct3D11.Buffer(device, initialData, desc);
 
 			// Create SRV for reading from the buffer.
 			SRV = new ShaderResourceView(device, _buffer);
