@@ -13,22 +13,18 @@ using Microsoft.CSharp.RuntimeBinder;
 
 namespace SRPCommon.Scripting
 {
-	public class ScriptHelper
+	public static class ScriptHelper
 	{
-		public static ScriptHelper Instance => instance;
-
-		public ScriptEngine Engine { get; set; }
-		public ObjectOperations Operations => Engine.Operations;
-
 		// If x is a function, execute it and return the result. Otherwise just return x.
-		public dynamic ResolveFunction(dynamic x)
+		public static object ResolveFunction(object x)
 		{
-			if (x != null && Operations.IsCallable(x))
+			Func<object> func;
+			if (x != null && TryConvert(x, out func))
 			{
 				// Catch exceptions caused by the function not taking zero arguments.
 				try
 				{
-					return x();
+					return func();
 				}
 				catch (ArgumentTypeException ex)
 				{
@@ -78,26 +74,18 @@ namespace SRPCommon.Scripting
 		}
 
 		// Helper functions that determine if the given dynamic can be converted to a specific type.
-		public void CheckConvertibleFloat(dynamic x, string description)
+		public static void CheckConvertibleFloat(object x, string description)
 		{
-			if (x != null)
+			if (x == null || (!CanConvert<float>(x) && !CanConvert<Func<float>>(x)))
 			{
-				// Is the value directly convertible to a float?
-				float dummy;
-				if (Operations.TryConvertTo<float>(x, out dummy))
-					return;
-
-				// If not a float, is it a function (can't tell more than this unfortunately).
-				if (Operations.IsCallable(x))
-					return;
+				// Not convertible, so throw exception so the user will get an error message.
+				throw new ScriptException(
+					string.Format("{0} must be a float, or a zero-argument function returning float. Got '{1}'.",
+					description, x != null ? x.ToString() : "null"));
 			}
-
-			// Not convertible, so throw exception so the user will get an error message.
-			throw new ScriptException(String.Format("{0} must be a float, or a zero-argument function returning float. Got '{1}'.",
-				description, x != null ? x.ToString() : "null"));
 		}
 
-		public void CheckConvertibleFloatList(dynamic x, int numComponents, string description)
+		public static void CheckConvertibleFloatList(dynamic x, int numComponents, string description)
 		{
 			if (numComponents == 1)
 			{
@@ -108,32 +96,25 @@ namespace SRPCommon.Scripting
 				if (x != null)
 				{
 					// Is the value convertible to a list?
-					IEnumerable<dynamic> list;
-					if (Operations.TryConvertTo<IEnumerable<object>>(x, out list))
+					IEnumerable<object> list;
+					if (TryConvert<IEnumerable<object>>(x, out list))
 					{
 						// Check it has at least enough components.
 						if (list.Count() >= numComponents)
 						{
 							// Try to convert each element to float.
-							bool allFloat = true;
-							foreach (dynamic entry in list)
+							if (list.All(element => CanConvert<float>(element)))
 							{
-								float dummyFloat;
-								if (!Operations.TryConvertTo<float>(entry, out dummyFloat))
-								{
-									allFloat = false;
-									break;
-								}
-							}
-
-							if (allFloat)
 								return;
+							}
 						}
 					}
 
-					// Is it a function (can't tell more than this unfortunately).
-					if (Operations.IsCallable(x))
+					// Is it a function?
+					if (CanConvert<Func<float>>(x))
+					{
 						return;
+					}
 				}
 
 				// Not convertible, so report error to user.
@@ -143,25 +124,26 @@ namespace SRPCommon.Scripting
 			}
 		}
 
-		public void LogScriptError(Exception ex)
+		public static bool CanConvert<T>(object x)
 		{
-			OutputLogger.Instance.LogLine(LogCategory.Script, "Script execution failed.");
-
-			var eo = Engine.GetService<ExceptionOperations>();
-
-			if (ex.InnerException != null)
-			{
-				string error = eo.FormatException(ex.InnerException);
-				OutputLogger.Instance.LogLine(LogCategory.Script, ex.Message);
-				OutputLogger.Instance.LogLine(LogCategory.Script, error);
-			}
-			else
-			{
-				string error = eo.FormatException(ex);
-				OutputLogger.Instance.LogLine(LogCategory.Script, error);
-			}
+			T dummy;
+			return TryConvert(x, out dummy);
 		}
 
-		private static ScriptHelper instance = new ScriptHelper();
+		public static bool TryConvert<T>(object x, out T result)
+		{
+			try
+			{
+				// Forcing to dynamic first lets the DLR kick in and do its thing,
+				// which allows a wider range of conversions to be performed.
+				result = (T)(dynamic)x;
+				return true;
+			}
+			catch (Exception)
+			{
+				result = default(T);
+				return false;
+			}
+		}
 	}
 }

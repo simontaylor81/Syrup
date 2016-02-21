@@ -59,8 +59,6 @@ namespace SRPCommon.Scripting
 			StreamWriter writer = OutputLogger.Instance.GetStreamWriter(LogCategory.Script);
 			pythonEngine.Runtime.IO.SetOutput(writer.BaseStream, writer);
 			pythonEngine.Runtime.IO.SetErrorOutput(writer.BaseStream, writer);
-
-			ScriptHelper.Instance.Engine = pythonEngine;
 		}
 
 		private ScriptEngine CreatePythonEngine()
@@ -150,6 +148,23 @@ namespace SRPCommon.Scripting
 				OutputLogger.Instance.LogLine(LogCategory.Script, error);
 
 				throw;
+			}
+		}
+
+		// Helper for formatting script errors.
+		public string FormatScriptError(Exception ex)
+		{
+			var eo = pythonEngine.GetService<ExceptionOperations>();
+
+			if (ex.InnerException != null)
+			{
+				string error = eo.FormatException(ex.InnerException);
+				return $"{ex.Message}\n{error}\n";
+			}
+			else
+			{
+				string error = eo.FormatException(ex);
+				return $"{error}\n";
 			}
 		}
 

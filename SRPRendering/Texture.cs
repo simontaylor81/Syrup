@@ -133,7 +133,7 @@ namespace SRPRendering
 			// For some reason it won't dynamically overload on the delegate type,
 			// so we have to convert it by hand.
 			TexelCallback callback;
-			if (ScriptHelper.Instance.Operations.TryConvertTo<TexelCallback>(contents, out callback))
+			if (ScriptHelper.TryConvert<TexelCallback>(contents, out callback))
 			{
 				FillStream(callback, stream, width, height, format);
 			}

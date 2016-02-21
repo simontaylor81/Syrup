@@ -26,6 +26,7 @@ namespace SRPRendering
 		{
 			_workspace = workspace;
 			_device = device;
+			_scripting = scripting;
 
 			// Create object for interacting with script.
 			_scriptRenderControl = new ScriptRenderControl(workspace, device);
@@ -35,8 +36,11 @@ namespace SRPRendering
 			ScriptInterface = new ProxyGenerator().CreateInterfaceProxyWithTarget<IRenderInterface>(_scriptRenderControl);
 
 			// Reset before script execution.
-			_disposables.Add(scripting.PreExecute.Subscribe(PreExecuteScript));
-			_disposables.Add(scripting.ExecutionComplete.Subscribe(ExecutionComplete));
+			if (scripting != null)
+			{
+				_disposables.Add(scripting.PreExecute.Subscribe(PreExecuteScript));
+				_disposables.Add(scripting.ExecutionComplete.Subscribe(ExecutionComplete));
+			}
 
 			_overlayRenderer = new OverlayRenderer(device.GlobalResources);
 
@@ -76,7 +80,7 @@ namespace SRPRendering
 			}
 			catch (ScriptException ex)
 			{
-				ScriptHelper.Instance.LogScriptError(ex);
+				LogScriptError(ex);
 				bScriptExecutionError = true;
 				return;
 			}
@@ -158,7 +162,7 @@ namespace SRPRendering
 			}
 			catch (Exception ex)
 			{
-				ScriptHelper.Instance.LogScriptError(ex);
+				LogScriptError(ex);
 
 				// Remember that the script fails so we don't just fail over and over.
 				bScriptRenderError = true;
@@ -172,6 +176,21 @@ namespace SRPRendering
 			_overlayRenderer.Draw(deviceContext, _renderScene, viewInfo);
 
 			_bIgnoreRedrawRequests = false;
+		}
+
+		private void LogScriptError(Exception ex)
+		{
+			OutputLogger.Instance.LogLine(LogCategory.Script, "Script execution failed.");
+
+			if (_scripting != null)
+			{
+				OutputLogger.Instance.Log(LogCategory.Script, _scripting.FormatScriptError(ex));
+			}
+			else
+			{
+				OutputLogger.Instance.LogLine(LogCategory.Script, ex.Message);
+				OutputLogger.Instance.LogLine(LogCategory.Script, ex.StackTrace);
+			}
 		}
 
 		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
@@ -223,5 +242,6 @@ namespace SRPRendering
 		private CompositeDisposable _disposables = new CompositeDisposable();
 
 		private readonly ScriptRenderControl _scriptRenderControl;
+		private readonly Scripting _scripting;
 	}
 }
