@@ -69,6 +69,15 @@ namespace SRPTests.TestRenderer
 
 		public Bitmap Render(SyrupRenderer sr)
 		{
+			Dispatch(sr);
+
+			// Read back the render target and convert to bitmap.
+			return ReadBackBufferBitmap();
+		}
+
+		// Basically the same as Render, but doesn't read back the backbuffer contents.
+		public void Dispatch(SyrupRenderer sr)
+		{
 			Trace.Assert(sr != null);
 
 			var context = device.Device.ImmediateContext;
@@ -95,9 +104,6 @@ namespace SRPTests.TestRenderer
 
 			sr.Render(context, viewInfo);
 			context.Flush();
-
-			// Read back the render target and convert to bitmap.
-			return ReadBackBufferBitmap();
 		}
 
 		// Read contents of backbuffer to into bitmap.

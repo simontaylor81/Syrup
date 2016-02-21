@@ -18,10 +18,8 @@ namespace SRPTests.TestRenderer
 		private readonly TestRenderer _renderer;
 		private readonly TestWorkspace _workspace;
 		private readonly SyrupRenderer _sr;
-		private readonly Scripting _scripting;
 
 		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
-		private static readonly string _testDefinitionFile = Path.Combine(_baseDir, "tests.json");
 
 		private static bool bLoggedDevice = false;
 
@@ -31,7 +29,6 @@ namespace SRPTests.TestRenderer
 		{
 			_renderer = new TestRenderer(64, 64);
 			_workspace = new TestWorkspace(_baseDir);
-			_scripting = new Scripting(_workspace);
 
 			// Minor hack to avoid spamming the log with device names.
 			if (!bLoggedDevice)
@@ -42,8 +39,7 @@ namespace SRPTests.TestRenderer
 			}
 
 			// Create syrup renderer to drive the rendering.
-			_sr = new SyrupRenderer(_workspace, _renderer.Device, _scripting);
-			_scripting.RenderInterface = _sr.ScriptInterface;
+			_sr = new SyrupRenderer(_workspace, _renderer.Device, null);
 		}
 
 		public void Dispose()
@@ -57,8 +53,17 @@ namespace SRPTests.TestRenderer
 			// This should never fire, as the exception should propagate out of RunScript.
 			Assert.That(_sr.HasScriptError, Is.False, "Error executing script");
 
-			// Render it.
+			// Render stuff and return the resulting image.
 			return _renderer.Render(_sr);
+		}
+
+		public void Dispatch()
+		{
+			// This should never fire, as the exception should propagate out of RunScript.
+			Assert.That(_sr.HasScriptError, Is.False, "Error executing script");
+
+			// Run the renderer to trigger compute shaders.
+			_renderer.Dispatch(_sr);
 		}
 	}
 }

@@ -22,9 +22,9 @@ namespace SRPRendering
 
 			desc.SizeInBytes = sizeInBytes;
 			desc.Usage = ResourceUsage.Default;
-			desc.CpuAccessFlags = CpuAccessFlags.Read;  // TODO!
+			desc.CpuAccessFlags = CpuAccessFlags.Read;  // Need this for result verification.
 			desc.OptionFlags = ResourceOptionFlags.StructuredBuffer;
-			desc.StructureByteStride = sizeof(float);	// TODO
+			desc.StructureByteStride = sizeof(float);   // TODO
 
 			desc.BindFlags = BindFlags.ShaderResource;
 			if (uav)
@@ -51,11 +51,11 @@ namespace SRPRendering
 			_buffer.Dispose();
 		}
 
-		// TODO: Type
-		public object GetContents()
+		// Read back the contents of the buffer from the GPU.
+		public IEnumerable<T> GetContents<T>() where T : struct
 		{
 			var data = _buffer.Device.ImmediateContext.MapSubresource(_buffer, MapMode.Read, MapFlags.None);
-			return data.Data.ReadRange<float>((int)(data.Data.Length / sizeof(float)));
+			return data.Data.ReadRange<T>((int)(data.Data.Length / Marshal.SizeOf(typeof(T))));
 		}
 	}
 }

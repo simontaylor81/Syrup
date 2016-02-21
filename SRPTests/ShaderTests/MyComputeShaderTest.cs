@@ -27,12 +27,8 @@ namespace SRPTests.ShaderTests
 
 			RenderHarness.RenderImage();
 
-			var result = buffer.GetContents();
-
+			var result = buffer.GetContents<float>();
 			Assert.That(result, Is.EqualTo(Enumerable.Range(0, 16).Select(i => 2.0f * i + 10.0f)));
-
-			//var result = RenderHarness.RenderImage();
-			//CompareImage(result);
 		}
 	}
 }

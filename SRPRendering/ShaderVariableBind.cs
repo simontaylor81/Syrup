@@ -85,7 +85,7 @@ namespace SRPRendering
 
 	class ScriptShaderVariableBind : IShaderVariableBind
 	{
-		public ScriptShaderVariableBind(IShaderVariable variable, dynamic value)
+		public ScriptShaderVariableBind(IShaderVariable variable, object value)
 		{
 			this.variable = variable;
 			this.value = value;
