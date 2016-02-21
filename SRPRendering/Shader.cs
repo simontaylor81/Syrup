@@ -64,93 +64,132 @@ namespace SRPRendering
 
 	class Shader : IShader
 	{
-		public Shader(Device device, string filename, string entryPoint, string profile,
+		private Shader(Device device, string profile, IncludeHandler includeHandler, Func<ShaderBytecode> compiler)
+		{
+			// Compile the shader to bytecode.
+			using (var bytecode = compiler())
+			{
+				IncludedFiles = includeHandler != null ? includeHandler.IncludedFiles : Enumerable.Empty<IncludedFile>();
+
+				// Create the shader object of the appropriate type.
+				switch (profile.Substring(0, 2))
+				{
+					case "vs":
+						_vertexShader = new VertexShader(device, bytecode);
+						Signature = ShaderSignature.GetInputSignature(bytecode);
+						_frequency = ShaderFrequency.Vertex;
+						break;
+
+					case "ps":
+						_pixelShader = new PixelShader(device, bytecode);
+						_frequency = ShaderFrequency.Pixel;
+						break;
+
+					case "cs":
+						_computeShader = new ComputeShader(device, bytecode);
+						_frequency = ShaderFrequency.Compute;
+						break;
+
+					default:
+						throw new Exception("Unsupported shader profile: " + profile);
+				}
+
+				// Get info about the shader's inputs.
+				using (var reflection = new ShaderReflection(bytecode))
+				{
+					// Gether constant buffers.
+					_cbuffers = reflection.GetConstantBuffers()
+						.Where(cbuffer => cbuffer.Description.Type == ConstantBufferType.ConstantBuffer)
+						.Select(cbuffer => new ConstantBuffer(device, cbuffer))
+						.ToArray();
+					_cbuffers_buffers = _cbuffers.Select(cbuffer => cbuffer.Buffer).ToArray();
+
+					// Gather resource and sampler inputs.
+					var boundResources = reflection.GetBoundResources();
+					_resourceVariables = boundResources
+						.Where(desc => IsShaderResource(desc.Type))
+						.Select(desc => new ShaderResourceVariable(desc, Frequency))
+						.ToArray();
+					_samplerVariables = boundResources
+						.Where(desc => desc.Type == ShaderInputType.Sampler)
+						.Select(desc => new ShaderSamplerVariable(desc, Frequency))
+						.ToArray();
+					_uavVariables = boundResources
+						.Where(desc => IsUav(desc.Type))
+						.Select(desc => new ShaderUavVariable(desc, Frequency))
+						.ToArray();
+				}
+			}
+		}
+
+		// Create a new shader by compiling a file.
+		public static Shader CompileFromFile(Device device, string filename, string entryPoint, string profile,
 			Func<string, string> includeLookup, ShaderMacro[] defines)
 		{
 			try
 			{
-				var includeHandler = includeLookup != null ? new IncludeLookup(includeLookup) : null;
-
-				// Compile the shader to bytecode.
-				using (var bytecode = ShaderBytecode.CompileFromFile(filename, entryPoint,
-					profile, ShaderFlags.None, EffectFlags.None, defines, includeHandler))
-				{
-					IncludedFiles = includeHandler != null ? includeHandler.IncludedFiles : Enumerable.Empty<IncludedFile>();
-
-					// Create the shader object of the appropriate type.
-					switch (profile.Substring(0, 2))
-					{
-						case "vs":
-							_vertexShader = new VertexShader(device, bytecode);
-							Signature = ShaderSignature.GetInputSignature(bytecode);
-							_frequency = ShaderFrequency.Vertex;
-							break;
-
-						case "ps":
-							_pixelShader = new PixelShader(device, bytecode);
-							_frequency = ShaderFrequency.Pixel;
-							break;
-
-						case "cs":
-							_computeShader = new ComputeShader(device, bytecode);
-							_frequency = ShaderFrequency.Compute;
-							break;
-
-						default:
-							throw new Exception("Unsupported shader profile: " + profile);
-					}
-
-					// Get info about the shader's inputs.
-					using (var reflection = new ShaderReflection(bytecode))
-					{
-						// Gether constant buffers.
-						_cbuffers = reflection.GetConstantBuffers()
-							.Where(cbuffer => cbuffer.Description.Type == ConstantBufferType.ConstantBuffer)
-							.Select(cbuffer => new ConstantBuffer(device, cbuffer))
-							.ToArray();
-						_cbuffers_buffers = _cbuffers.Select(cbuffer => cbuffer.Buffer).ToArray();
-
-						// Gather resource and sampler inputs.
-						var boundResources = reflection.GetBoundResources();
-						_resourceVariables = boundResources
-							.Where(desc => IsShaderResource(desc.Type))
-							.Select(desc => new ShaderResourceVariable(desc, Frequency))
-							.ToArray();
-						_samplerVariables = boundResources
-							.Where(desc => desc.Type == ShaderInputType.Sampler)
-							.Select(desc => new ShaderSamplerVariable(desc, Frequency))
-							.ToArray();
-						_uavVariables = boundResources
-							.Where(desc => IsUav(desc.Type))
-							.Select(desc => new ShaderUavVariable(desc, Frequency))
-							.ToArray();
-					}
-				}
+				var includeHandler = includeLookup != null ? new IncludeHandler(includeLookup) : null;
+				return new Shader(device, profile, includeHandler,
+					() => ShaderBytecode.CompileFromFile(filename, entryPoint, profile, ShaderFlags.None, EffectFlags.None, defines, includeHandler));
 			}
 			catch (CompilationException ex)
 			{
-				// The shader compiler error messages contain the name used to
-				// include the file, rather than the full path, so we convert them back
-				// with some regex fun.
-
-				var filenameRegex = new Regex(@"^(.*)(\([0-9]+,[0-9]+\))", RegexOptions.Multiline);
-
-				MatchEvaluator replacer = match =>
-				{
-					// If the filename is the original input filename, use that,
-					// otherwise run it through the include lookup function again.
-					var file = match.Groups[1].Value;
-					var path = file == filename ? file : includeLookup(file);
-
-					// Add back the line an column numbers.
-					return path + match.Groups[2];
-				};
-
-				var message = filenameRegex.Replace(ex.Message, replacer);
-
-				OutputLogger.Instance.Log(LogCategory.ShaderCompile, message);
-				throw new ScriptException("Shader compilation failed. See Shader Compilation log for details.", ex);
+				throw TranslateException(ex, filename, includeLookup);
 			}
+		}
+
+		// Create a new shader compiled from in-memory string.
+		// Includes still come from the file system.
+		public static Shader CompileFromString(Device device, string source, string entryPoint, string profile,
+			Func<string, string> includeLookup, ShaderMacro[] defines)
+		{
+			try
+			{
+				var includeHandler = includeLookup != null ? new IncludeHandler(includeLookup) : null;
+				return new Shader(device, profile, includeHandler,
+					() => ShaderBytecode.Compile(source, entryPoint, profile, ShaderFlags.None, EffectFlags.None, defines, includeHandler));
+			}
+			catch (CompilationException ex)
+			{
+				throw TranslateException(ex, "<string>", includeLookup);
+			}
+		}
+
+		private static Exception TranslateException(CompilationException ex, string baseFilename, Func<string, string> includeLookup)
+		{
+			// The shader compiler error messages contain the name used to
+			// include the file, rather than the full path, so we convert them back
+			// with some regex fun.
+
+			var filenameRegex = new Regex(@"^(.*)(\([0-9]+,[0-9]+\))", RegexOptions.Multiline);
+
+			// When compiling from string, the errors come from some weird non-existant path.
+			var inMemoryFileRegex = new Regex(@"Shader@0x[0-9A-F]{8}$");
+
+			MatchEvaluator replacer = match =>
+			{
+				var matchedFile = match.Groups[1].Value;
+				
+				// If the filename is the original input filename, or the weird in-memory file, use the given name.
+				string path;
+				if (matchedFile == baseFilename || inMemoryFileRegex.IsMatch(matchedFile))
+				{
+					path = baseFilename;
+				}
+				else
+				{
+					// Otherwise run it through the include lookup function again.
+					path = includeLookup(matchedFile);
+				}
+
+				// Add back the line an column numbers.
+				return path + match.Groups[2];
+			};
+
+			var message = filenameRegex.Replace(ex.Message, replacer);
+
+			OutputLogger.Instance.Log(LogCategory.ShaderCompile, message);
+			return new ScriptException("Shader compilation failed. See Shader Compilation log for details.", ex);
 		}
 
 		private static bool IsShaderResource(ShaderInputType type) =>
@@ -339,14 +378,14 @@ namespace SRPRendering
 		private ShaderUavVariable[] _uavVariables;
 
 		// Class for handling include file lookups.
-		private class IncludeLookup : Include
+		private class IncludeHandler : Include
 		{
 			private Func<string, string> includeLookup;
 
 			private List<IncludedFile> _includedFiles = new List<IncludedFile>();
 			public IEnumerable<IncludedFile> IncludedFiles => _includedFiles;
 
-			public IncludeLookup(Func<string, string> includeLookup)
+			public IncludeHandler(Func<string, string> includeLookup)
 			{
 				this.includeLookup = includeLookup;
 			}

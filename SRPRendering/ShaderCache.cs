@@ -72,7 +72,7 @@ namespace SRPRendering
 
 			// If we go this far, either the shader is not present or had a hash mismatch,
 			// so, we compile a new shader.
-			var shader = new Shader(device, filename, entryPoint, profile, includeLookup, defines);
+			var shader = Shader.CompileFromFile(device, filename, entryPoint, profile, includeLookup, defines);
 			cache[key] = new ShaderCacheEntry(shader, ComputeHash(GetAllPaths(filename, shader)));
 
 			return shader;

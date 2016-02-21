@@ -70,18 +70,29 @@ namespace SRPRendering
 		}
 
 		public object CompileShader(
-			string filename, string entryPoint, string profile, IDictionary<string, object> defines)
+			string filename, string entryPoint, string profile, IDictionary<string, object> defines = null)
 		{
 			var path = FindShader(filename);
 			if (!File.Exists(path))
 				throw new ScriptException("Shader file " + filename + " not found in project.");
 
-			var macros = defines
-				.EmptyIfNull()
-				.Select(define => new SlimDX.D3DCompiler.ShaderMacro(define.Key, define.Value.ToString()))
-				.ToArray();
+			return AddShader(_device.GlobalResources.ShaderCache.GetShader(
+				path, entryPoint, profile, FindShader, ConvertDefines(defines)));
+		}
 
-			var shader = _device.GlobalResources.ShaderCache.GetShader(path, entryPoint, profile, FindShader, macros);
+		// Compile a shader from an in-memory string.
+		// All includes still must come from the file system.
+		public object CompileShaderFromString(string source, string entryPoint, string profile,
+			IDictionary<string, object> defines = null)
+		{
+			// Don't cache shader from string.
+			// TODO: Would be nice if we could if people are going to use them in scripts.
+			return AddShader(Shader.CompileFromString(
+				_device.Device, source, entryPoint, profile, FindShader, ConvertDefines(defines)));
+		}
+
+		private object AddShader(IShader shader)
+		{
 			shaders.Add(shader);
 
 			// Set up auto variable binds for this shader.
@@ -89,6 +100,12 @@ namespace SRPRendering
 
 			return new ShaderHandle(shaders.Count - 1);
 		}
+
+		private SlimDX.D3DCompiler.ShaderMacro[] ConvertDefines(IDictionary<string, object> defines) =>
+			defines
+				.EmptyIfNull()
+				.Select(define => new SlimDX.D3DCompiler.ShaderMacro(define.Key, define.Value.ToString()))
+				.ToArray();
 
 		// Lookup a shader filename in the project to retrieve the full path.
 		private string FindShader(string name)

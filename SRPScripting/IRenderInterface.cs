@@ -25,6 +25,11 @@ namespace SRPScripting
 		object CompileShader(string filename, string entryPoint, string profile,
 			IDictionary<string, object> defines = null);
 
+		// Compile a shader from an in-memory string.
+		// All includes still must come from the file system.
+		object CompileShaderFromString(string source, string entryPoint, string profile,
+			IDictionary<string, object> defines = null);
+
 		// Create a render target of dimensions equal to the viewport.
 		object CreateRenderTarget();
 

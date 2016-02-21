@@ -72,6 +72,10 @@ namespace ShaderUnit.TestRenderer
 			_renderer.Dispatch(_sr);
 		}
 
+		// Simple wrapper for the common 1D case.
+		public IEnumerable<T> DispatchToBuffer<T>(object cs, string outBufferVariable, int size, int shaderNumThreads) where T : struct =>
+			DispatchToBuffer<T>(cs, outBufferVariable, Tuple.Create(size, 1, 1), Tuple.Create(shaderNumThreads, 1, 1));
+
 		public IEnumerable<T> DispatchToBuffer<T>(object cs, string outBufferVariable, Tuple<int, int, int> size, Tuple<int, int, int> shaderNumThreads) where T : struct
 		{
 			// Create buffer to hold results.
@@ -97,5 +101,13 @@ namespace ShaderUnit.TestRenderer
 
 		// Integer division with round up instead of down.
 		private int DivideCeil(int x, int multipleOf) => (x + multipleOf - 1) / multipleOf;
+
+		public T ExecuteShaderFunction<T>(string shaderFile, string function, params object[] parameters) where T : struct
+		{
+			string shader = HlslTestHarness.GenerateComputeShader(shaderFile, function, typeof(T), parameters);
+			var cs = RenderInterface.CompileShaderFromString(shader, HlslTestHarness.EntryPoint, "cs_5_0");
+
+			return DispatchToBuffer<T>(cs, HlslTestHarness.OutBufferName, 1, 1).Single();
+		}
 	}
 }

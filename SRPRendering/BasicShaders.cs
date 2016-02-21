@@ -56,7 +56,7 @@ namespace SRPRendering
 			var filename = RenderUtils.GetShaderFilename("BasicShaders.hlsl");
 
 			// Compile basic scene vertex shader.
-			BasicSceneVS = new Shader(device, filename, "BasicSceneVS", "vs_4_0", null, null);
+			BasicSceneVS = Shader.CompileFromFile(device, filename, "BasicSceneVS", "vs_4_0", null, null);
 			disposables.Add(BasicSceneVS);
 
 			// Bind the required shader variables.
@@ -64,7 +64,7 @@ namespace SRPRendering
 			BindShaderVariable(BasicSceneVS, "WorldToProjectionMatrix", ShaderVariableBindSource.WorldToProjectionMatrix);
 
 			// Compile the solid colour pixel shader.
-			SolidColourPS = new Shader(device, filename, "SolidColourPS", "ps_4_0", null, null);
+			SolidColourPS = Shader.CompileFromFile(device, filename, "SolidColourPS", "ps_4_0", null, null);
 			disposables.Add(SolidColourPS);
 
 			// Cache reference to the solid colour variable.
