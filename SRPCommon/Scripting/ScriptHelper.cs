@@ -10,6 +10,7 @@ using Microsoft.Scripting.Hosting;
 using SlimDX;
 using SRPCommon.Util;
 using Microsoft.CSharp.RuntimeBinder;
+using System.Collections;
 
 namespace SRPCommon.Scripting
 {
@@ -85,7 +86,7 @@ namespace SRPCommon.Scripting
 			}
 		}
 
-		public static void CheckConvertibleFloatList(dynamic x, int numComponents, string description)
+		public static void CheckConvertibleFloatList(object x, int numComponents, string description)
 		{
 			if (numComponents == 1)
 			{
@@ -93,17 +94,22 @@ namespace SRPCommon.Scripting
 			}
 			else
 			{
-				if (x != null)
+				// Strings can be converted to IEnumerables of chars, which can be
+				// converted to floats, so will pass all these tests. However, it's
+				// probably not what the user wanted, so handle it explicitly here.
+				if (x != null && !(x is string))
 				{
 					// Is the value convertible to a list?
-					IEnumerable<object> list;
-					if (TryConvert<IEnumerable<object>>(x, out list))
+					// Use non-generic IEnumerable as it's oddly more forgiving.
+					IEnumerable list;
+					if (TryConvert(x, out list))
 					{
 						// Check it has at least enough components.
-						if (list.Count() >= numComponents)
+						var objList = list.Cast<object>();
+						if (objList.Count() >= numComponents)
 						{
 							// Try to convert each element to float.
-							if (list.All(element => CanConvert<float>(element)))
+							if (objList.All(element => CanConvert<float>(element)))
 							{
 								return;
 							}
