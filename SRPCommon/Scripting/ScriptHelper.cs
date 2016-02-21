@@ -150,25 +150,6 @@ namespace SRPCommon.Scripting
 			}
 		}
 
-		public void LogScriptError(Exception ex)
-		{
-			OutputLogger.Instance.LogLine(LogCategory.Script, "Script execution failed.");
-
-			var eo = Engine.GetService<ExceptionOperations>();
-
-			if (ex.InnerException != null)
-			{
-				string error = eo.FormatException(ex.InnerException);
-				OutputLogger.Instance.LogLine(LogCategory.Script, ex.Message);
-				OutputLogger.Instance.LogLine(LogCategory.Script, error);
-			}
-			else
-			{
-				string error = eo.FormatException(ex);
-				OutputLogger.Instance.LogLine(LogCategory.Script, error);
-			}
-		}
-
 		private static ScriptHelper instance = new ScriptHelper();
 	}
 }
