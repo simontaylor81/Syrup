@@ -21,14 +21,15 @@ namespace SRPCommon.Scripting
 		public ObjectOperations Operations => Engine.Operations;
 
 		// If x is a function, execute it and return the result. Otherwise just return x.
-		public dynamic ResolveFunction(dynamic x)
+		public object ResolveFunction(object x)
 		{
-			if (x != null && Operations.IsCallable(x))
+			Func<object> func;
+			if (x != null && TryConvert(x, out func))
 			{
 				// Catch exceptions caused by the function not taking zero arguments.
 				try
 				{
-					return x();
+					return func();
 				}
 				catch (ArgumentTypeException ex)
 				{
