@@ -79,4 +79,19 @@ namespace SRPRendering
 			return viewInfo.DepthBuffer.SRV;
 		}
 	}
+
+	class BufferShaderResourceVariableBind : IShaderResourceVariableBind
+	{
+		private readonly Buffer _buffer;
+
+		public BufferShaderResourceVariableBind(Buffer buffer)
+		{
+			_buffer = buffer;
+		}
+
+		public ShaderResourceView GetResource(IPrimitive primitive, ViewInfo viewInfo, IGlobalResources globalResources)
+		{
+			return _buffer.SRV;
+		}
+	}
 }

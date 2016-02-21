@@ -37,7 +37,14 @@ namespace SRPRendering
 			_disposables.Add(Device);
 
 			// Lazily get adapter from DXGI device.
-			_adapter = new Lazy<Adapter>(() => new SlimDX.DXGI.Device(Device).Adapter);
+			_adapter = new Lazy<Adapter>(() =>
+			{
+				var dxgiDevice = new SlimDX.DXGI.Device(Device);
+				var adapter = dxgiDevice.Adapter;
+				_disposables.Add(dxgiDevice);
+				_disposables.Add(adapter);
+				return adapter;
+			});
 
 			// Initialise basic resources.
 			GlobalResources = new GlobalResources(Device);

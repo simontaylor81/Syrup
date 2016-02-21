@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using SlimDX;
 using SlimDX.Direct3D11;
 
-using Buffer = SlimDX.Direct3D11.Buffer;
-
 namespace SRPRendering
 {
 	class ConstantBuffer : IDisposable
@@ -16,7 +14,7 @@ namespace SRPRendering
 		private DataBox contents;
 
 		public string Name { get; }
-		public Buffer Buffer { get; }
+		public SlimDX.Direct3D11.Buffer Buffer { get; }
 		public IEnumerable<IShaderVariable> Variables => variables;
 
 		public ConstantBuffer(Device device, SlimDX.D3DCompiler.ConstantBuffer bufferInfo)
@@ -37,7 +35,7 @@ namespace SRPRendering
 
 			// Create the actual buffer.
 			stream.Position = 0;
-			Buffer = new Buffer(
+			Buffer = new SlimDX.Direct3D11.Buffer(
 				device,
 				stream,
 				bufferInfo.Description.Size,

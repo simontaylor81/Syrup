@@ -102,6 +102,7 @@
   <ItemGroup>
     <Compile Include="BasicMesh.cs" />
     <Compile Include="BasicShaders.cs" />
+    <Compile Include="Buffer.cs" />
     <Compile Include="ConstantBuffer.cs" />
     <Compile Include="DepthBuffer.cs" />
     <Compile Include="MipGenerator.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="ScriptRenderContext.cs" />
     <Compile Include="ShaderSamplerVariable.cs" />
     <Compile Include="ShaderSamplerVariableBind.cs" />
+    <Compile Include="ShaderUavVariable.cs" />
     <Compile Include="SlimDXUtils.cs" />
     <Compile Include="SyrupRenderer.cs" />
     <Compile Include="ScriptRenderControl.cs" />

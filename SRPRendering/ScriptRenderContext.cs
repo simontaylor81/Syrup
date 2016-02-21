@@ -143,6 +143,24 @@ namespace SRPRendering
 			deviceContext.ClearState();
 		}
 
+		// Dispatch a compute shader.
+		public void Dispatch(dynamic shaderHandle, int numGroupsX, int numGroupsY, int numGroupsZ,
+							 IDictionary<string, dynamic> shaderVariableOverrides = null)
+		{
+			Shader cs = GetShader(shaderHandle);
+			if (cs == null)
+			{
+				throw new ScriptException("Dispatch: compute shader is required");
+			}
+
+			cs.Set(deviceContext);
+			cs.UpdateVariables(deviceContext, viewInfo, null, shaderVariableOverrides, _globalResources);
+			deviceContext.Dispatch(numGroupsX, numGroupsY, numGroupsZ);
+
+			// Enforce statelessness.
+			deviceContext.ClearState();
+		}
+
 		// Clear render targets.
 		public void Clear(dynamic colour, IEnumerable<object> renderTargetHandles = null)
 		{

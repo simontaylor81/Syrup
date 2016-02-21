@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 using SlimDX;
 using SlimDX.Direct3D11;
-using Buffer = SlimDX.Direct3D11.Buffer;
 using SRPCommon.Util;
 
 namespace SRPRendering
@@ -11,18 +10,6 @@ namespace SRPRendering
 	// Generic mesh class, containing vertex buffer, index buffer, etc.
 	public class Mesh : IDrawable, IDisposable
 	{
-		/*
-		public Mesh(Buffer vertexBuffer, Buffer indexBuffer, InputElement[] inputElements)
-		{
-			this.vertexBuffer = vertexBuffer;
-			this.indexBuffer = indexBuffer;
-			this.InputElements = inputElements;
-
-			// TODO: Make more generic?
-			numIndices = indexBuffer.Description.SizeInBytes / 2;
-		}
-		*/
-
 		public Mesh(Device device, DataStream vertexStream, int vertexStride, DataStream indexStream, InputElement[] inputElements)
 		{
 			// Make sure read/write pointers of the streams are reset.
@@ -30,9 +17,9 @@ namespace SRPRendering
 			indexStream.Position = 0;
 
 			// Create buffers.
-			vertexBuffer = new Buffer(device, vertexStream, (int)vertexStream.Length, ResourceUsage.Default,
+			vertexBuffer = new SlimDX.Direct3D11.Buffer(device, vertexStream, (int)vertexStream.Length, ResourceUsage.Default,
 				BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-			indexBuffer = new Buffer(device, indexStream, (int)indexStream.Length, ResourceUsage.Default,
+			indexBuffer = new SlimDX.Direct3D11.Buffer(device, indexStream, (int)indexStream.Length, ResourceUsage.Default,
 				BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
 
 			InputElements = inputElements;
@@ -54,8 +41,8 @@ namespace SRPRendering
 			context.DrawIndexed(numIndices, 0, 0);
 		}
 
-		private Buffer vertexBuffer;
-		private Buffer indexBuffer;
+		private SlimDX.Direct3D11.Buffer vertexBuffer;
+		private SlimDX.Direct3D11.Buffer indexBuffer;
 
 		int numIndices;
 		int vertexStride;

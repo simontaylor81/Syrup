@@ -31,6 +31,9 @@ namespace SRPScripting
 		// Create a 2D texture of the given size and format, and fill it with the given data.
 		object CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false);
 
+		// Create a buffer of the given size and format, and fill it with the given data.
+		IBuffer CreateBuffer(int sizeInBytes, dynamic contents, bool uav = false);
+
 		// Load a texture from a file.
 		object LoadTexture(string path, object generateMips = null);
 
@@ -42,6 +45,7 @@ namespace SRPScripting
 		void BindShaderResourceToMaterial(object shader, string var, string param, object fallback = null);
 		void SetShaderResourceVariable(object shader, string var, object value);
 		void SetShaderSamplerState(object shader, string samplerName, SamplerState state);
+		void SetShaderUavVariable(object shader, string var, IBuffer value);
 
 		#region User Variables
 		dynamic AddUserVar_Float(string name, float defaultValue);
