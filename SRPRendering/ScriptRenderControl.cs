@@ -10,6 +10,7 @@ using SRPCommon.Scene;
 using SRPCommon.Scripting;
 using SRPCommon.UserProperties;
 using SRPCommon.Util;
+using SRPRendering.Resources;
 using SRPScripting;
 
 namespace SRPRendering
@@ -231,7 +232,7 @@ namespace SRPRendering
 				.Where(variable => variable != null);
 
 			var texture = GetTexture(value);
-			var buffer = value as Buffer;
+			var buffer = value as BufferHandle;
 			var renderTargetHandle = value as RenderTargetHandle;
 
 			foreach (var variable in variables)
@@ -247,7 +248,7 @@ namespace SRPRendering
 				}
 				else if (buffer != null)
 				{
-					variable.Bind = new BufferShaderResourceVariableBind(buffer);
+					variable.Bind = new BufferShaderResourceVariableBind(buffer.Buffer);
 				}
 				else if (renderTargetHandle != null)
 				{
@@ -275,7 +276,7 @@ namespace SRPRendering
 				.Select(shader => shader.FindUavVariable(varName))
 				.Where(variable => variable != null);
 
-			var buffer = value as Buffer;
+			var buffer = value as BufferHandle;
 			if (buffer == null)
 			{
 				throw new ScriptException("Invalid buffer for UAV");
@@ -288,7 +289,7 @@ namespace SRPRendering
 					throw new ScriptException("Attempting to set an already set shader variable: " + varName);
 				}
 
-				variable.UAV = buffer.UAV;
+				variable.UAV = buffer.Buffer.UAV;
 			}
 		}
 
@@ -402,11 +403,11 @@ namespace SRPRendering
 
 		// Create a buffer of the given size and format, and fill it with the given data.
 		public IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents, bool uav = false) =>
-			AddResource(Buffer.CreateDynamic(_device.Device, sizeInBytes, uav, format, contents));
+			AddResource(BufferHandle.CreateDynamic(_device, sizeInBytes, uav, format, contents));
 
 		// Create a structured buffer.
 		public IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents, bool uav = false) where T : struct =>
-			AddResource(Buffer.CreateStructured(_device.Device, uav, contents));
+			AddResource(BufferHandle.CreateStructured(_device, uav, contents));
 
 		public void Dispose()
 		{

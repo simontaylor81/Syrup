@@ -10,7 +10,7 @@ using SRPScripting;
 
 namespace SRPRendering
 {
-	class Buffer : IBuffer, IDisposable
+	class Buffer : IDisposable
 	{
 		private SlimDX.Direct3D11.Buffer _buffer;
 
