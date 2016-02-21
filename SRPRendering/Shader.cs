@@ -113,7 +113,7 @@ namespace SRPRendering
 						// Gather resource and sampler inputs.
 						var boundResources = reflection.GetBoundResources();
 						_resourceVariables = boundResources
-							.Where(desc => desc.Type == ShaderInputType.Texture)		// TODO: Support more types.
+							.Where(desc => IsShaderResource(desc.Type))
 							.Select(desc => new ShaderResourceVariable(desc, Frequency))
 							.ToArray();
 						_samplerVariables = boundResources
@@ -121,7 +121,7 @@ namespace SRPRendering
 							.Select(desc => new ShaderSamplerVariable(desc, Frequency))
 							.ToArray();
 						_uavVariables = boundResources
-							.Where(desc => IsUav(desc.Type))		// TODO: Support more types.
+							.Where(desc => IsUav(desc.Type))
 							.Select(desc => new ShaderUavVariable(desc, Frequency))
 							.ToArray();
 					}
@@ -152,6 +152,13 @@ namespace SRPRendering
 				throw new ScriptException("Shader compilation failed. See Shader Compilation log for details.", ex);
 			}
 		}
+
+		private static bool IsShaderResource(ShaderInputType type) =>
+			type == ShaderInputType.Texture ||
+			type == ShaderInputType.Structured ||
+			type == ShaderInputType.AppendStructured ||
+			type == ShaderInputType.ConsumeStructured ||
+			type == ShaderInputType.ByteAddress;
 
 		private bool IsUav(ShaderInputType type) =>
 			type == (ShaderInputType)4 ||   // D3D_SIT_UAV_RWTYPED, not in SlimDX for some reason.

@@ -21,8 +21,15 @@ namespace SRPRendering
 		// Currently only supports single-element buffers, not structured buffers.
 		public static Buffer CreateDynamic(Device device, int sizeInBytes, bool uav, Format format, dynamic contents)
 		{
-			DataStream initialData = contents != null ? DynamicStream.CreateStream1D(contents, sizeInBytes / format.Size(), format) : null;
+			DataStream initialData = contents != null ? StreamUtil.CreateStream1D(contents, sizeInBytes / format.Size(), format) : null;
 			return new Buffer(device, sizeInBytes, uav, initialData);
+		}
+
+		// Create a structured buffer with typed initial data, for when calling from C# directly.
+		public static Buffer CreateStructured<T>(Device device, bool uav, IEnumerable<T> contents) where T : struct
+		{
+			var initialData = contents.ToDataStream();
+			return new Buffer(device, (int)initialData.Length, uav, initialData);
 		}
 
 		public Buffer(Device device, int sizeInBytes, bool uav, DataStream initialData)

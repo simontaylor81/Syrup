@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using SlimDX;
@@ -10,7 +11,7 @@ using SRPScripting;
 namespace SRPRendering
 {
 	// Helpers for filling SlimDX streams from dynamic (script) sources.
-	static class DynamicStream
+	static class StreamUtil
 	{
 		public static DataStream CreateStream1D(dynamic contents, int sizeX, Format format)
 		{
@@ -147,6 +148,21 @@ namespace SRPRendering
 		private static uint ToUNorm(float value, float max)
 		{
 			return (uint)(Math.Max(0.0f, Math.Min(1.0f, value)) * max);
+		}
+
+		// Create a stream from an enumerable (directly, no format conversion).
+		public static DataStream ToDataStream<T>(this IEnumerable<T> contents) where T : struct
+		{
+			var size = contents.Count() * Marshal.SizeOf(typeof(T));
+			var result = new DataStream(size, true, true);
+			foreach (var element in contents)
+			{
+				result.Write(element);
+			}
+
+			// Reset position
+			result.Position = 0;
+			return result;
 		}
 	}
 }

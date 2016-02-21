@@ -34,6 +34,9 @@ namespace SRPScripting
 		// Create a buffer of the given size and format, and fill it with the given data.
 		IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents, bool uav = false);
 
+		// Create a structured buffer.
+		IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents, bool uav = false) where T : struct;
+
 		// Load a texture from a file.
 		object LoadTexture(string path, object generateMips = null);
 

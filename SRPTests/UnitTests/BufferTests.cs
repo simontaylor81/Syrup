@@ -27,10 +27,11 @@ namespace SRPTests.UnitTests
 		[Fact]
 		public void Buffer_without_initial_data_is_all_zeros()
 		{
-			var buffer = new Buffer(_device.Device, 16, false, null);
-
-			var contents = buffer.GetContents<float>();
-			Assert.Equal(contents, new[] { 0.0f, 0.0f, 0.0f, 0.0f });
+			using (var buffer = new Buffer(_device.Device, 16, false, null))
+			{
+				var contents = buffer.GetContents<float>();
+				Assert.Equal(contents, new[] { 0.0f, 0.0f, 0.0f, 0.0f });
+			}
 		}
 
 		[Theory]
@@ -44,11 +45,12 @@ namespace SRPTests.UnitTests
 			var format = Format.R32_Float;
 
 			// Act.
-			Buffer buffer = Buffer.CreateDynamic(_device.Device, numElements * format.Size(), false, format, contents);
-
-			// Assert.
-			var result = buffer.GetContents<float>();
-			Assert.Equal(result, Enumerable.Range(0, numElements).Select(x => (float)x));
+			using (Buffer buffer = Buffer.CreateDynamic(_device.Device, numElements * format.Size(), false, format, contents))
+			{
+				// Assert.
+				var result = buffer.GetContents<float>();
+				Assert.Equal(result, Enumerable.Range(0, numElements).Select(x => (float)x));
+			}
 		}
 
 		[Theory]
@@ -61,11 +63,12 @@ namespace SRPTests.UnitTests
 			var format = Format.R32G32B32A32_Float;
 
 			// Act.
-			Buffer buffer = Buffer.CreateDynamic(_device.Device, numElements * format.Size(), false, format, contents);
-
-			// Assert.
-			var result = buffer.GetContents<Vector4>();
-			Assert.Equal(result, Enumerable.Range(0, numElements).Select(x => new Vector4(10 * x + 0, 10 * x + 1, 10 * x + 2, 10 * x + 3)));
+			using (Buffer buffer = Buffer.CreateDynamic(_device.Device, numElements * format.Size(), false, format, contents))
+			{
+				// Assert.
+				var result = buffer.GetContents<Vector4>();
+				Assert.Equal(result, Enumerable.Range(0, numElements).Select(x => new Vector4(10 * x + 0, 10 * x + 1, 10 * x + 2, 10 * x + 3)));
+			}
 		}
 	}
 }

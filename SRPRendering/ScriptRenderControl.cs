@@ -388,6 +388,13 @@ namespace SRPRendering
 			return _buffers[_buffers.Count - 1];
 		}
 
+		// Create a structured buffer.
+		public IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents, bool uav = false) where T : struct
+		{
+			_buffers.Add(Buffer.CreateStructured(_device.Device, uav, contents));
+			return _buffers[_buffers.Count - 1];
+		}
+
 		public void Dispose()
 		{
 			Reset();

@@ -102,7 +102,7 @@ namespace SRPRendering
 			Device device, int width, int height, Format format, dynamic contents, bool generateMips = false)
 		{
 			// Construct data stream from script data.
-			var initialData = new DataRectangle(width * format.Size(), DynamicStream.CreateStream2D(contents, width, height, format));
+			var initialData = new DataRectangle(width * format.Size(), StreamUtil.CreateStream2D(contents, width, height, format));
 
 			// Create DirectXTex representation (so we can apply the same operations as images loaded
 			// from disk, e.g. mip generation).
