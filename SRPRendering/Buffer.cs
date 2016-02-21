@@ -21,18 +21,19 @@ namespace SRPRendering
 		// Currently only supports single-element buffers, not structured buffers.
 		public static Buffer CreateDynamic(Device device, int sizeInBytes, bool uav, Format format, dynamic contents)
 		{
-			DataStream initialData = contents != null ? StreamUtil.CreateStream1D(contents, sizeInBytes / format.Size(), format) : null;
-			return new Buffer(device, sizeInBytes, uav, initialData);
+			var stride = format.Size();
+			DataStream initialData = contents != null ? SRPRendering.StreamUtil.CreateStream1D(contents, sizeInBytes / stride, format) : null;
+			return new Buffer(device, sizeInBytes, stride, uav, initialData);
 		}
 
 		// Create a structured buffer with typed initial data, for when calling from C# directly.
 		public static Buffer CreateStructured<T>(Device device, bool uav, IEnumerable<T> contents) where T : struct
 		{
 			var initialData = contents.ToDataStream();
-			return new Buffer(device, (int)initialData.Length, uav, initialData);
+			return new Buffer(device, (int)initialData.Length, Marshal.SizeOf(typeof(T)), uav, initialData);
 		}
 
-		public Buffer(Device device, int sizeInBytes, bool uav, DataStream initialData)
+		public Buffer(Device device, int sizeInBytes, int stride, bool uav, DataStream initialData)
 		{
 			var desc = new BufferDescription();
 
@@ -40,7 +41,7 @@ namespace SRPRendering
 			desc.Usage = ResourceUsage.Default;
 			desc.CpuAccessFlags = CpuAccessFlags.Read;  // Need this for result verification.
 			desc.OptionFlags = ResourceOptionFlags.StructuredBuffer;
-			desc.StructureByteStride = sizeof(float);   // TODO
+			desc.StructureByteStride = stride;
 
 			desc.BindFlags = BindFlags.ShaderResource;
 			if (uav)
