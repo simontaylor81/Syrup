@@ -36,7 +36,9 @@ namespace SRPRendering
 			// Clear render target descriptors and dispose the actual render targets.
 			DisposableUtil.DisposeList(renderTargets);
 			DisposableUtil.DisposeList(textures);
-			DisposableUtil.DisposeList(_buffers);
+
+			// Dispose resources registered for cleanup.
+			DisposableUtil.DisposeList(_resources);
 		}
 
 		// Get the list of properties for a script run. Call after script execution.
@@ -399,18 +401,12 @@ namespace SRPRendering
 		}
 
 		// Create a buffer of the given size and format, and fill it with the given data.
-		public IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents, bool uav = false)
-		{
-			_buffers.Add(Buffer.CreateDynamic(_device.Device, sizeInBytes, uav, format, contents));
-			return _buffers[_buffers.Count - 1];
-		}
+		public IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents, bool uav = false) =>
+			AddResource(Buffer.CreateDynamic(_device.Device, sizeInBytes, uav, format, contents));
 
 		// Create a structured buffer.
-		public IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents, bool uav = false) where T : struct
-		{
-			_buffers.Add(Buffer.CreateStructured(_device.Device, uav, contents));
-			return _buffers[_buffers.Count - 1];
-		}
+		public IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents, bool uav = false) where T : struct =>
+			AddResource(Buffer.CreateStructured(_device.Device, uav, contents));
 
 		public void Dispose()
 		{
@@ -515,6 +511,13 @@ namespace SRPRendering
 			return null;
 		}
 
+		// Register a resource for later disposal, returning it for easy chaining.
+		private T AddResource<T>(T resource) where T : IDisposable
+		{
+			_resources.Add(resource);
+			return resource;
+		}
+
 		public dynamic GetScene() => Scene;
 
 		public object DepthBuffer => DepthBufferHandle.Default;
@@ -535,7 +538,9 @@ namespace SRPRendering
 
 		// Script-generated resources.
 		private List<Texture> textures = new List<Texture>();
-		private List<Buffer> _buffers = new List<Buffer>();
+
+		// List of resource to be disposed of when reseting or disposing.
+		private List<IDisposable> _resources = new List<IDisposable>();
 
 		// List of render targets and their descritors.
 		private List<RenderTargetDescriptor> renderTargets = new List<RenderTargetDescriptor>();
