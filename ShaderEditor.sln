@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22310.1
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderEditorApp", "ShaderEditorApp\ShaderEditorApp.csproj", "{3F041CC2-36F4-468B-BE78-AB6B28BC7FFA}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -31,6 +31,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{44DD01
 	ProjectSection(SolutionItems) = preProject
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderUnit", "ShaderUnit\ShaderUnit.csproj", "{1FCBB772-B521-4C9B-B970-C544A472C7BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +68,10 @@ Global
 		{3AE8A8E6-EA2C-47C4-AC22-7ED4EC0BCF3A}.Debug|x86.Build.0 = Debug|x86
 		{3AE8A8E6-EA2C-47C4-AC22-7ED4EC0BCF3A}.Release|x86.ActiveCfg = Release|x86
 		{3AE8A8E6-EA2C-47C4-AC22-7ED4EC0BCF3A}.Release|x86.Build.0 = Release|x86
+		{1FCBB772-B521-4C9B-B970-C544A472C7BD}.Debug|x86.ActiveCfg = Debug|x86
+		{1FCBB772-B521-4C9B-B970-C544A472C7BD}.Debug|x86.Build.0 = Debug|x86
+		{1FCBB772-B521-4C9B-B970-C544A472C7BD}.Release|x86.ActiveCfg = Release|x86
+		{1FCBB772-B521-4C9B-B970-C544A472C7BD}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
