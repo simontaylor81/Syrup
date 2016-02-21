@@ -7,7 +7,7 @@ using SlimDX;
 using SlimDX.Direct3D11;
 using SRPRendering;
 
-namespace SRPTests.TestRenderer
+namespace ShaderUnit.TestRenderer
 {
 	class TestRenderer : IDisposable
 	{

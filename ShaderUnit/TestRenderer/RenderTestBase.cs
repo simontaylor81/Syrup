@@ -9,7 +9,7 @@ using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using SRPCommon.Util;
 
-namespace SRPTests.TestRenderer
+namespace ShaderUnit.TestRenderer
 {
 	public class RenderTestBase
 	{
@@ -17,7 +17,7 @@ namespace SRPTests.TestRenderer
 
 		private Bitmap _imageResult;
 
-		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
+		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"ShaderUnit\TestScripts");
 		private static readonly string _expectedResultDir = Path.Combine(_baseDir, "ExpectedResults");
 
 		[SetUp]

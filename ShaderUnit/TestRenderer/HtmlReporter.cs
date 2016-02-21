@@ -1,4 +1,4 @@
-﻿using SRPTests.Util;
+﻿using ShaderUnit.Util;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reactive.Disposables;
 
-namespace SRPTests.TestRenderer
+namespace ShaderUnit.TestRenderer
 {
 	public struct TestResult
 	{

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SRPTests.Util
+namespace ShaderUnit.Util
 {
 	// Simple dummy CI provider for debugging.
 	internal class DummyCIProvider : ICIProvider

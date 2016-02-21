@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using SlimDX;
-using SRPTests.TestRenderer;
+using ShaderUnit.TestRenderer;
 
-namespace SRPTests.ShaderTests
+namespace ShaderUnit.ShaderTests
 {
 	public class MyPixelShaderTest : RenderTestBase
 	{

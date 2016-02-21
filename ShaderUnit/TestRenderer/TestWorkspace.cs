@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SRPTests.TestRenderer
+namespace ShaderUnit.TestRenderer
 {
 	// Implementation of IWorkspace that finds test files.
 	class TestWorkspace : IWorkspace

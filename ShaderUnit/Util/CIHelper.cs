@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SRPTests.Util
+namespace ShaderUnit.Util
 {
 	// Continuous integration helper functionality.
 	// Currently supports Appveyor

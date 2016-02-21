@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using SRPScripting;
 using NUnit.Framework;
 
-namespace SRPTests.TestRenderer
+namespace ShaderUnit.TestRenderer
 {
 	public class RenderTestHarness : IDisposable
 	{
@@ -19,7 +19,7 @@ namespace SRPTests.TestRenderer
 		private readonly TestWorkspace _workspace;
 		private readonly SyrupRenderer _sr;
 
-		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
+		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"ShaderUnit\TestScripts");
 
 		private static bool bLoggedDevice = false;
 

@@ -36,4 +36,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
 // Make internal classes visible to the unit test project
-[assembly: InternalsVisibleTo("SRPTests")]
+[assembly: InternalsVisibleTo("ShaderUnit")]

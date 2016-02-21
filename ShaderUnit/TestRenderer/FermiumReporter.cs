@@ -9,9 +9,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using SRPTests.Util;
+using ShaderUnit.Util;
 
-namespace SRPTests.TestRenderer
+namespace ShaderUnit.TestRenderer
 {
 	// Fixture class for handling interaction with Fermium,
 	// including retrieving expected results and reporting results.

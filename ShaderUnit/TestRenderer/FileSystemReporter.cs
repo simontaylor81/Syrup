@@ -4,7 +4,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace SRPTests.TestRenderer
+namespace ShaderUnit.TestRenderer
 {
 	// Test reporter that just writes out the generated images to disk so you can look at them.s
 	class FileSystemReporter : ITestReporter

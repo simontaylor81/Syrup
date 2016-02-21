@@ -7,12 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
-using SRPTests.Util;
+using ShaderUnit.Util;
 
 // In reality, this would have to go in the test assembly.
-[assembly: SRPTests.TestRenderer.UseTestReporter]
+[assembly: ShaderUnit.TestRenderer.UseTestReporter]
 
-namespace SRPTests.TestRenderer
+namespace ShaderUnit.TestRenderer
 {
 	// Interface for a test reporter implementation.
 	interface ITestReporter

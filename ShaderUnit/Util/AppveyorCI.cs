@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SRPTests.Util
+namespace ShaderUnit.Util
 {
 	// AppVeyor CI provider
 	internal class AppveyorCI : ICIProvider
