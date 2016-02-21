@@ -96,10 +96,8 @@
     <Compile Include="TestRenderer\FermiumReporter.cs" />
     <Compile Include="TestRenderer\FileSystemReporter.cs" />
     <Compile Include="TestRenderer\ImageAssert.cs" />
-    <Compile Include="TestRenderer\ImageComparison.cs" />
     <Compile Include="TestRenderer\RenderTestBase.cs" />
     <Compile Include="TestRenderer\RenderTestHarness.cs" />
-    <Compile Include="TestRenderer\RenderTestContext.cs" />
     <Compile Include="TestRenderer\TestRenderer.cs" />
     <Compile Include="TestRenderer\HtmlReporter.cs" />
     <Compile Include="TestRenderer\TestReporter.cs" />
