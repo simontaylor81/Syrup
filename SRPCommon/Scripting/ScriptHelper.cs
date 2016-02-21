@@ -78,23 +78,15 @@ namespace SRPCommon.Scripting
 		}
 
 		// Helper functions that determine if the given dynamic can be converted to a specific type.
-		public void CheckConvertibleFloat(dynamic x, string description)
+		public void CheckConvertibleFloat(object x, string description)
 		{
-			if (x != null)
+			if (x == null || (!CanConvert<float>(x) && !CanConvert<Func<float>>(x)))
 			{
-				// Is the value directly convertible to a float?
-				float dummy;
-				if (Operations.TryConvertTo<float>(x, out dummy))
-					return;
-
-				// If not a float, is it a function (can't tell more than this unfortunately).
-				if (Operations.IsCallable(x))
-					return;
+				// Not convertible, so throw exception so the user will get an error message.
+				throw new ScriptException(
+					string.Format("{0} must be a float, or a zero-argument function returning float. Got '{1}'.",
+					description, x != null ? x.ToString() : "null"));
 			}
-
-			// Not convertible, so throw exception so the user will get an error message.
-			throw new ScriptException(String.Format("{0} must be a float, or a zero-argument function returning float. Got '{1}'.",
-				description, x != null ? x.ToString() : "null"));
 		}
 
 		public void CheckConvertibleFloatList(dynamic x, int numComponents, string description)
@@ -108,38 +100,53 @@ namespace SRPCommon.Scripting
 				if (x != null)
 				{
 					// Is the value convertible to a list?
-					IEnumerable<dynamic> list;
-					if (Operations.TryConvertTo<IEnumerable<object>>(x, out list))
+					IEnumerable<object> list;
+					if (TryConvert<IEnumerable<object>>(x, out list))
 					{
 						// Check it has at least enough components.
 						if (list.Count() >= numComponents)
 						{
 							// Try to convert each element to float.
-							bool allFloat = true;
-							foreach (dynamic entry in list)
+							if (list.All(element => CanConvert<float>(element)))
 							{
-								float dummyFloat;
-								if (!Operations.TryConvertTo<float>(entry, out dummyFloat))
-								{
-									allFloat = false;
-									break;
-								}
-							}
-
-							if (allFloat)
 								return;
+							}
 						}
 					}
 
-					// Is it a function (can't tell more than this unfortunately).
-					if (Operations.IsCallable(x))
+					// Is it a function?
+					if (CanConvert<Func<float>>(x))
+					{
 						return;
+					}
 				}
 
 				// Not convertible, so report error to user.
 				throw new ScriptException(
 					String.Format("{0} must be a tuple of floats, or a zero-argument function returning a tuple of floats, of at least {1} elements. Got '{2}'.",
 					description, numComponents, x != null ? x.ToString() : "null"));
+			}
+		}
+
+		private bool CanConvert<T>(object x)
+		{
+			T dummy;
+			return TryConvert(x, out dummy);
+		}
+
+		private bool TryConvert<T>(object x, out T result)
+		{
+			try
+			{
+				// Forcing to dynamic first lets the DLR kick in and do its thing,
+				// which allows a wider range of conversions to be performed.
+				result = (T)(dynamic)x;
+				return true;
+			}
+			catch (Exception)
+			{
+				result = default(T);
+				return false;
 			}
 		}
 
