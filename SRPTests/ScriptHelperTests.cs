@@ -94,6 +94,24 @@ namespace SRPTests
 			ScriptHelper.CheckConvertibleFloatList(GetPythonValue(expression), numComponents, "");
 		}
 
+		[Fact]
+		public void CheckConvertibleFloatList_CS_FloatArray()
+		{
+			ScriptHelper.CheckConvertibleFloatList(new[] { 1.0f, 2.0f, 3.0f }, 3, "");
+		}
+
+		[Fact]
+		public void CheckConvertibleFloatList_CS_DoubleArray()
+		{
+			ScriptHelper.CheckConvertibleFloatList(new[] { 1.0, 2.0, 3.0 }, 3, "");
+		}
+
+		[Fact]
+		public void CheckConvertibleFloatList_CS_IntArray()
+		{
+			ScriptHelper.CheckConvertibleFloatList(new[] { 1, 2, 3}, 3, "");
+		}
+
 		[Theory]
 		[InlineData("'str'")]
 		[InlineData("(1,2)")]
