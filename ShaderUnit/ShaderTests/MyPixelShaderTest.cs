@@ -21,12 +21,7 @@ namespace ShaderUnit.ShaderTests
 
 			ri.SetShaderVariable(ps, "Colour", new[] { 1, 0, 0, 1 });
 
-			ri.SetFrameCallback(context =>
-			{
-				context.DrawFullscreenQuad(vs, ps);
-			});
-
-			var result = RenderHarness.RenderImage();
+			var result = RenderHarness.RenderFullscreenImage(vs, ps);
 			CompareImage(result);
 		}
 

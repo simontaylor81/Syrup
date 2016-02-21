@@ -80,6 +80,9 @@ namespace ShaderUnit.TestRenderer
 		{
 			Trace.Assert(sr != null);
 
+			// This should never fire, as the exception should propagate out earlier.
+			Trace.Assert(!sr.HasScriptError);
+
 			var context = device.Device.ImmediateContext;
 
 			// The SRC should clear the render target, so clear to a nice garish magenta so we detect if it doesn't.

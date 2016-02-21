@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SRPScripting;
 using NUnit.Framework;
+using System.Runtime.InteropServices;
 
 namespace ShaderUnit.TestRenderer
 {
@@ -50,20 +51,51 @@ namespace ShaderUnit.TestRenderer
 
 		public Bitmap RenderImage()
 		{
-			// This should never fire, as the exception should propagate out of RunScript.
-			Assert.That(_sr.HasScriptError, Is.False, "Error executing script");
-
 			// Render stuff and return the resulting image.
 			return _renderer.Render(_sr);
 		}
 
+		// Helper for the common case of rendering a fullscreen quad.
+		public Bitmap RenderFullscreenImage(object vs, object ps)
+		{
+			RenderInterface.SetFrameCallback(context =>
+			{
+				context.DrawFullscreenQuad(vs, ps);
+			});
+
+			return RenderImage();
+		}
+
 		public void Dispatch()
 		{
-			// This should never fire, as the exception should propagate out of RunScript.
-			Assert.That(_sr.HasScriptError, Is.False, "Error executing script");
-
 			// Run the renderer to trigger compute shaders.
 			_renderer.Dispatch(_sr);
 		}
+
+		public IEnumerable<T> DispatchToBuffer<T>(object cs, string outBufferVariable, Tuple<int, int, int> size, Tuple<int, int, int> shaderNumThreads) where T : struct
+		{
+			// Create buffer to hold results.
+			var numElements = size.Item1 * size.Item2 * size.Item3;
+			var outputBuffer = RenderInterface.CreateBuffer(numElements * Marshal.SizeOf(typeof(T)), Format.R32_Float, null, uav: true);
+			RenderInterface.SetShaderUavVariable(cs, outBufferVariable, outputBuffer);
+
+			int numThreadGroupsX = DivideCeil(size.Item1, shaderNumThreads.Item1);
+			int numThreadGroupsY = DivideCeil(size.Item2, shaderNumThreads.Item2);
+			int numThreadGroupsZ = DivideCeil(size.Item3, shaderNumThreads.Item3);
+
+			RenderInterface.SetFrameCallback(context =>
+			{
+				context.Dispatch(cs, numThreadGroupsX, numThreadGroupsY, numThreadGroupsY);
+			});
+
+			// Render a frame to dispatch the compute shader.
+			Dispatch();
+
+			// Read results back from the buffer
+			return outputBuffer.GetContents<T>();
+		}
+
+		// Integer division with round up instead of down.
+		private int DivideCeil(int x, int multipleOf) => (x + multipleOf - 1) / multipleOf;
 	}
 }
