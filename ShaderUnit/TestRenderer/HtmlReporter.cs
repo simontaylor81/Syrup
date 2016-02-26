@@ -46,7 +46,7 @@ namespace ShaderUnit.TestRenderer
 			// Write to temp directory.
 			var outDir = Path.Combine(Path.GetTempPath(), "ShaderUnitOutput");
 			Directory.CreateDirectory(outDir);
-			var filename = Path.Combine(outDir, "SRPTestReport.html");
+			var filename = Path.Combine(outDir, "ShaderUnitTestReport.html");
 
 			using (var writer = new StreamWriter(filename, false, Encoding.UTF8))
 			{
