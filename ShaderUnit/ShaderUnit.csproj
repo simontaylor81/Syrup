@@ -7,8 +7,8 @@
     <ProjectGuid>{1FCBB772-B521-4C9B-B970-C544A472C7BD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SRPTests</RootNamespace>
-    <AssemblyName>SRPTests</AssemblyName>
+    <RootNamespace>ShaderUnit</RootNamespace>
+    <AssemblyName>ShaderUnit</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>

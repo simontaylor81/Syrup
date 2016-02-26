@@ -7,7 +7,7 @@ using NUnit.Framework;
 using ShaderUnit.TestRenderer;
 using SlimDX;
 
-namespace SRPTests.ShaderTests
+namespace ShaderUnit.ShaderTests
 {
 	public class MyShaderUnitTest : RenderTestBase
 	{
