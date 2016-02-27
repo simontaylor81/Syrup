@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using SRPCommon.Scene;
-using SlimDX;
+using System.Numerics;
 using SlimDX.Direct3D11;
-using SlimDX.DXGI;
+using SlimDX;
+
+using Vector2 = System.Numerics.Vector2;
+using Vector3 = System.Numerics.Vector3;
 
 namespace SRPRendering
 {
@@ -151,17 +154,17 @@ namespace SRPRendering
 		public static InputElement[] InputElements => SceneVertex.InputElements;
 
 		// Write a vertex for a sphere, which has a normal equal to its position.
-		private static void WriteSphereVert(DataStream vertices, Vector3 position, Vector2 uv)
+		private static void WriteSphereVert(DataStream vertices, System.Numerics.Vector3 position, Vector2 uv)
 		{
-			var tangent = Vector3.Cross(position, Vector3.UnitY);
+			var tangent = System.Numerics.Vector3.Cross(position, System.Numerics.Vector3.UnitY);
 			if (tangent.LengthSquared() < 0.01f)
 			{
-				tangent = Vector3.UnitX;
+				tangent = System.Numerics.Vector3.UnitX;
 			}
-			tangent.Normalize();
+			tangent = Vector3.Normalize(tangent);
 
-			var biTangent = Vector3.Cross(position, tangent);
-			biTangent.Normalize();
+			var biTangent = System.Numerics.Vector3.Cross(position, tangent);
+			biTangent = Vector3.Normalize(biTangent);
 
 			vertices.Write(new SceneVertex(position, position, tangent, biTangent, uv));
 		}

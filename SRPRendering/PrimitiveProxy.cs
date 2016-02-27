@@ -10,7 +10,7 @@ namespace SRPRendering
 {
 	public interface IPrimitive
 	{
-		Matrix LocalToWorld { get; }
+		System.Numerics.Matrix4x4 LocalToWorld { get; }
 		Material Material { get; }
 		IRenderScene Scene { get; }
 		IDrawable Mesh { get; }
@@ -23,7 +23,7 @@ namespace SRPRendering
 		public IDrawable Mesh { get; }
 		public IRenderScene Scene { get; }
 
-		public Matrix LocalToWorld => primitive.LocalToWorld;
+		public System.Numerics.Matrix4x4 LocalToWorld => primitive.LocalToWorld;
 		public Material Material => primitive.Material;
 
 		public PrimitiveProxy(Primitive primitive, IDrawable mesh, IRenderScene scene)
@@ -37,12 +37,12 @@ namespace SRPRendering
 	// A primitive proxy that doesn't actually represent a primitive in the scene, just a simple shape drawn directly.
 	class SimplePrimitiveProxy : IPrimitive
 	{
-		public Matrix LocalToWorld { get; }
+		public System.Numerics.Matrix4x4 LocalToWorld { get; }
 		public Material Material => null;
 		public IRenderScene Scene => null;
 		public IDrawable Mesh => null;
 
-		public SimplePrimitiveProxy(Matrix localToWorld)
+		public SimplePrimitiveProxy(System.Numerics.Matrix4x4 localToWorld)
 		{
 			LocalToWorld = localToWorld;
 		}

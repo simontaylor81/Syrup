@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Windows.Forms;
 
-using SlimDX;
 using ShaderEditorApp.ViewModel;
+using SRPCommon.Util;
 
 namespace ShaderEditorApp.View
 {
@@ -27,16 +28,16 @@ namespace ShaderEditorApp.View
 		}
 
 		// Get the world -> view space matrix.
-		public Matrix WorldToViewMatrix
-			=> Matrix.Translation(-pos) * Matrix.RotationY(-yaw) * Matrix.RotationX(-pitch);
+		public Matrix4x4 WorldToViewMatrix
+			=> Matrix4x4.CreateTranslation(-pos) * Matrix4x4.CreateRotationY(-yaw) * Matrix4x4.CreateRotationX(-pitch);
 
 		// Get the eye position.
 		public Vector3 EyePosition => pos;
 
 		// Get view -> projection matrix. Aspect ratio differs per viewport so must be passed as a param.
-		public Matrix GetViewToProjectionMatrix(float aspectRatio)
+		public Matrix4x4 GetViewToProjectionMatrix(float aspectRatio)
 		{
-			return Matrix.PerspectiveFovLH(FOV * (float)Math.PI / 180.0f, aspectRatio, Near, Far);
+			return MatrixUtil.CreatePerspectiveFieldOfViewLH(FOV * (float)Math.PI / 180.0f, aspectRatio, Near, Far);
 		}
 
 		public ViewportViewModel ViewportViewModel { get; }
@@ -113,7 +114,7 @@ namespace ShaderEditorApp.View
 				float deltaUp = (float)deltaY * 0.01f;
 
 				var viewToWorldMatrix = WorldToViewMatrix;
-				viewToWorldMatrix.Invert();
+				Matrix4x4.Invert(viewToWorldMatrix, out viewToWorldMatrix);
 				var right = Vector3.TransformNormal(new Vector3(1.0f, 0.0f, 0.0f), viewToWorldMatrix);
 				var up = Vector3.TransformNormal(new Vector3(0.0f, 1.0f, 0.0f), viewToWorldMatrix);
 
@@ -152,7 +153,7 @@ namespace ShaderEditorApp.View
 				float deltaUp = (float)deltaY * -0.01f;
 
 				var viewToWorldMatrix = WorldToViewMatrix;
-				viewToWorldMatrix.Invert();
+				Matrix4x4.Invert(viewToWorldMatrix, out viewToWorldMatrix);
 				var right = Vector3.TransformNormal(new Vector3(1.0f, 0.0f, 0.0f), viewToWorldMatrix);
 				var up = Vector3.TransformNormal(new Vector3(0.0f, 1.0f, 0.0f), viewToWorldMatrix);
 

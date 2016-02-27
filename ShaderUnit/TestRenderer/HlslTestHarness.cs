@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using SlimDX;
+using System.Numerics;
 
 namespace ShaderUnit.TestRenderer
 {

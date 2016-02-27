@@ -3,81 +3,81 @@
     {
       "type": "MeshInstance",
       "mesh": "ground_planeShape_subset0_ground",
-      "position": "0, 0, 0",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "ground"
     },
     {
       "type": "MeshInstance",
       "mesh": "polySurfaceShape371_subset0_left_engine_phong",
-      "position": "0, 0, 0",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "left_engine_phong"
     },
     {
       "type": "MeshInstance",
       "mesh": "polySurfaceShape376_subset0_left_engine_phong",
-      "position": "0, 0, 0",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "left_engine_phong"
     },
     {
       "type": "MeshInstance",
       "mesh": "polySurfaceShape380_subset0_left_engine_phong",
-      "position": "0, 0, 0",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "left_engine_phong"
     },
     {
       "type": "MeshInstance",
       "mesh": "polySurfaceShape381_subset0_left_engine_phong",
-      "position": "0, 0, 0",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "left_engine_phong"
     },
     {
       "type": "MeshInstance",
       "mesh": "polySurfaceShape382_subset0_left_engine_phong",
-      "position": "0, 0, 0",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "left_engine_phong"
     },
     {
       "type": "MeshInstance",
       "mesh": "tank_geoShape_subset0_left_engine_phong",
-      "position": "0, 0, 0",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "left_engine_phong"
     },
     {
       "type": "MeshInstance",
       "mesh": "tank_geoShape_subset1_right_engine_phong",
-      "position": "0, 0, 0",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "right_engine_phong"
     },
     {
       "type": "MeshInstance",
       "mesh": "tank_geoShape_subset2_turret_phong",
-      "position": "0, 0, 0",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "turret_phong"
     },
     {
       "type": "MeshInstance",
       "mesh": "barricade_geoShape_subset0_barricade_phong",
-      "position": "0, 0, 0",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "barricade_phong"
     }
   ],
@@ -116,11 +116,11 @@
   "materials": {
     "ground": {
       "vectorParams": {
-        "Diffuse": "1, 1, 1, 1",
-        "Ambient": "0, 0, 0, 0",
-        "Specular": "0, 0, 0, 0",
-        "Emissive": "0, 0, 0, 0",
-        "Power": "1, 0, 0, 0"
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
       },
       "textures": {
         "DiffuseTexture": "ground_diff.dds",
@@ -129,11 +129,11 @@
     },
     "left_engine_phong": {
       "vectorParams": {
-        "Diffuse": "1, 1, 1, 1",
-        "Ambient": "0, 0, 0, 0",
-        "Specular": "0, 0, 0, 0",
-        "Emissive": "0, 0, 0, 0",
-        "Power": "1, 0, 0, 0"
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
       },
       "textures": {
         "DiffuseTexture": "left_engine_diff.dds",
@@ -142,11 +142,11 @@
     },
     "right_engine_phong": {
       "vectorParams": {
-        "Diffuse": "1, 1, 1, 1",
-        "Ambient": "0, 0, 0, 0",
-        "Specular": "0, 0, 0, 0",
-        "Emissive": "0, 0, 0, 0",
-        "Power": "1, 0, 0, 0"
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
       },
       "textures": {
         "DiffuseTexture": "left_engine_diff.dds",
@@ -155,11 +155,11 @@
     },
     "turret_phong": {
       "vectorParams": {
-        "Diffuse": "1, 1, 1, 1",
-        "Ambient": "0, 0, 0, 0",
-        "Specular": "0, 0, 0, 0",
-        "Emissive": "0, 0, 0, 0",
-        "Power": "1, 0, 0, 0"
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
       },
       "textures": {
         "DiffuseTexture": "turret_diff.dds",
@@ -168,11 +168,11 @@
     },
     "lambert1": {
       "vectorParams": {
-        "Diffuse": "1, 1, 1, 1",
-        "Ambient": "0, 0, 0, 0",
-        "Specular": "0, 0, 0, 0",
-        "Emissive": "0, 0, 0, 0",
-        "Power": "1, 0, 0, 0"
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
       },
       "textures": {
         "DiffuseTexture": "default.dds",
@@ -181,11 +181,11 @@
     },
     "barricade_phong": {
       "vectorParams": {
-        "Diffuse": "1, 1, 1, 1",
-        "Ambient": "0, 0, 0, 0",
-        "Specular": "0, 0, 0, 0",
-        "Emissive": "0, 0, 0, 0",
-        "Power": "1, 0, 0, 0"
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
       },
       "textures": {
         "DiffuseTexture": "turret_diff.dds",

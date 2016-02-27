@@ -1,5 +1,4 @@
-﻿using SlimDX;
-using SRPCommon.Util;
+﻿using SRPCommon.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Xunit;
+using System.Numerics;
 
 namespace SRPTests
 {

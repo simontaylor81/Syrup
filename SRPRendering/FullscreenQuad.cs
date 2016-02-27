@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX;
 using SlimDX.Direct3D11;
 
 namespace SRPRendering
@@ -14,7 +14,7 @@ namespace SRPRendering
 		public FullscreenQuad(Device device)
 		{
 			int vertexBufferSize = 4 * VertexStride;
-			var vertexStream = new DataStream(vertexBufferSize, true, true);
+			var vertexStream = new SlimDX.DataStream(vertexBufferSize, true, true);
 
 			// Add the four quad verts to the stream.
 			vertexStream.Write(new Vector4(-1.0f, -1.0f, 0.0f, 1.0f));

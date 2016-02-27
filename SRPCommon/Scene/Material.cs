@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SlimDX;
 using Newtonsoft.Json;
 using SRPCommon.UserProperties;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Numerics;
 
 namespace SRPCommon.Scene
 {

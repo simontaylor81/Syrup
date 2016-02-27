@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<project>
+<project DefaultScene="/temp.srpscene">
   <folder>
     <folder name="Utils">
       <include filename="Utils/utils.py" runAtStartup="false" />
@@ -25,6 +25,7 @@
     <include filename="Clear.py" runAtStartup="false" />
     <include filename="Null.py" runAtStartup="false" />
     <include filename="SimplePixelShader.py" runAtStartup="false" />
+    <include filename="temp.srpscene" runAtStartup="false" />
   </folder>
   <OpenDocuments>
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Utils\utils.py" />

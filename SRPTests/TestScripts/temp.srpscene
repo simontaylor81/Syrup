@@ -1,0 +1,26 @@
+{
+  "primitives": [
+    {
+      "type": "Cube",
+      "position": {
+        "x": 1.0,
+        "y": 2.0,
+        "z": 3.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "rotation": {
+        "x": 12.0,
+        "y": 34.0,
+        "z": 56.0
+      },
+      "material": null
+    }
+  ],
+  "meshes": {},
+  "materials": {},
+  "lights": []
+}

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using ShaderUnit.TestRenderer;
-using SlimDX;
 
 namespace ShaderUnit.ShaderTests
 {

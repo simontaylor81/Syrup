@@ -4,12 +4,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX;
-using SlimDX.D3DCompiler;
+//using SlimDX;
 using SlimDX.Direct3D11;
 using SRPScripting;
 using SRPCommon.Scripting;
 using SRPCommon.Scene;
+using System.Numerics;
 
 namespace SRPRendering
 {
@@ -167,13 +167,16 @@ namespace SRPRendering
 			// Convert list of floats to a colour.
 			try
 			{
-				var col = ScriptHelper.ConvertToColor4(colour);
+				Vector4 vectorColour = ScriptHelper.ConvertToVector4(colour);
+
+				// SlimDX wants a Color4, not a vector (is there a difference?!)
+				var slimdxColour = new SlimDX.Color4(vectorColour.W, vectorColour.X, vectorColour.Y, vectorColour.Z);
 
 				// Clear each specified target.
 				var rtvs = GetRTVS(renderTargetHandles);
 				foreach (var rtv in rtvs)
 				{
-					deviceContext.ClearRenderTargetView(rtv, col);
+					deviceContext.ClearRenderTargetView(rtv, slimdxColour);
 				}
 			}
 			catch (ScriptException ex)
@@ -192,7 +195,7 @@ namespace SRPRendering
 			{
 				// Convert position and colour to a real vector and colour.
 				var pos = ScriptHelper.ConvertToVector3(position);
-				var col = new Color4(ScriptHelper.ConvertToColor3(colour));
+				var col = new Vector4(ScriptHelper.ConvertToVector3(colour), 1.0f);
 
 				// Set render target.
 				SetRenderTargets(new[] { renderTarget }, null);
@@ -207,7 +210,7 @@ namespace SRPRendering
 				SetShaders(_globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS);
 
 				// Construct transform matrix.
-				var transform = Matrix.Scaling(radius, radius, radius) * Matrix.Translation(pos);
+				var transform = Matrix4x4.CreateScale(radius, radius, radius) * Matrix4x4.CreateTranslation(pos);
 
 				// Set shader constants.
 				_globalResources.BasicShaders.SolidColourShaderVar.Set(col);

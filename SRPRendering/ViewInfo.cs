@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX;
 using SlimDX.Direct3D11;
 
 namespace SRPRendering
@@ -11,8 +11,8 @@ namespace SRPRendering
 	public class ViewInfo
 	{
 		public ViewInfo(
-			Matrix worldToViewMatrix,
-			Matrix viewToProjMatrix,
+			Matrix4x4 worldToViewMatrix,
+			Matrix4x4 viewToProjMatrix,
 			Vector3 eyePosition,
 			float nearPlane,
 			float farPlane,
@@ -32,8 +32,8 @@ namespace SRPRendering
 			this.DepthBuffer = depthBuffer;
 		}
 
-		public Matrix WorldToViewMatrix;
-		public Matrix ViewToProjMatrix;
+		public Matrix4x4 WorldToViewMatrix;
+		public Matrix4x4 ViewToProjMatrix;
 		public Vector3 EyePosition;
 		public float NearPlane;
 		public float FarPlane;

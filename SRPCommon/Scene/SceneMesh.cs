@@ -81,7 +81,7 @@ namespace SRPCommon.Scene
 						for (int uvChannel = 0; uvChannel < srcMesh.TextureCoordinateChannelCount; uvChannel++)
 						{
 							var uv = srcMesh.TextureCoordinateChannels[uvChannel][i];
-							vertex.SetUV(uvChannel, new Vector2(uv.X, uv.Y));
+							vertex.SetUV(uvChannel, new System.Numerics.Vector2(uv.X, uv.Y));
 						}
 
 						Vertices.Write(vertex);
@@ -106,6 +106,6 @@ namespace SRPCommon.Scene
 		}
 
 		// Convert AssImp types to SlimDX ones.
-		private static Vector3 ToVector3(Vector3D vec) => new Vector3(vec.X, vec.Y, vec.Z);
+		private static System.Numerics.Vector3 ToVector3(Vector3D vec) => new System.Numerics.Vector3(vec.X, vec.Y, vec.Z);
 	}
 }

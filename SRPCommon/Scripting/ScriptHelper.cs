@@ -7,10 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
-using SlimDX;
 using SRPCommon.Util;
 using Microsoft.CSharp.RuntimeBinder;
 using System.Collections;
+using System.Numerics;
 
 namespace SRPCommon.Scripting
 {
@@ -51,13 +51,6 @@ namespace SRPCommon.Scripting
 		public static Vector4 ConvertToVector4(dynamic x)
 			// Scripts pass vectors as tuples, so we extract the values to form the vector.
 			=> RunGuarded(() => new Vector4((float) x[0], (float) x[1], (float) x[2], (float) x[3]));
-
-		public static Color3 ConvertToColor3(dynamic x)
-			=> RunGuarded(() => new Color3((float)x[0], (float)x[1], (float)x[2]));
-
-		public static Color4 ConvertToColor4(dynamic x)
-			// Color4 constructor takes A, R, G, B.
-			=> RunGuarded(() => new Color4((float)x[3], (float)x[0], (float)x[1], (float)x[2]));
 
 		// Helper method for running potentially throwy code, throwing a ScriptException if something bad happen.
 		private static T RunGuarded<T>(Func<T> func, [CallerMemberName] string context = null)

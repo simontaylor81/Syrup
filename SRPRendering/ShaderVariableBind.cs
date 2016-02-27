@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX;
+//using SlimDX;
 using SlimDX.D3DCompiler;
 using SRPScripting;
 using SRPCommon.Scripting;
+using System.Numerics;
+using SRPCommon.Util;
 
 namespace SRPRendering
 {
@@ -35,7 +37,7 @@ namespace SRPRendering
 				case ShaderVariableBindSource.ProjectionToWorldMatrix:
 					{
 						var matrix = viewInfo.WorldToViewMatrix * viewInfo.ViewToProjMatrix;
-						matrix.Invert();
+						Matrix4x4.Invert(matrix, out matrix);
 						variable.Set(matrix);
 					}
 					return;
@@ -52,7 +54,7 @@ namespace SRPRendering
 					if (primitive != null)
 					{
 						var matrix = primitive.LocalToWorld;
-						matrix.Invert();
+						Matrix4x4.Invert(matrix, out matrix);
 						variable.Set(matrix);
 						return;
 					}
@@ -62,8 +64,8 @@ namespace SRPRendering
 					if (primitive != null)
 					{
 						var matrix = primitive.LocalToWorld;
-						matrix.Invert();
-						variable.Set(Matrix.Transpose(matrix));
+						Matrix4x4.Invert(matrix, out matrix);
+						variable.Set(Matrix4x4.Transpose(matrix));
 						return;
 					}
 					break;
@@ -145,10 +147,14 @@ namespace SRPRendering
 				Vector4 value;
 				if (primitive.Material.Parameters.TryGetValue(source, out value))
 				{
+					var valueArray = value.ToArray();
+
 					// Set each component individually, as the variable might be < 4 components.
 					int numComponents = Math.Min(variable.VariableType.Columns * variable.VariableType.Rows, 4);
 					for (int i = 0; i < numComponents; i++)
-						variable.SetComponent(i, value[i]);
+					{
+						variable.SetComponent(i, valueArray[i]);
+					}
 
 					return;
 				}

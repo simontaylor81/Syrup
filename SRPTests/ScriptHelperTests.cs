@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX;
 using SRPCommon.Scripting;
 using SRPTests.Util;
 using Xunit;
@@ -58,8 +58,6 @@ namespace SRPTests
 			Assert.Equal(new Vector2(1.1f, 2.0f), ScriptHelper.ConvertToVector2(_scriptTestHelper.GetPythonValue("(1.1, 2)")));
 			Assert.Equal(new Vector3(1.1f, 2.0f, 3.0f), ScriptHelper.ConvertToVector3(_scriptTestHelper.GetPythonValue("(1.1, 2, 3)")));
 			Assert.Equal(new Vector4(1.1f, 2.0f, 3.0f, 4.0f), ScriptHelper.ConvertToVector4(_scriptTestHelper.GetPythonValue("(1.1, 2, 3, 4)")));
-			Assert.Equal(new Color3(1.1f, 2.0f, 3.0f), ScriptHelper.ConvertToColor3(_scriptTestHelper.GetPythonValue("(1.1, 2, 3)")));
-			Assert.Equal(new Color4(4.0f, 1.1f, 2.0f, 3.0f), ScriptHelper.ConvertToColor4(_scriptTestHelper.GetPythonValue("(1.1, 2, 3, 4)")));
 
 			// Python lists should work too.
 			Assert.Equal(new Vector4(1.1f, 2.0f, 3.0f, 4.0f), ScriptHelper.ConvertToVector4(_scriptTestHelper.GetPythonValue("[1.1, 2, 3, 4]")));
@@ -68,8 +66,6 @@ namespace SRPTests
 			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToVector2(_scriptTestHelper.GetPythonValue("1")));
 			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToVector3(_scriptTestHelper.GetPythonValue("lambda: 7")));
 			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToVector4(_scriptTestHelper.GetPythonValue("(1,2,3)")));
-			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToColor3(_scriptTestHelper.GetPythonValue("('', '', '')")));
-			Assert.Throws<ScriptException>(() => ScriptHelper.ConvertToColor4(null));
 		}
 
 		[Theory]

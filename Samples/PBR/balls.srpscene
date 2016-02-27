@@ -2,53 +2,53 @@
   "primitives": [
     {
       "type": "Plane",
-      "position": "0, 0, 0",
-      "scale": "10, 1, 10",
-      "rotation": "0, 0, 0",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 10, "y": 1, "z": 10 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "Floor"
     },
     {
       "type": "Sphere",
       "stacks": 12,
       "slices": 24,
-      "position": "2, 1, 2",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 2, "y": 1, "z": 2 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "M0"
     },
     {
       "type": "Sphere",
       "stacks": 12,
       "slices": 24,
-      "position": "-2, 1, 2",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": -2, "y": 1, "z": 2 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "M1"
     },
     {
       "type": "Sphere",
       "stacks": 12,
       "slices": 24,
-      "position": "2, 1, -2",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": 2, "y": 1, "z": -2 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "M2"
     },
     {
       "type": "Sphere",
       "stacks": 12,
       "slices": 24,
-      "position": "-2, 1, -2",
-      "scale": "1, 1, 1",
-      "rotation": "0, 0, 0",
+      "position": { "x": -2, "y": 1, "z": -2 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
       "material": "M3"
     },
     {
       "type": "MeshInstance",
       "mesh": "Cerberus",
-      "position": "-2, 5, 0",
-      "scale": "0.05, 0.05, 0.05",
-      "rotation": "270, 90, 0",
+      "position": { "x": -2, "y": 5, "z": 0 },
+      "scale": { "x": 0.05, "y": 0.05, "z": 0.05 },
+      "rotation": { "x": 270, "y": 90, "z": 0 },
       "material": "Cerberus"
     }
   ],
@@ -60,36 +60,36 @@
   "materials": {
     "M0": {
       "vectorParams": {
-        "BaseColour": "1, 1, 0, 0",
-        "PbrParams": "0, 0, 0.5, 0"
+        "BaseColour": { "x": 1, "y": 1, "z": 0, "w": 0 },
+        "PbrParams": { "x": 0, "y": 0, "z": 0.5, "w": 0 }
       },
       "textures": {}
     },
     "M1": {
       "vectorParams": {
-        "BaseColour": "1, 0, 1, 0",
-        "PbrParams": "0.8, 0, 0.5, 0"
+        "BaseColour": { "x": 1, "y": 0, "z": 1, "w": 0 },
+        "PbrParams": { "x": 0.8, "y": 0, "z": 0.5, "w": 0 }
       },
       "textures": {}
     },
     "M2": {
       "vectorParams": {
-        "BaseColour": "1, 0, 0, 0",
-        "PbrParams": "0.4, 1, 0.5, 0"
+        "BaseColour": { "x": 1, "y": 0, "z": 0, "w": 0 },
+        "PbrParams": { "x": 0.4, "y": 1, "z": 0.5, "w": 0 }
       },
       "textures": {}
     },
     "M3": {
       "vectorParams": {
-        "BaseColour": "0, 1, 0, 0",
-        "PbrParams": "0.9, 1, 0.5, 0"
+        "BaseColour": { "x": 0, "y": 1, "z": 0, "w": 0 },
+        "PbrParams": { "x": 0.9, "y": 1, "z": 0.5, "w": 0 }
       },
       "textures": {}
     },
     "Floor": {
       "vectorParams": {
-        "BaseColour": "0.25, 0.25, 0.25, 0",
-        "PbrParams": "0.3, 0, 0.5, 0"
+        "BaseColour": { "x": 0.25, "y": 0.25, "z": 0.25, "w": 0 },
+        "PbrParams": { "x": 0.3, "y": 0, "z": 0.5, "w": 0 }
       },
       "textures": {}
     },

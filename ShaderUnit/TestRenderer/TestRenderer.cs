@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Numerics;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
-using SlimDX;
 using SlimDX.Direct3D11;
 using SRPRendering;
 
@@ -86,7 +86,7 @@ namespace ShaderUnit.TestRenderer
 			var context = device.Device.ImmediateContext;
 
 			// The SRC should clear the render target, so clear to a nice garish magenta so we detect if it doesn't.
-			context.ClearRenderTargetView(renderTarget, new Color4(1.0f, 1.0f, 0.0f, 1.0f));
+			context.ClearRenderTargetView(renderTarget, new SlimDX.Color4(1.0f, 1.0f, 0.0f, 1.0f));
 
 			// Clear back and depth buffers to ensure independence of tests.
 			context.ClearDepthStencilView(depthBuffer.DSV, DepthStencilClearFlags.Depth, 1.0f, 0);
@@ -94,8 +94,8 @@ namespace ShaderUnit.TestRenderer
 			// Construct view info object.
 			// TODO: What about the camera?
 			var viewInfo = new ViewInfo(
-				Matrix.Identity,
-				Matrix.Identity,
+				Matrix4x4.Identity,
+				Matrix4x4.Identity,
 				Vector3.Zero,
 				1.0f,
 				1000.0f,
