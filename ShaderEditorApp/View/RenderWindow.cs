@@ -21,7 +21,7 @@ namespace ShaderEditorApp.View
 		private List<IDisposable> sizeDependentResources = new List<IDisposable>();
 
 		private readonly SlimDX.Direct3D11.Device _device;
-		private readonly SlimDX.DXGI.SwapChain swapChain;
+		private readonly SwapChain swapChain;
 
 		private readonly WorkspaceViewModel _workspaceVM;
 

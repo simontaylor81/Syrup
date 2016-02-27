@@ -24,7 +24,7 @@ namespace SRPCommon.Scene
 		{
 		}
 
-		public SceneVertex(System.Numerics.Vector3 position, System.Numerics.Vector3 normal, System.Numerics.Vector3 tangent, System.Numerics.Vector3 biTangent, Vector2 uv)
+		public SceneVertex(Vector3 position, Vector3 normal, Vector3 tangent, Vector3 biTangent, Vector2 uv)
 		{
 			Position = position;
 			Normal = normal;

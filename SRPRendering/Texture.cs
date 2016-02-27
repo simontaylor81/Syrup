@@ -9,7 +9,6 @@ using SlimDX.Direct3D11;
 using SlimDX;
 using SRPScripting;
 using SRPCommon.Util;
-using SRPCommon.Scripting;
 
 namespace SRPRendering
 {

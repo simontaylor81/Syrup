@@ -10,7 +10,7 @@ namespace SRPCommon.Util
 {
 	public static class SerialisationUtils
 	{
-		public static System.Numerics.Vector3 ParseVector3(string str)
+		public static Vector3 ParseVector3(string str)
 		{
 			if (str == null)
 			{
@@ -20,12 +20,12 @@ namespace SRPCommon.Util
 			var components = str.Split(null);
 			if (components.Length == 3)
 			{
-				return new System.Numerics.Vector3(
+				return new Vector3(
 					float.Parse(components[0]),
 					float.Parse(components[1]),
 					float.Parse(components[2]));
 			}
-			throw new FormatException("Incorrect number of components for System.Numerics.Vector3");
+			throw new FormatException("Incorrect number of components for Vector3");
 		}
 
 		public static Vector4 ParseVector4(string str)
@@ -44,7 +44,7 @@ namespace SRPCommon.Util
 					float.Parse(components[2]),
 					float.Parse(components[3]));
 			}
-			throw new FormatException("Incorrect number of components for System.Numerics.Vector3");
+			throw new FormatException("Incorrect number of components for Vector3");
 		}
 
 		public static void ParseAttribute(XElement element, string attribute, Action<string> parseAction)

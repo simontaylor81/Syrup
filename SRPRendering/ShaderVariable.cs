@@ -10,7 +10,6 @@ using SlimDX;
 using SlimDX.D3DCompiler;
 using SRPCommon.UserProperties;
 using SRPCommon.Scripting;
-using System.Diagnostics;
 
 namespace SRPRendering
 {

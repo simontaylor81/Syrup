@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX;
 using SRPCommon.Util;
 using SRPCommon.UserProperties;
 using System.Reactive.Linq;
@@ -11,6 +10,7 @@ using System.Reactive;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 
 namespace SRPCommon.Scene
 {
@@ -30,14 +30,14 @@ namespace SRPCommon.Scene
 		public abstract PrimitiveType Type { get; }
 
 		[JsonProperty]
-		public System.Numerics.Vector3 Position { get; set; }
+		public Vector3 Position { get; set; }
 
 		[JsonProperty]
 
-		public System.Numerics.Vector3 Scale { get; set; }
+		public Vector3 Scale { get; set; }
 
 		[JsonProperty]
-		public System.Numerics.Vector3 Rotation { get; set; }
+		public Vector3 Rotation { get; set; }
 
 		public Material Material { get; private set; }
 
@@ -55,20 +55,20 @@ namespace SRPCommon.Scene
 
 		protected Primitive()
 		{
-			Scale = new System.Numerics.Vector3(1.0f, 1.0f, 1.0f);
+			Scale = new Vector3(1.0f, 1.0f, 1.0f);
 
-			_userProperties.Add(new StructUserProperty("Position", () => Position, o => Position = (System.Numerics.Vector3)o));
-			_userProperties.Add(new StructUserProperty("Scale", () => Scale, o => Scale = (System.Numerics.Vector3)o));
-			_userProperties.Add(new StructUserProperty("Rotation", () => Rotation, o => Rotation = (System.Numerics.Vector3)o));
+			_userProperties.Add(new StructUserProperty("Position", () => Position, o => Position = (Vector3)o));
+			_userProperties.Add(new StructUserProperty("Scale", () => Scale, o => Scale = (Vector3)o));
+			_userProperties.Add(new StructUserProperty("Rotation", () => Rotation, o => Rotation = (Vector3)o));
 
 			// We change whenever our properties change.
 			OnChanged = Observable.Merge(UserProperties);
 		}
 
-		public System.Numerics.Matrix4x4 LocalToWorld
-			=> System.Numerics.Matrix4x4.CreateScale(Scale)
-				* System.Numerics.Matrix4x4.CreateFromYawPitchRoll(ToRadians(Rotation.Y), ToRadians(Rotation.X), ToRadians(Rotation.Z))
-				* System.Numerics.Matrix4x4.CreateTranslation(Position);
+		public Matrix4x4 LocalToWorld
+			=> Matrix4x4.CreateScale(Scale)
+				* Matrix4x4.CreateFromYawPitchRoll(ToRadians(Rotation.Y), ToRadians(Rotation.X), ToRadians(Rotation.Z))
+				* Matrix4x4.CreateTranslation(Position);
 
 		private float ToRadians(float degrees) => degrees * ((float)Math.PI / 180.0f);
 

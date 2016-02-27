@@ -3,10 +3,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Assimp;
-using SlimDX;
 using SRPCommon.Util;
 using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
+using SlimDX;
 
 namespace SRPCommon.Scene
 {
@@ -105,7 +105,7 @@ namespace SRPCommon.Scene
 			}
 		}
 
-		// Convert AssImp types to SlimDX ones.
+		// Convert AssImp types to System.Numerics ones.
 		private static System.Numerics.Vector3 ToVector3(Vector3D vec) => new System.Numerics.Vector3(vec.X, vec.Y, vec.Z);
 	}
 }

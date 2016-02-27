@@ -154,16 +154,16 @@ namespace SRPRendering
 		public static InputElement[] InputElements => SceneVertex.InputElements;
 
 		// Write a vertex for a sphere, which has a normal equal to its position.
-		private static void WriteSphereVert(DataStream vertices, System.Numerics.Vector3 position, Vector2 uv)
+		private static void WriteSphereVert(DataStream vertices, Vector3 position, Vector2 uv)
 		{
-			var tangent = System.Numerics.Vector3.Cross(position, System.Numerics.Vector3.UnitY);
+			var tangent = Vector3.Cross(position, Vector3.UnitY);
 			if (tangent.LengthSquared() < 0.01f)
 			{
-				tangent = System.Numerics.Vector3.UnitX;
+				tangent = Vector3.UnitX;
 			}
 			tangent = Vector3.Normalize(tangent);
 
-			var biTangent = System.Numerics.Vector3.Cross(position, tangent);
+			var biTangent = Vector3.Cross(position, tangent);
 			biTangent = Vector3.Normalize(biTangent);
 
 			vertices.Write(new SceneVertex(position, position, tangent, biTangent, uv));

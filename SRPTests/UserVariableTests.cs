@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SRPRendering;
-using SRPScripting;
 using Xunit;
-using SlimDX;
 using SRPCommon.UserProperties;
 
 namespace SRPTests

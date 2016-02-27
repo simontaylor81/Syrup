@@ -1,14 +1,11 @@
-﻿using ReactiveUI;
-using SlimDX;
-using SRPCommon.Scene;
-using SRPCommon.UserProperties;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Text;
 using System.Windows.Input;
-using ShaderEditorApp.MVVMUtil;
+using ReactiveUI;
+using SRPCommon.Scene;
+using SRPCommon.UserProperties;
 
 namespace ShaderEditorApp.ViewModel.Scene
 {
