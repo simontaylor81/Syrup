@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using SharpDX;
-using SlimDX.DXGI;
 using SharpDX.Direct3D11;
 
 using SRPRendering;
 using ShaderEditorApp.ViewModel;
+using SharpDX.DXGI;
 
 namespace ShaderEditorApp.View
 {
@@ -20,7 +20,7 @@ namespace ShaderEditorApp.View
 		private List<IDisposable> resources = new List<IDisposable>();
 		private List<IDisposable> sizeDependentResources = new List<IDisposable>();
 
-		private readonly SlimDX.Direct3D11.Device _device;
+		private readonly SharpDX.Direct3D11.Device _device;
 		private readonly SwapChain swapChain;
 
 		private readonly WorkspaceViewModel _workspaceVM;
@@ -34,9 +34,9 @@ namespace ShaderEditorApp.View
 
 		public ViewportViewModel ViewportViewModel { get; }
 
-		public RenderWindow(SlimDX.Direct3D11.Device device, WorkspaceViewModel workspaceVM)
+		public RenderWindow(RenderDevice device, WorkspaceViewModel workspaceVM)
 		{
-			_device = device;
+			_device = device.Device;
 			_workspaceVM = workspaceVM;
 		
 			// Create camera.
@@ -58,11 +58,12 @@ namespace ShaderEditorApp.View
 				SwapEffect = SwapEffect.Discard
 			};
 
-			swapChain = new SwapChain(device.Factory, device, description);
+			var factory = device.Adapter.GetParent<Factory>();
+			swapChain = new SwapChain(factory, device.Device, description);
 			resources.Add(swapChain);
 
-			// prevent DXGI handling of alt+enter, which doesn't work properly with Winforms
-			device.Factory.SetWindowAssociation(Handle, WindowAssociationFlags.IgnoreAltEnter);
+			// Prevent DXGI handling of alt+enter, which doesn't work properly with Winforms
+			factory.MakeWindowAssociation(Handle, WindowAssociationFlags.IgnoreAltEnter);
 
 			this.SizeChanged += OnResize;
 
@@ -78,8 +79,10 @@ namespace ShaderEditorApp.View
 			sizeDependentResources.Clear();
 
 			swapChain.ResizeBuffers(0, 0, 0, Format.Unknown, SwapChainFlags.AllowModeSwitch);
-			using (var resource = SlimDX.Direct3D11.Resource.FromSwapChain<Texture2D>(swapChain, 0))
+			using (var resource = SharpDX.Direct3D11.Resource.FromSwapChain<Texture2D>(swapChain, 0))
+			{
 				renderTarget = new RenderTargetView(_device, resource);
+			}
 			sizeDependentResources.Add(renderTarget);
 
 			// Create depth/stencil buffer texture.

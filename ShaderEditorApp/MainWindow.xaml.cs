@@ -51,7 +51,7 @@ namespace ShaderEditorApp
 			_workspaceViewModel.Exit.Subscribe(_ => Close());
 
 			// Create render window and assign it to its host.
-			renderWindow = new RenderWindow(_renderDevice.Device, _workspaceViewModel);
+			renderWindow = new RenderWindow(_renderDevice, _workspaceViewModel);
 			viewportFrame.SetRenderWindow(renderWindow);
 
 			OutputLogger.Instance.AddTarget(outputWindow);
