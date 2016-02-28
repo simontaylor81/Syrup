@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Assimp;
-using SRPCommon.Util;
 using Newtonsoft.Json;
-using System.Diagnostics.CodeAnalysis;
-using SlimDX;
+using SRPCommon.Util;
 
 namespace SRPCommon.Scene
 {
@@ -22,8 +22,8 @@ namespace SRPCommon.Scene
 		private bool isValid = false;
 		public bool IsValid => isValid;
 
-		public DataStream Vertices { get; private set; }
-		public DataStream Indices { get; private set; }
+		public IEnumerable<SceneVertex> Vertices { get; private set; }
+		public IEnumerable<short> Indices { get; private set; }
 
 		// Load the mesh itself after serialisation.
 		internal void PostLoad()
@@ -66,39 +66,33 @@ namespace SRPCommon.Scene
 					Debug.Assert(srcMesh.HasNormals);
 					Debug.Assert(srcMesh.HasTangentBasis);
 
-					// Create vertex stream.
-					int vertexBufferSize = SceneVertex.GetStride() * srcMesh.VertexCount;
-					Vertices = new DataStream(vertexBufferSize, true, true);
-
-					for (int i = 0; i < srcMesh.VertexCount; i++)
-					{
-						var vertex = new SceneVertex(
-							ToVector3(srcMesh.Vertices[i]),
-							ToVector3(srcMesh.Normals[i]),
-							ToVector3(srcMesh.Tangents[i]),
-							ToVector3(srcMesh.BiTangents[i]));
-
-						for (int uvChannel = 0; uvChannel < srcMesh.TextureCoordinateChannelCount; uvChannel++)
+					// Create vertex array.
+					Vertices = Enumerable.Range(0, srcMesh.VertexCount)
+						.Select(i =>
 						{
-							var uv = srcMesh.TextureCoordinateChannels[uvChannel][i];
-							vertex.SetUV(uvChannel, new System.Numerics.Vector2(uv.X, uv.Y));
-						}
+							var vertex = new SceneVertex(
+								ToVector3(srcMesh.Vertices[i]),
+								ToVector3(srcMesh.Normals[i]),
+								ToVector3(srcMesh.Tangents[i]),
+								ToVector3(srcMesh.BiTangents[i]));
 
-						Vertices.Write(vertex);
-					}
+							for (int uvChannel = 0; uvChannel < srcMesh.TextureCoordinateChannelCount; uvChannel++)
+							{
+								var uv = srcMesh.TextureCoordinateChannels[uvChannel][i];
+								vertex.SetUV(uvChannel, new System.Numerics.Vector2(uv.X, uv.Y));
+							}
 
-					int indexBufferSize = 2 * srcMesh.FaceCount * 3;
-					Indices = new DataStream(indexBufferSize, true, true);
+							return vertex;
+						})
+						.ToList();
 
-					foreach (var face in srcMesh.Faces)
-					{
-						// AssImp should triangulate the mesh for us (since it's enabled in the post-process options).
-						Debug.Assert(face.IndexCount == 3);
+					// AssImp should triangulate the mesh for us (since it's enabled in the post-process options).
+					Debug.Assert(srcMesh.Faces.All(face => face.IndexCount == 3));
 
-						Indices.Write((Int16)face.Indices[0]);
-						Indices.Write((Int16)face.Indices[1]);
-						Indices.Write((Int16)face.Indices[2]);
-					}
+					Indices = srcMesh.Faces
+						.SelectMany(face => face.Indices)
+						.Select(i => (short)i)
+						.ToList();
 
 					isValid = true;
 				}

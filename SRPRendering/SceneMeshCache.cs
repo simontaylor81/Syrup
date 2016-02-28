@@ -35,8 +35,12 @@ namespace SRPRendering
 		public Mesh GetForSceneMesh(SceneMesh sceneMesh)
 		{
 			return _sceneMeshes.GetOrAdd(sceneMesh,
-				() => new Mesh(_device, sceneMesh.Vertices, SceneVertex.GetStride(),
-					sceneMesh.Indices, SceneVertex.InputElements));
+				() => new Mesh(
+					_device,
+					sceneMesh.Vertices.ToDataStream(),
+					SceneVertex.GetStride(),
+					sceneMesh.Indices.ToDataStream(),
+					SceneVertex.InputElements));
 		}
 
 		// Get a mesh for a sphere.
