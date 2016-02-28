@@ -50,6 +50,7 @@ namespace SRPCommon.Scripting
 			pythonEngine.Runtime.LoadAssembly(typeof(string).Assembly);		// mscorlib.dll
 			pythonEngine.Runtime.LoadAssembly(typeof(Uri).Assembly);		// System.dll
 			pythonEngine.Runtime.LoadAssembly(typeof(SRPScripting.IRenderInterface).Assembly);
+			pythonEngine.Runtime.LoadAssembly(typeof(System.Numerics.Vector3).Assembly);
 
 			// Add stdlib dir to the search path.
 			AddSearchPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "IronPythonLibs"));

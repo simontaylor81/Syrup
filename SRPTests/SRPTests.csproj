@@ -127,6 +127,7 @@
     <Compile Include="TestRenderer\TestReporter.cs" />
     <Compile Include="TestRenderer\TestWorkspace.cs" />
     <Compile Include="UnitTests\BufferTests.cs" />
+    <Compile Include="UnitTests\ScriptVectorTests.cs" />
     <Compile Include="UnitTests\UserPropertyCopyFromTests.cs" />
     <Compile Include="UserVariableTests.cs" />
     <Compile Include="Util\AppveyorCI.cs" />
