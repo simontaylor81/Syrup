@@ -101,25 +101,28 @@ namespace SRPRendering
 			Device device, int width, int height, Format format, dynamic contents, bool generateMips = false)
 		{
 			// Construct data stream from script data.
-			var initialData = new DataRectangle(StreamUtil.CreateStream2D(contents, width, height, format), width * format.Size());
-
-			// Create DirectXTex representation (so we can apply the same operations as images loaded
-			// from disk, e.g. mip generation).
-			var image = DirectXTex.Create2D(initialData, width, height, format.ToDXGI());
-
-			// Generate mipmaps if desired.
-			if (generateMips)
+			using (DataStream stream = StreamUtil.CreateStream2D(contents, width, height, format))
 			{
-				image.GenerateMipMaps();
+				var initialData = new DataRectangle(stream.DataPointer, width * format.Size());
+
+				// Create DirectXTex representation (so we can apply the same operations as images loaded
+				// from disk, e.g. mip generation).
+				var image = DirectXTex.Create2D(initialData, width, height, format.ToDXGI());
+
+				// Generate mipmaps if desired.
+				if (generateMips)
+				{
+					image.GenerateMipMaps();
+				}
+
+				// Create the actual texture resource.
+				var texture2D = image.CreateTexture(device);
+
+				// Create the SRV.
+				var srv = new ShaderResourceView(device, texture2D);
+
+				return new Texture(texture2D, srv);
 			}
-
-			// Create the actual texture resource.
-			var texture2D = image.CreateTexture(device);
-
-			// Create the SRV.
-			var srv = new ShaderResourceView(device, texture2D);
-
-			return new Texture(texture2D, srv);
 		}
 
 		private delegate dynamic TexelCallback(int x, int y);

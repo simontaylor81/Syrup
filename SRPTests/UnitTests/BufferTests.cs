@@ -67,7 +67,7 @@ namespace SRPTests.UnitTests
 			{
 				// Assert.
 				var result = buffer.GetContents<Vector4>();
-				Assert.Equal(result, Enumerable.Range(0, numElements).Select(x => new Vector4(10 * x + 0, 10 * x + 1, 10 * x + 2, 10 * x + 3)));
+				Assert.Equal(Enumerable.Range(0, numElements).Select(x => new Vector4(10 * x + 0, 10 * x + 1, 10 * x + 2, 10 * x + 3)), result);
 			}
 		}
 	}

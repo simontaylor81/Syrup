@@ -22,8 +22,10 @@ namespace SRPRendering.Resources
 		public static Buffer CreateDynamic(Device device, int sizeInBytes, bool uav, Format format, dynamic contents)
 		{
 			var stride = format.Size();
-			DataStream initialData = contents != null ? SRPRendering.StreamUtil.CreateStream1D(contents, sizeInBytes / stride, format) : null;
-			return new Buffer(device, sizeInBytes, stride, uav, initialData);
+			using (DataStream initialData = contents != null ? SRPRendering.StreamUtil.CreateStream1D(contents, sizeInBytes / stride, format) : null)
+			{
+				return new Buffer(device, sizeInBytes, stride, uav, initialData);
+			}
 		}
 
 		// Create a structured buffer with typed initial data, for when calling from C# directly.

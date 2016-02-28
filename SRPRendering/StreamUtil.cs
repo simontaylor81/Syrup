@@ -89,7 +89,6 @@ namespace SRPRendering
 			{
 				case Format.R32G32B32A32_Float:
 				case Format.R32G32B32_Float:
-					stream.Write(ScriptHelper.ConvertToVector4(element));
 					for (int i = 0; i < numComponents; i++)
 						stream.Write((float)element[i]);
 					break;
