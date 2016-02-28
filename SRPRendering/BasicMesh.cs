@@ -151,7 +151,7 @@ namespace SRPRendering
 			return new Mesh(device, vertices, SceneVertex.GetStride(), indices, InputElements);
 		}
 
-		public static InputElement[] InputElements => SceneVertex.InputElements;
+		public static InputElement[] InputElements => InputLayoutCache.SceneVertexInputElements;
 
 		// Write a vertex for a sphere, which has a normal equal to its position.
 		private static void WriteSphereVert(DataStream vertices, Vector3 position, Vector2 uv)

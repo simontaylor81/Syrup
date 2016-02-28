@@ -43,7 +43,7 @@ namespace SRPRendering
 
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
-				deviceContext.Device, _globalResources.BasicShaders.BasicSceneVS.Signature, SceneVertex.InputElements);
+				deviceContext.Device, _globalResources.BasicShaders.BasicSceneVS.Signature, InputLayoutCache.SceneVertexInputElements);
 
 			// Draw the selected mesh
 			var proxy = scene.Primitives.ElementAt(selectedMeshIndex);

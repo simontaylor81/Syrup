@@ -54,7 +54,7 @@ namespace SRPRendering
 
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
-				deviceContext.Device, vertexShader.Signature, SceneVertex.InputElements);
+				deviceContext.Device, vertexShader.Signature, InputLayoutCache.SceneVertexInputElements);
 
 			// Set render state.
 			SetRenderTargets(renderTargetHandles, depthBuffer);

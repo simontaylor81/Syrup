@@ -50,6 +50,21 @@ namespace SRPRendering
 			entries.Clear();
 		}
 
+		// Array of input element structures that describe the layout of SceneVertex to D3D.
+		// Doesn't really belong here, but can't go with SceneVertex because it's D3D-specific.
+		// This seems as good a place as anywhere.
+		public static InputElement[] SceneVertexInputElements => new[]
+		{
+			new InputElement("POSITION", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("NORMAL", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("TANGENT", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("BITANGENT", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("TEXCOORD", 0, SlimDX.DXGI.Format.R32G32_Float, 0),
+			new InputElement("TEXCOORD", 1, SlimDX.DXGI.Format.R32G32_Float, 0),
+			new InputElement("TEXCOORD", 2, SlimDX.DXGI.Format.R32G32_Float, 0),
+			new InputElement("TEXCOORD", 3, SlimDX.DXGI.Format.R32G32_Float, 0)
+		};
+
 		private struct Key : IEquatable<Key>
 		{
 			public readonly ShaderSignature shaderSignature;

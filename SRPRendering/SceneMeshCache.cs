@@ -40,7 +40,7 @@ namespace SRPRendering
 					sceneMesh.Vertices.ToDataStream(),
 					SceneVertex.GetStride(),
 					sceneMesh.Indices.ToDataStream(),
-					SceneVertex.InputElements));
+					InputLayoutCache.SceneVertexInputElements));
 		}
 
 		// Get a mesh for a sphere.

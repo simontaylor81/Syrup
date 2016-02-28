@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Numerics;
-using SlimDX.Direct3D11;
 
 namespace SRPCommon.Scene
 {
@@ -56,19 +55,6 @@ namespace SRPCommon.Scene
 				default: throw new ArgumentOutOfRangeException(nameof(index), "UV index must be between 0 and 3");
 			}
 		}
-
-		// Array of input element structures that describe the layout of vertices to D3D.
-		public static InputElement[] InputElements => new[]
-		{
-			new InputElement("POSITION", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
-			new InputElement("NORMAL", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
-			new InputElement("TANGENT", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
-			new InputElement("BITANGENT", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
-			new InputElement("TEXCOORD", 0, SlimDX.DXGI.Format.R32G32_Float, 0),
-			new InputElement("TEXCOORD", 1, SlimDX.DXGI.Format.R32G32_Float, 0),
-			new InputElement("TEXCOORD", 2, SlimDX.DXGI.Format.R32G32_Float, 0),
-			new InputElement("TEXCOORD", 3, SlimDX.DXGI.Format.R32G32_Float, 0)
-		};
 
 		// Get the size of a the vertex, to be used as the stride for vertex buffers.
 		public static int GetStride() => Marshal.SizeOf(typeof(SceneVertex));
