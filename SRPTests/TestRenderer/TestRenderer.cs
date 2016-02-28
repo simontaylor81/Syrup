@@ -3,7 +3,10 @@ using System.Drawing;
 using System.Numerics;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
+using SharpDX;
 using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using SharpDX.Mathematics.Interop;
 using SRPRendering;
 using Xunit;
 
@@ -37,13 +40,13 @@ namespace SRPTests.TestRenderer
 			{
 				Width = _width,
 				Height = _height,
-				Format = SlimDX.DXGI.Format.B8G8R8A8_UNorm,
+				Format = Format.B8G8R8A8_UNorm,
 				MipLevels = 1,
 				ArraySize = 1,
 				BindFlags = BindFlags.RenderTarget,
 				Usage = ResourceUsage.Default,
 				CpuAccessFlags = CpuAccessFlags.None,
-				SampleDescription = new SlimDX.DXGI.SampleDescription(1, 0)
+				SampleDescription = new SampleDescription(1, 0)
 			};
 			renderTargetTexture = new Texture2D(device.Device, rtDesc);
 
@@ -74,7 +77,7 @@ namespace SRPTests.TestRenderer
 			var context = device.Device.ImmediateContext;
 
 			// The SRC should clear the render target, so clear to a nice garish magenta so we detect if it doesn't.
-			context.ClearRenderTargetView(renderTarget, new SlimDX.Color4(1.0f, 1.0f, 0.0f, 1.0f));
+			context.ClearRenderTargetView(renderTarget, new RawColor4(1.0f, 1.0f, 0.0f, 1.0f));
 
 			// Clear back and depth buffers to ensure independence of tests.
 			context.ClearDepthStencilView(depthBuffer.DSV, DepthStencilClearFlags.Depth, 1.0f, 0);
@@ -108,11 +111,12 @@ namespace SRPTests.TestRenderer
 			// Copy to staging resource.
 			context.CopyResource(renderTargetTexture, stagingTexture);
 
-			var dataBox = context.MapSubresource(stagingTexture, 0, 0, MapMode.Read, SlimDX.Direct3D11.MapFlags.None);
+			DataStream data;
+			var dataBox = context.MapSubresource(stagingTexture, 0, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out data);
 			try
 			{
 				var result = new Bitmap(_width, _height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-				var bits = result.LockBits(new System.Drawing.Rectangle(0, 0, _width, _height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+				var bits = result.LockBits(new Rectangle(0, 0, _width, _height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 				var destPtr = bits.Scan0;
 
 				var lineSize = _width * 4;
@@ -120,8 +124,8 @@ namespace SRPTests.TestRenderer
 
 				for (int y = 0; y < _height; y++)
 				{
-					dataBox.Data.Seek(y * dataBox.RowPitch, System.IO.SeekOrigin.Begin);
-					dataBox.Data.ReadRange(lineTemp, 0, lineSize);
+					data.Seek(y * dataBox.RowPitch, System.IO.SeekOrigin.Begin);
+					data.ReadRange(lineTemp, 0, lineSize);
 
 					Marshal.Copy(lineTemp, 0, destPtr, lineSize);
 					destPtr += bits.Stride;

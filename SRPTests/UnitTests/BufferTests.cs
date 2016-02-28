@@ -9,7 +9,7 @@ using SRPScripting;
 using SRPTests.Util;
 using Xunit;
 
-using Buffer = SRPRendering.Buffer;
+using Buffer = SRPRendering.Resources.Buffer;
 
 namespace SRPTests.UnitTests
 {
