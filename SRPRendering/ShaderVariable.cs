@@ -6,10 +6,10 @@ using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX;
-using SlimDX.D3DCompiler;
 using SRPCommon.UserProperties;
 using SRPCommon.Scripting;
+using SharpDX.D3DCompiler;
+using SharpDX;
 
 namespace SRPRendering
 {
@@ -26,8 +26,8 @@ namespace SRPRendering
 		{
 			Class = type.Description.Class;
 			Type = type.Description.Type;
-			Columns = type.Description.Columns;
-			Rows = type.Description.Rows;
+			Columns = type.Description.ColumnCount;
+			Rows = type.Description.RowCount;
 		}
 
 		public bool Equals(ShaderVariableTypeDesc other)

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.D3DCompiler;
-using SlimDX.Direct3D11;
+using SharpDX.D3DCompiler;
+using SharpDX.Direct3D11;
 using SRPCommon.Scripting;
 
 namespace SRPRendering
@@ -37,7 +38,7 @@ namespace SRPRendering
 				throw new ScriptException("UAVs are only supported for compute shaders.");
 			}
 
-			context.ComputeShader.SetUnorderedAccessView(UAV, _slot);
+			context.ComputeShader.SetUnorderedAccessView(_slot, UAV);
 		}
 
 		public ShaderUavVariable(InputBindingDescription desc, ShaderFrequency shaderFrequency)
@@ -48,7 +49,7 @@ namespace SRPRendering
 			_shaderFrequency = shaderFrequency;
 
 			// TODO: Support arrays.
-			System.Diagnostics.Debug.Assert(desc.BindCount == 1);
+			Trace.Assert(desc.BindCount == 1);
 		}
 
 		private int _slot;

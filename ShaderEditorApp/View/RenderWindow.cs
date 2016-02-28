@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using SlimDX;
+using SharpDX;
 using SlimDX.DXGI;
-using SlimDX.Direct3D11;
+using SharpDX.Direct3D11;
 
 using SRPRendering;
 using ShaderEditorApp.ViewModel;

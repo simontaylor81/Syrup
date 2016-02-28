@@ -32,5 +32,12 @@ namespace SRPCommon.Util
 		// Start the observable with its default value.
 		public static IObservable<T> StartWithDefault<T>(this IObservable<T> source)
 			=> source.StartWith(default(T));
+
+		// Add an item to the list, and return the added item.
+		public static TAdded AddAndReturn<TAdded, TElement>(this IList<TElement> list, TAdded newElement) where TAdded : TElement
+		{
+			list.Add(newElement);
+			return newElement;
+		}
 	}
 }

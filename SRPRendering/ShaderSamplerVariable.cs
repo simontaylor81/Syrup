@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.D3DCompiler;
-using SlimDX.Direct3D11;
+using SharpDX.D3DCompiler;
+using SharpDX.Direct3D11;
 
 namespace SRPRendering
 {
@@ -48,15 +48,15 @@ namespace SRPRendering
 			switch (_shaderFrequency)
 			{
 				case ShaderFrequency.Vertex:
-					context.VertexShader.SetSampler(State, _slot);
+					context.VertexShader.SetSampler(_slot, State);
 					break;
 
 				case ShaderFrequency.Pixel:
-					context.PixelShader.SetSampler(State, _slot);
+					context.PixelShader.SetSampler(_slot, State);
 					break;
 
 				case ShaderFrequency.Compute:
-					context.ComputeShader.SetSampler(State, _slot);
+					context.ComputeShader.SetSampler(_slot, State);
 					break;
 			}
 		}

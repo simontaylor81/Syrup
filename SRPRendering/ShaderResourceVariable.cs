@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.D3DCompiler;
-using SlimDX.Direct3D11;
+using SharpDX.D3DCompiler;
+using SharpDX.Direct3D11;
 
 namespace SRPRendering
 {
@@ -38,15 +39,15 @@ namespace SRPRendering
 			switch (shaderFrequency)
 			{
 				case ShaderFrequency.Vertex:
-					context.VertexShader.SetShaderResource(Resource, slot);
+					context.VertexShader.SetShaderResource(slot, Resource);
 					break;
 
 				case ShaderFrequency.Pixel:
-					context.PixelShader.SetShaderResource(Resource, slot);
+					context.PixelShader.SetShaderResource(slot, Resource);
 					break;
 
 				case ShaderFrequency.Compute:
-					context.ComputeShader.SetShaderResource(Resource, slot);
+					context.ComputeShader.SetShaderResource(slot, Resource);
 					break;
 			}
 		}
@@ -60,7 +61,7 @@ namespace SRPRendering
 			this.shaderFrequency = shaderFrequency;
 
 			// TODO: Support arrays.
-			System.Diagnostics.Debug.Assert(desc.BindCount == 1);
+			Trace.Assert(desc.BindCount == 1);
 		}
 
 		private int slot;

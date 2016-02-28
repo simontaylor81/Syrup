@@ -4,12 +4,13 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.IO;
 
-using SlimDX;
-using SlimDX.D3DCompiler;
-using SlimDX.Direct3D11;
 using SRPCommon.Util;
 using SRPCommon.Scripting;
 using System.Text.RegularExpressions;
+using SharpDX.Direct3D11;
+using SharpDX.D3DCompiler;
+using SharpDX;
+using SharpDX.Direct3D;
 
 namespace SRPRendering
 {
@@ -195,15 +196,13 @@ namespace SRPRendering
 		private static bool IsShaderResource(ShaderInputType type) =>
 			type == ShaderInputType.Texture ||
 			type == ShaderInputType.Structured ||
-			type == ShaderInputType.AppendStructured ||
-			type == ShaderInputType.ConsumeStructured ||
 			type == ShaderInputType.ByteAddress;
 
 		private bool IsUav(ShaderInputType type) =>
-			type == (ShaderInputType)4 ||   // D3D_SIT_UAV_RWTYPED, not in SlimDX for some reason.
-			type == ShaderInputType.RWStructured ||
-			type == ShaderInputType.RWStructuredWithCounter ||
-			type == ShaderInputType.RWByteAddress;
+			type == ShaderInputType.UnorderedAccessViewRWTyped ||
+			type == ShaderInputType.UnorderedAccessViewRWStructured ||
+			type == ShaderInputType.UnorderedAccessViewRWStructuredWithCounter ||
+			type == ShaderInputType.UnorderedAccessViewRWByteAddress;
 
 		public void Dispose()
 		{
@@ -223,17 +222,17 @@ namespace SRPRendering
 			if (_vertexShader != null)
 			{
 				context.VertexShader.Set(_vertexShader);
-				context.VertexShader.SetConstantBuffers(_cbuffers_buffers, 0, _cbuffers_buffers.Length);
+				context.VertexShader.SetConstantBuffers(0, _cbuffers_buffers);
 			}
 			else if (_pixelShader != null)
 			{
 				context.PixelShader.Set(_pixelShader);
-				context.PixelShader.SetConstantBuffers(_cbuffers_buffers, 0, _cbuffers_buffers.Length);
+				context.PixelShader.SetConstantBuffers(0, _cbuffers_buffers);
 			}
 			else if (_computeShader != null)
 			{
 				context.ComputeShader.Set(_computeShader);
-				context.ComputeShader.SetConstantBuffers(_cbuffers_buffers, 0, _cbuffers_buffers.Length);
+				context.ComputeShader.SetConstantBuffers(0, _cbuffers_buffers);
 			}
 		}
 
@@ -366,7 +365,7 @@ namespace SRPRendering
 
 		// Constant buffer info.
 		private ConstantBuffer[] _cbuffers;
-		private SlimDX.Direct3D11.Buffer[] _cbuffers_buffers;
+		private SharpDX.Direct3D11.Buffer[] _cbuffers_buffers;
 
 		// Resource variable info.
 		private ShaderResourceVariable[] _resourceVariables;
@@ -378,7 +377,7 @@ namespace SRPRendering
 		private ShaderUavVariable[] _uavVariables;
 
 		// Class for handling include file lookups.
-		private class IncludeHandler : Include
+		private class IncludeHandler : CallbackBase, Include
 		{
 			private Func<string, string> includeLookup;
 
@@ -391,16 +390,16 @@ namespace SRPRendering
 			}
 
 			// Include interface.
-			public void Open(IncludeType type, string filename, Stream parentStream, out Stream stream)
+			public Stream Open(IncludeType type, string filename, Stream parentStream)
 			{
 				// Find full path.
 				var path = includeLookup(filename);
 
-				// Open file stream.
-				stream = new FileStream(path, FileMode.Open);
-
 				// Remember that we included this file.
 				_includedFiles.Add(new IncludedFile { SourceName = filename, ResolvedFile = path });
+
+				// Open file stream.
+				return new FileStream(path, FileMode.Open);
 			}
 
 			public void Close(Stream stream)

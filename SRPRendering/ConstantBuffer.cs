@@ -3,41 +3,46 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX;
-using SlimDX.Direct3D11;
+using SharpDX;
+using SharpDX.Direct3D11;
 
 namespace SRPRendering
 {
 	class ConstantBuffer : IDisposable
 	{
 		private ShaderVariable[] variables;
-		private DataBox contents;
+
+		private readonly DataBox _contents;
+		private readonly DataStream _stream;
 
 		public string Name { get; }
-		public SlimDX.Direct3D11.Buffer Buffer { get; }
+		public SharpDX.Direct3D11.Buffer Buffer { get; }
 		public IEnumerable<IShaderVariable> Variables => variables;
 
-		public ConstantBuffer(Device device, SlimDX.D3DCompiler.ConstantBuffer bufferInfo)
+		public ConstantBuffer(Device device, SharpDX.D3DCompiler.ConstantBuffer bufferInfo)
 		{
 			Name = bufferInfo.Description.Name;
 
 			// Gather info about the variables in this buffer.
-			variables = (from i in Enumerable.Range(0, bufferInfo.Description.Variables)
-						 select new ShaderVariable(bufferInfo.GetVariable(i))).ToArray();
+			variables = bufferInfo.GetVariables()
+				.Select(variable => new ShaderVariable(variable))
+				.ToArray();
 
 			// Create a data stream containing the initial contents buffer.
-			var stream = new DataStream(bufferInfo.Description.Size, true, true);
-			contents = new DataBox(bufferInfo.Description.Size, bufferInfo.Description.Size, stream);
+			_stream = new DataStream(bufferInfo.Description.Size, true, true);
+			_contents = new DataBox(_stream.DataPointer);
 
 			// Write initial values to buffer.
 			foreach (var variable in variables)
-				variable.WriteToBuffer(stream);
+			{
+				variable.WriteToBuffer(_stream);
+			}
 
 			// Create the actual buffer.
-			stream.Position = 0;
-			Buffer = new SlimDX.Direct3D11.Buffer(
+			_stream.Position = 0;
+			Buffer = new SharpDX.Direct3D11.Buffer(
 				device,
-				stream,
+				_stream,
 				bufferInfo.Description.Size,
 				ResourceUsage.Default,
 				BindFlags.ConstantBuffer,
@@ -57,12 +62,14 @@ namespace SRPRendering
 		{
 			bool bDirty = false;
 			foreach (var variable in variables)
-				bDirty |= variable.WriteToBuffer(contents.Data);
+			{
+				bDirty |= variable.WriteToBuffer(_stream);
+			}
 
 			if (bDirty)
 			{
-				contents.Data.Position = 0;
-				context.UpdateSubresource(contents, Buffer, 0);
+				_stream.Position = 0;
+				context.UpdateSubresource(_contents, Buffer, 0);
 			}
 		}
 	}

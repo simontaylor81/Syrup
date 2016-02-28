@@ -4,8 +4,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.D3DCompiler;
-using SlimDX.Direct3D11;
+using SharpDX;
+using SharpDX.D3DCompiler;
+using SharpDX.Direct3D11;
 using SRPCommon.Scripting;
 
 namespace SRPRendering
@@ -35,7 +36,7 @@ namespace SRPRendering
 				entries.Add(key, result);
 				return result;
 			}
-			catch (Direct3D11Exception ex)
+			catch (SharpDXException ex)
 			{
 				throw new ScriptException("Failed to create input layout. Check shader inputs match scene format.", ex);
 			}
@@ -55,14 +56,14 @@ namespace SRPRendering
 		// This seems as good a place as anywhere.
 		public static InputElement[] SceneVertexInputElements => new[]
 		{
-			new InputElement("POSITION", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
-			new InputElement("NORMAL", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
-			new InputElement("TANGENT", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
-			new InputElement("BITANGENT", 0, SlimDX.DXGI.Format.R32G32B32_Float, 0),
-			new InputElement("TEXCOORD", 0, SlimDX.DXGI.Format.R32G32_Float, 0),
-			new InputElement("TEXCOORD", 1, SlimDX.DXGI.Format.R32G32_Float, 0),
-			new InputElement("TEXCOORD", 2, SlimDX.DXGI.Format.R32G32_Float, 0),
-			new InputElement("TEXCOORD", 3, SlimDX.DXGI.Format.R32G32_Float, 0)
+			new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("NORMAL", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("TANGENT", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("BITANGENT", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0),
+			new InputElement("TEXCOORD", 0, SharpDX.DXGI.Format.R32G32_Float, 0),
+			new InputElement("TEXCOORD", 1, SharpDX.DXGI.Format.R32G32_Float, 0),
+			new InputElement("TEXCOORD", 2, SharpDX.DXGI.Format.R32G32_Float, 0),
+			new InputElement("TEXCOORD", 3, SharpDX.DXGI.Format.R32G32_Float, 0)
 		};
 
 		private struct Key : IEquatable<Key>

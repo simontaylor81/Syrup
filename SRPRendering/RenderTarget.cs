@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.Direct3D11;
+using SharpDX.Direct3D11;
 
 namespace SRPRendering
 {
@@ -17,7 +17,7 @@ namespace SRPRendering
 		public int Width => texture.Description.Width;
 		public int Height => texture.Description.Height;
 
-		public RenderTarget(Device device, int width, int height, SlimDX.DXGI.Format format)
+		public RenderTarget(Device device, int width, int height, SharpDX.DXGI.Format format)
 		{
 			// Create the texture itself.
 			var desc = new Texture2DDescription()
@@ -30,7 +30,7 @@ namespace SRPRendering
 					BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource,
 					Usage = ResourceUsage.Default,
 					CpuAccessFlags = CpuAccessFlags.None,
-					SampleDescription = new SlimDX.DXGI.SampleDescription(1, 0)
+					SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0)
 				};
 			texture = new Texture2D(device, desc);
 

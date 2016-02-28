@@ -5,7 +5,8 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.Direct3D11;
+using SharpDX.Direct3D11;
+using SharpDX.Mathematics.Interop;
 using SRPCommon.Scene;
 using SRPCommon.Scripting;
 using SRPScripting;
@@ -167,15 +168,13 @@ namespace SRPRendering
 			try
 			{
 				Vector4 vectorColour = ScriptHelper.ConvertToVector4(colour);
-
-				// SlimDX wants a Color4, not a vector (is there a difference?!)
-				var slimdxColour = new SlimDX.Color4(vectorColour.W, vectorColour.X, vectorColour.Y, vectorColour.Z);
+				var rawColour = new RawColor4(vectorColour.W, vectorColour.X, vectorColour.Y, vectorColour.Z);
 
 				// Clear each specified target.
 				var rtvs = GetRTVS(renderTargetHandles);
 				foreach (var rtv in rtvs)
 				{
-					deviceContext.ClearRenderTargetView(rtv, slimdxColour);
+					deviceContext.ClearRenderTargetView(rtv, rawColour);
 				}
 			}
 			catch (ScriptException ex)
@@ -311,7 +310,7 @@ namespace SRPRendering
 			deviceContext.OutputMerger.SetTargets(dsv, rtvs);
 
 			// Set viewport.
-			deviceContext.Rasterizer.SetViewports(GetViewport(renderTargetHandles));
+			deviceContext.Rasterizer.SetViewports(new[] { GetViewport(renderTargetHandles) });
 		}
 
 		// Converts a list of render target handles to a list of RTVs, resolving nulls to the back buffer.
@@ -330,7 +329,7 @@ namespace SRPRendering
 		}
 
 		// Get the viewport dimensions to use.
-		private Viewport GetViewport(IEnumerable<object> renderTargetHandles)
+		private RawViewportF GetViewport(IEnumerable<object> renderTargetHandles)
 		{
 			if (renderTargetHandles != null)
 			{
@@ -339,11 +338,27 @@ namespace SRPRendering
 				if (handle != null)
 				{
 					var rt = GetRenderTarget(handle);
-					return new Viewport(0.0f, 0.0f, rt.Width, rt.Height);
+					return new RawViewportF
+					{
+						X = 0.0f,
+						Y = 0.0f,
+						Width = rt.Width,
+						Height = rt.Height,
+						MinDepth = 0.0f,
+						MaxDepth = 1.0f,
+					};
 				}
 			}
 
-			return new Viewport(0.0f, 0.0f, viewInfo.ViewportWidth, viewInfo.ViewportHeight);
+			return new RawViewportF
+			{
+				X = 0.0f,
+				Y = 0.0f,
+				Width = viewInfo.ViewportWidth,
+				Height = viewInfo.ViewportHeight,
+				MinDepth = 0.0f,
+				MaxDepth = 1.0f,
+			};
 		}
 
 		private DeviceContext deviceContext;

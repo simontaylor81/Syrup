@@ -5,8 +5,9 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.D3DCompiler;
-using SlimDX.Direct3D11;
+using SharpDX.D3DCompiler;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
 using SRPCommon.Interfaces;
 using SRPCommon.Scripting;
 using SRPScripting;
@@ -14,6 +15,8 @@ using SRPScripting;
 using DepthStencilState = SRPScripting.DepthStencilState;
 using SamplerState = SRPScripting.SamplerState;
 using BlendState = SRPScripting.BlendState;
+using SharpDX.Mathematics.Interop;
+using SharpDX.Direct3D;
 
 namespace SRPRendering
 {
@@ -41,7 +44,7 @@ namespace SRPRendering
 		// Do the generation.
 		public void Generate(Texture texture, string shaderFile)
 		{
-			if (SlimDXUtils.IsCompressed(texture.Texture2D.Description.Format))
+			if (FormatHelper.IsCompressed(texture.Texture2D.Description.Format))
 			{
 				throw new ScriptException("Cannot generate mips for a compressed texture");
 			}
@@ -105,7 +108,15 @@ namespace SRPRendering
 				int mip = 1;
 				while (mipWidth > 0 && mipHeight > 0)
 				{
-					context.Rasterizer.SetViewports(new Viewport(0, 0, mipWidth, mipHeight));
+					context.Rasterizer.SetViewports(new[] { new RawViewportF
+					{
+						X = 0.0f,
+						Y = 0.0f,
+						Width = mipWidth,
+						Height = mipHeight,
+						MinDepth = 0.0f,
+						MaxDepth = 0.0f,
+					}});
 
 					destMipVariable?.Set(mip);
 
@@ -120,7 +131,7 @@ namespace SRPRendering
 
 						// Copy result back to the mip chain of the source texture.
 						var region = new ResourceRegion(0, 0, 0, mipWidth, mipHeight, 1);
-						var subresource = Resource.CalculateSubresourceIndex(mip, arraySlice, numMips);
+						var subresource = SharpDX.Direct3D11.Resource.CalculateSubResourceIndex(mip, arraySlice, numMips);
 						context.CopySubresourceRegion(renderTarget.Texture2D, 0, region, texture.Texture2D, subresource, 0, 0, 0);
 					}
 

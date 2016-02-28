@@ -1,4 +1,4 @@
-﻿using SlimDX.Direct3D11;
+﻿using SharpDX.Direct3D11;
 using SRPCommon.Scene;
 using SRPCommon.Util;
 using System;
@@ -34,13 +34,19 @@ namespace SRPRendering
 		// Get a mesh for a scene mesh.
 		public Mesh GetForSceneMesh(SceneMesh sceneMesh)
 		{
-			return _sceneMeshes.GetOrAdd(sceneMesh,
-				() => new Mesh(
-					_device,
-					sceneMesh.Vertices.ToDataStream(),
-					SceneVertex.GetStride(),
-					sceneMesh.Indices.ToDataStream(),
-					InputLayoutCache.SceneVertexInputElements));
+			return _sceneMeshes.GetOrAdd(sceneMesh, () =>
+			{
+				using (var vertData = sceneMesh.Vertices.ToDataStream())
+				using (var indexData = sceneMesh.Indices.ToDataStream())
+				{
+					return new Mesh(
+						_device,
+						vertData,
+						SceneVertex.GetStride(),
+						indexData,
+						InputLayoutCache.SceneVertexInputElements);
+				}
+			});
 		}
 
 		// Get a mesh for a sphere.

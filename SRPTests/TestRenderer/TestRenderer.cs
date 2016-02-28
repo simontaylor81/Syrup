@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Numerics;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
-using SlimDX.Direct3D11;
+using SharpDX.Direct3D11;
 using SRPRendering;
 using Xunit;
 

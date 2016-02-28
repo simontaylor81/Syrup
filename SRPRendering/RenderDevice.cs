@@ -1,13 +1,13 @@
-﻿using SlimDX.Direct3D11;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.DXGI;
-
-using Device = SlimDX.Direct3D11.Device;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using Device = SharpDX.Direct3D11.Device;
 
 namespace SRPRendering
 {
@@ -39,7 +39,7 @@ namespace SRPRendering
 			// Lazily get adapter from DXGI device.
 			_adapter = new Lazy<Adapter>(() =>
 			{
-				var dxgiDevice = new SlimDX.DXGI.Device(Device);
+				var dxgiDevice = new SharpDX.DXGI.Device(Device.NativePointer);
 				var adapter = dxgiDevice.Adapter;
 				_disposables.Add(dxgiDevice);
 				_disposables.Add(adapter);

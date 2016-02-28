@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using SRPCommon.Scene;
 using System.Numerics;
-using SlimDX.Direct3D11;
-using SlimDX;
-
-using Vector2 = System.Numerics.Vector2;
-using Vector3 = System.Numerics.Vector3;
+using SharpDX.Direct3D11;
+using DataStream = SharpDX.DataStream;
 
 namespace SRPRendering
 {
@@ -14,7 +11,7 @@ namespace SRPRendering
 	class BasicMesh
 	{
 		// Create a cube with corners at 1 (side length 2).
-		public static Mesh CreateCube(SlimDX.Direct3D11.Device device)
+		public static Mesh CreateCube(Device device)
 		{
 			// Generate vertices.
 			int numVerts = 24;
@@ -45,7 +42,7 @@ namespace SRPRendering
 		}
 
 		// Create single square face in the XZ plane with corners at 1 (edge length 2).
-		public static Mesh CreatePlane(SlimDX.Direct3D11.Device device)
+		public static Mesh CreatePlane(Device device)
 		{
 			// Generate vertices.
 			int numVerts = 4;
@@ -66,7 +63,7 @@ namespace SRPRendering
 		}
 
 		// Create a sphere with radius 1.
-		public static Mesh CreateSphere(SlimDX.Direct3D11.Device device, int slices, int stacks)
+		public static Mesh CreateSphere(Device device, int slices, int stacks)
 		{
 			int i;
 

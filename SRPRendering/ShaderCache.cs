@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.D3DCompiler;
-using SlimDX.Direct3D11;
+using SharpDX.Direct3D11;
 using System.Security.Cryptography;
+using SharpDX.Direct3D;
 
 namespace SRPRendering
 {
@@ -160,7 +160,7 @@ namespace SRPRendering
 		public override int GetHashCode()
 		{
 			var definesHash = defines.Aggregate(0,
-				(hash, define) => hash ^ define.Name.GetHashCode() ^ define.Value.GetHashCode());
+				(hash, define) => hash ^ define.GetHashCode());
 
 			return entryPoint.GetHashCode() ^
 				profile.GetHashCode() ^

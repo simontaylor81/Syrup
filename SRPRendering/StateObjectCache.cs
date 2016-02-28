@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.Direct3D11;
+using SharpDX.Direct3D11;
 
 namespace SRPRendering
 {
@@ -14,14 +14,24 @@ namespace SRPRendering
 		StateType Get(StateDescriptorType desc);
 	}
 
+	static class StateObjectCache
+	{
+		// Convenience creation method.
+		public static StateObjectCache<StateType, StateDescriptorType> Create<StateType, StateDescriptorType>(Func<StateDescriptorType, StateType> creationFunctor)
+			where StateDescriptorType : struct
+			where StateType : IDisposable
+		{
+			return new StateObjectCache<StateType, StateDescriptorType>(creationFunctor);
+		}
+	}
+
 	// A cache for D3D state objects.
 	class StateObjectCache<StateType, StateDescriptorType> : IStateObjectCache<StateType, StateDescriptorType>
 		where StateDescriptorType : struct
 		where StateType : IDisposable
 	{
-		public StateObjectCache(Device device, Func<Device, StateDescriptorType, StateType> creationFunctor)
+		public StateObjectCache(Func<StateDescriptorType, StateType> creationFunctor)
 		{
-			this.device = device;
 			this.creationFunctor = creationFunctor;
 		}
 
@@ -33,7 +43,7 @@ namespace SRPRendering
 			if (!cache.TryGetValue(desc, out result))
 			{
 				// Not found, so create a new one and add it.
-				result = creationFunctor(device, desc);
+				result = creationFunctor(desc);
 				cache.Add(desc, result);
 			}
 
@@ -50,7 +60,6 @@ namespace SRPRendering
 		}
 
 		private Dictionary<StateDescriptorType, StateType> cache = new Dictionary<StateDescriptorType,StateType>();
-		private Func<Device, StateDescriptorType, StateType> creationFunctor;
-		private Device device;
+		private Func<StateDescriptorType, StateType> creationFunctor;
 	}
 }

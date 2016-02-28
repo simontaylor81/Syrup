@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 
-using SlimDX;
+using SharpDX.Direct3D;
 using SRPCommon.Interfaces;
 using SRPCommon.Scene;
 using SRPCommon.Scripting;
@@ -104,10 +104,10 @@ namespace SRPRendering
 			return new ShaderHandle(shaders.Count - 1);
 		}
 
-		private SlimDX.D3DCompiler.ShaderMacro[] ConvertDefines(IDictionary<string, object> defines) =>
+		private ShaderMacro[] ConvertDefines(IDictionary<string, object> defines) =>
 			defines
 				.EmptyIfNull()
-				.Select(define => new SlimDX.D3DCompiler.ShaderMacro(define.Key, define.Value.ToString()))
+				.Select(define => new ShaderMacro(define.Key, define.Value.ToString()))
 				.ToArray();
 
 		// Lookup a shader filename in the project to retrieve the full path.
@@ -343,7 +343,7 @@ namespace SRPRendering
 		// Create a render target of dimensions equal to the viewport.
 		public object CreateRenderTarget()
 		{
-			renderTargets.Add(new RenderTargetDescriptor(new Rational(1, 1), new Rational(1, 1), true));
+			renderTargets.Add(new RenderTargetDescriptor(new SharpDX.DXGI.Rational(1, 1), new SharpDX.DXGI.Rational(1, 1), true));
 			return new RenderTargetHandle(renderTargets.Count - 1);
 		}
 
@@ -419,7 +419,7 @@ namespace SRPRendering
 			_device = null;
 		}
 
-		public void Render(SlimDX.Direct3D11.DeviceContext deviceContext, ViewInfo viewInfo, RenderScene renderScene)
+		public void Render(SharpDX.Direct3D11.DeviceContext deviceContext, ViewInfo viewInfo, RenderScene renderScene)
 		{
 			// Create render targets if necessary.
 			UpdateRenderTargets(viewInfo.ViewportWidth, viewInfo.ViewportHeight);
@@ -453,7 +453,7 @@ namespace SRPRendering
 					desc.renderTarget?.Dispose();
 
 					// TODO: Custom format
-					desc.renderTarget = new RenderTarget(_device.Device, width, height, SlimDX.DXGI.Format.R8G8B8A8_UNorm);
+					desc.renderTarget = new RenderTarget(_device.Device, width, height, SharpDX.DXGI.Format.R8G8B8A8_UNorm);
 				}
 			}
 		}

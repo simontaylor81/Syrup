@@ -4,15 +4,15 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX;
-using SlimDX.Direct3D11;
+using SharpDX;
+using SharpDX.Direct3D11;
 using SRPScripting;
 
-namespace SRPRendering
+namespace SRPRendering.Resources
 {
 	class Buffer : IDisposable
 	{
-		private SlimDX.Direct3D11.Buffer _buffer;
+		private SharpDX.Direct3D11.Buffer _buffer;
 
 		public ShaderResourceView SRV { get; }
 		public UnorderedAccessView UAV { get; }
@@ -29,8 +29,10 @@ namespace SRPRendering
 		// Create a structured buffer with typed initial data, for when calling from C# directly.
 		public static Buffer CreateStructured<T>(Device device, bool uav, IEnumerable<T> contents) where T : struct
 		{
-			var initialData = contents.ToDataStream();
-			return new Buffer(device, (int)initialData.Length, Marshal.SizeOf(typeof(T)), uav, initialData);
+			using (var initialData = contents.ToDataStream())
+			{
+				return new Buffer(device, (int)initialData.Length, Marshal.SizeOf(typeof(T)), uav, initialData);
+			}
 		}
 
 		public Buffer(Device device, int sizeInBytes, int stride, bool uav, DataStream initialData)
@@ -40,7 +42,7 @@ namespace SRPRendering
 			desc.SizeInBytes = sizeInBytes;
 			desc.Usage = ResourceUsage.Default;
 			desc.CpuAccessFlags = CpuAccessFlags.Read;  // Need this for result verification.
-			desc.OptionFlags = ResourceOptionFlags.StructuredBuffer;
+			desc.OptionFlags = ResourceOptionFlags.BufferStructured;
 			desc.StructureByteStride = stride;
 
 			desc.BindFlags = BindFlags.ShaderResource;
@@ -49,7 +51,7 @@ namespace SRPRendering
 				desc.BindFlags |= BindFlags.UnorderedAccess;
 			}
 
-			_buffer = new SlimDX.Direct3D11.Buffer(device, initialData, desc);
+			_buffer = new SharpDX.Direct3D11.Buffer(device, initialData, desc);
 
 			// Create SRV for reading from the buffer.
 			SRV = new ShaderResourceView(device, _buffer);
@@ -71,8 +73,9 @@ namespace SRPRendering
 		// Read back the contents of the buffer from the GPU.
 		public IEnumerable<T> GetContents<T>() where T : struct
 		{
-			var data = _buffer.Device.ImmediateContext.MapSubresource(_buffer, MapMode.Read, MapFlags.None);
-			return data.Data.ReadRange<T>((int)(data.Data.Length / Marshal.SizeOf(typeof(T))));
+			DataStream stream;
+			_buffer.Device.ImmediateContext.MapSubresource(_buffer, 0, MapMode.Read, MapFlags.None, out stream);
+			return stream.ReadRange<T>((int)(stream.Length / Marshal.SizeOf(typeof(T))));
 		}
 	}
 }

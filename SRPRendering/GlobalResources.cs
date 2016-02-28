@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
-using SlimDX.Direct3D11;
+using SharpDX.Direct3D11;
 using SRPCommon.Util;
 using System.Reactive.Disposables;
 
@@ -31,7 +31,7 @@ namespace SRPRendering
 		IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; }
 		IStateObjectCache<DepthStencilState, DepthStencilStateDescription> DepthStencilStateCache { get; }
 		IStateObjectCache<BlendState, BlendStateDescription> BlendStateCache { get; }
-		IStateObjectCache<SamplerState, SamplerDescription> SamplerStateCache { get; }
+		IStateObjectCache<SamplerState, SamplerStateDescription> SamplerStateCache { get; }
 		IInputLayoutCache InputLayoutCache { get; }
 	}
 
@@ -56,7 +56,7 @@ namespace SRPRendering
 		public IStateObjectCache<RasterizerState, RasterizerStateDescription> RastStateCache { get; }
 		public IStateObjectCache<DepthStencilState, DepthStencilStateDescription> DepthStencilStateCache { get; }
 		public IStateObjectCache<BlendState, BlendStateDescription> BlendStateCache { get; }
-		public IStateObjectCache<SamplerState, SamplerDescription> SamplerStateCache { get; }
+		public IStateObjectCache<SamplerState, SamplerStateDescription> SamplerStateCache { get; }
 		public IInputLayoutCache InputLayoutCache { get; }
 
 		private CompositeDisposable disposables = new CompositeDisposable();
@@ -98,10 +98,11 @@ namespace SRPRendering
 			disposables.Add(ShaderCache);
 
 			// Create the state object caches.
-			RastStateCache = new StateObjectCache<RasterizerState, RasterizerStateDescription>(device, RasterizerState.FromDescription);
-			DepthStencilStateCache = new StateObjectCache<DepthStencilState, DepthStencilStateDescription>(device, DepthStencilState.FromDescription);
-			BlendStateCache = new StateObjectCache<BlendState, BlendStateDescription>(device, BlendState.FromDescription);
-			SamplerStateCache = new StateObjectCache<SamplerState, SamplerDescription>(device, SamplerState.FromDescription);
+			RastStateCache = StateObjectCache.Create((RasterizerStateDescription desc) => new RasterizerState(device, desc));
+			DepthStencilStateCache = StateObjectCache.Create((DepthStencilStateDescription desc) => new DepthStencilState(device, desc));
+			BlendStateCache = StateObjectCache.Create((BlendStateDescription desc) => new BlendState(device, desc));
+			SamplerStateCache = StateObjectCache.Create((SamplerStateDescription desc) => new SamplerState(device, desc));
+
 			InputLayoutCache = new InputLayoutCache();
 
 			disposables.Add(RastStateCache);
@@ -125,9 +126,9 @@ namespace SRPRendering
 			{
 				Width = 1,
 				Height = 1,
-				Format = sRGB ? SlimDX.DXGI.Format.R8G8B8A8_UNorm_SRGB : SlimDX.DXGI.Format.R8G8B8A8_UNorm,
+				Format = sRGB ? SharpDX.DXGI.Format.R8G8B8A8_UNorm_SRgb : SharpDX.DXGI.Format.R8G8B8A8_UNorm,
 				MipLevels = 1,
-				SampleDescription = new SlimDX.DXGI.SampleDescription() { Count = 1 },
+				SampleDescription = new SharpDX.DXGI.SampleDescription() { Count = 1 },
 				ArraySize = 1,
 				BindFlags = BindFlags.ShaderResource,
 				CpuAccessFlags = CpuAccessFlags.None,
@@ -135,17 +136,18 @@ namespace SRPRendering
 			};
 
 			// Initilise with the constant colour.
-			var data = new[] {colour.R, colour.G, colour.B, colour.A };
-			var dataStream = new SlimDX.DataStream(data, true, true);
-			var dataRect = new SlimDX.DataRectangle(4, dataStream);
+			using (var dataStream = new[] { colour.R, colour.G, colour.B, colour.A }.ToDataStream())
+			{
+				var dataRect = new SharpDX.DataRectangle(dataStream.DataPointer, 4);
 
-			// Create the texture resource.
-			var texture2D = new Texture2D(device, description, dataRect);
+				// Create the texture resource.
+				var texture2D = new Texture2D(device, description, dataRect);
 
-			// Create the shader resource view.
-			var srv = new ShaderResourceView(device, texture2D);
+				// Create the shader resource view.
+				var srv = new ShaderResourceView(device, texture2D);
 
-			return new Texture(texture2D, srv);
+				return new Texture(texture2D, srv);
+			}
 		}
 	}
 }

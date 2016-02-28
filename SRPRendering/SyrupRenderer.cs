@@ -7,8 +7,8 @@ using System.Reactive.Subjects;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
-using SlimDX;
-using SlimDX.Direct3D11;
+using SharpDX;
+using SharpDX.Direct3D11;
 using SRPCommon.Interfaces;
 using SRPCommon.Scene;
 using SRPCommon.Scripting;
@@ -16,6 +16,7 @@ using SRPCommon.UserProperties;
 using SRPCommon.Util;
 using SRPScripting;
 using Castle.DynamicProxy;
+using SharpDX.Mathematics.Interop;
 
 namespace SRPRendering
 {
@@ -155,7 +156,7 @@ namespace SRPRendering
 			try
 			{
 				// Always clear the back buffer to black to avoid the script having to do so for trivial stuff.
-				deviceContext.ClearRenderTargetView(viewInfo.BackBuffer, new Color4(0));
+				deviceContext.ClearRenderTargetView(viewInfo.BackBuffer, new RawColor4());
 
 				// Let the script do its thing.
 				_scriptRenderControl.Render(deviceContext, viewInfo, _renderScene);
@@ -170,7 +171,15 @@ namespace SRPRendering
 
 			// Make sure we're rendering to the back buffer before rendering the overlay.
 			deviceContext.OutputMerger.SetTargets(viewInfo.DepthBuffer.DSV, viewInfo.BackBuffer);
-			deviceContext.Rasterizer.SetViewports(new Viewport(0.0f, 0.0f, viewInfo.ViewportWidth, viewInfo.ViewportHeight));
+			deviceContext.Rasterizer.SetViewports(new[] { new RawViewportF
+			{
+				X = 0.0f,
+				Y = 0.0f,
+				Width = viewInfo.ViewportWidth,
+				Height = viewInfo.ViewportHeight,
+				MinDepth = 0.0f,
+				MaxDepth = 0.0f,
+			} });
 
 			// Render the overlay.
 			_overlayRenderer.Draw(deviceContext, _renderScene, viewInfo);

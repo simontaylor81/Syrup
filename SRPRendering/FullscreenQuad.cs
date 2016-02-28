@@ -5,7 +5,8 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.Direct3D11;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
 
 namespace SRPRendering
 {
@@ -14,7 +15,7 @@ namespace SRPRendering
 		public FullscreenQuad(Device device)
 		{
 			int vertexBufferSize = 4 * VertexStride;
-			var vertexStream = new SlimDX.DataStream(vertexBufferSize, true, true);
+			var vertexStream = new SharpDX.DataStream(vertexBufferSize, true, true);
 
 			// Add the four quad verts to the stream.
 			vertexStream.Write(new Vector4(-1.0f, -1.0f, 0.0f, 1.0f));
@@ -26,7 +27,7 @@ namespace SRPRendering
 			vertexStream.Position = 0;
 
 			// Create the vertex buffer.
-			vertexBuffer = new SlimDX.Direct3D11.Buffer(device, vertexStream, vertexBufferSize,
+			vertexBuffer = new SharpDX.Direct3D11.Buffer(device, vertexStream, vertexBufferSize,
 				ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
 		}
 
@@ -46,11 +47,11 @@ namespace SRPRendering
 		// Array of input element structures that describe the layout of vertices to D3D.
 		public static InputElement[] InputElements => new[]
 		{
-			new InputElement("POSITION", 0, SlimDX.DXGI.Format.R32G32B32A32_Float, 0),
+			new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 0),
 		};
 
 		private int VertexStride => Marshal.SizeOf(typeof(Vector4));
 
-		private SlimDX.Direct3D11.Buffer vertexBuffer;
+		private SharpDX.Direct3D11.Buffer vertexBuffer;
 	}
 }

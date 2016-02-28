@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DirectXTexSlim;
-using SlimDX.Direct3D11;
-using SlimDX;
+using DirectXTexSharp;
+using SharpDX.Direct3D11;
+using SharpDX;
 using SRPScripting;
 using SRPCommon.Util;
 
@@ -101,7 +101,7 @@ namespace SRPRendering
 			Device device, int width, int height, Format format, dynamic contents, bool generateMips = false)
 		{
 			// Construct data stream from script data.
-			var initialData = new DataRectangle(width * format.Size(), StreamUtil.CreateStream2D(contents, width, height, format));
+			var initialData = new DataRectangle(StreamUtil.CreateStream2D(contents, width, height, format), width * format.Size());
 
 			// Create DirectXTex representation (so we can apply the same operations as images loaded
 			// from disk, e.g. mip generation).

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SlimDX.Direct3D11;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
 
 namespace SRPRendering
 {
@@ -23,31 +24,30 @@ namespace SRPRendering
 					Height = height,
 					MipLevels = 1,
 					ArraySize = 1,
-					Format = SlimDX.DXGI.Format.R24G8_Typeless,
+					Format = SharpDX.DXGI.Format.R24G8_Typeless,
 					Usage = ResourceUsage.Default,
 					BindFlags = BindFlags.DepthStencil | BindFlags.ShaderResource,
 					CpuAccessFlags = CpuAccessFlags.None,
 					OptionFlags = ResourceOptionFlags.None,
-					SampleDescription = new SlimDX.DXGI.SampleDescription(1, 0)	// TODO MSAA?
+					SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0)	// TODO MSAA?
 				};
-			texture = new SlimDX.Direct3D11.Texture2D(device, depthDesc);
+			texture = new Texture2D(device, depthDesc);
 
 			// Create the view for the depth buffer.
 			var dsvDesc = new DepthStencilViewDescription()
 				{
 					Dimension = DepthStencilViewDimension.Texture2D,
-					Format = SlimDX.DXGI.Format.D24_UNorm_S8_UInt,
+					Format = SharpDX.DXGI.Format.D24_UNorm_S8_UInt,
 				};
 			dsv = new DepthStencilView(device, texture, dsvDesc);
 
 			// Create the shader resource so the buffer can be read from a shader.
-			var srvDesc = new ShaderResourceViewDescription()
-				{
-					Dimension = ShaderResourceViewDimension.Texture2D,
-					Format = SlimDX.DXGI.Format.R24_UNorm_X8_Typeless,
-					MipLevels = 1,
-					MostDetailedMip = 0,
-				};
+			var srvDesc = new ShaderResourceViewDescription();
+			srvDesc.Dimension = ShaderResourceViewDimension.Texture2D;
+			srvDesc.Format = SharpDX.DXGI.Format.R24_UNorm_X8_Typeless;
+			srvDesc.Texture2D.MipLevels = 1;
+			srvDesc.Texture2D.MostDetailedMip = 0;
+
 			srv = new ShaderResourceView(device, texture, srvDesc);
 		}
 

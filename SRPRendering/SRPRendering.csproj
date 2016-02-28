@@ -68,8 +68,25 @@
       <HintPath>..\packages\IronPython.2.7.5\lib\Net45\Microsoft.Scripting.Metadata.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SlimDX, Version=4.0.13.43, Culture=neutral, PublicKeyToken=b1b0c32fd1ffe4f9, processorArchitecture=x86">
-      <HintPath>..\packages\SlimDX.4.0.13.44\lib\NET40\SlimDX.dll</HintPath>
+    <Reference Include="SharpDX, Version=3.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.3.0.1\lib\net45\SharpDX.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SharpDX.D3DCompiler, Version=3.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.D3DCompiler.3.0.1\lib\net45\SharpDX.D3DCompiler.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11, Version=3.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.Direct3D11.3.0.1\lib\net45\SharpDX.Direct3D11.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SharpDX.DXGI, Version=3.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.DXGI.3.0.1\lib\net45\SharpDX.DXGI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SharpDX.Mathematics, Version=3.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.Mathematics.3.0.1\lib\net45\SharpDX.Mathematics.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -108,10 +125,11 @@
   <ItemGroup>
     <Compile Include="BasicMesh.cs" />
     <Compile Include="BasicShaders.cs" />
-    <Compile Include="Buffer.cs" />
+    <Compile Include="Resources\Buffer.cs" />
     <Compile Include="ConstantBuffer.cs" />
     <Compile Include="DepthBuffer.cs" />
     <Compile Include="Resources\BufferHandle.cs" />
+    <Compile Include="SharpDXUtils.cs" />
     <Compile Include="StreamUtil.cs" />
     <Compile Include="MipGenerator.cs" />
     <Compile Include="RenderDevice.cs" />
@@ -135,7 +153,6 @@
     <Compile Include="ShaderSamplerVariable.cs" />
     <Compile Include="ShaderSamplerVariableBind.cs" />
     <Compile Include="ShaderUavVariable.cs" />
-    <Compile Include="SlimDXUtils.cs" />
     <Compile Include="SyrupRenderer.cs" />
     <Compile Include="ScriptRenderControl.cs" />
     <Compile Include="Shader.cs" />
@@ -156,9 +173,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DirectXTexSlim\DirectXTexSlim.vcxproj">
-      <Project>{695c8ab2-0e79-4bfe-9a7c-bc490f518533}</Project>
-      <Name>DirectXTexSlim</Name>
+    <ProjectReference Include="..\DirectXTexSharp\DirectXTexSharp.vcxproj">
+      <Project>{7373d47a-5da1-4a43-948b-6f3125b17a64}</Project>
+      <Name>DirectXTexSharp</Name>
     </ProjectReference>
     <ProjectReference Include="..\SRPCommon\SRPCommon.csproj">
       <Project>{ae1f21f0-3ddd-4f3f-9633-72cee5848f14}</Project>

@@ -10,6 +10,6 @@ namespace SRPRendering
 	// This is a silly name -- can we think of something better?
 	public interface IDrawable
 	{
-		void Draw(SlimDX.Direct3D11.DeviceContext context);
+		void Draw(SharpDX.Direct3D11.DeviceContext context);
 	}
 }

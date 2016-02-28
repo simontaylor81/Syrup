@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SRPCommon.Scene;
-using SlimDX.Direct3D11;
+using SharpDX.Direct3D11;
 
 namespace SRPRendering
 {

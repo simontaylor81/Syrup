@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SlimDX.Direct3D11;
-using SlimDX;
-using SRPCommon.Scene;
+using SharpDX.Direct3D11;
+using System.Numerics;
 
 namespace SRPRendering
 {
@@ -39,7 +38,7 @@ namespace SRPRendering
 			_globalResources.BasicShaders.SolidColourPS.Set(deviceContext);
 
 			// Set shader constants.
-			_globalResources.BasicShaders.SolidColourShaderVar.Set(new Color4(1.0f, 1.0f, 0.0f));	// Yellow
+			_globalResources.BasicShaders.SolidColourShaderVar.Set(new Vector4(1.0f, 1.0f, 0.0f, 1.0f));	// Yellow
 
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(

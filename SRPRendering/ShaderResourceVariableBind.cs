@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.Direct3D11;
+using SharpDX.Direct3D11;
 
 namespace SRPRendering
 {
@@ -82,9 +82,9 @@ namespace SRPRendering
 
 	class BufferShaderResourceVariableBind : IShaderResourceVariableBind
 	{
-		private readonly Buffer _buffer;
+		private readonly Resources.Buffer _buffer;
 
-		public BufferShaderResourceVariableBind(Buffer buffer)
+		public BufferShaderResourceVariableBind(Resources.Buffer buffer)
 		{
 			_buffer = buffer;
 		}

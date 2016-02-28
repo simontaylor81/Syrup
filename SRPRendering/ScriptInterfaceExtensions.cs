@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX.Direct3D11;
-using SlimDX.DXGI;
+using SharpDX.Direct3D11;
 
 namespace SRPRendering
 {
@@ -22,7 +21,7 @@ namespace SRPRendering
 				{
 					FillMode = state.fillMode.ToD3D11(),
 					CullMode = state.cullMode.ToD3D11(),
-					IsFrontCounterclockwise = false,
+					IsFrontCounterClockwise = false,
 					DepthBias = state.depthBias,
 					DepthBiasClamp = state.depthBiasClamp,
 					SlopeScaledDepthBias = state.slopeScaleDepthBias,
@@ -58,13 +57,13 @@ namespace SRPRendering
 
 			var rtState = new RenderTargetBlendDescription()
 				{
-					BlendEnable = state.enableBlending,
+					IsBlendEnabled = state.enableBlending,
 					SourceBlend = state.sourceInput.ToD3D11(),
 					DestinationBlend = state.destInput.ToD3D11(),
-					SourceBlendAlpha = state.sourceAlphaInput.ToD3D11(),
-					DestinationBlendAlpha = state.destAlphaInput.ToD3D11(),
+					SourceAlphaBlend = state.sourceAlphaInput.ToD3D11(),
+					DestinationAlphaBlend = state.destAlphaInput.ToD3D11(),
 					BlendOperation = state.colourOp.ToD3D11(),
-					BlendOperationAlpha = state.alphaOp.ToD3D11(),
+					AlphaBlendOperation = state.alphaOp.ToD3D11(),
 					RenderTargetWriteMask = ColorWriteMaskFlags.All,
 				};
 
@@ -73,19 +72,19 @@ namespace SRPRendering
 					IndependentBlendEnable = false,
 					AlphaToCoverageEnable = false,
 				};
-			desc.RenderTargets[0] = rtState;
+			desc.RenderTarget[0] = rtState;
 
 			return desc;
 		}
 
 		// Convert a script-interface sampler state to a D3D11 one.
-		public static SamplerDescription ToD3D11(this SRPScripting.SamplerState state)
+		public static SamplerStateDescription ToD3D11(this SRPScripting.SamplerState state)
 		{
 			// Allow transparent handling of null references.
 			if (state == null)
 				return SRPScripting.SamplerState.LinearWrap.ToD3D11();
 
-			return new SamplerDescription()
+			return new SamplerStateDescription()
 			{
 				Filter = state.filter.ToD3D11(),
 				AddressU = state.addressMode.ToD3D11(),
@@ -98,33 +97,33 @@ namespace SRPRendering
 			};
 		}
 
-		public static SlimDX.Direct3D11.FillMode ToD3D11(this SRPScripting.FillMode fillMode)
+		public static SharpDX.Direct3D11.FillMode ToD3D11(this SRPScripting.FillMode fillMode)
 		{
 			switch (fillMode)
 			{
 				case SRPScripting.FillMode.Solid:
-					return SlimDX.Direct3D11.FillMode.Solid;
+					return SharpDX.Direct3D11.FillMode.Solid;
 
 				case SRPScripting.FillMode.Wireframe:
-					return SlimDX.Direct3D11.FillMode.Wireframe;
+					return SharpDX.Direct3D11.FillMode.Wireframe;
 
 				default:
 					throw new ArgumentException("Invalid fill mode.");
 			}
 		}
 
-		public static SlimDX.Direct3D11.CullMode ToD3D11(this SRPScripting.CullMode cullMode)
+		public static SharpDX.Direct3D11.CullMode ToD3D11(this SRPScripting.CullMode cullMode)
 		{
 			switch (cullMode)
 			{
 				case SRPScripting.CullMode.Back:
-					return SlimDX.Direct3D11.CullMode.Back;
+					return SharpDX.Direct3D11.CullMode.Back;
 
 				case SRPScripting.CullMode.Front:
-					return SlimDX.Direct3D11.CullMode.Front;
+					return SharpDX.Direct3D11.CullMode.Front;
 
 				case SRPScripting.CullMode.None:
-					return SlimDX.Direct3D11.CullMode.None;
+					return SharpDX.Direct3D11.CullMode.None;
 
 				default:
 					throw new ArgumentException("Invalid cull mode.");
@@ -218,10 +217,10 @@ namespace SRPRendering
 		}
 
 		// Convert a script format to a DXGI one.
-		public static Format ToDXGI(this SRPScripting.Format format)
+		public static SharpDX.DXGI.Format ToDXGI(this SRPScripting.Format format)
 		{
-			// This is rather dirty -- the formats are just copies of the SlimDX ones, currently.
-			Format result;
+			// This is rather dirty -- the formats are just copies of the SharpDX ones, currently.
+			SharpDX.DXGI.Format result;
 			if (Enum.TryParse(format.ToString(), out result))
 			{
 				return result;
