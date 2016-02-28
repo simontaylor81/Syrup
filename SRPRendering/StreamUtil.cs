@@ -80,32 +80,38 @@ namespace SRPRendering
 		// Write a single element to the stream.
 		private static void WriteElement(DataStream stream, dynamic element, Format format)
 		{
+			var numComponents = format.NumComponents();
+
+			// If the element is a vector, coerce it to an array.
+			element = ScriptHelper.CoerceVectorToArray(element);
+
 			switch (format)
 			{
 				case Format.R32G32B32A32_Float:
 				case Format.R32G32B32_Float:
-					for (int i = 0; i < format.NumComponents(); i++)
+					stream.Write(ScriptHelper.ConvertToVector4(element));
+					for (int i = 0; i < numComponents; i++)
 						stream.Write((float)element[i]);
 					break;
 
 				case Format.R16G16B16A16_Float:
-					for (int i = 0; i < format.NumComponents(); i++)
+					for (int i = 0; i < numComponents; i++)
 						stream.Write<Half>(new Half((float)element[i]));
 					break;
 
 				case Format.R16G16B16A16_UNorm:
-					for (int i = 0; i < format.NumComponents(); i++)
+					for (int i = 0; i < numComponents; i++)
 						stream.Write((ushort)ToUNorm(element[i], 65535.0f));
 					break;
 
 				case Format.R8G8B8A8_UNorm:
 				case Format.R8G8B8A8_UNorm_SRGB:
-					for (int i = 0; i < format.NumComponents(); i++)
+					for (int i = 0; i < numComponents; i++)
 						stream.Write((byte)ToUNorm((float)element[i], 255.0f));
 					break;
 
 				case Format.R8G8B8A8_UInt:
-					for (int i = 0; i < format.NumComponents(); i++)
+					for (int i = 0; i < numComponents; i++)
 						stream.Write<byte>(element[i]);
 					break;
 
@@ -113,7 +119,7 @@ namespace SRPRendering
 				//	break;
 
 				case Format.R8G8B8A8_SInt:
-					for (int i = 0; i < format.NumComponents(); i++)
+					for (int i = 0; i < numComponents; i++)
 						stream.Write<sbyte>(element[i]);
 					break;
 

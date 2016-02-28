@@ -6,9 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Scripting;
-using Microsoft.Scripting.Hosting;
 using SRPCommon.Util;
-using Microsoft.CSharp.RuntimeBinder;
 using System.Collections;
 using System.Numerics;
 
@@ -42,15 +40,30 @@ namespace SRPCommon.Scripting
 		// Helper functions that convert a dynamic object into various vector/colour types.
 		public static Vector2 ConvertToVector2(dynamic x)
 			// Scripts pass vectors as tuples, so we extract the values to form the vector.
-			=> RunGuarded(() => new Vector2((float)x[0], (float)x[1]));
+			=> PassThroughOrRunGuarded((object)x, () => new Vector2((float)x[0], (float)x[1]));
 
 		public static Vector3 ConvertToVector3(dynamic x)
 			// Scripts pass vectors as tuples, so we extract the values to form the vector.
-			=> RunGuarded(() => new Vector3((float)x[0], (float)x[1], (float)x[2]));
+			=> PassThroughOrRunGuarded((object)x, () => new Vector3((float)x[0], (float)x[1], (float)x[2]));
 
 		public static Vector4 ConvertToVector4(dynamic x)
 			// Scripts pass vectors as tuples, so we extract the values to form the vector.
-			=> RunGuarded(() => new Vector4((float) x[0], (float) x[1], (float) x[2], (float) x[3]));
+			=> PassThroughOrRunGuarded((object)x, () => new Vector4((float)x[0], (float)x[1], (float)x[2], (float)x[3]));
+
+		// Cheesy helper to avoid typing the same thing 3 times.
+		private static T PassThroughOrRunGuarded<T>(object x, Func<T> func, [CallerMemberName] string context = null) where T : struct
+		{
+			Debug.Assert(context != null);
+
+			// Pass the type itself through unmolested.
+			var vector = x as T?;
+			if (vector != null)
+			{
+				return vector.Value;
+			}
+
+			return RunGuarded(func, context);
+		}
 
 		// Helper method for running potentially throwy code, throwing a ScriptException if something bad happen.
 		private static T RunGuarded<T>(Func<T> func, [CallerMemberName] string context = null)
@@ -65,6 +78,25 @@ namespace SRPCommon.Scripting
 			{
 				throw new ScriptException("Invalid parameters for " + context, ex);
 			}
+		}
+
+		// Converts vectors into a coresponding array of floats. Everything else is returned unaltered.
+		public static object CoerceVectorToArray(object x)
+		{
+			if (x is Vector2)
+			{
+				return ((Vector2)x).ToArray();
+			}
+			if (x is Vector3)
+			{
+				return ((Vector3)x).ToArray();
+			}
+			if (x is Vector4)
+			{
+				return ((Vector4)x).ToArray();
+			}
+
+			return x;
 		}
 
 		// Helper functions that determine if the given dynamic can be converted to a specific type.
@@ -92,6 +124,14 @@ namespace SRPCommon.Scripting
 				// probably not what the user wanted, so handle it explicitly here.
 				if (x != null && !(x is string))
 				{
+					// Check if the value is a Vector* of the right size.
+					if (numComponents == 2 && x is Vector2 ||
+						numComponents == 3 && x is Vector3 ||
+						numComponents == 4 && x is Vector4)
+					{
+						return;
+					}
+
 					// Is the value convertible to a list?
 					// Use non-generic IEnumerable as it's oddly more forgiving.
 					IEnumerable list;

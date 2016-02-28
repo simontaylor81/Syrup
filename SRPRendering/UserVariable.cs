@@ -35,7 +35,9 @@ namespace SRPRendering
 
 		public static UserVariable<T[]> CreateVector<T>(int numComponents, string name, object defaultValue)
 		{
+			defaultValue = ScriptHelper.CoerceVectorToArray(defaultValue);
 			dynamic dynamicDefault = defaultValue;
+
 			try
 			{
 				var components = Enumerable.Range(0, numComponents)

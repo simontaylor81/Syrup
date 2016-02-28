@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using SRPRendering;
 using Xunit;
 using SRPCommon.UserProperties;
+using System.Numerics;
+using SRPCommon.Util;
 
 namespace SRPTests
 {
@@ -102,6 +104,30 @@ namespace SRPTests
 			{
 				Assert.Equal(otherValue[i], ((IScalarProperty<T>)prop.GetComponent(i)).Value);
 			}
+		}
+
+		[Fact]
+		public void FloatVectorVariable_Vector2Default()
+		{
+			var vector = new Vector2(1.0f, 2.0f);
+			var uv = UserVariable.CreateVector<float>(2, "myvar", vector);
+			Assert.Equal(vector.ToArray(), uv.GetFunction()());
+		}
+
+		[Fact]
+		public void FloatVectorVariable_Vector3Default()
+		{
+			var vector = new Vector3(1.0f, 2.0f, 3.0f);
+			var uv = UserVariable.CreateVector<float>(3, "myvar", vector);
+			Assert.Equal(vector.ToArray(), uv.GetFunction()());
+		}
+
+		[Fact]
+		public void FloatVectorVariable_Vector4Default()
+		{
+			var vector = new Vector4(1.0f, 2.0f, 3.0f, 4.0f);
+			var uv = UserVariable.CreateVector<float>(4, "myvar", vector);
+			Assert.Equal(vector.ToArray(), uv.GetFunction()());
 		}
 
 		[Fact]
