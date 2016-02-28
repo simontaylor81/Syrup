@@ -168,7 +168,7 @@ namespace SRPRendering
 			try
 			{
 				Vector4 vectorColour = ScriptHelper.ConvertToVector4(colour);
-				var rawColour = new RawColor4(vectorColour.W, vectorColour.X, vectorColour.Y, vectorColour.Z);
+				var rawColour = new RawColor4(vectorColour.X, vectorColour.Y, vectorColour.Z, vectorColour.W);
 
 				// Clear each specified target.
 				var rtvs = GetRTVS(renderTargetHandles);
