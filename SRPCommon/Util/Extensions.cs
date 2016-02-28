@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,6 +39,13 @@ namespace SRPCommon.Util
 		{
 			list.Add(newElement);
 			return newElement;
+		}
+
+		// Add a disposable to the composite, and return the added item.
+		public static T AddAndReturn<T>(this CompositeDisposable compositeDisposable, T newDisposable) where T : IDisposable
+		{
+			compositeDisposable.Add(newDisposable);
+			return newDisposable;
 		}
 	}
 }

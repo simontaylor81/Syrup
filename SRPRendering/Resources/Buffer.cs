@@ -51,7 +51,15 @@ namespace SRPRendering.Resources
 				desc.BindFlags |= BindFlags.UnorderedAccess;
 			}
 
-			_buffer = new SharpDX.Direct3D11.Buffer(device, initialData, desc);
+			if (initialData != null)
+			{
+				_buffer = new SharpDX.Direct3D11.Buffer(device, initialData, desc);
+			}
+			else
+			{
+				// Passing null initialData to the Buffer constructor throws, so must use the other overload.
+				_buffer = new SharpDX.Direct3D11.Buffer(device, desc);
+			}
 
 			// Create SRV for reading from the buffer.
 			SRV = new ShaderResourceView(device, _buffer);

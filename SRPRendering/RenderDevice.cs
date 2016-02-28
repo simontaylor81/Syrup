@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using SRPCommon.Util;
 using Device = SharpDX.Direct3D11.Device;
 
 namespace SRPRendering
@@ -39,11 +40,10 @@ namespace SRPRendering
 			// Lazily get adapter from DXGI device.
 			_adapter = new Lazy<Adapter>(() =>
 			{
-				var dxgiDevice = new SharpDX.DXGI.Device(Device.NativePointer);
-				var adapter = dxgiDevice.Adapter;
-				_disposables.Add(dxgiDevice);
-				_disposables.Add(adapter);
-				return adapter;
+				using (var dxgiDevice = Device.QueryInterface<SharpDX.DXGI.Device>())
+				{
+					return _disposables.AddAndReturn(dxgiDevice.Adapter);
+				}
 			});
 
 			// Initialise basic resources.
