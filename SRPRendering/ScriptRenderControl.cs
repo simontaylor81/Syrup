@@ -428,7 +428,6 @@ namespace SRPRendering
 			if (frameCallback != null)
 			{
 				var renderContext = new DeferredRenderContext(
-					deviceContext,
 					viewInfo,
 					renderScene,
 					shaders,
@@ -437,7 +436,7 @@ namespace SRPRendering
 
 				frameCallback(renderContext);
 
-				renderContext.Execute();
+				renderContext.Execute(deviceContext);
 			}
 		}
 

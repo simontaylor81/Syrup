@@ -15,20 +15,19 @@ namespace SRPRendering
 {
 	class DeferredRenderContext : IRenderContext
 	{
-		private List<Action> _commands = new List<Action>();
+		private List<Action<DeviceContext>> _commands = new List<Action<DeviceContext>>();
 		private HashSet<Shader> _shaders = new HashSet<Shader>();
 
 		// All the shaders in use this frame.
 		public IEnumerable<Shader> Shaders => _shaders;
 
-		public DeferredRenderContext(DeviceContext deviceContext,
-								   ViewInfo viewInfo,
-								   RenderScene scene,
-								   IList<IShader> shaders,
-								   IList<RenderTarget> renderTargets,
-								   IGlobalResources globalResources)
+		public DeferredRenderContext(
+			ViewInfo viewInfo,
+			RenderScene scene,
+			IList<IShader> shaders,
+			IList<RenderTarget> renderTargets,
+			IGlobalResources globalResources)
 		{
-			this.deviceContext = deviceContext;
 			this.viewInfo = viewInfo;
 			this.scene = scene;
 			this.shaders = shaders;
@@ -37,11 +36,11 @@ namespace SRPRendering
 		}
 
 		// TODO: Pass in deviceContext here instead of constructor.
-		public void Execute()
+		public void Execute(DeviceContext deviceContext)
 		{
 			foreach (var command in _commands)
 			{
-				command();
+				command(deviceContext);
 			}
 		}
 
@@ -64,7 +63,7 @@ namespace SRPRendering
 			if (pixelShader != null)
 				_shaders.Add(pixelShader);
 
-			_commands.Add(() => DrawSceneImpl(vertexShader, pixelShader, rastState,
+			_commands.Add(deviceContext => DrawSceneImpl(deviceContext, vertexShader, pixelShader, rastState,
 				depthStencilState, blendState, renderTargets, depthBuffer, shaderVariableOverrides));
 		}
 
@@ -81,7 +80,7 @@ namespace SRPRendering
 			if (pixelShader != null)
 				_shaders.Add(pixelShader);
 
-			_commands.Add(() => DrawSphereImpl(vertexShader, pixelShader, rastState,
+			_commands.Add(deviceContext => DrawSphereImpl(deviceContext, vertexShader, pixelShader, rastState,
 				depthStencilState, blendState, renderTargets, depthBuffer, shaderVariableOverrides));
 		}
 
@@ -98,7 +97,7 @@ namespace SRPRendering
 			if (pixelShader != null)
 				_shaders.Add(pixelShader);
 
-			_commands.Add(() => DrawFullscreenQuadImpl(vertexShader, pixelShader, renderTargets, shaderVariableOverrides));
+			_commands.Add(deviceContext => DrawFullscreenQuadImpl(deviceContext, vertexShader, pixelShader, renderTargets, shaderVariableOverrides));
 		}
 
 		public void Dispatch(dynamic shader, int numGroupsX, int numGroupsY, int numGroupsZ, IDictionary<string, object> shaderVariableOverrides = null)
@@ -110,7 +109,7 @@ namespace SRPRendering
 			}
 
 			_shaders.Add(cs);
-			_commands.Add(() => DispatchImpl(cs, numGroupsX, numGroupsY, numGroupsZ, shaderVariableOverrides));
+			_commands.Add(deviceContext => DispatchImpl(deviceContext, cs, numGroupsX, numGroupsY, numGroupsZ, shaderVariableOverrides));
 		}
 
 		public void Clear(dynamic colour, IEnumerable<object> renderTargets = null)
@@ -121,7 +120,7 @@ namespace SRPRendering
 				Vector4 vectorColour = ScriptHelper.ConvertToVector4(colour);
 				var rawColour = new RawColor4(vectorColour.X, vectorColour.Y, vectorColour.Z, vectorColour.W);
 
-				_commands.Add(() => ClearImpl(rawColour, renderTargets));
+				_commands.Add(deviceContext => ClearImpl(deviceContext, rawColour, renderTargets));
 			}
 			catch (ScriptException ex)
 			{
@@ -137,7 +136,7 @@ namespace SRPRendering
 				var pos = ScriptHelper.ConvertToVector3(position);
 				var col = new Vector4(ScriptHelper.ConvertToVector3(colour), 1.0f);
 
-				_commands.Add(() => DrawWireSphereImpl(pos, radius, col, renderTarget));
+				_commands.Add(deviceContext => DrawWireSphereImpl(deviceContext, pos, radius, col, renderTarget));
 			}
 			catch (ScriptException ex)
 			{
@@ -150,30 +149,32 @@ namespace SRPRendering
 		#region Actual rendering implementation
 
 		// Draw the entire scene.
-		private void DrawSceneImpl(Shader vertexShader,
-							  Shader pixelShader,
-							  RastState rastState,
-							  SRPScripting.DepthStencilState depthStencilState,
-							  SRPScripting.BlendState blendState,
-							  IEnumerable<object> renderTargetHandles,
-							  object depthBuffer,
-							  IDictionary<string, object> shaderVariableOverrides)
+		private void DrawSceneImpl(
+			DeviceContext deviceContext,
+			Shader vertexShader,
+			Shader pixelShader,
+			RastState rastState,
+			SRPScripting.DepthStencilState depthStencilState,
+			SRPScripting.BlendState blendState,
+			IEnumerable<object> renderTargetHandles,
+			object depthBuffer,
+			IDictionary<string, object> shaderVariableOverrides)
 		{
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
 				deviceContext.Device, vertexShader.Signature, InputLayoutCache.SceneVertexInputElements);
 
 			// Set render state.
-			SetRenderTargets(renderTargetHandles, depthBuffer);
+			SetRenderTargets(deviceContext, renderTargetHandles, depthBuffer);
 			deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(rastState.ToD3D11());
 			deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(depthStencilState.ToD3D11());
 			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(blendState.ToD3D11());
-			SetShaders(vertexShader, pixelShader);
+			SetShaders(deviceContext, vertexShader, pixelShader);
 
 			// Draw each mesh.
 			foreach (var proxy in scene.Primitives)
 			{
-				UpdateShaders(vertexShader, pixelShader, proxy, shaderVariableOverrides);
+				UpdateShaders(deviceContext, vertexShader, pixelShader, proxy, shaderVariableOverrides);
 				proxy.Mesh.Draw(deviceContext);
 			}
 
@@ -182,28 +183,30 @@ namespace SRPRendering
 		}
 
 		// Draw a unit sphere.
-		private void DrawSphereImpl(Shader vertexShader,
-							  Shader pixelShader,
-							   RastState rastState,
-							   SRPScripting.DepthStencilState depthStencilState,
-							   SRPScripting.BlendState blendState,
-							   IEnumerable<object> renderTargetHandles,
-							   object depthBuffer,
-							   IDictionary<string, object> shaderVariableOverrides)
+		private void DrawSphereImpl(
+			DeviceContext deviceContext,
+			Shader vertexShader,
+			Shader pixelShader,
+			RastState rastState,
+			SRPScripting.DepthStencilState depthStencilState,
+			SRPScripting.BlendState blendState,
+			IEnumerable<object> renderTargetHandles,
+			object depthBuffer,
+			IDictionary<string, object> shaderVariableOverrides)
 		{
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
 				deviceContext.Device, vertexShader.Signature, BasicMesh.InputElements);
 
 			// Set render state.
-			SetRenderTargets(renderTargetHandles, depthBuffer);
+			SetRenderTargets(deviceContext, renderTargetHandles, depthBuffer);
 			deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(rastState.ToD3D11());
 			deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(depthStencilState.ToD3D11());
 			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(blendState.ToD3D11());
-			SetShaders(vertexShader, pixelShader);
+			SetShaders(deviceContext, vertexShader, pixelShader);
 
 			// Draw the sphere mesh.
-			UpdateShaders(vertexShader, pixelShader, null, shaderVariableOverrides);        // TODO: Pass a valid proxy here?
+			UpdateShaders(deviceContext, vertexShader, pixelShader, null, shaderVariableOverrides);        // TODO: Pass a valid proxy here?
 			_globalResources.SphereMesh.Draw(deviceContext);
 
 			// Force all state to defaults -- we're completely stateless.
@@ -211,24 +214,26 @@ namespace SRPRendering
 		}
 
 		// Draw a fullscreen quad.
-		private void DrawFullscreenQuadImpl(Shader vertexShader,
-							  Shader pixelShader,
-									   IEnumerable<object> renderTargetHandles,
-									   IDictionary<string, object> shaderVariableOverrides)
+		private void DrawFullscreenQuadImpl(
+			DeviceContext deviceContext,
+			Shader vertexShader,
+			Shader pixelShader,
+			IEnumerable<object> renderTargetHandles,
+			IDictionary<string, object> shaderVariableOverrides)
 		{
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
 				deviceContext.Device, vertexShader.Signature, FullscreenQuad.InputElements);
 
 			// Set render state.
-			SetRenderTargets(renderTargetHandles, DepthBufferHandle.NoDepthBuffer);
+			SetRenderTargets(deviceContext, renderTargetHandles, DepthBufferHandle.NoDepthBuffer);
 			deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(RastState.Default.ToD3D11());
 			deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(SRPScripting.DepthStencilState.DisableDepth.ToD3D11());
 			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(SRPScripting.BlendState.NoBlending.ToD3D11());
-			SetShaders(vertexShader, pixelShader);
+			SetShaders(deviceContext, vertexShader, pixelShader);
 
 			// Draw the quad.
-			UpdateShaders(vertexShader, pixelShader, null, shaderVariableOverrides);
+			UpdateShaders(deviceContext, vertexShader, pixelShader, null, shaderVariableOverrides);
 			_globalResources.FullscreenQuad.Draw(deviceContext);
 
 			// Force all state to defaults -- we're completely stateless.
@@ -236,8 +241,13 @@ namespace SRPRendering
 		}
 
 		// Dispatch a compute shader.
-		private void DispatchImpl(Shader cs, int numGroupsX, int numGroupsY, int numGroupsZ,
-							 IDictionary<string, object> shaderVariableOverrides)
+		private void DispatchImpl(
+			DeviceContext deviceContext,
+			Shader cs,
+			int numGroupsX,
+			int numGroupsY,
+			int numGroupsZ,
+			IDictionary<string, object> shaderVariableOverrides)
 		{
 			cs.Set(deviceContext);
 			cs.UpdateVariables(deviceContext, viewInfo, null, shaderVariableOverrides, _globalResources);
@@ -248,7 +258,7 @@ namespace SRPRendering
 		}
 
 		// Clear render targets.
-		private void ClearImpl(RawColor4 colour, IEnumerable<object> renderTargetHandles)
+		private void ClearImpl(DeviceContext deviceContext, RawColor4 colour, IEnumerable<object> renderTargetHandles)
 		{
 			// Clear each specified target.
 			var rtvs = GetRTVS(renderTargetHandles);
@@ -259,13 +269,15 @@ namespace SRPRendering
 		}
 
 		// Draw a wireframe sphere.
-		private void DrawWireSphereImpl(Vector3 position,
-								   float radius,
-								   Vector4 colour,
-								   object renderTarget)
+		private void DrawWireSphereImpl(
+			DeviceContext deviceContext,
+			Vector3 position,
+			float radius,
+			Vector4 colour,
+			object renderTarget)
 		{
 			// Set render target.
-			SetRenderTargets(new[] { renderTarget }, null);
+			SetRenderTargets(deviceContext, new[] { renderTarget }, null);
 
 			// Set wireframe render state.
 			var rastState = new RastState(SRPScripting.FillMode.Wireframe);
@@ -274,14 +286,14 @@ namespace SRPRendering
 			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(SRPScripting.BlendState.NoBlending.ToD3D11());
 
 			// Set simple shaders.
-			SetShaders(_globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS);
+			SetShaders(deviceContext, _globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS);
 
 			// Construct transform matrix.
 			var transform = Matrix4x4.CreateScale(radius, radius, radius) * Matrix4x4.CreateTranslation(position);
 
 			// Set shader constants.
 			_globalResources.BasicShaders.SolidColourShaderVar.Set(colour);
-			UpdateShaders(_globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS, new SimplePrimitiveProxy(transform), null);
+			UpdateShaders(deviceContext, _globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS, new SimplePrimitiveProxy(transform), null);
 
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
@@ -323,7 +335,7 @@ namespace SRPRendering
 		}
 
 		// Set the given shaders to the device.
-		private void SetShaders(params IShader[] shaders)
+		private void SetShaders(DeviceContext deviceContext, params IShader[] shaders)
 		{
 			foreach (var shader in shaders)
 			{
@@ -333,7 +345,7 @@ namespace SRPRendering
 		}
 
 		// Update the variables of the given shaders, unless they're null.
-		private void UpdateShaders(IShader vs, IShader ps, IPrimitive primitive, IDictionary<string, object> variableOverrides)
+		private void UpdateShaders(DeviceContext deviceContext, IShader vs, IShader ps, IPrimitive primitive, IDictionary<string, object> variableOverrides)
 		{
 			if (vs != null)
 				vs.UpdateVariables(deviceContext, viewInfo, primitive, variableOverrides, _globalResources);
@@ -347,7 +359,7 @@ namespace SRPRendering
 		}
 
 		// Set render targets based on the given list of handles.
-		private void SetRenderTargets(IEnumerable<object> renderTargetHandles, object depthBuffer)
+		private void SetRenderTargets(DeviceContext deviceContext, IEnumerable<object> renderTargetHandles, object depthBuffer)
 		{
 			// Collect render target views for the given handles.
 			var rtvs = GetRTVS(renderTargetHandles).ToArray();
@@ -423,7 +435,6 @@ namespace SRPRendering
 			};
 		}
 
-		private DeviceContext deviceContext;
 		private RenderScene scene;
 		private IList<IShader> shaders;
 		private IList<RenderTarget> renderTargetResources;
