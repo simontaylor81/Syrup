@@ -35,7 +35,9 @@ namespace ShaderUnit.TestRenderer
 			if (!bLoggedDevice)
 			{
 				// Write adapter description to the console, since it can affect results.
-				Console.WriteLine($"RenderTestHarness: Using device '{_renderer.Device.Adapter.ToString()}'");
+				// Trim weird null characters that appear from somewhere.
+				var deviceName = _renderer.Device.Adapter.Description.Description.Trim('\0');
+				Console.WriteLine($"RenderTestHarness: Using device '{deviceName}'");
 				bLoggedDevice = true;
 			}
 
