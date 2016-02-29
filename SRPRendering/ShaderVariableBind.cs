@@ -13,7 +13,7 @@ namespace SRPRendering
 {
 	public interface IShaderVariableBind
 	{
-		void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, dynamic> overrides);
+		void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides);
 		bool AllowScriptOverride { get; }
 	}
 
@@ -25,7 +25,7 @@ namespace SRPRendering
 			this.source = source;
 		}
 
-		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, dynamic> overrides)
+		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
 		{
 			switch (source)
 			{
@@ -106,7 +106,7 @@ namespace SRPRendering
 			}
 		}
 
-		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, dynamic> overrides)
+		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
 		{
 			try
 			{
@@ -139,7 +139,7 @@ namespace SRPRendering
 			}
 		}
 
-		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, dynamic> overrides)
+		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
 		{
 			if (primitive != null && primitive.Material != null)
 			{
@@ -176,9 +176,9 @@ namespace SRPRendering
 			this.variable = variable;
 		}
 
-		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, dynamic> overrides)
+		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
 		{
-			dynamic overriddenValue;
+			object overriddenValue;
 
 			// Is the variable overridden this drawcall?
 			if (overrides != null && overrides.TryGetValue(variable.Name, out overriddenValue))

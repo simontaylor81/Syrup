@@ -427,7 +427,7 @@ namespace SRPRendering
 			// Let the script do its thing.
 			if (frameCallback != null)
 			{
-				var renderContext = new ScriptRenderContext(
+				var renderContext = new DeferredRenderContext(
 					deviceContext,
 					viewInfo,
 					renderScene,
@@ -436,6 +436,8 @@ namespace SRPRendering
 					_device.GlobalResources);
 
 				frameCallback(renderContext);
+
+				renderContext.Execute();
 			}
 		}
 

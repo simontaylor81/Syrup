@@ -129,6 +129,7 @@
     <Compile Include="ConstantBuffer.cs" />
     <Compile Include="DepthBuffer.cs" />
     <Compile Include="Resources\BufferHandle.cs" />
+    <Compile Include="DeferredRenderContext.cs" />
     <Compile Include="SharpDXUtils.cs" />
     <Compile Include="StreamUtil.cs" />
     <Compile Include="MipGenerator.cs" />

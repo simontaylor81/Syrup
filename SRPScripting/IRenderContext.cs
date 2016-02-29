@@ -17,7 +17,7 @@ namespace SRPScripting
 			BlendState blendState = null,
 			IEnumerable<object> renderTargets = null,
 			object depthBuffer = null,
-			IDictionary<string, dynamic> shaderVariableOverrides = null);
+			IDictionary<string, object> shaderVariableOverrides = null);
 
 		// Draw a shaded sphere.
 		void DrawSphere(
@@ -28,18 +28,18 @@ namespace SRPScripting
 			BlendState blendState = null,
 			IEnumerable<object> renderTargets = null,
 			object depthBuffer = null,
-			IDictionary<string, dynamic> shaderVariableOverrides = null);
+			IDictionary<string, object> shaderVariableOverrides = null);
 
 		// Draw a fullscreen quad.
 		void DrawFullscreenQuad(
 			dynamic vertexShaderIndex,
 			dynamic pixelShaderIndex,
 			IEnumerable<object> renderTargets = null,
-			IDictionary<string, dynamic> shaderVariableOverrides = null);
+			IDictionary<string, object> shaderVariableOverrides = null);
 
 		// Dispatch a compute shader.
 		void Dispatch(dynamic shader, int numGroupsX, int numGroupsY, int numGroupsZ,
-			IDictionary<string, dynamic> shaderVariableOverrides = null);
+			IDictionary<string, object> shaderVariableOverrides = null);
 
 		// Clear render targets.
 		void Clear(dynamic colour, IEnumerable<object> renderTargets = null);

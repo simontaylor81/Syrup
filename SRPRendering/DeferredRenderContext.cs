@@ -13,9 +13,15 @@ using SRPScripting;
 
 namespace SRPRendering
 {
-	class ScriptRenderContext : IRenderContext
+	class DeferredRenderContext : IRenderContext
 	{
-		public ScriptRenderContext(DeviceContext deviceContext,
+		private List<Action> _commands = new List<Action>();
+		private HashSet<Shader> _shaders = new HashSet<Shader>();
+
+		// All the shaders in use this frame.
+		public IEnumerable<Shader> Shaders => _shaders;
+
+		public DeferredRenderContext(DeviceContext deviceContext,
 								   ViewInfo viewInfo,
 								   RenderScene scene,
 								   IList<IShader> shaders,
@@ -30,17 +36,18 @@ namespace SRPRendering
 			_globalResources = globalResources;
 		}
 
+		// TODO: Pass in deviceContext here instead of constructor.
+		public void Execute()
+		{
+			foreach (var command in _commands)
+			{
+				command();
+			}
+		}
+
 		#region IRenderContext interface
 
-		// Draw the entire scene.
-		public void DrawScene(dynamic vertexShaderIndex,
-							  dynamic pixelShaderIndex,
-							  RastState rastState = null,
-							  SRPScripting.DepthStencilState depthStencilState = null,
-							  SRPScripting.BlendState blendState = null,
-							  IEnumerable<object> renderTargetHandles = null,
-							  object depthBuffer = null,
-							  IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawScene(dynamic vertexShaderIndex, dynamic pixelShaderIndex, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargets = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
 		{
 			Shader vertexShader = GetShader(vertexShaderIndex);
 			Shader pixelShader = GetShader(pixelShaderIndex);
@@ -53,6 +60,105 @@ namespace SRPRendering
 			if (scene == null)
 				throw new ScriptException("DrawScene: No scene set.");
 
+			_shaders.Add(vertexShader);
+			if (pixelShader != null)
+				_shaders.Add(pixelShader);
+
+			_commands.Add(() => DrawSceneImpl(vertexShader, pixelShader, rastState,
+				depthStencilState, blendState, renderTargets, depthBuffer, shaderVariableOverrides));
+		}
+
+		public void DrawSphere(dynamic vertexShaderIndex, dynamic pixelShaderIndex, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargets = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
+		{
+			Shader vertexShader = GetShader(vertexShaderIndex);
+			Shader pixelShader = GetShader(pixelShaderIndex);
+
+			// Vertex shader is not optional.
+			if (vertexShader == null)
+				throw new ScriptException("DrawSphere: Cannot draw without a vertex shader.");
+
+			_shaders.Add(vertexShader);
+			if (pixelShader != null)
+				_shaders.Add(pixelShader);
+
+			_commands.Add(() => DrawSphereImpl(vertexShader, pixelShader, rastState,
+				depthStencilState, blendState, renderTargets, depthBuffer, shaderVariableOverrides));
+		}
+
+		public void DrawFullscreenQuad(dynamic vertexShaderIndex, dynamic pixelShaderIndex, IEnumerable<object> renderTargets = null, IDictionary<string, object> shaderVariableOverrides = null)
+		{
+			Shader vertexShader = GetShader(vertexShaderIndex);
+			Shader pixelShader = GetShader(pixelShaderIndex);
+
+			// Vertex shader is not optional.
+			if (vertexShader == null)
+				throw new ScriptException("DrawFullscreenQuad: Cannot draw without a vertex shader.");
+
+			_shaders.Add(vertexShader);
+			if (pixelShader != null)
+				_shaders.Add(pixelShader);
+
+			_commands.Add(() => DrawFullscreenQuadImpl(vertexShader, pixelShader, renderTargets, shaderVariableOverrides));
+		}
+
+		public void Dispatch(dynamic shader, int numGroupsX, int numGroupsY, int numGroupsZ, IDictionary<string, object> shaderVariableOverrides = null)
+		{
+			Shader cs = GetShader(shader);
+			if (cs == null)
+			{
+				throw new ScriptException("Dispatch: compute shader is required");
+			}
+
+			_shaders.Add(cs);
+			_commands.Add(() => DispatchImpl(cs, numGroupsX, numGroupsY, numGroupsZ, shaderVariableOverrides));
+		}
+
+		public void Clear(dynamic colour, IEnumerable<object> renderTargets = null)
+		{
+			// Convert list of floats to a colour.
+			try
+			{
+				Vector4 vectorColour = ScriptHelper.ConvertToVector4(colour);
+				var rawColour = new RawColor4(vectorColour.X, vectorColour.Y, vectorColour.Z, vectorColour.W);
+
+				_commands.Add(() => ClearImpl(rawColour, renderTargets));
+			}
+			catch (ScriptException ex)
+			{
+				throw new ScriptException("Clear: Invalid colour.", ex);
+			}
+		}
+
+		public void DrawWireSphere(dynamic position, float radius, dynamic colour, object renderTarget = null)
+		{
+			try
+			{
+				// Convert position and colour to a real vector and colour.
+				var pos = ScriptHelper.ConvertToVector3(position);
+				var col = new Vector4(ScriptHelper.ConvertToVector3(colour), 1.0f);
+
+				_commands.Add(() => DrawWireSphereImpl(pos, radius, col, renderTarget));
+			}
+			catch (ScriptException ex)
+			{
+				throw new ScriptException("Invalid parameters to DrawWireSphere.", ex);
+			}
+		}
+
+		#endregion
+
+		#region Actual rendering implementation
+
+		// Draw the entire scene.
+		private void DrawSceneImpl(Shader vertexShader,
+							  Shader pixelShader,
+							  RastState rastState,
+							  SRPScripting.DepthStencilState depthStencilState,
+							  SRPScripting.BlendState blendState,
+							  IEnumerable<object> renderTargetHandles,
+							  object depthBuffer,
+							  IDictionary<string, object> shaderVariableOverrides)
+		{
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
 				deviceContext.Device, vertexShader.Signature, InputLayoutCache.SceneVertexInputElements);
@@ -76,22 +182,15 @@ namespace SRPRendering
 		}
 
 		// Draw a unit sphere.
-		public void DrawSphere(dynamic vertexShaderIndex,
-							   dynamic pixelShaderIndex,
-							   RastState rastState = null,
-							   SRPScripting.DepthStencilState depthStencilState = null,
-							   SRPScripting.BlendState blendState = null,
-							   IEnumerable<object> renderTargetHandles = null,
-							   object depthBuffer = null,
-							   IDictionary<string, object> shaderVariableOverrides = null)
+		private void DrawSphereImpl(Shader vertexShader,
+							  Shader pixelShader,
+							   RastState rastState,
+							   SRPScripting.DepthStencilState depthStencilState,
+							   SRPScripting.BlendState blendState,
+							   IEnumerable<object> renderTargetHandles,
+							   object depthBuffer,
+							   IDictionary<string, object> shaderVariableOverrides)
 		{
-			Shader vertexShader = GetShader(vertexShaderIndex);
-			Shader pixelShader = GetShader(pixelShaderIndex);
-
-			// Vertex shader is not optional.
-			if (vertexShader == null)
-				throw new ScriptException("DrawSphere: Cannot draw without a vertex shader.");
-
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
 				deviceContext.Device, vertexShader.Signature, BasicMesh.InputElements);
@@ -104,7 +203,7 @@ namespace SRPRendering
 			SetShaders(vertexShader, pixelShader);
 
 			// Draw the sphere mesh.
-			UpdateShaders(vertexShader, pixelShader, null, shaderVariableOverrides);		// TODO: Pass a valid proxy here?
+			UpdateShaders(vertexShader, pixelShader, null, shaderVariableOverrides);        // TODO: Pass a valid proxy here?
 			_globalResources.SphereMesh.Draw(deviceContext);
 
 			// Force all state to defaults -- we're completely stateless.
@@ -112,18 +211,11 @@ namespace SRPRendering
 		}
 
 		// Draw a fullscreen quad.
-		public void DrawFullscreenQuad(dynamic vertexShaderIndex,
-									   dynamic pixelShaderIndex,
-									   IEnumerable<object> renderTargetHandles = null,
-									   IDictionary<string, object> shaderVariableOverrides = null)
+		private void DrawFullscreenQuadImpl(Shader vertexShader,
+							  Shader pixelShader,
+									   IEnumerable<object> renderTargetHandles,
+									   IDictionary<string, object> shaderVariableOverrides)
 		{
-			Shader vertexShader = GetShader(vertexShaderIndex);
-			Shader pixelShader = GetShader(pixelShaderIndex);
-
-			// Vertex shader is not optional.
-			if (vertexShader == null)
-				throw new ScriptException("DrawFullscreenQuad: Cannot draw without a vertex shader.");
-
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
 				deviceContext.Device, vertexShader.Signature, FullscreenQuad.InputElements);
@@ -144,15 +236,9 @@ namespace SRPRendering
 		}
 
 		// Dispatch a compute shader.
-		public void Dispatch(dynamic shaderHandle, int numGroupsX, int numGroupsY, int numGroupsZ,
-							 IDictionary<string, object> shaderVariableOverrides = null)
+		private void DispatchImpl(Shader cs, int numGroupsX, int numGroupsY, int numGroupsZ,
+							 IDictionary<string, object> shaderVariableOverrides)
 		{
-			Shader cs = GetShader(shaderHandle);
-			if (cs == null)
-			{
-				throw new ScriptException("Dispatch: compute shader is required");
-			}
-
 			cs.Set(deviceContext);
 			cs.UpdateVariables(deviceContext, viewInfo, null, shaderVariableOverrides, _globalResources);
 			deviceContext.Dispatch(numGroupsX, numGroupsY, numGroupsZ);
@@ -162,74 +248,50 @@ namespace SRPRendering
 		}
 
 		// Clear render targets.
-		public void Clear(dynamic colour, IEnumerable<object> renderTargetHandles = null)
+		private void ClearImpl(RawColor4 colour, IEnumerable<object> renderTargetHandles)
 		{
-			// Convert list of floats to a colour.
-			try
+			// Clear each specified target.
+			var rtvs = GetRTVS(renderTargetHandles);
+			foreach (var rtv in rtvs)
 			{
-				Vector4 vectorColour = ScriptHelper.ConvertToVector4(colour);
-				var rawColour = new RawColor4(vectorColour.X, vectorColour.Y, vectorColour.Z, vectorColour.W);
-
-				// Clear each specified target.
-				var rtvs = GetRTVS(renderTargetHandles);
-				foreach (var rtv in rtvs)
-				{
-					deviceContext.ClearRenderTargetView(rtv, rawColour);
-				}
-			}
-			catch (ScriptException ex)
-			{
-				throw new ScriptException("Clear: Invalid colour.", ex);
+				deviceContext.ClearRenderTargetView(rtv, colour);
 			}
 		}
 
 		// Draw a wireframe sphere.
-		public void DrawWireSphere(dynamic position,
+		private void DrawWireSphereImpl(Vector3 position,
 								   float radius,
-								   dynamic colour,
-								   object renderTarget = null)
+								   Vector4 colour,
+								   object renderTarget)
 		{
-			try
-			{
-				// Convert position and colour to a real vector and colour.
-				var pos = ScriptHelper.ConvertToVector3(position);
-				var col = new Vector4(ScriptHelper.ConvertToVector3(colour), 1.0f);
+			// Set render target.
+			SetRenderTargets(new[] { renderTarget }, null);
 
-				// Set render target.
-				SetRenderTargets(new[] { renderTarget }, null);
+			// Set wireframe render state.
+			var rastState = new RastState(SRPScripting.FillMode.Wireframe);
+			deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(rastState.ToD3D11());
+			deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(SRPScripting.DepthStencilState.DisableDepthWrite.ToD3D11());
+			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(SRPScripting.BlendState.NoBlending.ToD3D11());
 
-				// Set wireframe render state.
-				var rastState = new RastState(SRPScripting.FillMode.Wireframe);
-				deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(rastState.ToD3D11());
-				deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(SRPScripting.DepthStencilState.DisableDepthWrite.ToD3D11());
-				deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(SRPScripting.BlendState.NoBlending.ToD3D11());
+			// Set simple shaders.
+			SetShaders(_globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS);
 
-				// Set simple shaders.
-				SetShaders(_globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS);
+			// Construct transform matrix.
+			var transform = Matrix4x4.CreateScale(radius, radius, radius) * Matrix4x4.CreateTranslation(position);
 
-				// Construct transform matrix.
-				var transform = Matrix4x4.CreateScale(radius, radius, radius) * Matrix4x4.CreateTranslation(pos);
+			// Set shader constants.
+			_globalResources.BasicShaders.SolidColourShaderVar.Set(colour);
+			UpdateShaders(_globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS, new SimplePrimitiveProxy(transform), null);
 
-				// Set shader constants.
-				_globalResources.BasicShaders.SolidColourShaderVar.Set(col);
-				UpdateShaders(_globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS, new SimplePrimitiveProxy(transform), null);
+			// Set input layout
+			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
+				deviceContext.Device, _globalResources.BasicShaders.BasicSceneVS.Signature, BasicMesh.InputElements);
 
-				// Set input layout
-				deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(
-					deviceContext.Device, _globalResources.BasicShaders.BasicSceneVS.Signature, BasicMesh.InputElements);
+			// Draw the sphere.
+			_globalResources.SphereMesh.Draw(deviceContext);
 
-				// Draw the sphere.
-				_globalResources.SphereMesh.Draw(deviceContext);
-			}
-			catch (ScriptException ex)
-			{
-				throw new ScriptException("Invalid parameters to DrawWireSphere.", ex);
-			}
-			finally
-			{
-				// Force all state to defaults -- we're completely stateless.
-				deviceContext.ClearState();
-			}
+			// Force all state to defaults -- we're completely stateless.
+			deviceContext.ClearState();
 		}
 
 		#endregion

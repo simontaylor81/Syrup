@@ -34,7 +34,7 @@ namespace SRPRendering
 		void Set(DeviceContext context);
 
 		// Upload constants if required.
-		void UpdateVariables(DeviceContext context, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, dynamic> overrides, IGlobalResources globalResources);
+		void UpdateVariables(DeviceContext context, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides, IGlobalResources globalResources);
 
 		// Reset to the same state as immediately after compile.
 		void Reset();
@@ -237,7 +237,7 @@ namespace SRPRendering
 		}
 
 		// Upload constants if required.
-		public void UpdateVariables(DeviceContext context, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, dynamic> overrides, IGlobalResources globalResources)
+		public void UpdateVariables(DeviceContext context, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides, IGlobalResources globalResources)
 		{
 			// First, update the value of bound and overridden variables.
 			foreach (var variable in Variables)
