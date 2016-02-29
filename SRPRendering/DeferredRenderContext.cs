@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -9,6 +10,7 @@ using SharpDX.Direct3D11;
 using SharpDX.Mathematics.Interop;
 using SRPCommon.Scene;
 using SRPCommon.Scripting;
+using SRPCommon.Util;
 using SRPScripting;
 
 namespace SRPRendering
@@ -46,7 +48,7 @@ namespace SRPRendering
 
 		#region IRenderContext interface
 
-		public void DrawScene(dynamic vertexShaderIndex, dynamic pixelShaderIndex, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargets = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawScene(dynamic vertexShaderIndex, dynamic pixelShaderIndex, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargetHandles = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
 		{
 			Shader vertexShader = GetShader(vertexShaderIndex);
 			Shader pixelShader = GetShader(pixelShaderIndex);
@@ -63,11 +65,14 @@ namespace SRPRendering
 			if (pixelShader != null)
 				_shaders.Add(pixelShader);
 
+			var renderTargets = GetRenderTargets(renderTargetHandles);
+			var dsv = GetDepthBuffer(depthBuffer);
+
 			_commands.Add(deviceContext => DrawSceneImpl(deviceContext, vertexShader, pixelShader, rastState,
-				depthStencilState, blendState, renderTargets, depthBuffer, shaderVariableOverrides));
+				depthStencilState, blendState, renderTargets, dsv, shaderVariableOverrides));
 		}
 
-		public void DrawSphere(dynamic vertexShaderIndex, dynamic pixelShaderIndex, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargets = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawSphere(dynamic vertexShaderIndex, dynamic pixelShaderIndex, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargetHandles = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
 		{
 			Shader vertexShader = GetShader(vertexShaderIndex);
 			Shader pixelShader = GetShader(pixelShaderIndex);
@@ -80,11 +85,14 @@ namespace SRPRendering
 			if (pixelShader != null)
 				_shaders.Add(pixelShader);
 
+			var renderTargets = GetRenderTargets(renderTargetHandles);
+			var dsv = GetDepthBuffer(depthBuffer);
+
 			_commands.Add(deviceContext => DrawSphereImpl(deviceContext, vertexShader, pixelShader, rastState,
-				depthStencilState, blendState, renderTargets, depthBuffer, shaderVariableOverrides));
+				depthStencilState, blendState, renderTargets, dsv, shaderVariableOverrides));
 		}
 
-		public void DrawFullscreenQuad(dynamic vertexShaderIndex, dynamic pixelShaderIndex, IEnumerable<object> renderTargets = null, IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawFullscreenQuad(dynamic vertexShaderIndex, dynamic pixelShaderIndex, IEnumerable<object> renderTargetHandles = null, IDictionary<string, object> shaderVariableOverrides = null)
 		{
 			Shader vertexShader = GetShader(vertexShaderIndex);
 			Shader pixelShader = GetShader(pixelShaderIndex);
@@ -96,6 +104,8 @@ namespace SRPRendering
 			_shaders.Add(vertexShader);
 			if (pixelShader != null)
 				_shaders.Add(pixelShader);
+
+			var renderTargets = GetRenderTargets(renderTargetHandles);
 
 			_commands.Add(deviceContext => DrawFullscreenQuadImpl(deviceContext, vertexShader, pixelShader, renderTargets, shaderVariableOverrides));
 		}
@@ -112,7 +122,7 @@ namespace SRPRendering
 			_commands.Add(deviceContext => DispatchImpl(deviceContext, cs, numGroupsX, numGroupsY, numGroupsZ, shaderVariableOverrides));
 		}
 
-		public void Clear(dynamic colour, IEnumerable<object> renderTargets = null)
+		public void Clear(dynamic colour, IEnumerable<object> renderTargetHandles = null)
 		{
 			// Convert list of floats to a colour.
 			try
@@ -120,7 +130,9 @@ namespace SRPRendering
 				Vector4 vectorColour = ScriptHelper.ConvertToVector4(colour);
 				var rawColour = new RawColor4(vectorColour.X, vectorColour.Y, vectorColour.Z, vectorColour.W);
 
-				_commands.Add(deviceContext => ClearImpl(deviceContext, rawColour, renderTargets));
+				var rtvs = GetRTVs(GetRenderTargets(renderTargetHandles));
+
+				_commands.Add(deviceContext => ClearImpl(deviceContext, rawColour, rtvs));
 			}
 			catch (ScriptException ex)
 			{
@@ -128,13 +140,14 @@ namespace SRPRendering
 			}
 		}
 
-		public void DrawWireSphere(dynamic position, float radius, dynamic colour, object renderTarget = null)
+		public void DrawWireSphere(dynamic position, float radius, dynamic colour, object renderTargetHandle = null)
 		{
 			try
 			{
 				// Convert position and colour to a real vector and colour.
 				var pos = ScriptHelper.ConvertToVector3(position);
 				var col = new Vector4(ScriptHelper.ConvertToVector3(colour), 1.0f);
+				var renderTarget = GetRenderTarget(renderTargetHandle);
 
 				_commands.Add(deviceContext => DrawWireSphereImpl(deviceContext, pos, radius, col, renderTarget));
 			}
@@ -156,8 +169,8 @@ namespace SRPRendering
 			RastState rastState,
 			SRPScripting.DepthStencilState depthStencilState,
 			SRPScripting.BlendState blendState,
-			IEnumerable<object> renderTargetHandles,
-			object depthBuffer,
+			IEnumerable<RenderTarget> renderTargets,
+			DepthStencilView dsv,
 			IDictionary<string, object> shaderVariableOverrides)
 		{
 			// Set input layout
@@ -165,7 +178,7 @@ namespace SRPRendering
 				deviceContext.Device, vertexShader.Signature, InputLayoutCache.SceneVertexInputElements);
 
 			// Set render state.
-			SetRenderTargets(deviceContext, renderTargetHandles, depthBuffer);
+			SetRenderTargets(deviceContext, renderTargets, dsv);
 			deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(rastState.ToD3D11());
 			deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(depthStencilState.ToD3D11());
 			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(blendState.ToD3D11());
@@ -190,8 +203,8 @@ namespace SRPRendering
 			RastState rastState,
 			SRPScripting.DepthStencilState depthStencilState,
 			SRPScripting.BlendState blendState,
-			IEnumerable<object> renderTargetHandles,
-			object depthBuffer,
+			IEnumerable<RenderTarget> renderTargets,
+			DepthStencilView dsv,
 			IDictionary<string, object> shaderVariableOverrides)
 		{
 			// Set input layout
@@ -199,7 +212,7 @@ namespace SRPRendering
 				deviceContext.Device, vertexShader.Signature, BasicMesh.InputElements);
 
 			// Set render state.
-			SetRenderTargets(deviceContext, renderTargetHandles, depthBuffer);
+			SetRenderTargets(deviceContext, renderTargets, dsv);
 			deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(rastState.ToD3D11());
 			deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(depthStencilState.ToD3D11());
 			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(blendState.ToD3D11());
@@ -218,7 +231,7 @@ namespace SRPRendering
 			DeviceContext deviceContext,
 			Shader vertexShader,
 			Shader pixelShader,
-			IEnumerable<object> renderTargetHandles,
+			IEnumerable<RenderTarget> renderTargets,
 			IDictionary<string, object> shaderVariableOverrides)
 		{
 			// Set input layout
@@ -226,7 +239,7 @@ namespace SRPRendering
 				deviceContext.Device, vertexShader.Signature, FullscreenQuad.InputElements);
 
 			// Set render state.
-			SetRenderTargets(deviceContext, renderTargetHandles, DepthBufferHandle.NoDepthBuffer);
+			SetRenderTargets(deviceContext, renderTargets, null);
 			deviceContext.Rasterizer.State = _globalResources.RastStateCache.Get(RastState.Default.ToD3D11());
 			deviceContext.OutputMerger.DepthStencilState = _globalResources.DepthStencilStateCache.Get(SRPScripting.DepthStencilState.DisableDepth.ToD3D11());
 			deviceContext.OutputMerger.BlendState = _globalResources.BlendStateCache.Get(SRPScripting.BlendState.NoBlending.ToD3D11());
@@ -258,10 +271,9 @@ namespace SRPRendering
 		}
 
 		// Clear render targets.
-		private void ClearImpl(DeviceContext deviceContext, RawColor4 colour, IEnumerable<object> renderTargetHandles)
+		private void ClearImpl(DeviceContext deviceContext, RawColor4 colour, IEnumerable<RenderTargetView> rtvs)
 		{
 			// Clear each specified target.
-			var rtvs = GetRTVS(renderTargetHandles);
 			foreach (var rtv in rtvs)
 			{
 				deviceContext.ClearRenderTargetView(rtv, colour);
@@ -274,7 +286,7 @@ namespace SRPRendering
 			Vector3 position,
 			float radius,
 			Vector4 colour,
-			object renderTarget)
+			RenderTarget renderTarget)
 		{
 			// Set render target.
 			SetRenderTargets(deviceContext, new[] { renderTarget }, null);
@@ -325,13 +337,44 @@ namespace SRPRendering
 		// Access a render target by handle.
 		private RenderTarget GetRenderTarget(object handleObj, [CallerMemberName] string caller = null)
 		{
+			// Null has special meaning (using backbuffer).
+			if (handleObj == null)
+			{
+				return null;
+			}
+
 			var handle = handleObj as RenderTargetHandle;
 
-			// If it's null or not a valid index, throw.
+			// If it's not the right type, or not a valid index, throw.
 			if (handle == null || handle.index < 0 || handle.index >= shaders.Count)
 				throw new ScriptException(string.Format("Invalid render target given to {0}.", caller));
 
 			return renderTargetResources[handle.index];
+		}
+
+		// Get list of render targets for a list of handles.
+		private IEnumerable<RenderTarget> GetRenderTargets(IEnumerable<object> renderTargetHandles)
+			=> renderTargetHandles
+				.EmptyIfNull()
+				.Select(handle => GetRenderTarget(handle))
+				.ToList();
+
+		// Get the depth buffer corresponding to a handle.
+		private DepthStencilView GetDepthBuffer(object handle)
+		{
+			if (handle == null || DepthBufferHandle.Default.Equals(handle))
+			{
+				return viewInfo.DepthBuffer.DSV;
+			}
+			else if (DepthBufferHandle.NoDepthBuffer.Equals(handle))
+			{
+				return null;
+			}
+			else
+			{
+				// TODO: User-allocated depth buffers.
+				throw new ScriptException("Invalid depth buffer.");
+			}
 		}
 
 		// Set the given shaders to the device.
@@ -359,71 +402,47 @@ namespace SRPRendering
 		}
 
 		// Set render targets based on the given list of handles.
-		private void SetRenderTargets(DeviceContext deviceContext, IEnumerable<object> renderTargetHandles, object depthBuffer)
+		private void SetRenderTargets(DeviceContext deviceContext, IEnumerable<RenderTarget> renderTargets, DepthStencilView dsv)
 		{
-			// Collect render target views for the given handles.
-			var rtvs = GetRTVS(renderTargetHandles).ToArray();
-
-			// Find the depth buffer.
-			DepthStencilView dsv;
-			if (depthBuffer == null || DepthBufferHandle.Default.Equals(depthBuffer))
-			{
-				dsv = viewInfo.DepthBuffer.DSV;
-			}
-			else if (DepthBufferHandle.NoDepthBuffer.Equals(depthBuffer))
-			{
-				dsv = null;
-			}
-			else
-			{
-				// TODO: User-allocated depth buffers.
-				throw new ScriptException("Invalid depth buffer.");
-			}
-
 			// Set them to the device.
+			var rtvs = GetRTVs(renderTargets);
 			deviceContext.OutputMerger.SetTargets(dsv, rtvs);
 
 			// Set viewport.
-			deviceContext.Rasterizer.SetViewports(new[] { GetViewport(renderTargetHandles) });
+			deviceContext.Rasterizer.SetViewports(new[] { GetViewport(renderTargets) });
 		}
 
 		// Converts a list of render target handles to a list of RTVs, resolving nulls to the back buffer.
-		private IEnumerable<RenderTargetView> GetRTVS(IEnumerable<object> renderTargetHandles)
+		private RenderTargetView[] GetRTVs(IEnumerable<RenderTarget> renderTargets)
 		{
-			if (renderTargetHandles != null)
-			{
-				return from handle in renderTargetHandles
-					   select handle != null ? GetRenderTarget(handle).RTV : viewInfo.BackBuffer;
-			}
-			else
-			{
-				// No render targets specified, so write to backbuffer.
-				return new[] { viewInfo.BackBuffer };
-			}
+			Trace.Assert(renderTargets != null);
+			return renderTargets
+				.DefaultIfEmpty()
+				.Select(rt => rt != null ? rt.RTV : viewInfo.BackBuffer)
+				.ToArray();
 		}
 
 		// Get the viewport dimensions to use.
-		private RawViewportF GetViewport(IEnumerable<object> renderTargetHandles)
+		private RawViewportF GetViewport(IEnumerable<RenderTarget> renderTargets)
 		{
-			if (renderTargetHandles != null)
+			Trace.Assert(renderTargets != null);
+
+			// Get viewport size from the first render target.
+			var rt = renderTargets.FirstOrDefault();
+			if (rt != null)
 			{
-				// Get viewport size from the first render target.
-				var handle = renderTargetHandles.FirstOrDefault();
-				if (handle != null)
+				return new RawViewportF
 				{
-					var rt = GetRenderTarget(handle);
-					return new RawViewportF
-					{
-						X = 0.0f,
-						Y = 0.0f,
-						Width = rt.Width,
-						Height = rt.Height,
-						MinDepth = 0.0f,
-						MaxDepth = 1.0f,
-					};
-				}
+					X = 0.0f,
+					Y = 0.0f,
+					Width = rt.Width,
+					Height = rt.Height,
+					MinDepth = 0.0f,
+					MaxDepth = 1.0f,
+				};
 			}
 
+			// No explicit render target, so use backbuffer dimensions.
 			return new RawViewportF
 			{
 				X = 0.0f,
