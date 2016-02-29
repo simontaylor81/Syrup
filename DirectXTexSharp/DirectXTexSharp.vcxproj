@@ -95,6 +95,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalIncludeDirectories>..\DirectXTex</AdditionalIncludeDirectories>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
