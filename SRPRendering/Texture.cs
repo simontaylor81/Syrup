@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DirectXTexSharp;
 using SharpDX.Direct3D11;
 using SharpDX;
 using SRPScripting;
 using SRPCommon.Util;
+using DirectXTexNet;
 
 namespace SRPRendering
 {
@@ -58,7 +58,7 @@ namespace SRPRendering
 					image.CreateEmptyMipChain();
 				}
 
-				var texture2D = image.CreateTexture(device);
+				var texture2D = new Texture2D(image.CreateTexture(device.NativePointer));
 
 				//stopwatch.Stop();
 				//Console.WriteLine("Loading {0} took {1} ms.", System.IO.Path.GetFileName(filename), stopwatch.ElapsedMilliseconds);
@@ -76,7 +76,7 @@ namespace SRPRendering
 			}
 		}
 
-		private static ScratchImage LoadImage(string filename)
+		private static IScratchImage LoadImage(string filename)
 		{
 			var ext = Path.GetExtension(filename).ToLowerInvariant();
 			if (ext == ".dds")
@@ -107,7 +107,7 @@ namespace SRPRendering
 
 				// Create DirectXTex representation (so we can apply the same operations as images loaded
 				// from disk, e.g. mip generation).
-				var image = DirectXTex.Create2D(initialData, width, height, format.ToDXGI());
+				var image = DirectXTex.Create2D(initialData.DataPointer, initialData.Pitch, width, height, (uint)format.ToDXGI());
 
 				// Generate mipmaps if desired.
 				if (generateMips)
@@ -116,7 +116,7 @@ namespace SRPRendering
 				}
 
 				// Create the actual texture resource.
-				var texture2D = image.CreateTexture(device);
+				var texture2D = new Texture2D(image.CreateTexture(device.NativePointer));
 
 				// Create the SRV.
 				var srv = new ShaderResourceView(device, texture2D);
