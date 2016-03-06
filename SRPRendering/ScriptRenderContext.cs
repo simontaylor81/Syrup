@@ -254,7 +254,7 @@ namespace SRPRendering
 			var handle = handleObj as RenderTargetHandle;
 
 			// If it's null or not a valid index, throw.
-			if (handle == null || handle.index < 0 || handle.index >= shaders.Count)
+			if (handle == null || handle.index < 0 || handle.index >= renderTargetResources.Count)
 				throw new ScriptException(string.Format("Invalid render target given to {0}.", caller));
 
 			return renderTargetResources[handle.index];
