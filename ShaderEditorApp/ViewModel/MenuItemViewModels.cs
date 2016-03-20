@@ -25,7 +25,9 @@ namespace ShaderEditorApp.ViewModel
 		public virtual bool IsChecked
 		{
 			get { return false; }
+#pragma warning disable RECS0029 // Warns about property or indexer setters and event adders or removers that do not use the value parameter
 			set { }
+#pragma warning restore RECS0029
 		}
 	}
 
@@ -41,11 +43,12 @@ namespace ShaderEditorApp.ViewModel
 		private IEnumerable<object> _items;
 		public override IEnumerable<object> Items => _items;
 
-		public override string Header { get; }
+		private string _header;
+		public override string Header => _header;
 
 		public StaticMenuItem(string header)
 		{
-			Header = header;
+			_header = header;
 		}
 
 		// Helpers for creating one with a list of sub-items.
@@ -71,16 +74,20 @@ namespace ShaderEditorApp.ViewModel
 	// Menu item representing a raw command on its own without associated view model.
 	class RawCommandMenuItem : MenuItemViewModel
 	{
-		public override ICommand Command { get; }
-		public override object CommandParameter { get; }
+		private ICommand _command;
+		public override ICommand Command => _command;
 
-		public override string Header { get; }
+		private object _commandParameter;
+		public override object CommandParameter => _commandParameter;
+
+		private string _header;
+		public override string Header => _header;
 
 		public RawCommandMenuItem(string header, ICommand command, object parameter = null)
 		{
-			Header = header;
-			Command = command;
-			CommandParameter = parameter;
+			_header = header;
+			_command = command;
+			_commandParameter = parameter;
 		}
 	}
 
@@ -113,7 +120,9 @@ namespace ShaderEditorApp.ViewModel
 		private readonly Func<bool> _get;
 		private readonly Action<bool> _set;
 
-		public override string Header { get; }
+		private string _header;
+		public override string Header => _header;
+
 		public override bool IsCheckable => true;
 
 		// TODO: Support change notification.
@@ -125,7 +134,7 @@ namespace ShaderEditorApp.ViewModel
 
 		public CheckableMenuItem(string header, Func<bool> get, Action<bool> set)
 		{
-			Header = header;
+			_header = header;
 			_get = get;
 			_set = set;
 		}
@@ -137,11 +146,12 @@ namespace ShaderEditorApp.ViewModel
 		private ObservableAsPropertyHelper<IEnumerable<object>> _subitems;
 		public override IEnumerable<object> Items => _subitems.Value;
 
-		public override string Header { get; }
+		private string _header;
+		public override string Header => _header;
 
 		public RecentFilesMenuItem(string header, string noFilesText, RecentFileList recentFiles, ICommand openCommand)
 		{
-			Header = header;
+			_header = header;
 
 			// Sub menu to display when there are no recent files.
 			var emptyMenu = new object[]
