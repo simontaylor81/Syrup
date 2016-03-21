@@ -234,10 +234,6 @@ namespace SRPRendering
 		public void Dispose()
 		{
 			Reset();
-
-			shaders.Clear();
-			DisposableUtil.DisposeList(_renderTargets);
-
 			_device = null;
 		}
 
@@ -252,7 +248,6 @@ namespace SRPRendering
 				var renderContext = new DeferredRenderContext(
 					viewInfo,
 					renderScene,
-					shaders,
 					_device.GlobalResources);
 
 				frameCallback(renderContext);
@@ -293,7 +288,7 @@ namespace SRPRendering
 
 		private RenderDevice _device;
 
-		// Resource arrays.
+		// List of shaders. Needed to gather user properties.
 		private List<Shader> shaders = new List<Shader>();
 
 		// List of resource to be disposed of when reseting or disposing.

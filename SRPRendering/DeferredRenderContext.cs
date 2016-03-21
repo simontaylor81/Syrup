@@ -28,12 +28,10 @@ namespace SRPRendering
 		public DeferredRenderContext(
 			ViewInfo viewInfo,
 			RenderScene scene,
-			IList<Shader> shaders,
 			IGlobalResources globalResources)
 		{
 			this.viewInfo = viewInfo;
 			this.scene = scene;
-			this.shaders = shaders;
 			_globalResources = globalResources;
 		}
 
@@ -477,7 +475,6 @@ namespace SRPRendering
 		}
 
 		private RenderScene scene;
-		private IList<Shader> shaders;
 		private ViewInfo viewInfo;
 		private IGlobalResources _globalResources;
 	}
