@@ -33,16 +33,6 @@ namespace SRPRendering
 			=> index;
 	}
 
-
-	// Handle to a render traget.
-	internal class RenderTargetHandle : HandleBase
-	{
-		internal RenderTargetHandle(int index)
-			: base(index)
-		{
-		}
-	}
-
 	// Handle to a depth buffer.
 	internal class DepthBufferHandle : HandleBase
 	{

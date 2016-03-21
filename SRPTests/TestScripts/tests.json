@@ -80,5 +80,8 @@
     "vars": {
       "mip": [ 1, 2 ]
     }
+  },
+  {
+    "script": "RenderTarget.py"
   }
 ]

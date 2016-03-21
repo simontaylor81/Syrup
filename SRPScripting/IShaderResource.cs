@@ -26,4 +26,9 @@ namespace SRPScripting
 		int Width { get; }
 		int Height { get; }
 	}
+
+	// A render target.
+	public interface IRenderTarget : IShaderResource
+	{
+	}
 }

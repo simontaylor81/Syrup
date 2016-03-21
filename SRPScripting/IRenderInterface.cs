@@ -32,7 +32,7 @@ namespace SRPScripting
 			IDictionary<string, object> defines = null);
 
 		// Create a render target of dimensions equal to the viewport.
-		object CreateRenderTarget();
+		IRenderTarget CreateRenderTarget();
 
 		// Create a 2D texture of the given size and format, and fill it with the given data.
 		ITexture2D CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false);

@@ -9,6 +9,6 @@ testTexCallback = utils.GetTestTextureCallback(ri, rt, "FullscreenTexture_PS", "
 
 def RenderFrame(context):
 	context.Clear((1, 0.5, 0, 1), [rt])
-	testTexCallback()
+	testTexCallback(context)
 	
 ri.SetFrameCallback(RenderFrame)

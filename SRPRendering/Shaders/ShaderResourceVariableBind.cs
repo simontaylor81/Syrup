@@ -58,22 +58,6 @@ namespace SRPRendering.Shaders
 		private readonly ID3DShaderResource _resource;
 	}
 
-	class RenderTargetShaderResourceVariableBinding : IShaderResourceVariableBinding
-	{
-		public RenderTargetShaderResourceVariableBinding(RenderTargetDescriptor descriptor)
-		{
-			this.descriptor = descriptor;
-		}
-
-		public ShaderResourceView GetResource(IPrimitive primitive, ViewInfo viewInfo, IGlobalResources globalResources)
-		{
-			System.Diagnostics.Debug.Assert(descriptor.renderTarget != null);
-			return descriptor.renderTarget.SRV;
-		}
-
-		private readonly RenderTargetDescriptor descriptor;
-	}
-
 	class DefaultDepthBufferShaderResourceVariableBinding : IShaderResourceVariableBinding
 	{
 		public ShaderResourceView GetResource(IPrimitive primitive, ViewInfo viewInfo, IGlobalResources globalResources)

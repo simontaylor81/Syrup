@@ -10,6 +10,7 @@ using SharpDX.Direct3D11;
 using SharpDX.Mathematics.Interop;
 using SRPCommon.Scripting;
 using SRPCommon.Util;
+using SRPRendering.Resources;
 using SRPRendering.Shaders;
 using SRPScripting;
 using SRPScripting.Shader;
@@ -28,17 +29,14 @@ namespace SRPRendering
 			ViewInfo viewInfo,
 			RenderScene scene,
 			IList<Shader> shaders,
-			IList<RenderTarget> renderTargets,
 			IGlobalResources globalResources)
 		{
 			this.viewInfo = viewInfo;
 			this.scene = scene;
 			this.shaders = shaders;
-			this.renderTargetResources = renderTargets;
 			_globalResources = globalResources;
 		}
 
-		// TODO: Pass in deviceContext here instead of constructor.
 		public void Execute(DeviceContext deviceContext)
 		{
 			foreach (var command in _commands)
@@ -49,7 +47,7 @@ namespace SRPRendering
 
 		#region IRenderContext interface
 
-		public void DrawScene(IShader vertexShaderInterface, IShader pixelShaderInterface, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargetHandles = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawScene(IShader vertexShaderInterface, IShader pixelShaderInterface, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<IRenderTarget> renderTargetInterfaces = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
 		{
 			Shader vertexShader = GetShader(vertexShaderInterface);
 			Shader pixelShader = GetShader(pixelShaderInterface);
@@ -66,14 +64,14 @@ namespace SRPRendering
 			if (pixelShader != null)
 				_usedShaders.Add(pixelShader);
 
-			var renderTargets = GetRenderTargets(renderTargetHandles);
+			var renderTargets = GetRenderTargets(renderTargetInterfaces);
 			var dsv = GetDepthBuffer(depthBuffer);
 
 			_commands.Add(deviceContext => DrawSceneImpl(deviceContext, vertexShader, pixelShader, rastState,
 				depthStencilState, blendState, renderTargets, dsv, shaderVariableOverrides));
 		}
 
-		public void DrawSphere(IShader vertexShaderInterface, IShader pixelShaderInterface, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargetHandles = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawSphere(IShader vertexShaderInterface, IShader pixelShaderInterface, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<IRenderTarget> renderTargetInterfaces = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
 		{
 			Shader vertexShader = GetShader(vertexShaderInterface);
 			Shader pixelShader = GetShader(pixelShaderInterface);
@@ -86,14 +84,14 @@ namespace SRPRendering
 			if (pixelShader != null)
 				_usedShaders.Add(pixelShader);
 
-			var renderTargets = GetRenderTargets(renderTargetHandles);
+			var renderTargets = GetRenderTargets(renderTargetInterfaces);
 			var dsv = GetDepthBuffer(depthBuffer);
 
 			_commands.Add(deviceContext => DrawSphereImpl(deviceContext, vertexShader, pixelShader, rastState,
 				depthStencilState, blendState, renderTargets, dsv, shaderVariableOverrides));
 		}
 
-		public void DrawFullscreenQuad(IShader vertexShaderInterface, IShader pixelShaderInterface, IEnumerable<object> renderTargetHandles = null, IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawFullscreenQuad(IShader vertexShaderInterface, IShader pixelShaderInterface, IEnumerable<IRenderTarget> renderTargetInterfaces = null, IDictionary<string, object> shaderVariableOverrides = null)
 		{
 			Shader vertexShader = GetShader(vertexShaderInterface);
 			Shader pixelShader = GetShader(pixelShaderInterface);
@@ -106,7 +104,7 @@ namespace SRPRendering
 			if (pixelShader != null)
 				_usedShaders.Add(pixelShader);
 
-			var renderTargets = GetRenderTargets(renderTargetHandles);
+			var renderTargets = GetRenderTargets(renderTargetInterfaces);
 
 			_commands.Add(deviceContext => DrawFullscreenQuadImpl(deviceContext, vertexShader, pixelShader, renderTargets, shaderVariableOverrides));
 		}
@@ -123,7 +121,7 @@ namespace SRPRendering
 			_commands.Add(deviceContext => DispatchImpl(deviceContext, cs, numGroupsX, numGroupsY, numGroupsZ, shaderVariableOverrides));
 		}
 
-		public void Clear(dynamic colour, IEnumerable<object> renderTargetHandles = null)
+		public void Clear(dynamic colour, IEnumerable<IRenderTarget> renderTargetInterfaces = null)
 		{
 			// Convert list of floats to a colour.
 			try
@@ -131,7 +129,7 @@ namespace SRPRendering
 				Vector4 vectorColour = ScriptHelper.ConvertToVector4(colour);
 				var rawColour = new RawColor4(vectorColour.X, vectorColour.Y, vectorColour.Z, vectorColour.W);
 
-				var rtvs = GetRTVs(GetRenderTargets(renderTargetHandles));
+				var rtvs = GetRTVs(GetRenderTargets(renderTargetInterfaces));
 
 				_commands.Add(deviceContext => ClearImpl(deviceContext, rawColour, rtvs));
 			}
@@ -141,14 +139,14 @@ namespace SRPRendering
 			}
 		}
 
-		public void DrawWireSphere(dynamic position, float radius, dynamic colour, object renderTargetHandle = null)
+		public void DrawWireSphere(dynamic position, float radius, dynamic colour, IRenderTarget renderTargetInterface = null)
 		{
 			try
 			{
 				// Convert position and colour to a real vector and colour.
 				var pos = ScriptHelper.ConvertToVector3(position);
 				var col = new Vector4(ScriptHelper.ConvertToVector3(colour), 1.0f);
-				var renderTarget = GetRenderTarget(renderTargetHandle);
+				var renderTarget = GetRenderTarget(renderTargetInterface);
 
 				_commands.Add(deviceContext => DrawWireSphereImpl(deviceContext, pos, radius, col, renderTarget));
 			}
@@ -339,26 +337,30 @@ namespace SRPRendering
 		}
 
 		// Access a render target by handle.
-		private RenderTarget GetRenderTarget(object handleObj, [CallerMemberName] string caller = null)
+		private RenderTarget GetRenderTarget(IRenderTarget rt, [CallerMemberName] string caller = null)
 		{
 			// Null has special meaning (using backbuffer).
-			if (handleObj == null)
+			if (rt == null)
 			{
 				return null;
 			}
 
-			var handle = handleObj as RenderTargetHandle;
+			var handle = rt as RenderTargetHandle;
 
-			// If it's not the right type, or not a valid index, throw.
-			if (handle == null || handle.index < 0 || handle.index >= shaders.Count)
+			// If it's not the right type, throw.
+			if (handle == null)
+			{
 				throw new ScriptException(string.Format("Invalid render target given to {0}.", caller));
+			}
 
-			return renderTargetResources[handle.index];
+			// Resource must have been allocated by now.
+			Trace.Assert(handle.RenderTarget != null);
+			return handle.RenderTarget;
 		}
 
 		// Get list of render targets for a list of handles.
-		private IEnumerable<RenderTarget> GetRenderTargets(IEnumerable<object> renderTargetHandles)
-			=> renderTargetHandles
+		private IEnumerable<RenderTarget> GetRenderTargets(IEnumerable<IRenderTarget> renderTargets)
+			=> renderTargets
 				.EmptyIfNull()
 				.Select(handle => GetRenderTarget(handle))
 				.ToList();
@@ -460,7 +462,6 @@ namespace SRPRendering
 
 		private RenderScene scene;
 		private IList<Shader> shaders;
-		private IList<RenderTarget> renderTargetResources;
 		private ViewInfo viewInfo;
 		private IGlobalResources _globalResources;
 	}

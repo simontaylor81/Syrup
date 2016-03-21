@@ -37,7 +37,7 @@ namespace SRPRendering
 			_userVariables.Clear();
 
 			// Clear render target descriptors and dispose the actual render targets.
-			DisposableUtil.DisposeList(renderTargets);
+			DisposableUtil.DisposeList(_renderTargets);
 			DisposableUtil.DisposeList(textures);
 
 			// Dispose resources registered for cleanup.
@@ -213,10 +213,10 @@ namespace SRPRendering
 		#endregion
 
 		// Create a render target of dimensions equal to the viewport.
-		public object CreateRenderTarget()
+		public IRenderTarget CreateRenderTarget()
 		{
-			renderTargets.Add(new RenderTargetDescriptor(new SharpDX.DXGI.Rational(1, 1), new SharpDX.DXGI.Rational(1, 1), true));
-			return new RenderTargetHandle(renderTargets.Count - 1);
+			return _renderTargets.AddAndReturn(new RenderTargetHandle(
+				new SharpDX.DXGI.Rational(1, 1), new SharpDX.DXGI.Rational(1, 1), true));
 		}
 
 		// Create a 2D texture of the given size and format, and fill it with the given data.
@@ -284,7 +284,7 @@ namespace SRPRendering
 			Reset();
 
 			shaders.Clear();
-			DisposableUtil.DisposeList(renderTargets);
+			DisposableUtil.DisposeList(_renderTargets);
 
 			_device = null;
 		}
@@ -301,7 +301,6 @@ namespace SRPRendering
 					viewInfo,
 					renderScene,
 					shaders,
-					(from desc in renderTargets select desc.renderTarget).ToArray(),
 					_device.GlobalResources);
 
 				frameCallback(renderContext);
@@ -312,20 +311,9 @@ namespace SRPRendering
 
 		private void UpdateRenderTargets(int viewportWidth, int viewportHeight)
 		{
-			foreach (var desc in renderTargets)
+			foreach (var rt in _renderTargets)
 			{
-				int width = desc.GetWidth(viewportWidth);
-				int height = desc.GetHeight(viewportHeight);
-
-				// If there's no resource, or it's the wrong size, create a new one.
-				if (desc.renderTarget == null || desc.renderTarget.Width != width || desc.renderTarget.Height != height)
-				{
-					// Don't forget to release the old one.
-					desc.renderTarget?.Dispose();
-
-					// TODO: Custom format
-					desc.renderTarget = new RenderTarget(_device.Device, width, height, SharpDX.DXGI.Format.R8G8B8A8_UNorm);
-				}
+				rt.UpdateSize(_device.Device, viewportWidth, viewportHeight);
 			}
 		}
 
@@ -389,7 +377,7 @@ namespace SRPRendering
 		private List<IDisposable> _resources = new List<IDisposable>();
 
 		// List of render targets and their descritors.
-		private List<RenderTargetDescriptor> renderTargets = new List<RenderTargetDescriptor>();
+		private List<RenderTargetHandle> _renderTargets = new List<RenderTargetHandle>();
 
 		// Master callback that we call each frame.
 		private FrameCallback frameCallback;

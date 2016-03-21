@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using SharpDX.Direct3D11;
 using SRPRendering.Resources;
 
-namespace SRPRendering
+namespace SRPRendering.Resources
 {
 	// Encapsulation of a D3D render target.
 	class RenderTarget : IDisposable, ID3DShaderResource

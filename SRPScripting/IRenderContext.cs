@@ -16,7 +16,7 @@ namespace SRPScripting
 			RastState rastState = null,
 			DepthStencilState depthStencilState = null,
 			BlendState blendState = null,
-			IEnumerable<object> renderTargets = null,
+			IEnumerable<IRenderTarget> renderTargets = null,
 			object depthBuffer = null,
 			IDictionary<string, object> shaderVariableOverrides = null);
 
@@ -27,7 +27,7 @@ namespace SRPScripting
 			RastState rastState = null,
 			DepthStencilState depthStencilState = null,
 			BlendState blendState = null,
-			IEnumerable<object> renderTargets = null,
+			IEnumerable<IRenderTarget> renderTargets = null,
 			object depthBuffer = null,
 			IDictionary<string, object> shaderVariableOverrides = null);
 
@@ -35,7 +35,7 @@ namespace SRPScripting
 		void DrawFullscreenQuad(
 			IShader vertexShaderIndex,
 			IShader pixelShaderIndex,
-			IEnumerable<object> renderTargets = null,
+			IEnumerable<IRenderTarget> renderTargets = null,
 			IDictionary<string, object> shaderVariableOverrides = null);
 
 		// Dispatch a compute shader.
@@ -43,13 +43,13 @@ namespace SRPScripting
 			IDictionary<string, object> shaderVariableOverrides = null);
 
 		// Clear render targets.
-		void Clear(dynamic colour, IEnumerable<object> renderTargets = null);
+		void Clear(dynamic colour, IEnumerable<IRenderTarget> renderTargets = null);
 
 		// Draw a wireframe sphere.
 		void DrawWireSphere(
 			dynamic position,
 			float radius,
 			dynamic colour,
-			object renderTarget = null);
+			IRenderTarget renderTarget = null);
 	}
 }
