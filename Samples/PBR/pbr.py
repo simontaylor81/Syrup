@@ -8,21 +8,26 @@ ps_noibl = ri.CompileShader("pbr.hlsl", "SolidColourPS", "ps_4_0", { 'PBR_USE_IB
 backgroundVs = ri.CompileShader("background.hlsl", "VS", "vs_4_0")
 backgroundPs = ri.CompileShader("background.hlsl", "PS", "ps_4_0")
 
-pixelshaders = [ps_ibl, ps_noibl]
-ri.BindShaderVariableToMaterial(pixelshaders, "BaseColour", "BaseColour")
-ri.BindShaderVariableToMaterial(pixelshaders, "PbrParams", "PbrParams")
-
-ri.BindShaderResourceToMaterial(pixelshaders, "BaseColourTex", "BaseColour", fallback = ri.WhiteTexture);
-ri.BindShaderResourceToMaterial(pixelshaders, "SmoothnessTex", "Smoothness", fallback = ri.WhiteTexture);
-ri.BindShaderResourceToMaterial(pixelshaders, "MetallicTex", "Metallic", fallback = ri.WhiteTexture);
-ri.BindShaderResourceToMaterial(pixelshaders, "NormalTex", "Normal", fallback = ri.DefaultNormalTexture);
-
-useIbl = ri.AddUserVar_Bool("Use IBL", True)
-
 # Load environment cubemap.
 envmap = ri.LoadTexture("assets/Arches_E_PineTree_Cube.dds")
-ri.SetShaderResourceVariable(backgroundPs, "EnvCube", envmap)
-ri.SetShaderResourceVariable(pixelshaders, "EnvCube", envmap)
+
+def BindPixelShaderVars(ps):
+	ps.FindConstantVariable("BaseColour").BindToMaterial("BaseColour")
+	ps.FindConstantVariable("PbrParams").BindToMaterial("PbrParams")
+
+	ps.FindResourceVariable("BaseColourTex").BindToMaterial("BaseColour", fallback = ri.WhiteTexture);
+	ps.FindResourceVariable("SmoothnessTex").BindToMaterial("Smoothness", fallback = ri.WhiteTexture);
+	ps.FindResourceVariable("MetallicTex").BindToMaterial("Metallic", fallback = ri.WhiteTexture);
+	ps.FindResourceVariable("NormalTex").BindToMaterial("Normal", fallback = ri.DefaultNormalTexture);
+	
+	ps.FindResourceVariable("EnvCube").Set(envmap);
+
+	
+BindPixelShaderVars(ps_ibl)
+BindPixelShaderVars(ps_noibl)
+backgroundPs.FindResourceVariable("EnvCube").Set(envmap);
+
+useIbl = ri.AddUserVar_Bool("Use IBL", True)
 
 def RenderFrame(context):
 	context.Clear((0.5, 0.5, 1.0, 0))
