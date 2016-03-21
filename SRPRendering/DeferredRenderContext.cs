@@ -47,7 +47,15 @@ namespace SRPRendering
 
 		#region IRenderContext interface
 
-		public void DrawScene(IShader vertexShaderInterface, IShader pixelShaderInterface, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<IRenderTarget> renderTargetInterfaces = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawScene(
+			IShader vertexShaderInterface,
+			IShader pixelShaderInterface,
+			RastState rastState = null,
+			SRPScripting.DepthStencilState depthStencilState = null,
+			SRPScripting.BlendState blendState = null,
+			IEnumerable<IRenderTarget> renderTargetInterfaces = null,
+			IDepthBuffer depthBuffer = null,
+			IDictionary<string, object> shaderVariableOverrides = null)
 		{
 			Shader vertexShader = GetShader(vertexShaderInterface);
 			Shader pixelShader = GetShader(pixelShaderInterface);
@@ -71,7 +79,15 @@ namespace SRPRendering
 				depthStencilState, blendState, renderTargets, dsv, shaderVariableOverrides));
 		}
 
-		public void DrawSphere(IShader vertexShaderInterface, IShader pixelShaderInterface, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<IRenderTarget> renderTargetInterfaces = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawSphere(
+			IShader vertexShaderInterface,
+			IShader pixelShaderInterface,
+			RastState rastState = null,
+			SRPScripting.DepthStencilState depthStencilState = null,
+			SRPScripting.BlendState blendState = null,
+			IEnumerable<IRenderTarget> renderTargetInterfaces = null,
+			IDepthBuffer depthBuffer = null,
+			IDictionary<string, object> shaderVariableOverrides = null)
 		{
 			Shader vertexShader = GetShader(vertexShaderInterface);
 			Shader pixelShader = GetShader(pixelShaderInterface);
@@ -303,7 +319,7 @@ namespace SRPRendering
 			var transform = Matrix4x4.CreateScale(radius, radius, radius) * Matrix4x4.CreateTranslation(position);
 
 			// Set shader constants.
-			_globalResources.BasicShaders.SolidColourShaderVar.Set(colour);
+			_globalResources.BasicShaders.SolidColourShaderVar.SetValue(colour);
 			UpdateShaders(deviceContext, _globalResources.BasicShaders.BasicSceneVS, _globalResources.BasicShaders.SolidColourPS, new SimplePrimitiveProxy(transform), null);
 
 			// Set input layout
@@ -366,21 +382,21 @@ namespace SRPRendering
 				.ToList();
 
 		// Get the depth buffer corresponding to a handle.
-		private DepthStencilView GetDepthBuffer(object handle)
+		private DepthStencilView GetDepthBuffer(IDepthBuffer handle)
 		{
-			if (handle == null || DepthBufferHandle.Default.Equals(handle))
+			// Null means render to the default depth buffer.
+			if (handle == null)
 			{
 				return viewInfo.DepthBuffer.DSV;
 			}
-			else if (DepthBufferHandle.NoDepthBuffer.Equals(handle))
+
+			var db = handle as ID3DDepthBuffer;
+			if (db == null)
 			{
-				return null;
-			}
-			else
-			{
-				// TODO: User-allocated depth buffers.
 				throw new ScriptException("Invalid depth buffer.");
 			}
+
+			return db.DSV;
 		}
 
 		// Set the given shaders to the device.

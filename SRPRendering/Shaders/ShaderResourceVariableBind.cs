@@ -57,12 +57,4 @@ namespace SRPRendering.Shaders
 
 		private readonly ID3DShaderResource _resource;
 	}
-
-	class DefaultDepthBufferShaderResourceVariableBinding : IShaderResourceVariableBinding
-	{
-		public ShaderResourceView GetResource(IPrimitive primitive, ViewInfo viewInfo, IGlobalResources globalResources)
-		{
-			return viewInfo.DepthBuffer.SRV;
-		}
-	}
 }

@@ -17,7 +17,7 @@ namespace SRPScripting
 			DepthStencilState depthStencilState = null,
 			BlendState blendState = null,
 			IEnumerable<IRenderTarget> renderTargets = null,
-			object depthBuffer = null,
+			IDepthBuffer depthBuffer = null,
 			IDictionary<string, object> shaderVariableOverrides = null);
 
 		// Draw a shaded sphere.
@@ -28,7 +28,7 @@ namespace SRPScripting
 			DepthStencilState depthStencilState = null,
 			BlendState blendState = null,
 			IEnumerable<IRenderTarget> renderTargets = null,
-			object depthBuffer = null,
+			IDepthBuffer depthBuffer = null,
 			IDictionary<string, object> shaderVariableOverrides = null);
 
 		// Draw a fullscreen quad.

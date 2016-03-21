@@ -135,6 +135,7 @@
   <ItemGroup>
     <Compile Include="BasicMesh.cs" />
     <Compile Include="Resources\Buffer.cs" />
+    <Compile Include="Resources\DepthBufferHandle.cs" />
     <Compile Include="Resources\RenderTargetHandle.cs" />
     <Compile Include="Shaders\ConstantBuffer.cs" />
     <Compile Include="DepthBuffer.cs" />
@@ -168,7 +169,6 @@
     <Compile Include="RenderScene.cs" />
     <Compile Include="Resources\RenderTarget.cs" />
     <Compile Include="RenderUtils.cs" />
-    <Compile Include="ResourceHandles.cs" />
     <Compile Include="SceneMeshCache.cs" />
     <Compile Include="ScriptInterfaceExtensions.cs" />
     <Compile Include="SyrupRenderer.cs" />

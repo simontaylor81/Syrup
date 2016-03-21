@@ -67,8 +67,8 @@ namespace SRPScripting
 		dynamic GetScene();
 
 		// Handles to special resources.
-		object DepthBuffer { get; }
-		object NoDepthBuffer { get; }
+		IDepthBuffer DepthBuffer { get; }
+		IDepthBuffer NoDepthBuffer { get; }
 
 		ITexture2D BlackTexture { get; }
 		ITexture2D WhiteTexture { get; }

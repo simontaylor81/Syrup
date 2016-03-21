@@ -292,7 +292,7 @@ namespace SRPRendering
 		public void Render(SharpDX.Direct3D11.DeviceContext deviceContext, ViewInfo viewInfo, RenderScene renderScene)
 		{
 			// Create render targets if necessary.
-			UpdateRenderTargets(viewInfo.ViewportWidth, viewInfo.ViewportHeight);
+			UpdateRenderTargets(viewInfo);
 
 			// Let the script do its thing.
 			if (frameCallback != null)
@@ -309,12 +309,15 @@ namespace SRPRendering
 			}
 		}
 
-		private void UpdateRenderTargets(int viewportWidth, int viewportHeight)
+		private void UpdateRenderTargets(ViewInfo viewInfo)
 		{
 			foreach (var rt in _renderTargets)
 			{
-				rt.UpdateSize(_device.Device, viewportWidth, viewportHeight);
+				rt.UpdateSize(_device.Device, viewInfo.ViewportWidth, viewInfo.ViewportHeight);
 			}
+
+			// Update default depth buffer too.
+			DepthBufferHandle.Default.DepthBuffer = viewInfo.DepthBuffer;
 		}
 
 		/*
@@ -355,8 +358,8 @@ namespace SRPRendering
 
 		public dynamic GetScene() => Scene;
 
-		public object DepthBuffer => DepthBufferHandle.Default;
-		public object NoDepthBuffer => DepthBufferHandle.NoDepthBuffer;
+		public IDepthBuffer DepthBuffer => DepthBufferHandle.Default;
+		public IDepthBuffer NoDepthBuffer => DepthBufferHandle.Null;
 
 		public ITexture2D BlackTexture => _device.GlobalResources.BlackTexture;
 		public ITexture2D WhiteTexture => _device.GlobalResources.WhiteTexture;

@@ -31,4 +31,9 @@ namespace SRPScripting
 	public interface IRenderTarget : IShaderResource
 	{
 	}
+
+	// A depth buffer.
+	public interface IDepthBuffer : IShaderResource
+	{
+	}
 }

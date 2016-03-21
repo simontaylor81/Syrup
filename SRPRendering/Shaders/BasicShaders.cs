@@ -26,7 +26,7 @@ namespace SRPRendering.Shaders
 		/// <summary>
 		/// Shader variable for setting the solid colour to use when rendering with the solid colour pixel shader.
 		/// </summary>
-		public IShaderConstantVariable SolidColourShaderVar { get; }
+		public ShaderConstantVariable SolidColourShaderVar { get; }
 
 
 		// List of shader that need to be disposed.
@@ -50,7 +50,7 @@ namespace SRPRendering.Shaders
 			disposables.Add(SolidColourPS);
 
 			// Cache reference to the solid colour variable.
-			SolidColourShaderVar = SolidColourPS.FindConstantVariable("SolidColour");
+			SolidColourShaderVar = (ShaderConstantVariable)SolidColourPS.FindConstantVariable("SolidColour");
 			if (SolidColourShaderVar == null)
 				throw new Exception("Could not find SolidColour variable for solid colour pixel shader.");
 		}
