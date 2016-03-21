@@ -36,9 +36,8 @@ namespace SRPRendering
 			shaders.Clear();
 			_userVariables.Clear();
 
-			// Clear render target descriptors and dispose the actual render targets.
+			// Clear render target handles and dispose the actual render targets.
 			DisposableUtil.DisposeList(_renderTargets);
-			DisposableUtil.DisposeList(textures);
 
 			// Dispose resources registered for cleanup.
 			DisposableUtil.DisposeList(_resources);
@@ -133,53 +132,6 @@ namespace SRPRendering
 				variable.AutoBind();
 			}
 		}
-
-		/*
-		public void SetShaderResourceVariable(object handleOrHandles, string varName, object value)
-		{
-			var variables = GetShaders(handleOrHandles)
-				.Select(shader => shader.FindResourceVariable(varName))
-				.Where(variable => variable != null);
-
-			var texture = GetTexture(value);
-			var buffer = value as BufferHandle;
-			var renderTargetHandle = value as RenderTargetHandle;
-
-			foreach (var variable in variables)
-			{
-				if (variable.Bind != null)
-				{
-					throw new ScriptException("Attempting to bind already bound shader variable: " + varName);
-				}
-
-				if (texture != null)
-				{
-					variable.Bind = new TextureShaderResourceVariableBind(texture);
-				}
-				else if (buffer != null)
-				{
-					variable.Bind = new BufferShaderResourceVariableBind(buffer.Buffer);
-				}
-				else if (renderTargetHandle != null)
-				{
-					// Bind the variable to a render target's SRV.
-					int rtIndex = renderTargetHandle.index;
-					System.Diagnostics.Debug.Assert(rtIndex >= 0 && rtIndex < renderTargets.Count);
-
-					variable.Bind = new RenderTargetShaderResourceVariableBind(renderTargets[rtIndex]);
-				}
-				else if (value == DepthBufferHandle.Default)
-				{
-					// Bind to the default depth buffer.
-					variable.Bind = new DefaultDepthBufferShaderResourceVariableBind();
-				}
-				else
-				{
-					throw new ScriptException("Invalid parameter for shader resource variable value.");
-				}
-			}
-		}
-		*/
 
 		#region User Variables
 		public dynamic AddUserVar_Float(string name, float defaultValue) => AddScalarUserVar<float>(name, defaultValue);
@@ -320,35 +272,6 @@ namespace SRPRendering
 			DepthBufferHandle.Default.DepthBuffer = viewInfo.DepthBuffer;
 		}
 
-		/*
-		// Get the texture to use for a shader resource variable.
-		private Texture GetTexture(object handle)
-		{
-			if (handle == BlackTexture)
-			{
-				return _device.GlobalResources.BlackTexture;
-			}
-			else if (handle == WhiteTexture)
-			{
-				return _device.GlobalResources.WhiteTexture;
-			}
-			else if (handle == DefaultNormalTexture)
-			{
-				return _device.GlobalResources.DefaultNormalTexture;
-			}
-			else if (handle is TextureHandle)
-			{
-				// Bind the variable to a texture's SRV.
-				int texIndex = ((TextureHandle)handle).index;
-				System.Diagnostics.Debug.Assert(texIndex >= 0 && texIndex < textures.Count);
-
-				return textures[texIndex];
-			}
-
-			return null;
-		}
-		*/
-
 		// Register a resource for later disposal, returning it for easy chaining.
 		private T AddResource<T>(T resource) where T : IDisposable
 		{
@@ -372,9 +295,6 @@ namespace SRPRendering
 
 		// Resource arrays.
 		private List<Shader> shaders = new List<Shader>();
-
-		// Script-generated resources.
-		private List<Texture> textures = new List<Texture>();
 
 		// List of resource to be disposed of when reseting or disposing.
 		private List<IDisposable> _resources = new List<IDisposable>();
