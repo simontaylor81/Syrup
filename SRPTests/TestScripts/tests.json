@@ -83,5 +83,8 @@
   },
   {
     "script": "RenderTarget.py"
+  },
+  {
+    "script": "MissingShaderVars.py"
   }
 ]

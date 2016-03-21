@@ -29,6 +29,7 @@
     <include filename="Null.py" runAtStartup="false" />
     <include filename="SimplePixelShader.py" runAtStartup="false" />
     <include filename="RenderTarget.py" runAtStartup="false" />
+    <include filename="MissingShaderVars.py" runAtStartup="false" />
   </folder>
   <OpenDocuments>
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Utils\utils.py" />

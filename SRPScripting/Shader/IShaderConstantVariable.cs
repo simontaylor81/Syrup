@@ -20,5 +20,8 @@ namespace SRPScripting.Shader
 
 		// Mark the variable as being overridden directly from script during rendering.
 		void MarkAsScriptOverride();
+
+		// Is this a null implementation for a missing variable?
+		bool IsNull { get; }
 	}
 }

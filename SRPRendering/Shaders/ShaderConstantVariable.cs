@@ -85,6 +85,7 @@ namespace SRPRendering.Shaders
 	{
 		// IShaderVariable interface.
 		public string Name { get; }
+		public bool IsNull => false;
 
 		#region IShaderConstantVariable interface
 
