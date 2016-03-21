@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 using System.Reactive;
 using System.Reactive.Linq;
 
-namespace SRPRendering
+namespace SRPRendering.Shaders
 {
 	class ScalarShaderVariableUserProperty<T> : IScalarProperty<T> where T : struct
 	{
-		private readonly IEnumerable<IShaderVariable> _variables;
+		private readonly IEnumerable<ShaderConstantVariable> _variables;
 		int _componentIndex;
 
-		public ScalarShaderVariableUserProperty(IEnumerable<IShaderVariable> variables, int componentIndex)
+		public ScalarShaderVariableUserProperty(IEnumerable<ShaderConstantVariable> variables, int componentIndex)
 		{
 			_variables = variables;
 			_componentIndex = componentIndex;

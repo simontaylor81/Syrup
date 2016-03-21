@@ -41,11 +41,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Format.cs" />
-    <Compile Include="IBuffer.cs" />
     <Compile Include="IRenderContext.cs" />
     <Compile Include="IRenderInterface.cs" />
+    <Compile Include="IShaderResource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenderState.cs" />
+    <Compile Include="Shader\IShader.cs" />
+    <Compile Include="Shader\IShaderConstantVariable.cs" />
+    <Compile Include="Shader\IShaderResourceVariable.cs" />
+    <Compile Include="Shader\IShaderSamplerVariable.cs" />
+    <Compile Include="Shader\IShaderUavVariable.cs" />
+    <Compile Include="Shader\IShaderVariable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

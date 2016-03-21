@@ -10,11 +10,11 @@ using System.Reactive;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
 
-namespace SRPRendering
+namespace SRPRendering.Shaders
 {
 	class MatrixShaderVariableUserProperty : IMatrixProperty
 	{
-		public MatrixShaderVariableUserProperty(IEnumerable<IShaderVariable> variables, IUserProperty[,] components)
+		public MatrixShaderVariableUserProperty(IEnumerable<ShaderConstantVariable> variables, IUserProperty[,] components)
 		{
 			var first = variables.First();
 
@@ -42,6 +42,6 @@ namespace SRPRendering
 		}
 
 		private readonly IUserProperty[,] _components;
-		private readonly IEnumerable<IShaderVariable> _variables;
+		private readonly IEnumerable<ShaderConstantVariable> _variables;
 	}
 }

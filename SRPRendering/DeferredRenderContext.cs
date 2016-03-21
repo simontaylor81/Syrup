@@ -8,25 +8,26 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX.Direct3D11;
 using SharpDX.Mathematics.Interop;
-using SRPCommon.Scene;
 using SRPCommon.Scripting;
 using SRPCommon.Util;
+using SRPRendering.Shaders;
 using SRPScripting;
+using SRPScripting.Shader;
 
 namespace SRPRendering
 {
 	class DeferredRenderContext : IRenderContext
 	{
 		private List<Action<DeviceContext>> _commands = new List<Action<DeviceContext>>();
-		private HashSet<Shader> _shaders = new HashSet<Shader>();
+		private HashSet<Shader> _usedShaders = new HashSet<Shader>();
 
 		// All the shaders in use this frame.
-		public IEnumerable<Shader> Shaders => _shaders;
+		public IEnumerable<Shader> UsedShaders => _usedShaders;
 
 		public DeferredRenderContext(
 			ViewInfo viewInfo,
 			RenderScene scene,
-			IList<IShader> shaders,
+			IList<Shader> shaders,
 			IList<RenderTarget> renderTargets,
 			IGlobalResources globalResources)
 		{
@@ -48,10 +49,10 @@ namespace SRPRendering
 
 		#region IRenderContext interface
 
-		public void DrawScene(dynamic vertexShaderIndex, dynamic pixelShaderIndex, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargetHandles = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawScene(IShader vertexShaderInterface, IShader pixelShaderInterface, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargetHandles = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
 		{
-			Shader vertexShader = GetShader(vertexShaderIndex);
-			Shader pixelShader = GetShader(pixelShaderIndex);
+			Shader vertexShader = GetShader(vertexShaderInterface);
+			Shader pixelShader = GetShader(pixelShaderInterface);
 
 			// Vertex shader is not optional.
 			if (vertexShader == null)
@@ -61,9 +62,9 @@ namespace SRPRendering
 			if (scene == null)
 				throw new ScriptException("DrawScene: No scene set.");
 
-			_shaders.Add(vertexShader);
+			_usedShaders.Add(vertexShader);
 			if (pixelShader != null)
-				_shaders.Add(pixelShader);
+				_usedShaders.Add(pixelShader);
 
 			var renderTargets = GetRenderTargets(renderTargetHandles);
 			var dsv = GetDepthBuffer(depthBuffer);
@@ -72,18 +73,18 @@ namespace SRPRendering
 				depthStencilState, blendState, renderTargets, dsv, shaderVariableOverrides));
 		}
 
-		public void DrawSphere(dynamic vertexShaderIndex, dynamic pixelShaderIndex, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargetHandles = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawSphere(IShader vertexShaderInterface, IShader pixelShaderInterface, RastState rastState = null, SRPScripting.DepthStencilState depthStencilState = null, SRPScripting.BlendState blendState = null, IEnumerable<object> renderTargetHandles = null, object depthBuffer = null, IDictionary<string, object> shaderVariableOverrides = null)
 		{
-			Shader vertexShader = GetShader(vertexShaderIndex);
-			Shader pixelShader = GetShader(pixelShaderIndex);
+			Shader vertexShader = GetShader(vertexShaderInterface);
+			Shader pixelShader = GetShader(pixelShaderInterface);
 
 			// Vertex shader is not optional.
 			if (vertexShader == null)
 				throw new ScriptException("DrawSphere: Cannot draw without a vertex shader.");
 
-			_shaders.Add(vertexShader);
+			_usedShaders.Add(vertexShader);
 			if (pixelShader != null)
-				_shaders.Add(pixelShader);
+				_usedShaders.Add(pixelShader);
 
 			var renderTargets = GetRenderTargets(renderTargetHandles);
 			var dsv = GetDepthBuffer(depthBuffer);
@@ -92,25 +93,25 @@ namespace SRPRendering
 				depthStencilState, blendState, renderTargets, dsv, shaderVariableOverrides));
 		}
 
-		public void DrawFullscreenQuad(dynamic vertexShaderIndex, dynamic pixelShaderIndex, IEnumerable<object> renderTargetHandles = null, IDictionary<string, object> shaderVariableOverrides = null)
+		public void DrawFullscreenQuad(IShader vertexShaderInterface, IShader pixelShaderInterface, IEnumerable<object> renderTargetHandles = null, IDictionary<string, object> shaderVariableOverrides = null)
 		{
-			Shader vertexShader = GetShader(vertexShaderIndex);
-			Shader pixelShader = GetShader(pixelShaderIndex);
+			Shader vertexShader = GetShader(vertexShaderInterface);
+			Shader pixelShader = GetShader(pixelShaderInterface);
 
 			// Vertex shader is not optional.
 			if (vertexShader == null)
 				throw new ScriptException("DrawFullscreenQuad: Cannot draw without a vertex shader.");
 
-			_shaders.Add(vertexShader);
+			_usedShaders.Add(vertexShader);
 			if (pixelShader != null)
-				_shaders.Add(pixelShader);
+				_usedShaders.Add(pixelShader);
 
 			var renderTargets = GetRenderTargets(renderTargetHandles);
 
 			_commands.Add(deviceContext => DrawFullscreenQuadImpl(deviceContext, vertexShader, pixelShader, renderTargets, shaderVariableOverrides));
 		}
 
-		public void Dispatch(dynamic shader, int numGroupsX, int numGroupsY, int numGroupsZ, IDictionary<string, object> shaderVariableOverrides = null)
+		public void Dispatch(IShader shader, int numGroupsX, int numGroupsY, int numGroupsZ, IDictionary<string, object> shaderVariableOverrides = null)
 		{
 			Shader cs = GetShader(shader);
 			if (cs == null)
@@ -118,7 +119,7 @@ namespace SRPRendering
 				throw new ScriptException("Dispatch: compute shader is required");
 			}
 
-			_shaders.Add(cs);
+			_usedShaders.Add(cs);
 			_commands.Add(deviceContext => DispatchImpl(deviceContext, cs, numGroupsX, numGroupsY, numGroupsZ, shaderVariableOverrides));
 		}
 
@@ -321,17 +322,20 @@ namespace SRPRendering
 		#endregion
 
 		// Access a shader by handle.
-		private Shader GetShader(dynamic handle, [CallerMemberName] string caller = null)
+		private Shader GetShader(IShader handle, [CallerMemberName] string caller = null)
 		{
 			// null means no shader.
 			if (handle == null)
 				return null;
 
-			// If it's not null, but not a valid index, throw.
-			if (handle.index < 0 || handle.index >= shaders.Count)
+			// Check it's really a shader.
+			var shader = handle as Shader;
+			if (shader == null)
+			{
 				throw new ScriptException(string.Format("Invalid shader given to {0}.", caller));
+			}
 
-			return shaders[handle.index];
+			return shader;
 		}
 
 		// Access a render target by handle.
@@ -378,7 +382,7 @@ namespace SRPRendering
 		}
 
 		// Set the given shaders to the device.
-		private void SetShaders(DeviceContext deviceContext, params IShader[] shaders)
+		private void SetShaders(DeviceContext deviceContext, params Shader[] shaders)
 		{
 			foreach (var shader in shaders)
 			{
@@ -388,7 +392,7 @@ namespace SRPRendering
 		}
 
 		// Update the variables of the given shaders, unless they're null.
-		private void UpdateShaders(DeviceContext deviceContext, IShader vs, IShader ps, IPrimitive primitive, IDictionary<string, object> variableOverrides)
+		private void UpdateShaders(DeviceContext deviceContext, Shader vs, Shader ps, IPrimitive primitive, IDictionary<string, object> variableOverrides)
 		{
 			if (vs != null)
 				vs.UpdateVariables(deviceContext, viewInfo, primitive, variableOverrides, _globalResources);
@@ -455,7 +459,7 @@ namespace SRPRendering
 		}
 
 		private RenderScene scene;
-		private IList<IShader> shaders;
+		private IList<Shader> shaders;
 		private IList<RenderTarget> renderTargetResources;
 		private ViewInfo viewInfo;
 		private IGlobalResources _globalResources;

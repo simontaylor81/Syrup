@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<project DefaultScene="/temp.srpscene">
+<project>
   <folder>
     <folder name="Utils">
       <include filename="Utils/utils.py" runAtStartup="false" />
@@ -21,10 +21,14 @@
       <include filename="CubeMips.py" runAtStartup="false" />
       <include filename="CustomMips.py" runAtStartup="false" />
       <include filename="CustomCubeMips.py" runAtStartup="false" />
+      <include filename="WhiteTexture.py" runAtStartup="false" />
+      <include filename="BlackTexture.py" runAtStartup="false" />
+      <include filename="DefaultNormalTexture.py" runAtStartup="false" />
     </folder>
     <include filename="Clear.py" runAtStartup="false" />
     <include filename="Null.py" runAtStartup="false" />
     <include filename="SimplePixelShader.py" runAtStartup="false" />
+    <include filename="RenderTarget.py" runAtStartup="false" />
   </folder>
   <OpenDocuments>
     <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\Utils\utils.py" />

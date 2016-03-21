@@ -4,15 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX.Direct3D11;
+using SRPRendering.Resources;
 
 namespace SRPRendering
 {
 	// Encapsulation of a D3D render target.
-	class RenderTarget : IDisposable
+	class RenderTarget : IDisposable, ID3DShaderResource
 	{
 		public Texture2D Texture2D => texture;
 		public RenderTargetView RTV => rtv;
 		public ShaderResourceView SRV => srv;
+
+		public UnorderedAccessView UAV { get { throw new NotImplementedException("TODO: Render target UAVs"); } }
 
 		public int Width => texture.Description.Width;
 		public int Height => texture.Description.Height;

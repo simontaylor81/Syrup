@@ -10,7 +10,7 @@ using SRPScripting;
 using SRPCommon.Util;
 using DirectXTexNet;
 
-namespace SRPRendering
+namespace SRPRendering.Resources
 {
 	public enum MipGenerationMode
 	{
@@ -19,10 +19,15 @@ namespace SRPRendering
 		CreateOnly,	// Create the mip chain, but don't put any data in it.
 	}
 
-	public class Texture : IDisposable
+	public class Texture : ID3DShaderResource, ITexture2D, IDisposable
 	{
+		public int Width { get; }
+		public int Height { get; }
+
 		public Texture2D Texture2D { get; }
 		public ShaderResourceView SRV { get; }
+
+		public UnorderedAccessView UAV { get { throw new NotImplementedException("TODO: Texture UAVs"); } }
 
 		// Simple constructor taking a texture and shader resource view.
 		public Texture(Texture2D texture2D, ShaderResourceView srv)

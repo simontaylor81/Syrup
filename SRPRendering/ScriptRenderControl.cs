@@ -11,7 +11,9 @@ using SRPCommon.Scripting;
 using SRPCommon.UserProperties;
 using SRPCommon.Util;
 using SRPRendering.Resources;
+using SRPRendering.Shaders;
 using SRPScripting;
+using SRPScripting.Shader;
 
 namespace SRPRendering
 {
@@ -49,13 +51,13 @@ namespace SRPRendering
 			// Don't add bound variables, not event as read-only
 			// (as they're too slow to update every time we render the frame).
 			var variablesByName = from shader in shaders
-									from variable in shader.Variables
-									where variable.Bind == null
-									group variable by variable.Name;
+								  from variable in shader.ConstantVariables
+								  where variable.Binding == null
+								  group variable by variable.Name;
 
 			// Add shader variable property to the list for each unique name.
 			var result = variablesByName
-				.Select(variableGroup => ShaderVariable.CreateUserProperty(variableGroup));
+				.Select(variableGroup => ShaderUserProperties.Create(variableGroup));
 
 			// Add user variables too.
 			result = result.Concat(_userVariables);
@@ -72,7 +74,7 @@ namespace SRPRendering
 			frameCallback = callback;
 		}
 
-		public object CompileShader(
+		public IShader CompileShader(
 			string filename, string entryPoint, string profile, IDictionary<string, object> defines = null)
 		{
 			var path = FindShader(filename);
@@ -85,23 +87,24 @@ namespace SRPRendering
 
 		// Compile a shader from an in-memory string.
 		// All includes still must come from the file system.
-		public object CompileShaderFromString(string source, string entryPoint, string profile,
+		public IShader CompileShaderFromString(string source, string entryPoint, string profile,
 			IDictionary<string, object> defines = null)
 		{
 			// Don't cache shader from string.
 			// TODO: Would be nice if we could if people are going to use them in scripts.
-			return AddShader(Shader.CompileFromString(
-				_device.Device, source, entryPoint, profile, FindShader, ConvertDefines(defines)));
+			// As they're not cache, we must manually dispose them, so add them to the resource list.
+			return AddShader(AddResource(ShaderCompiler.CompileFromString(
+				_device.Device, source, entryPoint, profile, FindShader, ConvertDefines(defines))));
 		}
 
-		private object AddShader(IShader shader)
+		private IShader AddShader(Shader shader)
 		{
 			shaders.Add(shader);
 
 			// Set up auto variable binds for this shader.
 			BindAutoShaderVariables(shader);
 
-			return new ShaderHandle(shaders.Count - 1);
+			return shader;
 		}
 
 		private ShaderMacro[] ConvertDefines(IDictionary<string, object> defines) =>
@@ -123,108 +126,15 @@ namespace SRPRendering
 		}
 
 		// Set up auto variable binds for a shader
-		private void BindAutoShaderVariables(IShader shader)
+		private void BindAutoShaderVariables(Shader shader)
 		{
-			foreach (var variable in shader.Variables)
+			foreach (var variable in shader.ConstantVariables)
 			{
-				// We auto bind variable with the same name as a bind source.
-				ShaderVariableBindSource source;
-				if (Enum.TryParse(variable.Name, out source))
-				{
-					// Nothing should be bound yet.
-					System.Diagnostics.Debug.Assert(variable.Bind == null);
-					variable.Bind = new SimpleShaderVariableBind(variable, source);
-					variable.IsAutoBound = true;
-				}
+				variable.AutoBind();
 			}
 		}
 
-		public void BindShaderVariable(object handleOrHandles, string varName, ShaderVariableBindSource source)
-		{
-			var shaders = GetShaders(handleOrHandles);
-			var variables = shaders.Select(shader => shader.FindVariable(varName));
-			SetShaderBind(variables, variable => new SimpleShaderVariableBind(variable, source));
-		}
-
-		public void BindShaderVariableToMaterial(object handleOrHandles, string varName, string paramName)
-		{
-			var shaders = GetShaders(handleOrHandles);
-			var variables = shaders.Select(shader => shader.FindVariable(varName));
-			SetShaderBind(variables, variable => new MaterialShaderVariableBind(variable, paramName));
-		}
-
-		public void SetShaderVariable(object handleOrHandles, string varName, dynamic value)
-		{
-			var shaders = GetShaders(handleOrHandles);
-			var variables = shaders.Select(shader => shader.FindVariable(varName));
-			SetShaderBind(variables, variable => new ScriptShaderVariableBind(variable, value));
-		}
-
-		public void ShaderVariableIsScriptOverride(object handleOrHandles, string varName)
-		{
-			var shaders = GetShaders(handleOrHandles);
-			var variables = shaders.Select(shader => shader.FindVariable(varName));
-			SetShaderBind(variables, variable => new ScriptOverrideShaderVariableBind(variable));
-		}
-
-		// Simple helper to avoid duplication.
-		// If the passed in variable is valid, and it is not already bound, sets its
-		// bind to the result of the given function.
-		private void SetShaderBind(IEnumerable<IShaderVariable> variables,
-			Func<IShaderVariable, IShaderVariableBind> createBind)
-		{
-			foreach (var variable in variables)
-			{
-				// Silently fail on null (not-found) variable, as they can be removed by optimisation.
-				if (variable != null)
-				{
-					// Allow manual override of auto-binds
-					if (variable.Bind != null && !variable.IsAutoBound)
-					{
-						throw new ScriptException("Attempting to bind already bound shader variable: " + variable.Name);
-					}
-
-					// Bind the variable's value to the script value.
-					variable.Bind = createBind(variable);
-					variable.IsAutoBound = false;
-				}
-			}
-		}
-
-		public void BindShaderResourceToMaterial(object handleOrHandles, string varName, string paramName, object fallback = null)
-		{
-			var variables = GetShaders(handleOrHandles)
-				.Select(shader => shader.FindResourceVariable(varName))
-				.Where(variable => variable != null);
-
-			Texture fallbackTexture = _device.GlobalResources.ErrorTexture;
-
-			// Ugh, Castle DynamicProxy doesn't pass through the null default value, so detect it.
-			if (fallback == System.Reflection.Missing.Value)
-			{
-				fallback = null;
-			}
-
-			if (fallback != null)
-			{
-				fallbackTexture = GetTexture(fallback);
-				if (fallbackTexture == null)
-				{
-					throw new ScriptException($"Invalid fallback texture binding {varName}");
-				}
-			}
-
-			foreach (var variable in variables)
-			{
-				if (variable.Bind != null)
-				{
-					throw new ScriptException("Attempting to bind already bound shader variable: " + varName);
-				}
-
-				variable.Bind = new MaterialShaderResourceVariableBind(paramName, fallbackTexture);
-			}
-		}
-
+		/*
 		public void SetShaderResourceVariable(object handleOrHandles, string varName, object value)
 		{
 			var variables = GetShaders(handleOrHandles)
@@ -269,45 +179,7 @@ namespace SRPRendering
 				}
 			}
 		}
-
-		public void SetShaderUavVariable(object handleOrHandles, string varName, IBuffer value)
-		{
-			var variables = GetShaders(handleOrHandles)
-				.Select(shader => shader.FindUavVariable(varName))
-				.Where(variable => variable != null);
-
-			var buffer = value as BufferHandle;
-			if (buffer == null)
-			{
-				throw new ScriptException("Invalid buffer for UAV");
-			}
-
-			foreach (var variable in variables)
-			{
-				if (variable.UAV != null)
-				{
-					throw new ScriptException("Attempting to set an already set shader variable: " + varName);
-				}
-
-				variable.UAV = buffer.Buffer.UAV;
-			}
-		}
-
-		public void SetShaderSamplerState(object handleOrHandles, string samplerName, SamplerState state)
-		{
-			var variables = GetShaders(handleOrHandles)
-				.Select(shader => shader.FindSamplerVariable(samplerName))
-				.Where(variable => variable != null);
-
-			foreach (var variable in variables)
-			{
-				if (variable.Bind != null)
-				{
-					throw new ScriptException("Attempting to bind already bound shader sampler: " + samplerName);
-				}
-				variable.Bind = new ShaderSamplerVariableBindDirect(state);
-			}
-		}
+		*/
 
 		#region User Variables
 		public dynamic AddUserVar_Float(string name, float defaultValue) => AddScalarUserVar<float>(name, defaultValue);
@@ -348,14 +220,13 @@ namespace SRPRendering
 		}
 
 		// Create a 2D texture of the given size and format, and fill it with the given data.
-		public object CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false)
+		public ITexture2D CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false)
 		{
-			textures.Add(Texture.CreateFromScript(_device.Device, width, height, format, contents, generateMips));
-			return new TextureHandle(textures.Count - 1);
+			return AddResource(Texture.CreateFromScript(_device.Device, width, height, format, contents, generateMips));
 		}
 
 		// Load a texture from disk.
-		public object LoadTexture(string path, object generateMips = null)
+		public ITexture2D LoadTexture(string path, object generateMips = null)
 		{
 			var absPath = _workspace.GetAbsolutePath(path);
 
@@ -397,8 +268,7 @@ namespace SRPRendering
 				_mipGenerator.Generate(texture, generateMips as string);
 			}
 
-			textures.Add(texture);
-			return new TextureHandle(textures.Count - 1);
+			return AddResource(texture);
 		}
 
 		// Create a buffer of the given size and format, and fill it with the given data.
@@ -459,33 +329,7 @@ namespace SRPRendering
 			}
 		}
 
-		private bool IsValidShaderHandle(ShaderHandle handle)
-			=> handle != null && handle.index >= 0 && handle.index < shaders.Count;
-
-		// Given a shader handle or list of handles, get a list of shaders they correspond to.
-		private IEnumerable<IShader> GetShaders(object handleOrHandles)
-		{
-			var handle = handleOrHandles as ShaderHandle;
-			var handleList = handleOrHandles as IEnumerable<object>;
-
-			IEnumerable<ShaderHandle> handles = null;
-			if (handle != null)
-			{
-				handles = EnumerableEx.Return(handle);
-			}
-			else if (handleList != null)
-			{
-				handles = handleList.Select(h => h as ShaderHandle);
-			}
-
-			if (handles == null || handles.Any(h => !IsValidShaderHandle(h)))
-			{
-				throw new ScriptException("Invalid shader.");
-			}
-
-			return handles.Select(h => shaders[h.index]);
-		}
-
+		/*
 		// Get the texture to use for a shader resource variable.
 		private Texture GetTexture(object handle)
 		{
@@ -512,6 +356,7 @@ namespace SRPRendering
 
 			return null;
 		}
+		*/
 
 		// Register a resource for later disposal, returning it for easy chaining.
 		private T AddResource<T>(T resource) where T : IDisposable
@@ -525,10 +370,9 @@ namespace SRPRendering
 		public object DepthBuffer => DepthBufferHandle.Default;
 		public object NoDepthBuffer => DepthBufferHandle.NoDepthBuffer;
 
-		// These don't need to be anything, we're just going to use them with reference equality checks.
-		public object BlackTexture { get; } = new object();
-		public object WhiteTexture { get; } = new object();
-		public object DefaultNormalTexture { get; } = new object();
+		public ITexture2D BlackTexture => _device.GlobalResources.BlackTexture;
+		public ITexture2D WhiteTexture => _device.GlobalResources.WhiteTexture;
+		public ITexture2D DefaultNormalTexture => _device.GlobalResources.DefaultNormalTexture;
 
 
 		public Scene Scene { get; set; }
@@ -536,7 +380,7 @@ namespace SRPRendering
 		private RenderDevice _device;
 
 		// Resource arrays.
-		private List<IShader> shaders = new List<IShader>();
+		private List<Shader> shaders = new List<Shader>();
 
 		// Script-generated resources.
 		private List<Texture> textures = new List<Texture>();

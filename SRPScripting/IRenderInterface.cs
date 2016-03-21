@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SRPScripting.Shader;
 
 namespace SRPScripting
 {
-	public enum ShaderVariableBindSource
+	public enum ShaderConstantVariableBindSource
 	{
 		WorldToProjectionMatrix,	// Bind to the combined world to projection space matrix.
 		ProjectionToWorldMatrix,	// Bind to the combined projection to world space matrix (i.e. the inverse of the WorldToProjectionMatrix).
@@ -22,19 +23,19 @@ namespace SRPScripting
 	// Interface to the rendering system exposed to the scripting system.
 	public interface IRenderInterface
 	{
-		object CompileShader(string filename, string entryPoint, string profile,
+		IShader CompileShader(string filename, string entryPoint, string profile,
 			IDictionary<string, object> defines = null);
 
 		// Compile a shader from an in-memory string.
 		// All includes still must come from the file system.
-		object CompileShaderFromString(string source, string entryPoint, string profile,
+		IShader CompileShaderFromString(string source, string entryPoint, string profile,
 			IDictionary<string, object> defines = null);
 
 		// Create a render target of dimensions equal to the viewport.
 		object CreateRenderTarget();
 
 		// Create a 2D texture of the given size and format, and fill it with the given data.
-		object CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false);
+		ITexture2D CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false);
 
 		// Create a buffer of the given size and format, and fill it with the given data.
 		IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents, bool uav = false);
@@ -43,17 +44,7 @@ namespace SRPScripting
 		IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents, bool uav = false) where T : struct;
 
 		// Load a texture from a file.
-		object LoadTexture(string path, object generateMips = null);
-
-		void BindShaderVariable(object shader, string var, ShaderVariableBindSource source);
-		void BindShaderVariableToMaterial(object shader, string var, string param);
-		void SetShaderVariable(object shader, string var, dynamic value);
-		void ShaderVariableIsScriptOverride(object shader, string var);
-
-		void BindShaderResourceToMaterial(object shader, string var, string param, object fallback = null);
-		void SetShaderResourceVariable(object shader, string var, object value);
-		void SetShaderSamplerState(object shader, string samplerName, SamplerState state);
-		void SetShaderUavVariable(object shader, string var, IBuffer value);
+		ITexture2D LoadTexture(string path, object generateMips = null);
 
 		#region User Variables
 		dynamic AddUserVar_Float(string name, float defaultValue);
@@ -76,12 +67,11 @@ namespace SRPScripting
 		dynamic GetScene();
 
 		// Handles to special resources.
-		//object BackBuffer { get; }
 		object DepthBuffer { get; }
 		object NoDepthBuffer { get; }
 
-		object BlackTexture { get; }
-		object WhiteTexture { get; }
-		object DefaultNormalTexture { get; }
+		ITexture2D BlackTexture { get; }
+		ITexture2D WhiteTexture { get; }
+		ITexture2D DefaultNormalTexture { get; }
 	}
 }

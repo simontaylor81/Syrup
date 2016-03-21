@@ -31,7 +31,7 @@ namespace ShaderUnit.ShaderTests
 			// Input buffer.
 			var input = Enumerable.Range(0, 16).Select(x => (float)x);
 			var inputBuffer = ri.CreateStructuredBuffer(input);
-			ri.SetShaderResourceVariable(cs, "InBuffer", inputBuffer);
+			cs.FindResourceVariable("InBuffer").Set(inputBuffer);
 
 			var result = RenderHarness.DispatchToBuffer<float>(cs, "OutUAV", Tuple.Create(16, 1, 1), Tuple.Create(16, 1, 1));
 			Assert.That(result, Is.EqualTo(input.Select(x => 2.0f * x)));
@@ -51,7 +51,7 @@ namespace ShaderUnit.ShaderTests
 				Uint = 100 + 2 * (uint)x,
 			});
 			var inputBuffer = ri.CreateStructuredBuffer(input);
-			ri.SetShaderResourceVariable(cs, "InBufferComplex", inputBuffer);
+			cs.FindResourceVariable("InBufferComplex").Set(inputBuffer);
 
 			var result = RenderHarness.DispatchToBuffer<float>(cs, "OutUAV", Tuple.Create(16, 1, 1), Tuple.Create(16, 1, 1));
 			Assert.That(result, Is.EqualTo(input.Select(x => x.Vec2.X + x.Vec2.Y + x.Uint)));

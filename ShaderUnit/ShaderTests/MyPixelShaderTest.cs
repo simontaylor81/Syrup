@@ -18,7 +18,7 @@ namespace ShaderUnit.ShaderTests
 			var vs = ri.CompileShader("ConstantColour.hlsl", "VS", "vs_4_0");
 			var ps = ri.CompileShader("ConstantColour.hlsl", "PS", "ps_4_0");
 
-			ri.SetShaderVariable(ps, "Colour", new[] { 1, 0, 0, 1 });
+			ps.FindConstantVariable("Colour").Set(new[] { 1, 0, 0, 1 });
 
 			var result = RenderHarness.RenderFullscreenImage(vs, ps);
 			CompareImage(result);
@@ -33,7 +33,7 @@ namespace ShaderUnit.ShaderTests
 			var vs = ri.CompileShader("ConstantColour.hlsl", "VS", "vs_4_0");
 			var ps = ri.CompileShader("ConstantColour.hlsl", "PS", "ps_4_0");
 
-			ri.SetShaderVariable(ps, "Colour", new[] { r, g, b, a });
+			ps.FindConstantVariable("Colour").Set(new[] { r, g, b, a });
 
 			ri.SetFrameCallback(context =>
 			{

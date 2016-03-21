@@ -10,22 +10,26 @@ def TestSetting(key, default, globalsDict):
 
 
 # Texture testing helper.
-def TestTexture_Impl(ri, tex, psEntryPoint, texShaderVar, level = None):
+def GetTestTextureCallback(ri, tex, psEntryPoint, texShaderVar, level = None):
 	# Compile shaders.
 	vs = ri.CompileShader("FullscreenTexture.hlsl", "FullscreenTexture_VS", "vs_4_0")
 	ps = ri.CompileShader("FullscreenTexture.hlsl", psEntryPoint, "ps_4_0")
 	
-	ri.SetShaderResourceVariable(ps, texShaderVar, tex)
-	ri.SetShaderSamplerState(ps, "mySampler", SamplerState.PointClamp)
+	ps.FindResourceVariable(texShaderVar).Set(tex)
+	ps.FindSamplerVariable("mySampler").Set(SamplerState.PointClamp)
 	
 	if level != None:
-		ri.SetShaderVariable(ps, "MipLevel", level)
+		ps.FindConstantVariable("MipLevel").Set(level)
+		#ri.SetShaderVariable(ps, "MipLevel", level)
 	
 	def RenderFrame(context):
 		# Draw the texture fullscreen.
 		context.DrawFullscreenQuad(vs, ps)
-	
-	ri.SetFrameCallback(RenderFrame)
+		
+	return RenderFrame
+
+def TestTexture_Impl(ri, tex, psEntryPoint, texShaderVar, level = None):
+	ri.SetFrameCallback(GetTestTextureCallback(ri, tex, psEntryPoint, texShaderVar, level))
 	
 def TestTexture(ri, tex):
 	TestTexture_Impl(ri, tex, "FullscreenTexture_PS", "tex")

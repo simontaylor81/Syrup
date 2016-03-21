@@ -50,7 +50,7 @@ namespace SRPRendering
 			new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 0),
 		};
 
-		private int VertexStride => Marshal.SizeOf(typeof(Vector4));
+		private int VertexStride => Marshal.SizeOf<Vector4>();
 
 		private SharpDX.Direct3D11.Buffer vertexBuffer;
 	}

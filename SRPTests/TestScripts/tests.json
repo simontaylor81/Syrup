@@ -37,6 +37,16 @@
     "script": "TextureCubemap.py"
   },
 
+  {
+    "script": "WhiteTexture.py"
+  },
+  {
+    "script": "BlackTexture.py"
+  },
+  {
+    "script": "DefaultNormalTexture.py"
+  },
+
   // Tests for cubemap mipmap generation.
   {
     "script": "CubeMips.py",

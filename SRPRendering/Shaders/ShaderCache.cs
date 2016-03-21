@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 using SharpDX.Direct3D11;
 using System.Security.Cryptography;
 using SharpDX.Direct3D;
+using SRPScripting.Shader;
 
-namespace SRPRendering
+namespace SRPRendering.Shaders
 {
-	public interface IShaderCache : IDisposable
+	interface IShaderCache : IDisposable
 	{
-		IShader GetShader(string filename, string entryPoint, string profile,
+		Shader GetShader(string filename, string entryPoint, string profile,
 			Func<string, string> includeLookup, ShaderMacro[] defines);
 	}
 
@@ -33,7 +34,7 @@ namespace SRPRendering
 			cache.Clear();
 		}
 
-		public IShader GetShader(string filename, string entryPoint, string profile,
+		public Shader GetShader(string filename, string entryPoint, string profile,
 			Func<string, string> includeLookup, ShaderMacro[] defines)
 		{
 			defines = defines ?? new ShaderMacro[0];
@@ -72,13 +73,13 @@ namespace SRPRendering
 
 			// If we go this far, either the shader is not present or had a hash mismatch,
 			// so, we compile a new shader.
-			var shader = Shader.CompileFromFile(device, filename, entryPoint, profile, includeLookup, defines);
+			var shader = ShaderCompiler.CompileFromFile(device, filename, entryPoint, profile, includeLookup, defines);
 			cache[key] = new ShaderCacheEntry(shader, ComputeHash(GetAllPaths(filename, shader)));
 
 			return shader;
 		}
 
-		private IEnumerable<string> GetAllPaths(string baseFile, IShader shader)
+		private IEnumerable<string> GetAllPaths(string baseFile, Shader shader)
 		{
 			return shader.IncludedFiles.Select(f => f.ResolvedFile)
 				.StartWith(baseFile);

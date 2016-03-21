@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SRPScripting
+namespace SRPScripting.Shader
 {
-	// A handle to a D3D Buffer
-	public interface IBuffer
+	public interface IShaderUavVariable : IShaderVariable
 	{
-		IEnumerable<T> GetContents<T>() where T : struct;
+		void Set(IShaderResource resource);
 	}
 }

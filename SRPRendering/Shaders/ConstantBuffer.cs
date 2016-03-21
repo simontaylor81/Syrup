@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
 
-namespace SRPRendering
+namespace SRPRendering.Shaders
 {
 	class ConstantBuffer : IDisposable
 	{
-		private ShaderVariable[] variables;
+		private ShaderConstantVariable[] variables;
 
 		private readonly DataBox _contents;
 		private readonly DataStream _stream;
 
 		public string Name { get; }
 		public SharpDX.Direct3D11.Buffer Buffer { get; }
-		public IEnumerable<IShaderVariable> Variables => variables;
+		public IEnumerable<ShaderConstantVariable> Variables => variables;
 
 		public ConstantBuffer(Device device, SharpDX.D3DCompiler.ConstantBuffer bufferInfo)
 		{
@@ -25,7 +25,7 @@ namespace SRPRendering
 
 			// Gather info about the variables in this buffer.
 			variables = bufferInfo.GetVariables()
-				.Select(variable => new ShaderVariable(variable))
+				.Select(variable => new ShaderConstantVariable(variable))
 				.ToArray();
 
 			// Create a data stream containing the initial contents buffer.

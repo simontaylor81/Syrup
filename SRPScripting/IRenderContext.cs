@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SRPScripting.Shader;
 
 namespace SRPScripting
 {
@@ -10,8 +11,8 @@ namespace SRPScripting
 	{
 		// Draw the full scene.
 		void DrawScene(
-			dynamic vertexShaderIndex,
-			dynamic pixelShaderIndex,
+			IShader vertexShaderIndex,
+			IShader pixelShaderIndex,
 			RastState rastState = null,
 			DepthStencilState depthStencilState = null,
 			BlendState blendState = null,
@@ -21,8 +22,8 @@ namespace SRPScripting
 
 		// Draw a shaded sphere.
 		void DrawSphere(
-			dynamic vertexShaderIndex,
-			dynamic pixelShaderIndex,
+			IShader vertexShaderIndex,
+			IShader pixelShaderIndex,
 			RastState rastState = null,
 			DepthStencilState depthStencilState = null,
 			BlendState blendState = null,
@@ -32,13 +33,13 @@ namespace SRPScripting
 
 		// Draw a fullscreen quad.
 		void DrawFullscreenQuad(
-			dynamic vertexShaderIndex,
-			dynamic pixelShaderIndex,
+			IShader vertexShaderIndex,
+			IShader pixelShaderIndex,
 			IEnumerable<object> renderTargets = null,
 			IDictionary<string, object> shaderVariableOverrides = null);
 
 		// Dispatch a compute shader.
-		void Dispatch(dynamic shader, int numGroupsX, int numGroupsY, int numGroupsZ,
+		void Dispatch(IShader shader, int numGroupsX, int numGroupsY, int numGroupsZ,
 			IDictionary<string, object> shaderVariableOverrides = null);
 
 		// Clear render targets.

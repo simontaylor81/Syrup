@@ -10,9 +10,12 @@ using SRPScripting;
 
 namespace SRPRendering.Resources
 {
-	class Buffer : IDisposable
+	class Buffer : ID3DShaderResource, IBuffer, IDisposable
 	{
 		private SharpDX.Direct3D11.Buffer _buffer;
+
+		public int ElementCount { get; }
+		public int SizeInBytes { get; }
 
 		public ShaderResourceView SRV { get; }
 		public UnorderedAccessView UAV { get; }
@@ -33,7 +36,7 @@ namespace SRPRendering.Resources
 		{
 			using (var initialData = contents.ToDataStream())
 			{
-				return new Buffer(device, (int)initialData.Length, Marshal.SizeOf(typeof(T)), uav, initialData);
+				return new Buffer(device, (int)initialData.Length, Marshal.SizeOf<T>(), uav, initialData);
 			}
 		}
 
@@ -71,6 +74,9 @@ namespace SRPRendering.Resources
 			{
 				UAV = new UnorderedAccessView(device, _buffer);
 			}
+			
+			ElementCount = sizeInBytes / stride;
+			SizeInBytes = sizeInBytes;
 		}
 
 		public void Dispose()
@@ -85,7 +91,10 @@ namespace SRPRendering.Resources
 		{
 			DataStream stream;
 			_buffer.Device.ImmediateContext.MapSubresource(_buffer, 0, MapMode.Read, MapFlags.None, out stream);
-			return stream.ReadRange<T>((int)(stream.Length / Marshal.SizeOf(typeof(T))));
+			using (stream)
+			{
+				return stream.ReadRange<T>((int)(stream.Length / Marshal.SizeOf<T>()));
+			}
 		}
 	}
 }

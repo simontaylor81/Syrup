@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using SharpDX.Direct3D11;
 using SRPCommon.Util;
 using System.Reactive.Disposables;
+using SRPRendering.Resources;
+using SRPRendering.Shaders;
 
 namespace SRPRendering
 {
-	public interface IGlobalResources : IDisposable
+	internal interface IGlobalResources : IDisposable
 	{
 		// Simple constant colour textures.
 		Texture BlackTexture { get; }
@@ -24,7 +26,7 @@ namespace SRPRendering
 		IDrawable SphereMesh { get; }
 		IDrawable FullscreenQuad { get; }
 
-		IBasicShaders BasicShaders { get; }
+		BasicShaders BasicShaders { get; }
 		IShaderCache ShaderCache { get; }
 
 		// State object caches.
@@ -49,7 +51,7 @@ namespace SRPRendering
 		public IDrawable SphereMesh { get; }
 		public IDrawable FullscreenQuad { get; }
 
-		public IBasicShaders BasicShaders { get; }
+		public BasicShaders BasicShaders { get; }
 		public IShaderCache ShaderCache { get; }
 
 		// State object caches.

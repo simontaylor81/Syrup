@@ -17,7 +17,7 @@ namespace SRPRendering
 	public class RenderDevice : IDisposable
 	{
 		public Device Device { get; }
-		public IGlobalResources GlobalResources { get; }
+		internal IGlobalResources GlobalResources { get; }
 
 		public Adapter Adapter => _adapter.Value;
 		private Lazy<Adapter> _adapter;

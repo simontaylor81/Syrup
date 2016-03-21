@@ -10,11 +10,11 @@ using System.Reactive;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
 
-namespace SRPRendering
+namespace SRPRendering.Shaders
 {
 	class VectorShaderVariableUserProperty : IVectorProperty
 	{
-		public VectorShaderVariableUserProperty(IEnumerable<IShaderVariable> variables, IUserProperty[] components)
+		public VectorShaderVariableUserProperty(IEnumerable<ShaderConstantVariable> variables, IUserProperty[] components)
 		{
 			var first = variables.First();
 			Debug.Assert(first.VariableType.Class == ShaderVariableClass.Vector ||
@@ -39,6 +39,6 @@ namespace SRPRendering
 		}
 
 		private readonly IUserProperty[] _components;
-		private readonly IEnumerable<IShaderVariable> _variables;
+		private readonly IEnumerable<ShaderConstantVariable> _variables;
 	}
 }

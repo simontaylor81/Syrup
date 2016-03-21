@@ -9,17 +9,17 @@ using SRPCommon.Scripting;
 using System.Numerics;
 using SRPCommon.Util;
 
-namespace SRPRendering
+namespace SRPRendering.Shaders
 {
-	public interface IShaderVariableBind
+	public interface IShaderConstantVariableBinding
 	{
 		void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides);
 		bool AllowScriptOverride { get; }
 	}
 
-	class SimpleShaderVariableBind : IShaderVariableBind
+	class SimpleShaderConstantVariableBinding : IShaderConstantVariableBinding
 	{
-		public SimpleShaderVariableBind(IShaderVariable variable, ShaderVariableBindSource source)
+		public SimpleShaderConstantVariableBinding(ShaderConstantVariable variable, ShaderConstantVariableBindSource source)
 		{
 			this.variable = variable;
 			this.source = source;
@@ -29,48 +29,48 @@ namespace SRPRendering
 		{
 			switch (source)
 			{
-				case ShaderVariableBindSource.WorldToProjectionMatrix:
-					variable.Set(viewInfo.WorldToViewMatrix * viewInfo.ViewToProjMatrix);
+				case ShaderConstantVariableBindSource.WorldToProjectionMatrix:
+					variable.SetValue(viewInfo.WorldToViewMatrix * viewInfo.ViewToProjMatrix);
 					return;
 
-				case ShaderVariableBindSource.ProjectionToWorldMatrix:
+				case ShaderConstantVariableBindSource.ProjectionToWorldMatrix:
 					{
 						var matrix = viewInfo.WorldToViewMatrix * viewInfo.ViewToProjMatrix;
 						Matrix4x4.Invert(matrix, out matrix);
-						variable.Set(matrix);
+						variable.SetValue(matrix);
 					}
 					return;
 
-				case ShaderVariableBindSource.LocalToWorldMatrix:
+				case ShaderConstantVariableBindSource.LocalToWorldMatrix:
 					if (primitive != null)
 					{
-						variable.Set(primitive.LocalToWorld);
+						variable.SetValue(primitive.LocalToWorld);
 						return;
 					}
 					break;
 
-				case ShaderVariableBindSource.WorldToLocalMatrix:
-					if (primitive != null)
-					{
-						var matrix = primitive.LocalToWorld;
-						Matrix4x4.Invert(matrix, out matrix);
-						variable.Set(matrix);
-						return;
-					}
-					break;
-
-				case ShaderVariableBindSource.LocalToWorldInverseTransposeMatrix:
+				case ShaderConstantVariableBindSource.WorldToLocalMatrix:
 					if (primitive != null)
 					{
 						var matrix = primitive.LocalToWorld;
 						Matrix4x4.Invert(matrix, out matrix);
-						variable.Set(Matrix4x4.Transpose(matrix));
+						variable.SetValue(matrix);
 						return;
 					}
 					break;
 
-				case ShaderVariableBindSource.CameraPosition:
-					variable.Set(viewInfo.EyePosition);
+				case ShaderConstantVariableBindSource.LocalToWorldInverseTransposeMatrix:
+					if (primitive != null)
+					{
+						var matrix = primitive.LocalToWorld;
+						Matrix4x4.Invert(matrix, out matrix);
+						variable.SetValue(Matrix4x4.Transpose(matrix));
+						return;
+					}
+					break;
+
+				case ShaderConstantVariableBindSource.CameraPosition:
+					variable.SetValue(viewInfo.EyePosition);
 					return;
 			}
 
@@ -80,13 +80,13 @@ namespace SRPRendering
 
 		public bool AllowScriptOverride => false;
 
-		private IShaderVariable variable;
-		private ShaderVariableBindSource source;
+		private ShaderConstantVariable variable;
+		private ShaderConstantVariableBindSource source;
 	}
 
-	class ScriptShaderVariableBind : IShaderVariableBind
+	class ScriptShaderConstantVariableBinding : IShaderConstantVariableBinding
 	{
-		public ScriptShaderVariableBind(IShaderVariable variable, object value)
+		public ScriptShaderConstantVariableBinding(ShaderConstantVariable variable, object value)
 		{
 			this.variable = variable;
 			this.value = value;
@@ -122,13 +122,13 @@ namespace SRPRendering
 
 		public bool AllowScriptOverride => false;
 
-		private IShaderVariable variable;
+		private ShaderConstantVariable variable;
 		private dynamic value;
 	}
 
-	class MaterialShaderVariableBind : IShaderVariableBind
+	class MaterialShaderConstantVariableBinding : IShaderConstantVariableBinding
 	{
-		public MaterialShaderVariableBind(IShaderVariable variable, string source)
+		public MaterialShaderConstantVariableBinding(ShaderConstantVariable variable, string source)
 		{
 			this.variable = variable;
 			this.source = source;
@@ -165,13 +165,13 @@ namespace SRPRendering
 
 		public bool AllowScriptOverride => false;
 
-		private IShaderVariable variable;
+		private ShaderConstantVariable variable;
 		private string source;
 	}
 
-	class ScriptOverrideShaderVariableBind : IShaderVariableBind
+	class ScriptOverrideShaderConstantVariableBinding : IShaderConstantVariableBinding
 	{
-		public ScriptOverrideShaderVariableBind(IShaderVariable variable)
+		public ScriptOverrideShaderConstantVariableBinding(ShaderConstantVariable variable)
 		{
 			this.variable = variable;
 		}
@@ -201,6 +201,6 @@ namespace SRPRendering
 
 		public bool AllowScriptOverride => true;
 
-		private IShaderVariable variable;
+		private ShaderConstantVariable variable;
 	}
 }

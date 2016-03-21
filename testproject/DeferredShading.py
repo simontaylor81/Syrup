@@ -12,18 +12,18 @@ albedoRT = ri.CreateRenderTarget()
 normalRT = ri.CreateRenderTarget()
 
 # Bind material textures.
-ri.BindShaderResourceToMaterial(basepassPS, "DiffuseTex", "DiffuseTexture")
+basepassPS.FindResourceVariable("DiffuseTex").BindToMaterial("DiffuseTexture")
 
-ri.ShaderVariableIsScriptOverride(deferredPS, "LightColour")
-ri.ShaderVariableIsScriptOverride(deferredPS, "LightPos")
-ri.ShaderVariableIsScriptOverride(deferredVS, "vsLightPos")
-ri.ShaderVariableIsScriptOverride(deferredPS, "LightInvSqrRadius")
-ri.ShaderVariableIsScriptOverride(deferredVS, "vsLightRadius")
+deferredPS.FindConstantVariable("LightColour").MarkAsScriptOverride()
+deferredPS.FindConstantVariable("LightPos").MarkAsScriptOverride()
+deferredVS.FindConstantVariable("vsLightPos").MarkAsScriptOverride()
+deferredPS.FindConstantVariable("LightInvSqrRadius").MarkAsScriptOverride()
+deferredVS.FindConstantVariable("vsLightRadius").MarkAsScriptOverride()
 
 # Bind g-buffer render targets to variables for the deferred pass.
-ri.SetShaderResourceVariable(deferredPS, "GBuffer_Albedo", albedoRT)
-ri.SetShaderResourceVariable(deferredPS, "GBuffer_Normal", normalRT)
-ri.SetShaderResourceVariable(deferredPS, "GBuffer_Depth", ri.DepthBuffer)
+deferredPS.FindResourceVariable("GBuffer_Albedo").Set(albedoRT)
+deferredPS.FindResourceVariable("GBuffer_Normal").Set(normalRT)
+deferredPS.FindResourceVariable("GBuffer_Depth").Set(ri.DepthBuffer)
 
 # Little helper to convert radius to inverse-square-radius.
 def InvSqrRadius(radius):

@@ -104,7 +104,7 @@ namespace SRPRendering
 					break;
 
 				case Format.R8G8B8A8_UNorm:
-				case Format.R8G8B8A8_UNorm_SRGB:
+				case Format.R8G8B8A8_UNorm_SRgb:
 					for (int i = 0; i < numComponents; i++)
 						stream.Write((byte)ToUNorm((float)element[i], 255.0f));
 					break;
@@ -158,7 +158,7 @@ namespace SRPRendering
 		// Create a stream from an enumerable (directly, no format conversion).
 		public static DataStream ToDataStream<T>(this IEnumerable<T> contents) where T : struct
 		{
-			var size = contents.Count() * Marshal.SizeOf(typeof(T));
+			var size = contents.Count() * Marshal.SizeOf<T>();
 			var result = new DataStream(size, true, true);
 			foreach (var element in contents)
 			{

@@ -10,8 +10,10 @@ using SRPCommon.UserProperties;
 using SRPCommon.Scripting;
 using SharpDX.D3DCompiler;
 using SharpDX;
+using SRPScripting.Shader;
+using SRPScripting;
 
-namespace SRPRendering
+namespace SRPRendering.Shaders
 {
 	// Need out own shader variable type descriptor because the SlimDX one just references a D3D
 	// object that needs to be cleaned up after compilation is complete.
@@ -34,6 +36,7 @@ namespace SRPRendering
 			=> Class == other.Class && Type == other.Type && Columns == other.Columns && Rows == other.Rows;
 	}
 
+	/*
 	/// <summary>
 	/// A single constant (non-resource) shader input.
 	/// </summary>
@@ -73,25 +76,87 @@ namespace SRPRendering
 		/// </summary>
 		void SetDefault();
 	}
+	*/
 
 	/// <summary>
 	/// Concrete implementation of IShaderVariable
 	/// </summary>
-	class ShaderVariable : IShaderVariable
+	class ShaderConstantVariable : IShaderConstantVariable, IObservable<Unit>
 	{
 		// IShaderVariable interface.
 		public string Name { get; }
+
+		#region IShaderConstantVariable interface
+
+		// Set directly to a given value.
+		public void Set(dynamic value)
+		{
+			Binding = new ScriptShaderConstantVariableBinding(this, value);
+			IsAutoBound = false;
+		}
+
+		// Bind to camera/scene property.
+		public void Bind(ShaderConstantVariableBindSource bindSource)
+		{
+			Binding = new SimpleShaderConstantVariableBinding(this, bindSource);
+			IsAutoBound = false;
+		}
+
+		// Bind to a material property.
+		public void BindToMaterial(string param)
+		{
+			Binding = new MaterialShaderConstantVariableBinding(this, param);
+			IsAutoBound = false;
+		}
+
+		// Mark the variable as script overridden, so it will not appear in the properties window.
+		public void MarkAsScriptOverride()
+		{
+			Binding = new ScriptOverrideShaderConstantVariableBinding(this);
+			IsAutoBound = false;
+		}
+
+		#endregion
+
 		public ShaderVariableTypeDesc VariableType { get; }
-		public IShaderVariableBind Bind { get; set; }
-		public bool IsAutoBound { get; set; }
+		public bool IsAutoBound { get; private set; }
+
+		private IShaderConstantVariableBinding _binding;
+		public IShaderConstantVariableBinding Binding
+		{
+			get { return _binding; }
+			private set
+			{
+				if (_binding != null && !IsAutoBound)
+				{
+					throw new ScriptException("Attempting to bind already bound shader variable: " + Name);
+				}
+				_binding = value;
+			}
+		}
+
+		// Attempt to automatically bind this variable.
+		public void AutoBind()
+		{
+			if (Binding == null)
+			{
+				// We auto bind variable with the same name as a bind source.
+				ShaderConstantVariableBindSource source;
+				if (Enum.TryParse(Name, out source))
+				{
+					Binding = new SimpleShaderConstantVariableBinding(this, source);
+					IsAutoBound = true;
+				}
+			}
+		}
 
 		// For debugger prettiness.
 		public override string ToString() => Name;
 
 		// Get the current value of the variable.
-		public T Get<T>() where T : struct
+		public T GetValue<T>() where T : struct
 		{
-			if (Marshal.SizeOf(typeof(T)) != data.Length)
+			if (Marshal.SizeOf<T>() != data.Length)
 				throw new ArgumentException("Given size does not match shader variable size.");
 
 			data.Position = 0;
@@ -99,9 +164,9 @@ namespace SRPRendering
 		}
 
 		// Set the value of the variable.
-		public void Set<T>(T value) where T : struct
+		public void SetValue<T>(T value) where T : struct
 		{
-			if (Marshal.SizeOf(typeof(T)) < data.Length)
+			if (Marshal.SizeOf<T>() < data.Length)
 				throw new ArgumentException(String.Format("Cannot set shader variable '{0}': given value is the wrong size.", Name));
 
 			data.Position = 0;
@@ -114,7 +179,7 @@ namespace SRPRendering
 		// Get the current value of an individual component of the array.
 		public T GetComponent<T>(int index) where T : struct
 		{
-			int componentSize = Marshal.SizeOf(typeof(T));
+			int componentSize = Marshal.SizeOf<T>();
 			if (componentSize * (index + 1) > data.Length)
 				throw new IndexOutOfRangeException();
 
@@ -125,7 +190,7 @@ namespace SRPRendering
 		// Get the current value of an individual component of the array.
 		public void SetComponent<T>(int index, T value) where T : struct
 		{
-			int componentSize = Marshal.SizeOf(typeof(T));
+			int componentSize = Marshal.SizeOf<T>();
 			if (componentSize * (index + 1) > data.Length)
 				throw new IndexOutOfRangeException();
 
@@ -155,12 +220,19 @@ namespace SRPRendering
 			}
 		}
 
-		// Reset to initial state.
+		// Set original default value.
 		public void SetDefault()
 		{
 			data.Position = 0;
 			data.Write(initialValue, 0, initialValue.Length);
 			bDirty = true;
+		}
+
+		// Reset to initial state.
+		public void Reset()
+		{
+			SetDefault();
+			_binding = null;
 		}
 
 		// IObservable interface
@@ -170,7 +242,7 @@ namespace SRPRendering
 		}
 
 		// Constructors.
-		public ShaderVariable(ShaderReflectionVariable shaderVariable)
+		public ShaderConstantVariable(ShaderReflectionVariable shaderVariable)
 		{
 			Name = shaderVariable.Description.Name;
 			VariableType = new ShaderVariableTypeDesc(shaderVariable.GetVariableType());
@@ -217,70 +289,5 @@ namespace SRPRendering
 		private bool bDirty = true;
 		private byte[] initialValue;
 		private Subject<Unit> _subject = new Subject<Unit>();
-
-		public static IUserProperty CreateUserProperty(IEnumerable<IShaderVariable> variables)
-		{
-			// Convert to list to avoid multiple potentially expensive iterations.
-			variables = variables.ToList();
-
-			// Must have at least one element.
-			var first = variables.First();
-
-			// Must be all the same type.
-			if (!variables.All(v => v.VariableType.Equals(first.VariableType)))
-			{
-				throw new ScriptException($"Shader variables named '{first.Name}' do not all share the same type.");
-			}
-
-			switch (first.VariableType.Class)
-			{
-				case ShaderVariableClass.Vector:
-					{
-						int numComponents = first.VariableType.Rows * first.VariableType.Columns;
-						var components = Enumerable.Range(0, numComponents)
-							.Select(i => CreateScalar(variables, i))
-							.ToArray();
-						return new VectorShaderVariableUserProperty(variables, components);
-					}
-
-				case ShaderVariableClass.MatrixColumns:
-					{
-						// Save typing
-						var numCols = first.VariableType.Columns;
-						var numRows = first.VariableType.Rows;
-
-						// Create a scalar property for each element in the matrix.
-						var components = new IUserProperty[numCols, numRows];
-						for (int col = 0; col < numCols; col++)
-						{
-							for (int row = 0; row < numRows; row++)
-							{
-								components[col, row] = CreateScalar(variables, row + col * numRows);
-							}
-						}
-
-						// Create matrix property.
-						return new MatrixShaderVariableUserProperty(variables, components);
-					}
-
-				case ShaderVariableClass.Scalar:
-					return CreateScalar(variables, 0);
-			}
-
-			throw new ScriptException("Unsupported shader parameter type. Variable: " + first.Name);
-		}
-
-		private static IUserProperty CreateScalar(IEnumerable<IShaderVariable> variables, int componentIndex)
-		{
-			switch (variables.First().VariableType.Type)
-			{
-				case ShaderVariableType.Float:
-					return new ScalarShaderVariableUserProperty<float>(variables, componentIndex);
-				case ShaderVariableType.Int:
-					return new ScalarShaderVariableUserProperty<int>(variables, componentIndex);
-			}
-
-			throw new ScriptException("Unsupported shader parameter type. Variable: " + variables.First());
-		}
 	}
 }

@@ -10,7 +10,7 @@ namespace SRPScripting
 		R16G16B16A16_Float,
 		R16G16B16A16_UNorm,
 		R8G8B8A8_UNorm,
-		R8G8B8A8_UNorm_SRGB,
+		R8G8B8A8_UNorm_SRgb,
 		R8G8B8A8_UInt,
 		R8G8B8A8_SNorm,
 		R8G8B8A8_SInt,

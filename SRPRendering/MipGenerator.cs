@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
-using SharpDX.D3DCompiler;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SRPCommon.Interfaces;
@@ -17,6 +15,8 @@ using SamplerState = SRPScripting.SamplerState;
 using BlendState = SRPScripting.BlendState;
 using SharpDX.Mathematics.Interop;
 using SharpDX.Direct3D;
+using SRPRendering.Resources;
+using SRPRendering.Shaders;
 
 namespace SRPRendering
 {
@@ -25,7 +25,7 @@ namespace SRPRendering
 	{
 		private readonly RenderDevice _device;
 		private readonly IWorkspace _workspace;
-		private readonly IShader _vertexShader;
+		private readonly Shader _vertexShader;
 
 		public MipGenerator(RenderDevice device, IWorkspace workspace)
 		{
@@ -85,8 +85,8 @@ namespace SRPRendering
 			// Compile pixel shader.
 			var pixelShader = _device.GlobalResources.ShaderCache.GetShader(
 				RenderUtils.GetShaderFilename("GenMipsPS.hlsl"), "Main", "ps_4_0", includeHandler, GetDefines(isCubemap));
-			var destMipVariable = pixelShader.FindVariable("DestMip");
-			var arraySliceVariable = pixelShader.FindVariable("ArraySlice");
+			var destMipVariable = (ShaderConstantVariable)pixelShader.FindConstantVariable("DestMip");
+			var arraySliceVariable = (ShaderConstantVariable)pixelShader.FindConstantVariable("ArraySlice");
 
 			var texDesc = texture.Texture2D.Description;
 			int mipWidth = texDesc.Width >> 1;
@@ -118,13 +118,13 @@ namespace SRPRendering
 						MaxDepth = 0.0f,
 					}});
 
-					destMipVariable?.Set(mip);
+					destMipVariable?.SetValue(mip);
 
 					// Loop through each array slice in the texture (includes cube faces).
 					for (int arraySlice = 0; arraySlice < numArraySlices; arraySlice++)
 					{
-						arraySliceVariable?.Set(arraySlice);
-						pixelShader.UpdateVariables(context, null, null, null, null);
+						arraySliceVariable?.SetValue(arraySlice);
+						pixelShader.UpdateVariables(context, null, null, null, _device.GlobalResources);
 
 						// Render 'fullscreen' quad to downsample the mip.
 						_device.GlobalResources.FullscreenQuad.Draw(context);
@@ -158,13 +158,13 @@ namespace SRPRendering
 		}
 
 		// Bind texture and samplers.
-		private void BindResources(IShader ps, Texture texture)
+		private void BindResources(Shader ps, Texture texture)
 		{
 			// Bind the texture itself.
 			var texVariable = ps.FindResourceVariable("Texture");
 			if (texVariable != null)
 			{
-				texVariable.Resource = texture.SRV;
+				texVariable.Set(texture);
 			}
 
 			// Bind samplers.
@@ -173,12 +173,12 @@ namespace SRPRendering
 		}
 
 		// Simpler helper for setting samplers by name using a state from the cache.
-		private void SetSampler(IShader shader, string name, SamplerState state)
+		private void SetSampler(Shader shader, string name, SamplerState state)
 		{
 			var sampler = shader.FindSamplerVariable(name);
 			if (sampler != null)
 			{
-				sampler.State = _device.GlobalResources.SamplerStateCache.Get(state.ToD3D11());
+				sampler.Set(state);
 			}
 		}
 

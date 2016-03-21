@@ -57,6 +57,6 @@ namespace SRPCommon.Scene
 		}
 
 		// Get the size of a the vertex, to be used as the stride for vertex buffers.
-		public static int GetStride() => Marshal.SizeOf(typeof(SceneVertex));
+		public static int GetStride() => Marshal.SizeOf<SceneVertex>();
 	}
 }

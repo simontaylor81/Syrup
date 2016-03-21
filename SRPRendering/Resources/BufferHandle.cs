@@ -4,12 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharpDX.Direct3D11;
 using SRPCommon.Scripting;
 using SRPScripting;
 
 namespace SRPRendering.Resources
 {
-	internal class BufferHandle : IBuffer, IDisposable
+	internal class BufferHandle : IBuffer, ID3DShaderResource, IDisposable
 	{
 		// Actual concrete buffer, lazily initialised.
 		private Buffer _buffer;
@@ -28,6 +29,12 @@ namespace SRPRendering.Resources
 				return _buffer;
 			}
 		}
+
+		public int ElementCount => Buffer.ElementCount;
+		public int SizeInBytes => Buffer.SizeInBytes;
+
+		public ShaderResourceView SRV => Buffer.SRV;
+		public UnorderedAccessView UAV => Buffer.UAV;
 
 		// Use static members to create.
 		private BufferHandle(Func<Buffer> createBuffer)
