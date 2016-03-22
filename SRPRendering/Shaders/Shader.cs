@@ -126,22 +126,7 @@ namespace SRPRendering.Shaders
 			// First, update the value of bound and overridden variables.
 			foreach (var variable in ConstantVariables)
 			{
-				// Is the variable bound?
-				if (variable.Binding != null)
-				{
-					variable.Binding.UpdateVariable(viewInfo, primitive, overrides);
-				}
-
-				// Warn if the user is attempting to override the value, but the variable has not been
-				// set as overridable.
-				if (overrides != null &&
-					overrides.ContainsKey(variable.Name) &&
-					(variable.Binding == null || !variable.Binding.AllowScriptOverride))
-				{
-					OutputLogger.Instance.LogLineOnce(LogCategory.Script,
-						"Warning: attempt to override shader variable {0} which has not been marked as overridable. Call MarkAsScriptOverride to mark it thus.",
-						variable.Name);
-				}
+				variable.Update(viewInfo, primitive, overrides);
 			}
 
 			// Next, do the actual upload the constant buffers.

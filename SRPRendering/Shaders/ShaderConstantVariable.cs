@@ -12,6 +12,7 @@ using SharpDX.D3DCompiler;
 using SharpDX;
 using SRPScripting.Shader;
 using SRPScripting;
+using SRPCommon.Util;
 
 namespace SRPRendering.Shaders
 {
@@ -133,6 +134,25 @@ namespace SRPRendering.Shaders
 					throw new ScriptException("Attempting to bind already bound shader variable: " + Name);
 				}
 				_binding = value;
+			}
+		}
+
+		// Update bindings prior to cbuffer upload.
+		public void Update(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
+		{
+			if (Binding != null)
+			{
+				Binding.UpdateVariable(viewInfo, primitive, overrides);
+			}
+
+			// Warn if the user is attempting to override the value, but the variable has not been
+			// set as overridable.
+			if (overrides != null &&
+				overrides.ContainsKey(Name) &&
+				(Binding == null || !Binding.AllowScriptOverride))
+			{
+				OutputLogger.Instance.LogLineOnce(LogCategory.Script,
+					$"Warning: attempt to override shader variable {Name} which has not been marked as overridable. Call MarkAsScriptOverride to mark it thus.");
 			}
 		}
 
