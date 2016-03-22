@@ -62,13 +62,13 @@ namespace SRPRendering.Shaders
 		}
 
 		// Bind a shader variable unconditionally.
-		private void BindShaderVariable(IShader shader, string variableName, ShaderConstantVariableBindSource source)
+		private void BindShaderVariable(Shader shader, string variableName, ShaderConstantVariableBindSource source)
 		{
 			var variable = shader.FindConstantVariable(variableName);
 			if (variable == null)
 				throw new Exception("Failed to find shader variable for basic shader: " + variableName);
 
-			variable.Bind(source);
+			variable.Binding = new SimpleShaderConstantVariableBinding(source);
 		}
 	}
 }

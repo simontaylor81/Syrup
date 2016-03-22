@@ -34,6 +34,7 @@ namespace SRPRendering
 
 			// Clear shaders array. Don't need to dispose as they're held by the cache.
 			shaders.Clear();
+			_shaderHandles.Clear();
 			_userVariables.Clear();
 
 			// Clear render target handles and dispose the actual render targets.
@@ -80,8 +81,8 @@ namespace SRPRendering
 			if (!File.Exists(path))
 				throw new ScriptException("Shader file " + filename + " not found in project.");
 
-			return AddShader(_device.GlobalResources.ShaderCache.GetShader(
-				path, entryPoint, profile, FindShader, ConvertDefines(defines)));
+			// Don't actually compile anything here -- defer so we can async/multithread it.
+			return _shaderHandles.AddAndReturn(new ShaderHandle(path, entryPoint, profile, FindShader, ConvertDefines(defines)));
 		}
 
 		// Compile a shader from an in-memory string.
@@ -89,21 +90,13 @@ namespace SRPRendering
 		public IShader CompileShaderFromString(string source, string entryPoint, string profile,
 			IDictionary<string, object> defines = null)
 		{
+			throw new NotImplementedException();
+
 			// Don't cache shader from string.
 			// TODO: Would be nice if we could if people are going to use them in scripts.
 			// As they're not cache, we must manually dispose them, so add them to the resource list.
-			return AddShader(AddResource(ShaderCompiler.CompileFromString(
-				_device.Device, source, entryPoint, profile, FindShader, ConvertDefines(defines))));
-		}
-
-		private IShader AddShader(Shader shader)
-		{
-			shaders.Add(shader);
-
-			// Set up auto variable binds for this shader.
-			BindAutoShaderVariables(shader);
-
-			return shader;
+			//return AddShader(AddResource(ShaderCompiler.CompileFromString(
+			//	_device.Device, source, entryPoint, profile, FindShader, ConvertDefines(defines))));
 		}
 
 		private ShaderMacro[] ConvertDefines(IDictionary<string, object> defines) =>
@@ -122,15 +115,6 @@ namespace SRPRendering
 			}
 
 			return path;
-		}
-
-		// Set up auto variable binds for a shader
-		private void BindAutoShaderVariables(Shader shader)
-		{
-			foreach (var variable in shader.ConstantVariables)
-			{
-				variable.AutoBind();
-			}
 		}
 
 		#region User Variables
@@ -237,6 +221,20 @@ namespace SRPRendering
 			_device = null;
 		}
 
+		// Called after script has finished executing (successfull).
+		// TODO: Async
+		public void ScriptExecutionComplete()
+		{
+			CompileShaders();
+		}
+
+		// Compile all shaders once we're done executing the script.
+		private /*async Task*/void CompileShaders()
+		{
+			// TODO: Async, parallel.
+			shaders = _shaderHandles.Select(handle => handle.Compile(_device.GlobalResources.ShaderCache)).ToList();
+		}
+
 		public void Render(SharpDX.Direct3D11.DeviceContext deviceContext, ViewInfo viewInfo, RenderScene renderScene)
 		{
 			// Create render targets if necessary.
@@ -290,6 +288,7 @@ namespace SRPRendering
 
 		// List of shaders. Needed to gather user properties.
 		private List<Shader> shaders = new List<Shader>();
+		private List<ShaderHandle> _shaderHandles = new List<ShaderHandle>();
 
 		// List of resource to be disposed of when reseting or disposing.
 		private List<IDisposable> _resources = new List<IDisposable>();

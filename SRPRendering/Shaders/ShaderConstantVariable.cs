@@ -13,6 +13,7 @@ using SharpDX;
 using SRPScripting.Shader;
 using SRPScripting;
 using SRPCommon.Util;
+using System.Diagnostics;
 
 namespace SRPRendering.Shaders
 {
@@ -37,112 +38,24 @@ namespace SRPRendering.Shaders
 			=> Class == other.Class && Type == other.Type && Columns == other.Columns && Rows == other.Rows;
 	}
 
-	/*
 	/// <summary>
-	/// A single constant (non-resource) shader input.
+	/// Concrete implementation of shader constant variable.
 	/// </summary>
-	/// Observable fires when the value changes.
-	public interface IShaderVariable : IObservable<Unit>
-	{
-		/// <summary>
-		/// Name of the variable.
-		/// </summary>
-		string Name { get; }
-
-		/// <summary>
-		/// Descriptor storing information about the variable's type.
-		/// </summary>
-		ShaderVariableTypeDesc VariableType { get; }
-
-		/// <summary>
-		/// Optional bind to automatically set the variable to a certain value.
-		/// </summary>
-		IShaderVariableBind Bind { get; set; }
-
-		/// <summary>
-		/// If true, Bind was set automatically (and therefore can be overridden by the user manually).
-		/// </summary>
-		bool IsAutoBound { get; set; }
-
-		T Get<T>() where T : struct;
-		void Set<T>(T value) where T : struct;
-
-		T GetComponent<T>(int index) where T : struct;
-		void SetComponent<T>(int index, T value) where T : struct;
-
-		void SetFromDynamic(dynamic value);
-
-		/// <summary>
-		/// Reset to initial value.
-		/// </summary>
-		void SetDefault();
-	}
-	*/
-
-	/// <summary>
-	/// Concrete implementation of IShaderVariable
-	/// </summary>
-	class ShaderConstantVariable : IShaderConstantVariable, IObservable<Unit>
+	class ShaderConstantVariable : IObservable<Unit>
 	{
 		// IShaderVariable interface.
 		public string Name { get; }
-		public bool IsNull => false;
-
-		#region IShaderConstantVariable interface
-
-		// Set directly to a given value.
-		public void Set(dynamic value)
-		{
-			Binding = new ScriptShaderConstantVariableBinding(this, value);
-			IsAutoBound = false;
-		}
-
-		// Bind to camera/scene property.
-		public void Bind(ShaderConstantVariableBindSource bindSource)
-		{
-			Binding = new SimpleShaderConstantVariableBinding(this, bindSource);
-			IsAutoBound = false;
-		}
-
-		// Bind to a material property.
-		public void BindToMaterial(string param)
-		{
-			Binding = new MaterialShaderConstantVariableBinding(this, param);
-			IsAutoBound = false;
-		}
-
-		// Mark the variable as script overridden, so it will not appear in the properties window.
-		public void MarkAsScriptOverride()
-		{
-			Binding = new ScriptOverrideShaderConstantVariableBinding(this);
-			IsAutoBound = false;
-		}
-
-		#endregion
 
 		public ShaderVariableTypeDesc VariableType { get; }
-		public bool IsAutoBound { get; private set; }
 
-		private IShaderConstantVariableBinding _binding;
-		public IShaderConstantVariableBinding Binding
-		{
-			get { return _binding; }
-			private set
-			{
-				if (_binding != null && !IsAutoBound)
-				{
-					throw new ScriptException("Attempting to bind already bound shader variable: " + Name);
-				}
-				_binding = value;
-			}
-		}
+		public IShaderConstantVariableBinding Binding { get; set; }
 
 		// Update bindings prior to cbuffer upload.
 		public void Update(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
 		{
 			if (Binding != null)
 			{
-				Binding.UpdateVariable(viewInfo, primitive, overrides);
+				Binding.UpdateVariable(this, viewInfo, primitive, overrides);
 			}
 
 			// Warn if the user is attempting to override the value, but the variable has not been
@@ -159,15 +72,14 @@ namespace SRPRendering.Shaders
 		// Attempt to automatically bind this variable.
 		public void AutoBind()
 		{
-			if (Binding == null)
+			// Should never try to auto-bind a variable with an existing binding.
+			Trace.Assert(Binding == null);
+
+			// We auto bind variables with the same name as a bind source.
+			ShaderConstantVariableBindSource source;
+			if (Enum.TryParse(Name, out source))
 			{
-				// We auto bind variable with the same name as a bind source.
-				ShaderConstantVariableBindSource source;
-				if (Enum.TryParse(Name, out source))
-				{
-					Binding = new SimpleShaderConstantVariableBinding(this, source);
-					IsAutoBound = true;
-				}
+				Binding = new SimpleShaderConstantVariableBinding(source);
 			}
 		}
 
@@ -253,7 +165,7 @@ namespace SRPRendering.Shaders
 		public void Reset()
 		{
 			SetDefault();
-			_binding = null;
+			Binding = null;
 		}
 
 		// IObservable interface
@@ -267,7 +179,6 @@ namespace SRPRendering.Shaders
 		{
 			Name = shaderVariable.Description.Name;
 			VariableType = new ShaderVariableTypeDesc(shaderVariable.GetVariableType());
-			IsAutoBound = false;
 
 			offset = shaderVariable.Description.StartOffset;
 			data = new DataStream(shaderVariable.Description.Size, true, true);

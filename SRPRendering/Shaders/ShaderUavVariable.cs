@@ -13,30 +13,11 @@ using SRPScripting.Shader;
 
 namespace SRPRendering.Shaders
 {
-	class ShaderUavVariable : IShaderUavVariable
+	class ShaderUavVariable
 	{
-		// IShaderVariable interface
 		public string Name { get; }
-		public bool IsNull => false;
 
-		// IShaderUavVariable interface
-		public void Set(IShaderResource iresource)
-		{
-			if (UAV != null)
-			{
-				throw new ScriptException("Attempting to set already set UAV variable: " + Name);
-			}
-
-			var resource = iresource as ID3DShaderResource;
-			if (resource == null)
-			{
-				throw new ScriptException("Invalid shader resource");
-			}
-
-			UAV = resource.UAV;
-		}
-
-		public UnorderedAccessView UAV { get; private set; }
+		public UnorderedAccessView UAV { get; set; }
 
 		public void SetToDevice(DeviceContext context)
 		{

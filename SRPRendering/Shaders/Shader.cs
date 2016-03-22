@@ -16,7 +16,7 @@ namespace SRPRendering.Shaders
 		public string ResolvedFile;		// File path that it was resolved to.
 	}
 
-	class Shader : IShader, IDisposable
+	class Shader : IDisposable
 	{
 		public Shader(Device device, string profile, IEnumerable<IncludedFile> includedFiles, ShaderBytecode bytecode)
 		{
@@ -187,20 +187,16 @@ namespace SRPRendering.Shaders
 		public IEnumerable<ShaderConstantVariable> ConstantVariables => _cbuffers.SelectMany(cbuffer => cbuffer.Variables);
 
 		// Find a variable by name.
-		public IShaderConstantVariable FindConstantVariable(string name)
-			=> (IShaderConstantVariable)ConstantVariables.FirstOrDefault(v => v.Name == name) ?? new NullShaderConstantVariable(name);
+		public ShaderConstantVariable FindConstantVariable(string name) => ConstantVariables.FirstOrDefault(v => v.Name == name);
 
 		// Find a resource variable by name.
-		public IShaderResourceVariable FindResourceVariable(string name)
-			=> (IShaderResourceVariable)_resourceVariables.FirstOrDefault(v => v.Name == name) ?? new NullShaderResourceVariable(name);
+		public ShaderResourceVariable FindResourceVariable(string name) => _resourceVariables.FirstOrDefault(v => v.Name == name);
 
 		// Find a sampler variable by name.
-		public IShaderSamplerVariable FindSamplerVariable(string name)
-			=> (IShaderSamplerVariable)_samplerVariables.FirstOrDefault(v => v.Name == name) ?? new NullShaderSamplerVariable(name);
+		public ShaderSamplerVariable FindSamplerVariable(string name) => _samplerVariables.FirstOrDefault(v => v.Name == name);
 
 		// Find a UAV variable by name.
-		public IShaderUavVariable FindUavVariable(string name)
-			=> (IShaderUavVariable)_uavVariables.FirstOrDefault(v => v.Name == name) ?? new NullShaderUavVariable(name);
+		public ShaderUavVariable FindUavVariable(string name) => _uavVariables.FirstOrDefault(v => v.Name == name);
 
 		// Actual shader. Only one of these is non-null.
 		private VertexShader _vertexShader;

@@ -147,12 +147,17 @@
     <Compile Include="Shaders\Shader.cs" />
     <Compile Include="Shaders\ShaderCache.cs" />
     <Compile Include="Shaders\ShaderCompiler.cs" />
+    <Compile Include="Shaders\ShaderConstantVariableHandle.cs" />
+    <Compile Include="Shaders\ShaderHandle.cs" />
     <Compile Include="Shaders\ShaderResourceVariable.cs" />
     <Compile Include="Shaders\ShaderResourceVariableBind.cs" />
+    <Compile Include="Shaders\ShaderResourceVariableHandle.cs" />
     <Compile Include="Shaders\ShaderSamplerVariable.cs" />
+    <Compile Include="Shaders\ShaderSamplerVariableHandle.cs" />
     <Compile Include="Shaders\ShaderUavVariable.cs" />
     <Compile Include="Shaders\ShaderConstantVariable.cs" />
     <Compile Include="Shaders\ShaderConstantVariableBind.cs" />
+    <Compile Include="Shaders\ShaderUavVariableHandle.cs" />
     <Compile Include="Shaders\ShaderUserProperties.cs" />
     <Compile Include="SharpDXUtils.cs" />
     <Compile Include="StreamUtil.cs" />

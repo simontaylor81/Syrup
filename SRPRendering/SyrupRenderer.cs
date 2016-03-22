@@ -67,7 +67,9 @@ namespace SRPRendering
 			OutputLogger.Instance.ResetLogOnce();
 		}
 
-		private void ExecutionComplete(Exception exception)
+		// TEMP: public for ShaderUnit.
+		// TODO: Make private again.
+		public void ExecutionComplete(Exception exception)
 		{
 			bScriptRenderError = false;
 
@@ -76,6 +78,11 @@ namespace SRPRendering
 
 			try
 			{
+				// Tell the script render control that we're done,
+				// so it can compile shaders, etc.
+				// TODO: Async
+				_scriptRenderControl.ScriptExecutionComplete();
+
 				// Get properties from script render control.
 				Properties = _scriptRenderControl.GetProperties();
 			}

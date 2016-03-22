@@ -341,13 +341,13 @@ namespace SRPRendering
 				return null;
 
 			// Check it's really a shader.
-			var shader = handle as Shader;
+			var shader = handle as ShaderHandle;
 			if (shader == null)
 			{
 				throw new ScriptException(string.Format("Invalid shader given to {0}.", caller));
 			}
 
-			return shader;
+			return shader.Shader;
 		}
 
 		// Access a render target by handle.

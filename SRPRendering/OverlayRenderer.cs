@@ -38,7 +38,7 @@ namespace SRPRendering
 			_globalResources.BasicShaders.SolidColourPS.Set(deviceContext);
 
 			// Set shader constants.
-			_globalResources.BasicShaders.SolidColourShaderVar.Set(new Vector4(1.0f, 1.0f, 0.0f, 1.0f));	// Yellow
+			_globalResources.BasicShaders.SolidColourShaderVar.SetValue(new Vector4(1.0f, 1.0f, 0.0f, 1.0f));	// Yellow
 
 			// Set input layout
 			deviceContext.InputAssembler.InputLayout = _globalResources.InputLayoutCache.GetInputLayout(

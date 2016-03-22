@@ -14,8 +14,5 @@ namespace SRPScripting.Shader
 
 		// Bind to a material property.
 		void BindToMaterial(string param, IShaderResource fallback = null);
-
-		// Is this a null implementation for a missing variable?
-		bool IsNull { get; }
 	}
 }

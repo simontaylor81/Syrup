@@ -11,26 +11,14 @@ using SRPScripting.Shader;
 namespace SRPRendering.Shaders
 {
 	// Info about a sampler input to a shader.
-	class ShaderSamplerVariable : IShaderSamplerVariable
+	class ShaderSamplerVariable
 	{
-		// IShaderVariable interface.
 		public string Name { get; }
-		public bool IsNull => false;
 
-		// IShaderSamplerVariable interface.
-		public void Set(SRPScripting.SamplerState state)
-		{
-			if (_state != null)
-			{
-				throw new ScriptException("Attempting to set already set sampler variable: " + Name);
-			}
-
-			_state = state;
-		}
+		public SRPScripting.SamplerState State { get; set; }
 
 		private readonly int _slot;
 		private readonly ShaderFrequency _shaderFrequency;
-		private SRPScripting.SamplerState _state;
 
 		public ShaderSamplerVariable(InputBindingDescription desc, ShaderFrequency frequency)
 		{
@@ -41,7 +29,7 @@ namespace SRPRendering.Shaders
 
 		public void SetToDevice(DeviceContext context, IGlobalResources globalResources)
 		{
-			var d3dState = globalResources.SamplerStateCache.Get(_state.ToD3D11());
+			var d3dState = globalResources.SamplerStateCache.Get(State.ToD3D11());
 
 			switch (_shaderFrequency)
 			{
@@ -61,7 +49,7 @@ namespace SRPRendering.Shaders
 
 		public void Reset()
 		{
-			_state = null;
+			State = null;
 		}
 	}
 }

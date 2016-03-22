@@ -164,7 +164,7 @@ namespace SRPRendering
 			var texVariable = ps.FindResourceVariable("Texture");
 			if (texVariable != null)
 			{
-				texVariable.Set(texture);
+				texVariable.Binding = new DirectShaderResourceVariableBinding(texture);
 			}
 
 			// Bind samplers.
@@ -178,7 +178,7 @@ namespace SRPRendering
 			var sampler = shader.FindSamplerVariable(name);
 			if (sampler != null)
 			{
-				sampler.Set(state);
+				sampler.State = state;
 			}
 		}
 

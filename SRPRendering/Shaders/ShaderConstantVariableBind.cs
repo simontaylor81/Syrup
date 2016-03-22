@@ -11,21 +11,20 @@ using SRPCommon.Util;
 
 namespace SRPRendering.Shaders
 {
-	public interface IShaderConstantVariableBinding
+	interface IShaderConstantVariableBinding
 	{
-		void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides);
+		void UpdateVariable(ShaderConstantVariable variable, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides);
 		bool AllowScriptOverride { get; }
 	}
 
 	class SimpleShaderConstantVariableBinding : IShaderConstantVariableBinding
 	{
-		public SimpleShaderConstantVariableBinding(ShaderConstantVariable variable, ShaderConstantVariableBindSource source)
+		public SimpleShaderConstantVariableBinding(ShaderConstantVariableBindSource source)
 		{
-			this.variable = variable;
 			this.source = source;
 		}
 
-		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
+		public void UpdateVariable(ShaderConstantVariable variable, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
 		{
 			switch (source)
 			{
@@ -80,17 +79,18 @@ namespace SRPRendering.Shaders
 
 		public bool AllowScriptOverride => false;
 
-		private ShaderConstantVariable variable;
 		private ShaderConstantVariableBindSource source;
 	}
 
 	class ScriptShaderConstantVariableBinding : IShaderConstantVariableBinding
 	{
-		public ScriptShaderConstantVariableBinding(ShaderConstantVariable variable, object value)
+		public ScriptShaderConstantVariableBinding(object value)
 		{
-			this.variable = variable;
 			this.value = value;
+		}
 
+		public void UpdateVariable(ShaderConstantVariable variable, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
+		{
 			// Check type of the variable.
 			if (variable.VariableType.Type == ShaderVariableType.Float)
 			{
@@ -104,10 +104,7 @@ namespace SRPRendering.Shaders
 				// TODO: Support other variable types.
 				throw new ScriptException("Unsupported shader variable type: " + variable.VariableType.Type.ToString());
 			}
-		}
 
-		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
-		{
 			try
 			{
 				// If the script gave us a function, call it.
@@ -122,25 +119,23 @@ namespace SRPRendering.Shaders
 
 		public bool AllowScriptOverride => false;
 
-		private ShaderConstantVariable variable;
 		private dynamic value;
 	}
 
 	class MaterialShaderConstantVariableBinding : IShaderConstantVariableBinding
 	{
-		public MaterialShaderConstantVariableBinding(ShaderConstantVariable variable, string source)
+		public MaterialShaderConstantVariableBinding(string source)
 		{
-			this.variable = variable;
 			this.source = source;
+		}
 
+		public void UpdateVariable(ShaderConstantVariable variable, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
+		{
 			if (variable.VariableType.Type != ShaderVariableType.Float)
 			{
 				throw new ScriptException(String.Format("Cannot bind shader variable '{0}' to material parameter: only float parameters are supported.", variable.Name));
 			}
-		}
 
-		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
-		{
 			if (primitive != null && primitive.Material != null)
 			{
 				Vector4 value;
@@ -165,18 +160,12 @@ namespace SRPRendering.Shaders
 
 		public bool AllowScriptOverride => false;
 
-		private ShaderConstantVariable variable;
 		private string source;
 	}
 
 	class ScriptOverrideShaderConstantVariableBinding : IShaderConstantVariableBinding
 	{
-		public ScriptOverrideShaderConstantVariableBinding(ShaderConstantVariable variable)
-		{
-			this.variable = variable;
-		}
-
-		public void UpdateVariable(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
+		public void UpdateVariable(ShaderConstantVariable variable, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
 		{
 			object overriddenValue;
 
@@ -200,7 +189,5 @@ namespace SRPRendering.Shaders
 		}
 
 		public bool AllowScriptOverride => true;
-
-		private ShaderConstantVariable variable;
 	}
 }

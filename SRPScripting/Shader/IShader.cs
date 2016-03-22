@@ -28,8 +28,5 @@ namespace SRPScripting.Shader
 
 		// Find a UAV variable by name.
 		IShaderUavVariable FindUavVariable(string name);
-
-		// Frequency (i.e. type) of shader.
-		ShaderFrequency Frequency { get; }
 	}
 }

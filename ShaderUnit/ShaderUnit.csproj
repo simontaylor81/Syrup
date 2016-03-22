@@ -106,7 +106,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShaderTests\MyComputeShaderTest.cs" />
     <Compile Include="ShaderTests\MyPixelShaderTest.cs" />
-    <Compile Include="ShaderTests\MyShaderUnitTest.cs" />
     <Compile Include="TestRenderer\FermiumReporter.cs" />
     <Compile Include="TestRenderer\FileSystemReporter.cs" />
     <Compile Include="TestRenderer\HlslTestHarness.cs" />

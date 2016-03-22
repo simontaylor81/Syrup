@@ -13,53 +13,10 @@ using SRPScripting.Shader;
 
 namespace SRPRendering.Shaders
 {
-	class ShaderResourceVariable : IShaderResourceVariable
+	class ShaderResourceVariable
 	{
-		// IShaderVariable interface.
 		public string Name { get; }
-		public bool IsNull => false;
-
-		#region IShaderResourceVariable interface.
-
-		// Set directly to a given resource.
-		public void Set(IShaderResource iresource)
-		{
-			var resource = iresource as ID3DShaderResource;
-			if (resource == null)
-			{
-				throw new ScriptException("Invalid shader resource");
-			}
-
-			Binding = new DirectShaderResourceVariableBinding(resource);
-		}
-
-		// Bind to a material property.
-		public void BindToMaterial(string param, IShaderResource fallback = null)
-		{
-			var fallbackResource = fallback as ID3DShaderResource;
-			if (fallback != null && fallbackResource == null)
-			{
-				throw new ScriptException("Invalid fallback resource");
-			}
-
-			Binding = new MaterialShaderResourceVariableBinding(param, fallbackResource);
-		}
-
-		#endregion
-
-		private IShaderResourceVariableBinding _binding;
-		public IShaderResourceVariableBinding Binding
-		{
-			get { return _binding; }
-			private set
-			{
-				if (_binding != null)
-				{
-					throw new ScriptException("Attempting to bind already bound shader variable: " + Name);
-				}
-				_binding = value;
-			}
-		}
+		public IShaderResourceVariableBinding Binding { get; set; }
 
 		public void SetToDevice(DeviceContext context, IPrimitive primitive, ViewInfo viewInfo, IGlobalResources globalResources)
 		{
@@ -83,8 +40,7 @@ namespace SRPRendering.Shaders
 
 		public void Reset()
 		{
-			// Set backing var directly to bypass 'already set' check.
-			_binding = null;
+			Binding = null;
 		}
 
 		// Constructors.
