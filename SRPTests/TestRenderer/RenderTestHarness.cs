@@ -57,7 +57,7 @@ namespace SRPTests.TestRenderer
 
 		[Theory]
 		[MemberData("ScriptFiles")]
-		public async Task RenderScript(string name, Script script)
+		public async Task RenderScript(string name, TestDefinition definition)
 		{
 			bool bSuccess = false;
 			Bitmap result = null;
@@ -65,7 +65,7 @@ namespace SRPTests.TestRenderer
 			try
 			{
 				// Execute the script.
-				await _scripting.RunScript(script);
+				await _scripting.RunScript(definition.Script);
 
 				// This should never fire, as the exception should propagate out of RunScript.
 				Assert.False(_sr.HasScriptError, "Error executing script");

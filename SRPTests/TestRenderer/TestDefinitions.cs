@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using SRPCommon.Scripting;
 using SRPCommon.Util;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace SRPTests.TestRenderer
 {
@@ -20,7 +21,7 @@ namespace SRPTests.TestRenderer
 		{
 			// Load and deserialise the json file.
 			var json = File.ReadAllText(filename);
-			var tests = JsonConvert.DeserializeObject<IEnumerable<TestDefinition>>(json);
+			var tests = JsonConvert.DeserializeObject<IEnumerable<SerializedTestDefinition>>(json);
 
 			// Script paths are relative to the json file.
 			var baseDir = Path.GetDirectoryName(filename);
@@ -33,18 +34,11 @@ namespace SRPTests.TestRenderer
 					var test = testAndVars.test;
 					var vars = testAndVars.vars;
 
-					var script = new Script(Path.Combine(baseDir, test.script));
-
-					// Add vars as globals so they can be accessed from the script.
-					foreach (var kvp in vars.EmptyIfNull())
-					{
-						script.GlobalVariables.Add(kvp.Key, kvp.Value);
-					}
-
 					var name = test.name != null ? FormatName(test.name, vars) : Path.GetFileNameWithoutExtension(test.script);
+					var definition = new TestDefinition(Path.Combine(baseDir, test.script), vars);
 
 					// Pass test name as first paramater so you can see what's what when running tests.
-					return new object[] { name, script };
+					return new object[] { name, definition };
 				});
 		}
 
@@ -87,16 +81,61 @@ namespace SRPTests.TestRenderer
 					select prevProductItem.Concat(EnumerableEx.Return(item)));
 
 		// Class used for file deserialisation.
-		private class TestDefinition
+		private class SerializedTestDefinition
 		{
 // Field is never assigned to, and will always have its default value null
 // These are assigned by deserialisation.
 #pragma warning disable CS0649
 			public string script;
 			public string name;
-			public string expectedResult;
 			public Dictionary<string, object> vars;
 #pragma warning restore CS0649
+		}
+	}
+
+	// Class containing data about a test script to give to the individual test functions.
+	// Don't pass the Script object directly, as we need to be able to serialise it
+	// for the tests to show up properly in the test runner.
+	public class TestDefinition : IXunitSerializable
+	{
+		private string _filename;
+		private IDictionary<string, object> _vars;
+
+		public Script Script
+		{
+			get
+			{
+				var script = new Script(_filename);
+
+				// Add vars as globals so they can be accessed from the script.
+				foreach (var kvp in _vars.EmptyIfNull())
+				{
+					script.GlobalVariables.Add(kvp.Key, kvp.Value);
+				}
+
+				return script;
+			}
+		}
+
+		// Used for deserialization only.
+		public TestDefinition() { }
+
+		public TestDefinition(string filename, IDictionary<string, object> vars)
+		{
+			_filename = filename;
+			_vars = vars;
+		}
+
+		public void Deserialize(IXunitSerializationInfo info)
+		{
+			_filename = info.GetValue<string>(nameof(_filename));
+			_vars = JsonConvert.DeserializeObject<Dictionary<string, object>>(info.GetValue<string>(nameof(_vars)));
+		}
+
+		public void Serialize(IXunitSerializationInfo info)
+		{
+			info.AddValue(nameof(_filename), _filename);
+			info.AddValue(nameof(_vars), JsonConvert.SerializeObject(_vars));
 		}
 	}
 }
