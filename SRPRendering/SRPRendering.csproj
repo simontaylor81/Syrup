@@ -143,7 +143,6 @@
     <Compile Include="DeferredRenderContext.cs" />
     <Compile Include="Resources\ID3DResource.cs" />
     <Compile Include="Shaders\BasicShaders.cs" />
-    <Compile Include="Shaders\NullShaderVariables.cs" />
     <Compile Include="Shaders\Shader.cs" />
     <Compile Include="Shaders\ShaderCache.cs" />
     <Compile Include="Shaders\ShaderCompiler.cs" />
