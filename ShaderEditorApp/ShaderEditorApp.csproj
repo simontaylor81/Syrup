@@ -293,6 +293,7 @@
       <SubType>Designer</SubType>
     </Content>
     <None Include="packages.config" />
+    <None Include="PostBuild.bat" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
