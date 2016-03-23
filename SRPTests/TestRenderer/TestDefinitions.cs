@@ -17,14 +17,25 @@ namespace SRPTests.TestRenderer
 	// Code for loading test definitions from a json file.
 	static class TestDefinitions
 	{
-		public static IEnumerable<object[]> Load(string filename)
+		private static readonly string _testDefinitionFile = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts\tests.json");
+
+		private static Lazy<SerializedTestDefinitions> _tests = new Lazy<SerializedTestDefinitions>(LoadDefinitions);
+
+		public static IEnumerable<object[]> RenderTests => GetTests(_tests.Value.render);
+		public static IEnumerable<object[]> ComputeTests => GetTests(_tests.Value.compute);
+
+		private static SerializedTestDefinitions LoadDefinitions()
 		{
 			// Load and deserialise the json file.
-			var json = File.ReadAllText(filename);
-			var tests = JsonConvert.DeserializeObject<IEnumerable<SerializedTestDefinition>>(json);
+			var json = File.ReadAllText(_testDefinitionFile);
+			return JsonConvert.DeserializeObject<SerializedTestDefinitions>(json);
+		}
 
+		// Get actual test parameters from an array of definitions from the json.
+		private static IEnumerable<object[]> GetTests(IEnumerable<SerializedTestDefinition> tests)
+		{
 			// Script paths are relative to the json file.
-			var baseDir = Path.GetDirectoryName(filename);
+			var baseDir = Path.GetDirectoryName(_testDefinitionFile);
 
 			return tests
 				// Flatten all combinations of variables for each test definition.
@@ -37,8 +48,8 @@ namespace SRPTests.TestRenderer
 					var name = test.name != null ? FormatName(test.name, vars) : Path.GetFileNameWithoutExtension(test.script);
 					var definition = new TestDefinition(Path.Combine(baseDir, test.script), vars);
 
-					// Pass test name as first paramater so you can see what's what when running tests.
-					return new object[] { name, definition };
+						// Pass test name as first paramater so you can see what's what when running tests.
+						return new object[] { name, definition };
 				});
 		}
 
@@ -80,17 +91,26 @@ namespace SRPTests.TestRenderer
 					from item in input
 					select prevProductItem.Concat(EnumerableEx.Return(item)));
 
-		// Class used for file deserialisation.
-		private class SerializedTestDefinition
-		{
 // Field is never assigned to, and will always have its default value null
 // These are assigned by deserialisation.
 #pragma warning disable CS0649
+
+		// Classes used for file deserialisation.
+
+		private class SerializedTestDefinitions
+		{
+			public IEnumerable<SerializedTestDefinition> render;
+			public IEnumerable<SerializedTestDefinition> compute;
+		}
+
+		private class SerializedTestDefinition
+		{
 			public string script;
 			public string name;
 			public Dictionary<string, object> vars;
-#pragma warning restore CS0649
 		}
+
+#pragma warning restore CS0649
 	}
 
 	// Class containing data about a test script to give to the individual test functions.

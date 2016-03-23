@@ -21,8 +21,8 @@ namespace SRPTests.TestRenderer
 		private readonly Texture2D stagingTexture;
 		CompositeDisposable disposables;
 
-		private readonly int _width = 256;
-		private readonly int _height = 256;
+		private readonly int _width;
+		private readonly int _height;
 
 		public RenderDevice Device => device;
 
@@ -72,6 +72,14 @@ namespace SRPTests.TestRenderer
 
 		public Bitmap Render(SyrupRenderer sr)
 		{
+			Dispatch(sr);
+
+			// Read back the render target and convert to bitmap.
+			return ReadBackBufferBitmap();
+		}
+
+		public void Dispatch(SyrupRenderer sr)
+		{
 			Assert.NotNull(sr);
 
 			var context = device.Device.ImmediateContext;
@@ -98,9 +106,6 @@ namespace SRPTests.TestRenderer
 
 			sr.Render(context, viewInfo);
 			context.Flush();
-
-			// Read back the render target and convert to bitmap.
-			return ReadBackBufferBitmap();
 		}
 
 		// Read contents of backbuffer to into bitmap.

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using SRPScripting;
 
 namespace SRPTests.TestRenderer
 {
@@ -22,7 +23,6 @@ namespace SRPTests.TestRenderer
 
 		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
 		private static readonly string _expectedResultDir = Path.Combine(_baseDir, "ExpectedResults");
-		private static readonly string _testDefinitionFile = Path.Combine(_baseDir, "tests.json");
 
 		private static bool bLoggedDevice = false;
 
@@ -56,7 +56,7 @@ namespace SRPTests.TestRenderer
 		}
 
 		[Theory]
-		[MemberData("ScriptFiles")]
+		[MemberData("RenderScripts")]
 		public async Task RenderScript(string name, TestDefinition definition)
 		{
 			bool bSuccess = false;
@@ -86,11 +86,61 @@ namespace SRPTests.TestRenderer
 			}
 			finally
 			{
-				// Report result to Fermium.
+				// Report result.
 				await _reporter.TestCompleteAsync(name, bSuccess, result);
 			}
 		}
 
-		public static IEnumerable<object[]> ScriptFiles => TestDefinitions.Load(_testDefinitionFile);
+		[Theory]
+		[MemberData("ComputeScripts")]
+		public async Task ComputeScript(string name, TestDefinition definition)
+		{
+			bool bSuccess = false;
+
+			try
+			{
+				// Execute the script.
+				var script = definition.Script;
+
+				// Add callback for setting expected result.
+				// Only float results supported.
+				IEnumerable<float> expected = null;
+				script.GlobalVariables.Add("SetExpected", (Action<IEnumerable<dynamic>>)(
+					newExpected => expected = newExpected.Select(x => (float)x)));
+
+				// Add callback for setting output buffer.
+				IBuffer resultBuffer = null;
+				script.GlobalVariables.Add("SetResultBuffer", (Action<IBuffer>)(buffer => resultBuffer = buffer));
+
+				await _scripting.RunScript(script);
+
+				// This should never fire, as the exception should propagate out of RunScript.
+				Assert.False(_sr.HasScriptError, "Error executing script");
+
+				// Script must set expected and result.
+				Assert.NotNull(expected);
+				Assert.NotNull(resultBuffer);
+
+				// Dispatch work.
+				_renderer.Dispatch(_sr);
+
+				Assert.False(_sr.HasScriptError, "Error executing script render callback");
+
+				// Read back the result from the buffer.
+				var result = resultBuffer.GetContents<float>();
+
+				// Compare the result to the expectation.
+				Assert.Equal(expected, result);
+				bSuccess = true;
+			}
+			finally
+			{
+				// Report result.
+				await _reporter.TestCompleteAsync(name, bSuccess, null);
+			}
+		}
+
+		public static IEnumerable<object[]> RenderScripts => TestDefinitions.RenderTests;
+		public static IEnumerable<object[]> ComputeScripts => TestDefinitions.ComputeTests;
 	}
 }
