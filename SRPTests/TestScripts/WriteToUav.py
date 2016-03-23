@@ -9,7 +9,7 @@ numElements = 16
 buffer = ri.CreateBuffer(numElements * 4, Format.R32_Float, None, uav = True)
 cs.FindUavVariable("OutUAV").Set(buffer)
 
-expected = [2.0 * i + 10.0 for i in xrange(0, 16)]
+expected = [2.0 * i + 10.0 for i in xrange(0, numElements)]
 
 SetExpected(expected)
 SetResultBuffer(buffer)

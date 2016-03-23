@@ -1,0 +1,24 @@
+# Test for reading from a buffer in a compute shader.
+# This is a special compute-only test script. It relies on stuff
+# from the test framework so will not work inside Syrup itself.
+from SRPScripting import *
+
+cs = ri.CompileShader("ComputeTest.hlsl", "ReadFromBuffer", "cs_4_0")
+
+numElements = 16
+input = range(0, numElements)
+
+inputBuffer = ri.CreateBuffer(numElements * 4, Format.R32_Float, input, uav = False)
+outputBuffer = ri.CreateBuffer(numElements * 4, Format.R32_Float, None, uav = True)
+cs.FindResourceVariable("InBuffer").Set(inputBuffer)
+cs.FindUavVariable("OutUAV").Set(outputBuffer)
+
+expected = [2.0 * i + 12.0 for i in xrange(0, numElements)]
+
+SetExpected(expected)
+SetResultBuffer(outputBuffer)
+
+def RenderFrame(context):
+	context.Dispatch(cs, 1, 1, 1)
+
+ri.SetFrameCallback(RenderFrame)
