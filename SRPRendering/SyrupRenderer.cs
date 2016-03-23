@@ -66,9 +66,10 @@ namespace SRPRendering
 					await _scripting.RunScript(script);
 					await PostExecuteScript(script);
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
 					bScriptExecutionError = true;
+					LogScriptError(ex);
 					throw;
 				}
 				finally
@@ -96,21 +97,12 @@ namespace SRPRendering
 
 		private async Task PostExecuteScript(Script script)
 		{
-			try
-			{
-				// Tell the script render control that we're done,
-				// so it can compile shaders, etc.
-				await _scriptRenderControl.ScriptExecutionComplete();
+			// Tell the script render control that we're done,
+			// so it can compile shaders, etc.
+			await _scriptRenderControl.ScriptExecutionComplete();
 
-				// Get properties from script render control.
-				Properties = _scriptRenderControl.GetProperties();
-			}
-			catch (ScriptException ex)
-			{
-				LogScriptError(ex);
-				bScriptExecutionError = true;
-				return;
-			}
+			// Get properties from script render control.
+			Properties = _scriptRenderControl.GetProperties();
 
 			// Attempt to copy over previous property values so they're not reset every
 			// time the user re-runs the script.

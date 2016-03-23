@@ -105,19 +105,7 @@ namespace SRPCommon.Scripting
 				pythonScope.SetVariable(global.Key, global.Value);
 			}
 
-			try
-			{
-				source.Execute(pythonScope);
-			}
-			catch (Exception ex)
-			{
-				var eo = pythonEngine.GetService<ExceptionOperations>();
-				string error = eo.FormatException(ex);
-				OutputLogger.Instance.LogLine(LogCategory.Script, "Script execution failed.");
-				OutputLogger.Instance.LogLine(LogCategory.Script, error);
-
-				throw;
-			}
+			source.Execute(pythonScope);
 		}
 
 		// Helper for formatting script errors.
