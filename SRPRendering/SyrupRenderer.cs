@@ -89,8 +89,7 @@ namespace SRPRendering
 			{
 				// Tell the script render control that we're done,
 				// so it can compile shaders, etc.
-				// TODO: Async
-				_scriptRenderControl.ScriptExecutionComplete();
+				await _scriptRenderControl.ScriptExecutionComplete();
 
 				// Get properties from script render control.
 				Properties = _scriptRenderControl.GetProperties();

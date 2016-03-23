@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-
+using System.Threading.Tasks;
 using SharpDX.Direct3D;
 using SRPCommon.Interfaces;
 using SRPCommon.Scene;
@@ -222,17 +222,18 @@ namespace SRPRendering
 		}
 
 		// Called after script has finished executing (successfull).
-		// TODO: Async
-		public void ScriptExecutionComplete()
+		public Task ScriptExecutionComplete()
 		{
-			CompileShaders();
+			return CompileShaders();
 		}
 
 		// Compile all shaders once we're done executing the script.
-		private /*async Task*/void CompileShaders()
+		private async Task CompileShaders()
 		{
-			// TODO: Async, parallel.
-			shaders = _shaderHandles.Select(handle => handle.Compile(_device.GlobalResources.ShaderCache)).ToList();
+			// Run on background thread so UI remains responsive.
+			// TODO: parallel.
+			shaders = await Task.Run(() =>
+				_shaderHandles.Select(handle => handle.Compile(_device.GlobalResources.ShaderCache)).ToList());
 		}
 
 		public void Render(SharpDX.Direct3D11.DeviceContext deviceContext, ViewInfo viewInfo, RenderScene renderScene)
