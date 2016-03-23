@@ -67,9 +67,7 @@ namespace SRPRendering
 			OutputLogger.Instance.ResetLogOnce();
 		}
 
-		// TEMP: public for ShaderUnit.
-		// TODO: Make private again.
-		public void ExecutionComplete(Exception exception)
+		private void ExecutionComplete(Exception exception)
 		{
 			bScriptRenderError = false;
 
