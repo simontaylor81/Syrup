@@ -17,6 +17,8 @@ using SRPCommon.Util;
 using SRPScripting;
 using Castle.DynamicProxy;
 using SharpDX.Mathematics.Interop;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace SRPRendering
 {
@@ -25,6 +27,10 @@ namespace SRPRendering
 	{
 		public SyrupRenderer(IWorkspace workspace, RenderDevice device, Scripting scripting)
 		{
+			Trace.Assert(workspace != null);
+			Trace.Assert(device != null);
+			Trace.Assert(scripting != null);
+
 			_workspace = workspace;
 			_device = device;
 			_scripting = scripting;
@@ -36,13 +42,6 @@ namespace SRPRendering
 			// Generate wrapper proxy using Castle Dynamic Proxy to avoid direct script access to our internals.
 			ScriptInterface = new ProxyGenerator().CreateInterfaceProxyWithTarget<IRenderInterface>(_scriptRenderControl);
 
-			// Reset before script execution.
-			if (scripting != null)
-			{
-				_disposables.Add(scripting.PreExecute.Subscribe(PreExecuteScript));
-				_disposables.Add(scripting.ExecutionComplete.Subscribe(ExecutionComplete));
-			}
-
 			_overlayRenderer = new OverlayRenderer(device.GlobalResources);
 
 			// Merge together change events of all current properties and fire redraw.
@@ -52,14 +51,31 @@ namespace SRPRendering
 				.Subscribe(_redrawRequired));
 		}
 
-		private void PreExecuteScript(Script script)
+		// Execute a script using this renderer.
+		public async Task ExecuteScript(Script script)
+		{
+			PreExecuteScript();
+			try
+			{
+				await _scripting.RunScript(script);
+				await PostExecuteScript(script);
+			}
+			catch (Exception)
+			{
+				bScriptExecutionError = true;
+				throw;
+			}
+		}
+
+		private void PreExecuteScript()
 		{
 			Reset();
-			_currentScript = script;
 		}
 
 		private void Reset()
 		{
+			bScriptRenderError = false;
+
 			_scriptRenderControl.Reset();
 			Properties = null;
 
@@ -67,13 +83,8 @@ namespace SRPRendering
 			OutputLogger.Instance.ResetLogOnce();
 		}
 
-		private void ExecutionComplete(Exception exception)
+		private async Task PostExecuteScript(Script script)
 		{
-			bScriptRenderError = false;
-
-			var script = _currentScript;
-			_currentScript = null;
-
 			try
 			{
 				// Tell the script render control that we're done,
@@ -106,7 +117,7 @@ namespace SRPRendering
 				script.UserProperties[property.Name] = property;
 			}
 
-			bScriptExecutionError = exception != null;
+			bScriptExecutionError = false;
 		}
 
 		// Fire redraw when it's requested, except when disallowed.
@@ -248,9 +259,6 @@ namespace SRPRendering
 
 		// Original scene data the above was created from.
 		private Scene _scene;
-
-		// Script currently being executed.
-		private Script _currentScript;
 
 		// List of things to dispose.
 		private CompositeDisposable _disposables = new CompositeDisposable();

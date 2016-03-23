@@ -65,7 +65,7 @@ namespace SRPTests.TestRenderer
 			try
 			{
 				// Execute the script.
-				await _scripting.RunScript(definition.Script);
+				await _sr.ExecuteScript(definition.Script);
 
 				// This should never fire, as the exception should propagate out of RunScript.
 				Assert.False(_sr.HasScriptError, "Error executing script");
@@ -112,7 +112,7 @@ namespace SRPTests.TestRenderer
 				IBuffer resultBuffer = null;
 				script.GlobalVariables.Add("SetResultBuffer", (Action<IBuffer>)(buffer => resultBuffer = buffer));
 
-				await _scripting.RunScript(script);
+				await _sr.ExecuteScript(script);
 
 				// This should never fire, as the exception should propagate out of RunScript.
 				Assert.False(_sr.HasScriptError, "Error executing script");

@@ -98,7 +98,7 @@ namespace ShaderEditorApp.Model
 				try
 				{
 					// Asynchronously execute the script.
-					await scripting.RunScript(script);
+					await Renderer.ExecuteScript(script);
 				}
 #pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
 				catch

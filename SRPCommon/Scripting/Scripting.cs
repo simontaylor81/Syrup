@@ -29,14 +29,6 @@ namespace SRPCommon.Scripting
 		private SRPPlatformAdaptationLayer _pal;
 		private bool bInProgress;
 
-		// Events fired before and after script execution.
-		public IObservable<Script> PreExecute => _preExecute;
-		public IObservable<Exception> ExecutionComplete => _executionComplete;
-
-		// Subjects for the above.
-		private Subject<Script> _preExecute = new Subject<Script>();
-		private Subject<Exception> _executionComplete = new Subject<Exception>();
-
 		private const string _projectPathPrefix = "project:";
 
 		public Scripting(IWorkspace workspace)
@@ -96,8 +88,6 @@ namespace SRPCommon.Scripting
 			{
 				bInProgress = true;
 
-				_preExecute.OnNext(script);
-
 				// Execute script on thread pool.
 				try
 				{
@@ -106,13 +96,6 @@ namespace SRPCommon.Scripting
 							var source = pythonEngine.CreateScriptSourceFromFile(script.Filename);
 							RunSource(source, script.GlobalVariables);
 						});
-
-					_executionComplete.OnNext(null);
-				}
-				catch (Exception ex)
-				{
-					_executionComplete.OnNext(ex);
-					throw;
 				}
 				finally
 				{
