@@ -168,7 +168,7 @@ namespace ShaderEditorApp.ViewModel
 				.Where(d => d.IsDirty)
 				.Select(d => d.FilePath);
 
-			if (Workspace.Project.IsDirty)
+			if (Workspace.Project != null && Workspace.Project.IsDirty)
 			{
 				unsavedFiles = unsavedFiles.Concat(EnumerableEx.Return(Workspace.Project.FilePath));
 			}
