@@ -54,16 +54,27 @@ namespace SRPRendering
 		// Execute a script using this renderer.
 		public async Task ExecuteScript(Script script)
 		{
-			PreExecuteScript();
-			try
+			// Don't run if we're already running a script.
+			if (!_bInProgress)
 			{
-				await _scripting.RunScript(script);
-				await PostExecuteScript(script);
-			}
-			catch (Exception)
-			{
-				bScriptExecutionError = true;
-				throw;
+				_bInProgress = true;
+
+				PreExecuteScript();
+
+				try
+				{
+					await _scripting.RunScript(script);
+					await PostExecuteScript(script);
+				}
+				catch (Exception)
+				{
+					bScriptExecutionError = true;
+					throw;
+				}
+				finally
+				{
+					_bInProgress = false;
+				}
 			}
 		}
 
@@ -264,5 +275,6 @@ namespace SRPRendering
 
 		private readonly ScriptRenderControl _scriptRenderControl;
 		private readonly Scripting _scripting;
+		private bool _bInProgress;
 	}
 }

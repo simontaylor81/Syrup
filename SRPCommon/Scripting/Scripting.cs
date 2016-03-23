@@ -27,7 +27,6 @@ namespace SRPCommon.Scripting
 
 		private ScriptEngine pythonEngine;
 		private SRPPlatformAdaptationLayer _pal;
-		private bool bInProgress;
 
 		private const string _projectPathPrefix = "project:";
 
@@ -83,25 +82,11 @@ namespace SRPCommon.Scripting
 
 		public async Task RunScript(Script script)
 		{
-			// Don't run if we're already running a script.
-			if (!bInProgress)
-			{
-				bInProgress = true;
-
-				// Execute script on thread pool.
-				try
+			await Task.Run(() =>
 				{
-					await Task.Run(() =>
-						{
-							var source = pythonEngine.CreateScriptSourceFromFile(script.Filename);
-							RunSource(source, script.GlobalVariables);
-						});
-				}
-				finally
-				{
-					bInProgress = false;
-				}
-			}
+					var source = pythonEngine.CreateScriptSourceFromFile(script.Filename);
+					RunSource(source, script.GlobalVariables);
+				});
 		}
 
 		private void RunSource(ScriptSource source, IDictionary<string, object> globals)
