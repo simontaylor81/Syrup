@@ -85,20 +85,6 @@ namespace SRPRendering
 			return _shaderHandles.AddAndReturn(new ShaderHandle(path, entryPoint, profile, FindShader, ConvertDefines(defines)));
 		}
 
-		// Compile a shader from an in-memory string.
-		// All includes still must come from the file system.
-		public IShader CompileShaderFromString(string source, string entryPoint, string profile,
-			IDictionary<string, object> defines = null)
-		{
-			throw new NotImplementedException();
-
-			// Don't cache shader from string.
-			// TODO: Would be nice if we could if people are going to use them in scripts.
-			// As they're not cache, we must manually dispose them, so add them to the resource list.
-			//return AddShader(AddResource(ShaderCompiler.CompileFromString(
-			//	_device.Device, source, entryPoint, profile, FindShader, ConvertDefines(defines))));
-		}
-
 		private ShaderMacro[] ConvertDefines(IDictionary<string, object> defines) =>
 			defines
 				.EmptyIfNull()
