@@ -231,9 +231,34 @@ namespace SRPRendering
 		private async Task CompileShaders()
 		{
 			// Run on background thread so UI remains responsive.
-			// TODO: parallel.
-			shaders = await Task.Run(() =>
-				_shaderHandles.Select(handle => handle.Compile(_device.GlobalResources.ShaderCache)).ToList());
+			shaders = await Task.Run(() => _shaderHandles
+				.AsParallel()
+				.Select(GuardedCompileShader)
+				.ToList());
+
+			// Null results mean the compilation failed.
+			int numFailures = shaders.Count(x => x == null);
+			if (numFailures > 0)
+			{
+				throw new ScriptException($"{numFailures} shader{(numFailures > 1 ? "s" : "")} failed to compile. See ShaderCompile output for more info.");
+			}
+		}
+
+		// Compile an individual shader, with error handling.
+		private Shader GuardedCompileShader(ShaderHandle handle)
+		{
+			try
+			{
+				return handle.Compile(_device.GlobalResources.ShaderCache);
+			}
+			catch (ScriptException ex)
+			{
+				// Log errors to the ShaderCompile log window.
+				OutputLogger.Instance.Log(LogCategory.ShaderCompile, ex.Message);
+
+				// Don't rethrow here so we gather errors from all shaders (don't fail fast).
+				return null;
+			}
 		}
 
 		public void Render(SharpDX.Direct3D11.DeviceContext deviceContext, ViewInfo viewInfo, RenderScene renderScene)

@@ -5,6 +5,10 @@ vs = ri.CompileShader("pbr.hlsl", "BasicVS", "vs_4_0")
 ps_ibl = ri.CompileShader("pbr.hlsl", "SolidColourPS", "ps_4_0", { 'PBR_USE_IBL': 1 })
 ps_noibl = ri.CompileShader("pbr.hlsl", "SolidColourPS", "ps_4_0", { 'PBR_USE_IBL': 0 })
 
+# TEMP: Compile loads of shaders to test parallel compilation.
+#for i in xrange(0, 50):
+#	ri.CompileShader("pbr.hlsl", "SolidColourPS", "ps_4_0", { 'PBR_USE_IBL': 1, 'DUMMY': i })
+
 backgroundVs = ri.CompileShader("background.hlsl", "VS", "vs_4_0")
 backgroundPs = ri.CompileShader("background.hlsl", "PS", "ps_4_0")
 

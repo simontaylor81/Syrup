@@ -8,6 +8,7 @@ using SharpDX.Direct3D11;
 using System.Security.Cryptography;
 using SharpDX.Direct3D;
 using SRPScripting.Shader;
+using System.Collections.Concurrent;
 
 namespace SRPRendering.Shaders
 {
@@ -67,7 +68,7 @@ namespace SRPRendering.Shaders
 
 					// Explicitly remove the entry from the cache, as the re-compilation
 					// might fail, and we don't want a stale reference in the cache.
-					cache.Remove(key);
+					cache.TryRemove(key, out existingEntry);
 				}
 			}
 
@@ -130,7 +131,7 @@ namespace SRPRendering.Shaders
 		}
 
 		private Device device;
-		Dictionary<ShaderCacheKey, ShaderCacheEntry> cache = new Dictionary<ShaderCacheKey, ShaderCacheEntry>();
+		ConcurrentDictionary<ShaderCacheKey, ShaderCacheEntry> cache = new ConcurrentDictionary<ShaderCacheKey, ShaderCacheEntry>();
 	}
 
 	struct ShaderCacheKey
