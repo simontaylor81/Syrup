@@ -98,7 +98,7 @@ namespace ShaderEditorApp.Model
 				try
 				{
 					// Asynchronously execute the script.
-					await Renderer.ExecuteScript(script);
+					await Renderer.ExecuteScript(script, _progress);
 				}
 #pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
 				catch
@@ -108,6 +108,8 @@ namespace ShaderEditorApp.Model
 					// They're only surfaced to get good callstacks in the test harness.
 				}
 			}
+
+			_progress.Complete();
 		}
 
 		// Do we have a scene loaded currently?
@@ -193,12 +195,15 @@ namespace ShaderEditorApp.Model
 		// Observables that indicate the state of script execution.
 		public IObservable<bool> CanRunScript { get; }
 		public IObservable<bool> IsScriptRunning { get; }
+		public IObservable<string> StatusMessage => _progress.Status;
 
 		// Observable that fires when the viewport should be redrawn.
 		public IObservable<Unit> RedrawRequired { get; }
 
 		// Previously run scripts.
 		private readonly Dictionary<string, Script> _scripts = new Dictionary<string, Script>();
+
+		private readonly Progress _progress = new Progress();
 
 		// Script file that was last run.
 		private Script _lastRunScript;

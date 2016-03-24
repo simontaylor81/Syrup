@@ -72,8 +72,7 @@ namespace ShaderEditorApp.ViewModel
 				.ToProperty(this, x => x.SceneViewModel);
 
 			// Status bar text, for now, prints whether the script is running.
-			Workspace.IsScriptRunning
-				.Select(isRunning => isRunning ? "Running script..." : "")
+			Workspace.StatusMessage
 				.ToProperty(this, x => x.StatusBarText, out _statusBarText);
 
 			// Create commands.

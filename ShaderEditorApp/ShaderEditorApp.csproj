@@ -185,6 +185,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Interfaces\IIsForegroundService.cs" />
+    <Compile Include="Model\Progress.cs" />
     <Compile Include="Model\RecentFileList.cs" />
     <Compile Include="Model\UserSettings.cs" />
     <Compile Include="Model\Workspace.cs" />

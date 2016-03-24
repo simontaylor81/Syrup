@@ -208,8 +208,9 @@ namespace SRPRendering
 		}
 
 		// Called after script has finished executing (successfull).
-		public Task ScriptExecutionComplete()
+		public Task ScriptExecutionComplete(IProgress progress)
 		{
+			progress.Update("Compiling shdaers...");
 			return CompileShaders();
 		}
 

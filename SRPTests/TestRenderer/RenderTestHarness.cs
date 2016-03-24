@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using SRPScripting;
+using SRPCommon.Interfaces;
 
 namespace SRPTests.TestRenderer
 {
@@ -65,7 +66,7 @@ namespace SRPTests.TestRenderer
 			try
 			{
 				// Execute the script.
-				await _sr.ExecuteScript(definition.Script);
+				await _sr.ExecuteScript(definition.Script, new NullProgress());
 
 				// This should never fire, as the exception should propagate out of RunScript.
 				Assert.False(_sr.HasScriptError, "Error executing script");
@@ -112,7 +113,7 @@ namespace SRPTests.TestRenderer
 				IBuffer resultBuffer = null;
 				script.GlobalVariables.Add("SetResultBuffer", (Action<IBuffer>)(buffer => resultBuffer = buffer));
 
-				await _sr.ExecuteScript(script);
+				await _sr.ExecuteScript(script, new NullProgress());
 
 				// This should never fire, as the exception should propagate out of RunScript.
 				Assert.False(_sr.HasScriptError, "Error executing script");

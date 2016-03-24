@@ -52,8 +52,11 @@ namespace SRPRendering
 		}
 
 		// Execute a script using this renderer.
-		public async Task ExecuteScript(Script script)
+		public async Task ExecuteScript(Script script, IProgress progress)
 		{
+			Trace.Assert(script != null);
+			Trace.Assert(progress != null);
+
 			// Don't run if we're already running a script.
 			if (!_bInProgress)
 			{
@@ -63,8 +66,9 @@ namespace SRPRendering
 
 				try
 				{
+					progress.Update("Running script...");
 					await _scripting.RunScript(script);
-					await PostExecuteScript(script);
+					await PostExecuteScript(script, progress);
 				}
 				catch (Exception ex)
 				{
@@ -95,13 +99,14 @@ namespace SRPRendering
 			OutputLogger.Instance.ResetLogOnce();
 		}
 
-		private async Task PostExecuteScript(Script script)
+		private async Task PostExecuteScript(Script script, IProgress progress)
 		{
 			// Tell the script render control that we're done,
 			// so it can compile shaders, etc.
-			await _scriptRenderControl.ScriptExecutionComplete();
+			await _scriptRenderControl.ScriptExecutionComplete(progress);
 
 			// Get properties from script render control.
+			progress.Update("Gathering properties");
 			Properties = _scriptRenderControl.GetProperties();
 
 			// Attempt to copy over previous property values so they're not reset every
