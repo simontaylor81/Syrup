@@ -17,7 +17,6 @@
             <Setter Property="IsReadOnlyCaretVisible" Value="True"/>
             <Setter Property="HorizontalScrollBarVisibility" Value="Visible"/>
             <Setter Property="VerticalScrollBarVisibility" Value="Visible"/>
-            <!--<Setter Property="Visibility" Value="Collapsed"/>       --><!-- Hide text boxes by default. -->
         </Style>
 
         <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
@@ -40,7 +39,9 @@
             <Button Content="Clear" Command="{Binding ClearCurrent}"/>
         </ToolBar>
 
+        <!-- The text boxes for each category. Only one is visible at a time. -->
         <ItemsControl Grid.Row="1" ItemsSource="{Binding Categories}">
+            <!-- Use a simple grid for layout to avoid any complications (no layout is required as only one is ever visible). -->
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid />

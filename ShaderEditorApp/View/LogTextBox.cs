@@ -10,6 +10,7 @@ using ShaderEditorApp.ViewModel;
 namespace ShaderEditorApp.View
 {
 	// TextBox subclass for displaying log output in the output window.
+	// Handles our custom auto-scroll behaviour.
 	public class LogTextBox : TextBox
 	{
 		public LogTextBox()
