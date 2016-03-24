@@ -15,6 +15,7 @@ using System.Reactive;
 using System.Reactive.Subjects;
 using System.Diagnostics;
 using SRPCommon.Interfaces;
+using SRPCommon.Logging;
 
 namespace SRPCommon.Scripting
 {
@@ -48,7 +49,7 @@ namespace SRPCommon.Scripting
 			AddSearchPath(_projectPathPrefix);
 
 			// Hook up log stream to the runtime.
-			StreamWriter writer = OutputLogger.Instance.GetStreamWriter(LogCategory.Script);
+			var writer = CompositeLoggerFactory.Instance.CreateLogger("Script").CreateStreamWriter();
 			pythonEngine.Runtime.IO.SetOutput(writer.BaseStream, writer);
 			pythonEngine.Runtime.IO.SetErrorOutput(writer.BaseStream, writer);
 		}

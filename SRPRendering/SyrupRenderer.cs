@@ -19,6 +19,7 @@ using Castle.DynamicProxy;
 using SharpDX.Mathematics.Interop;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using SRPCommon.Logging;
 
 namespace SRPRendering
 {
@@ -58,8 +59,8 @@ namespace SRPRendering
 			Trace.Assert(progress != null);
 
 			// Clear output from previous runs.
-			OutputLogger.Instance.Clear(LogCategory.Script);
-			OutputLogger.Instance.Clear(LogCategory.ShaderCompile);
+			_scriptLogger.Clear();
+			_shaderCompileLogger.Clear();
 
 			// Don't run if we're already running a script.
 			if (!_bInProgress)
@@ -98,9 +99,6 @@ namespace SRPRendering
 
 			_scriptRenderControl.Reset();
 			Properties = null;
-
-			// Reset output logger so warnings are written again.
-			OutputLogger.Instance.ResetLogOnce();
 		}
 
 		private async Task PostExecuteScript(Script script, IProgress progress)
@@ -216,17 +214,8 @@ namespace SRPRendering
 
 		private void LogScriptError(Exception ex)
 		{
-			OutputLogger.Instance.LogLine(LogCategory.Script, "Script execution failed.");
-
-			if (_scripting != null)
-			{
-				OutputLogger.Instance.Log(LogCategory.Script, _scripting.FormatScriptError(ex));
-			}
-			else
-			{
-				OutputLogger.Instance.LogLine(LogCategory.Script, ex.Message);
-				OutputLogger.Instance.LogLine(LogCategory.Script, ex.StackTrace);
-			}
+			_scriptLogger.LogLine("Script execution failed.");
+			_scriptLogger.Log(_scripting.FormatScriptError(ex));
 		}
 
 		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
@@ -277,5 +266,8 @@ namespace SRPRendering
 		private readonly ScriptRenderControl _scriptRenderControl;
 		private readonly Scripting _scripting;
 		private bool _bInProgress;
+
+		private ILogger _scriptLogger = CompositeLoggerFactory.Instance.CreateLogger("Script");
+		private ILogger _shaderCompileLogger = CompositeLoggerFactory.Instance.CreateLogger("ShaderCompile");
 	}
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using SRPCommon.Logging;
 using SRPCommon.Util;
 
 namespace SRPCommon.Scene
@@ -28,6 +29,9 @@ namespace SRPCommon.Scene
 			var prevCurrentDir = Environment.CurrentDirectory;
 			Environment.CurrentDirectory = Path.GetDirectoryName(filename);
 
+			// TODO: Do this better: own category, pass to children.
+			var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
+
 			try
 			{
 				// Load JSON file.
@@ -43,22 +47,22 @@ namespace SRPCommon.Scene
 			}
 			catch (IOException ex)
 			{
-				OutputLogger.Instance.LogLine(LogCategory.Log, "Failed to load scene {0}", filename);
-				OutputLogger.Instance.LogLine(LogCategory.Log, ex.Message);
+				logger.LogLine("Failed to load scene {0}", filename);
+				logger.LogLine(ex.Message);
 				return null;
 			}
 			catch (JsonException ex)
 			{
-				OutputLogger.Instance.LogLine(LogCategory.Log, "Failed to parse scene {0}", filename);
-				OutputLogger.Instance.LogLine(LogCategory.Log, ex.Message);
+				logger.LogLine("Failed to parse scene {0}", filename);
+				logger.LogLine(ex.Message);
 				return null;
 			}
 			catch (Exception ex)
 			{
 				// Catch-all for any exception thrown during the parsing process in case of malformed scene.
 				// TODO: Perhaps be more selective?
-				OutputLogger.Instance.LogLine(LogCategory.Log, "Scene is invalid: {0}", filename);
-				OutputLogger.Instance.LogLine(LogCategory.Log, ex.Message);
+				logger.LogLine("Scene is invalid: {0}", filename);
+				logger.LogLine(ex.Message);
 				return null;
 			}
 		}

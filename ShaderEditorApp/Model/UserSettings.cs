@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SRPCommon.Logging;
 
 namespace ShaderEditorApp.Model
 {
@@ -21,6 +22,8 @@ namespace ShaderEditorApp.Model
 			GlobalConfig.AppName,
 			"settings.json");
 
+		private ILogger _logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
+
 		public UserSettings()
 		{
 			try
@@ -32,13 +35,14 @@ namespace ShaderEditorApp.Model
 			catch (IOException ex)
 			{
 				// Ignore IO issues. File probably wasn't there (first run).
-				OutputLogger.Instance.LogLine(LogCategory.Log, $"Failed to load settings file {Filename}: {ex.Message}");
+				_logger.LogLine($"Failed to load settings file {Filename}: {ex.Message}");
 			}
 			catch (JsonException ex)
 			{
 				// Problem with the json, corrupted file?
 				// User loses the settings unfortunately, but better than crashing.
-				OutputLogger.Instance.LogLine(LogCategory.Log, $"Failed to read settings from {Filename}: {ex.Message}");
+				var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
+				_logger.LogLine($"Failed to read settings from {Filename}: {ex.Message}");
 			}
 		}
 
@@ -54,7 +58,7 @@ namespace ShaderEditorApp.Model
 			catch (IOException ex)
 			{
 				// Don't crash if there was some IO error.
-				OutputLogger.Instance.LogLine(LogCategory.Log, $"Failed to save settings to file {Filename}: {ex.Message}");
+				_logger.LogLine($"Failed to save settings to file {Filename}: {ex.Message}");
 			}
 		}
 	}

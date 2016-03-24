@@ -14,6 +14,7 @@ using SRPScripting.Shader;
 using SRPScripting;
 using SRPCommon.Util;
 using System.Diagnostics;
+using SRPCommon.Logging;
 
 namespace SRPRendering.Shaders
 {
@@ -50,6 +51,8 @@ namespace SRPRendering.Shaders
 
 		public IShaderConstantVariableBinding Binding { get; set; }
 
+		private bool _hasWarnedAboutOverride = false;
+
 		// Update bindings prior to cbuffer upload.
 		public void Update(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
 		{
@@ -60,12 +63,16 @@ namespace SRPRendering.Shaders
 
 			// Warn if the user is attempting to override the value, but the variable has not been
 			// set as overridable.
-			if (overrides != null &&
+			if (!_hasWarnedAboutOverride &&
+				overrides != null &&
 				overrides.ContainsKey(Name) &&
 				(Binding == null || !Binding.AllowScriptOverride))
 			{
-				OutputLogger.Instance.LogLineOnce(LogCategory.Script,
-					$"Warning: attempt to override shader variable {Name} which has not been marked as overridable. Call MarkAsScriptOverride to mark it thus.");
+				// Only do this once to avoid spam.
+				_hasWarnedAboutOverride = true;
+
+				var logger = CompositeLoggerFactory.Instance.CreateLogger("Script");
+				logger.LogLine($"Warning: attempt to override shader variable {Name} which has not been marked as overridable. Call MarkAsScriptOverride to mark it thus.");
 			}
 		}
 

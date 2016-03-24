@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SRPCommon.Logging;
 using SRPCommon.Util;
 
 namespace ShaderEditorApp
@@ -19,7 +20,7 @@ namespace ShaderEditorApp
 	/// <summary>
 	/// Interaction logic for OutputWindow.xaml
 	/// </summary>
-	public partial class OutputWindow : UserControl, ILogTarget
+	public partial class OutputWindow : UserControl, ILoggerFactory
 	{
 		public OutputWindow()
 		{
@@ -42,7 +43,7 @@ namespace ShaderEditorApp
 		}
 
 		// Add a message to the output window.
-		public void Log(LogCategory category, string text)
+		private void Log(LogCategory category, string text)
 		{
 			// This function can be called on any thread, but we need to access the UI on the UI thread,
 			// so post back to the WPF dispatcher.
@@ -63,7 +64,7 @@ namespace ShaderEditorApp
 		}
 
 		// Clear the output for a category.
-		public void Clear(LogCategory category)
+		private void Clear(LogCategory category)
 		{
 			Application.Current.Dispatcher.InvokeAsync(() =>
 				{
@@ -82,7 +83,7 @@ namespace ShaderEditorApp
 		private TextBox[] categoryTextBoxes = new TextBox[Enum.GetNames(typeof(LogCategory)).Length];
 
 		// Get/set the currently displayed category.
-		public LogCategory CurrentCategory
+		private LogCategory CurrentCategory
 		{
 			// Just mirror the selection index of the combo box.
 			// Setting triggers SelectionChanged event, as desired.
@@ -102,6 +103,49 @@ namespace ShaderEditorApp
 
 			// Show the current one.
 			CurrentTextbox.Visibility = Visibility.Visible;
+		}
+
+		public ILogger CreateLogger(string category)
+		{
+			// TODO: Replace LogCategory with strings.
+			LogCategory categoryEnum;
+			if (Enum.TryParse(category, true, out categoryEnum))
+			{
+				return new OutputWindowLogger(this, categoryEnum);
+			}
+			return new NullLogger();
+		}
+
+		// TODO: REMOVE
+		private enum LogCategory
+		{
+			Log,            // General debug log message
+			Script,         // Script output
+			ShaderCompile,  // Shader compilation output
+		}
+
+		// Logger that writes to the output window.
+		private class OutputWindowLogger : ILogger
+		{
+			private readonly LogCategory _category;
+			private readonly OutputWindow _outputWindow;
+
+			// TODO: Replace LogCategory with strings.
+			public OutputWindowLogger(OutputWindow outputWindow, LogCategory category)
+			{
+				_outputWindow = outputWindow;
+				_category = category;
+			}
+
+			public void Clear()
+			{
+				_outputWindow.Clear(_category);
+			}
+
+			public void Log(string message)
+			{
+				_outputWindow.Log(_category, message);
+			}
 		}
 	}
 }

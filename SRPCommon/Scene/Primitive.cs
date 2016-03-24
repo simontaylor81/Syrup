@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using SRPCommon.Logging;
 
 namespace SRPCommon.Scene
 {
@@ -84,7 +85,8 @@ namespace SRPCommon.Scene
 				}
 				else
 				{
-					OutputLogger.Instance.LogLine(LogCategory.Log, "Material not found: " + MaterialName);
+					var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
+					logger.LogLine("Material not found: " + MaterialName);
 				}
 			}
 		}

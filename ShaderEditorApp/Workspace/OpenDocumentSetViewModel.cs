@@ -10,6 +10,7 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using SRPCommon.Logging;
 
 namespace ShaderEditorApp.ViewModel
 {
@@ -64,7 +65,8 @@ namespace ShaderEditorApp.ViewModel
 			}
 			else
 			{
-				OutputLogger.Instance.LogLine(LogCategory.Log, "File not found: " + path);
+				var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
+				logger.LogLine("File not found: " + path);
 				return;
 			}
 

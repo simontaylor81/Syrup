@@ -16,6 +16,7 @@ using ShaderEditorApp.Model;
 using ShaderEditorApp.Services;
 using ShaderEditorApp.View;
 using ShaderEditorApp.ViewModel;
+using SRPCommon.Logging;
 using SRPCommon.Util;
 using SRPRendering;
 
@@ -40,6 +41,9 @@ namespace ShaderEditorApp
 
 		private void Window_Initialized(object sender, EventArgs e)
 		{
+			// Set up logging to output window. Must be first.
+			CompositeLoggerFactory.Instance.AddFactory(outputWindow);
+
 			// Initialise D3D device.
 			_renderDevice = new RenderDevice();
 
@@ -53,8 +57,6 @@ namespace ShaderEditorApp
 			// Create render window and assign it to its host.
 			renderWindow = new RenderWindow(_renderDevice, _workspaceViewModel);
 			viewportFrame.SetRenderWindow(renderWindow);
-
-			OutputLogger.Instance.AddTarget(outputWindow);
 
 			DataContext = _workspaceViewModel;
 			viewportFrame.DataContext = renderWindow.ViewportViewModel;

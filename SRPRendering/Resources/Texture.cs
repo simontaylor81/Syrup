@@ -9,6 +9,7 @@ using SharpDX;
 using SRPScripting;
 using SRPCommon.Util;
 using DirectXTexNet;
+using SRPCommon.Logging;
 
 namespace SRPRendering.Resources
 {
@@ -76,7 +77,8 @@ namespace SRPRendering.Resources
 			catch (Exception ex)
 			{
 				// TODO: Better error handling.
-				OutputLogger.Instance.LogLine(LogCategory.Log, "Failed to load texture file {0} Error code: 0x{1:x8}", filename, ex.HResult);
+				var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
+				logger.LogLine("Failed to load texture file {0} Error code: 0x{1:x8}", filename, ex.HResult);
 				throw;
 			}
 		}

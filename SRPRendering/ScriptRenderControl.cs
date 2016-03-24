@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using SharpDX.Direct3D;
 using SRPCommon.Interfaces;
+using SRPCommon.Logging;
 using SRPCommon.Scene;
 using SRPCommon.Scripting;
 using SRPCommon.UserProperties;
@@ -241,7 +242,7 @@ namespace SRPRendering
 			catch (ScriptException ex)
 			{
 				// Log errors to the ShaderCompile log window.
-				OutputLogger.Instance.Log(LogCategory.ShaderCompile, ex.Message);
+				_shaderCompileLogger.Log(ex.Message);
 
 				// Don't rethrow here so we gather errors from all shaders (don't fail fast).
 				return null;
@@ -319,5 +320,7 @@ namespace SRPRendering
 		private List<IUserProperty> _userVariables = new List<IUserProperty>();
 
 		private readonly MipGenerator _mipGenerator;
+
+		private readonly ILogger _shaderCompileLogger = CompositeLoggerFactory.Instance.CreateLogger("ShaderCompile");
 	}
 }

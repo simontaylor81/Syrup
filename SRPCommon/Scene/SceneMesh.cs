@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using Assimp;
 using Newtonsoft.Json;
+using SRPCommon.Logging;
 using SRPCommon.Util;
 
 namespace SRPCommon.Scene
@@ -35,7 +36,8 @@ namespace SRPCommon.Scene
 			}
 			else
 			{
-				OutputLogger.Instance.LogLine(LogCategory.Log, "Mesh not found: {0}", Filename);
+				var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
+				logger.LogLine("Mesh not found: {0}", Filename);
 			}
 		}
 

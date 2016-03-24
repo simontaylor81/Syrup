@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
+using SRPCommon.Logging;
 
 namespace SRPCommon.Scene
 {
@@ -33,7 +34,8 @@ namespace SRPCommon.Scene
 				}
 				else
 				{
-					OutputLogger.Instance.LogLine(LogCategory.Log, "Mesh not found: " + MeshName);
+					var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
+					logger.LogLine("Mesh not found: " + MeshName);
 				}
 			}
 		}
