@@ -234,7 +234,6 @@
     <Compile Include="View\RenderWindow.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="View\TextBoxUtils.cs" />
     <Compile Include="View\ViewportFrame.xaml.cs">
       <DependentUpon>ViewportFrame.xaml</DependentUpon>
     </Compile>
