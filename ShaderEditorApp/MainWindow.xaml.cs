@@ -45,17 +45,6 @@ namespace ShaderEditorApp
 			var outputWindowVM = new OutputWindowViewModel();
 			CompositeLoggerFactory.Instance.AddFactory(outputWindowVM);
 
-			// TEMP HACK
-			var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
-			Task.Run(async () =>
-			{
-				for (int i = 0; ; i++)
-				{
-					logger.LogLine($"Message {i}");
-					await Task.Delay(1000);
-				}
-			});
-
 			// Initialise D3D device.
 			_renderDevice = new RenderDevice();
 
