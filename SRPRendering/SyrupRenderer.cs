@@ -59,8 +59,9 @@ namespace SRPRendering
 			Trace.Assert(progress != null);
 
 			// Clear output from previous runs.
-			_scriptLogger.Clear();
+			// Clear script last so we select that in the output window.
 			_shaderCompileLogger.Clear();
+			_scriptLogger.Clear();
 
 			// Don't run if we're already running a script.
 			if (!_bInProgress)

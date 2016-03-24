@@ -41,6 +41,10 @@ namespace ShaderEditorApp.ViewModel
 					{
 						CurrentCategory = category;
 					}
+
+					// We take clearing a category to mean "I'm about to write stuff here, you want to look at it"
+					// So select it as the current category.
+					category.Cleared.Subscribe(_ => CurrentCategory = category);
 				});
 
 			// Update visibilities when the current category changes.
