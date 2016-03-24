@@ -35,6 +35,12 @@ namespace ShaderEditorApp.ViewModel
 				.Subscribe(category =>
 				{
 					Categories.Add(category);
+
+					// Set current category if we don't have one.
+					if (CurrentCategory == null)
+					{
+						CurrentCategory = category;
+					}
 				});
 
 			// Update visibilities when the current category changes.
