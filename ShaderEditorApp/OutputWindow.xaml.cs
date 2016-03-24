@@ -62,6 +62,15 @@ namespace ShaderEditorApp
 				});
 		}
 
+		// Clear the output for a category.
+		public void Clear(LogCategory category)
+		{
+			Application.Current.Dispatcher.InvokeAsync(() =>
+				{
+					categoryTextBoxes[(int)category].Clear();
+				});
+		}
+
 		private void clearButton_Click(object sender, RoutedEventArgs e)
 		{
 			// Clear the current category's text box.

@@ -16,6 +16,7 @@ namespace SRPCommon.Util
 	public interface ILogTarget
 	{
 		void Log(LogCategory category, string text);
+		void Clear(LogCategory category);
 	}
 
 	public class OutputLogger
@@ -35,6 +36,14 @@ namespace SRPCommon.Util
 			foreach (var target in targets)
 			{
 				target.Log(category, text);
+			}
+		}
+
+		public void Clear(LogCategory category)
+		{
+			foreach (var target in targets)
+			{
+				target.Clear(category);
 			}
 		}
 
@@ -101,6 +110,9 @@ namespace SRPCommon.Util
 		{
 			Console.Write(category.ToString() + ": " + text);
 		}
+
+		// Never clear the console.
+		public void Clear(LogCategory category) { }
 	}
 
 	// Stream that writes to the log.

@@ -57,6 +57,10 @@ namespace SRPRendering
 			Trace.Assert(script != null);
 			Trace.Assert(progress != null);
 
+			// Clear output from previous runs.
+			OutputLogger.Instance.Clear(LogCategory.Script);
+			OutputLogger.Instance.Clear(LogCategory.ShaderCompile);
+
 			// Don't run if we're already running a script.
 			if (!_bInProgress)
 			{
