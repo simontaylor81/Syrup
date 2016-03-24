@@ -137,7 +137,7 @@
                         <avalondock:LayoutAnchorablePane DockHeight="200">
                             <!-- Script/compilation output window -->
                             <avalondock:LayoutAnchorable ContentId="Output" Title="Output">
-                                <srp:OutputWindow x:Name="outputWindow"/>
+                                <srpview:OutputWindow x:Name="outputWindow" DataContext="{Binding OutputWindowViewModel}"/>
                             </avalondock:LayoutAnchorable>
                         </avalondock:LayoutAnchorablePane>
                     </avalondock:LayoutPanel>

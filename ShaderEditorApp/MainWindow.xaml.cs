@@ -41,15 +41,27 @@ namespace ShaderEditorApp
 
 		private void Window_Initialized(object sender, EventArgs e)
 		{
-			// Set up logging to output window. Must be first.
-			CompositeLoggerFactory.Instance.AddFactory(outputWindow);
+			// Must create output window VM first as other stuff might need to log to it.
+			var outputWindowVM = new OutputWindowViewModel();
+			CompositeLoggerFactory.Instance.AddFactory(outputWindowVM);
+
+			// TEMP HACK
+			var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
+			Task.Run(async () =>
+			{
+				for (int i = 0; ; i++)
+				{
+					logger.LogLine($"Message {i}");
+					await Task.Delay(1000);
+				}
+			});
 
 			// Initialise D3D device.
 			_renderDevice = new RenderDevice();
 
 			// Create workspace and corresponding view model.
 			_workspace = new Workspace(_renderDevice);
-			_workspaceViewModel = new WorkspaceViewModel(_workspace);
+			_workspaceViewModel = new WorkspaceViewModel(_workspace, outputWindowVM);
 
 			// Close ourselves when the Exit command is triggered.
 			_workspaceViewModel.Exit.Subscribe(_ => Close());

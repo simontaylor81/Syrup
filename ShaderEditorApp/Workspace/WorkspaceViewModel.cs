@@ -22,9 +22,10 @@ namespace ShaderEditorApp.ViewModel
 	// ViewModel for the application workspace, containing documents, docking windows, etc.
 	public class WorkspaceViewModel : ReactiveObject
 	{
-		public WorkspaceViewModel(Workspace workspace, IUserPrompt userPrompt = null)
+		public WorkspaceViewModel(Workspace workspace, OutputWindowViewModel outputWindowViewModel, IUserPrompt userPrompt = null)
 		{
 			Workspace = workspace;
+			OutputWindowViewModel = outputWindowViewModel;
 			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
 			OpenDocumentSet = new OpenDocumentSetViewModel(this);
 
@@ -290,6 +291,8 @@ namespace ShaderEditorApp.ViewModel
 
 		public Workspace Workspace { get; }
 		public OpenDocumentSetViewModel OpenDocumentSet { get; }
+
+		public OutputWindowViewModel OutputWindowViewModel { get; }
 
 		private bool _realTimeMode;
 		public bool RealTimeMode
