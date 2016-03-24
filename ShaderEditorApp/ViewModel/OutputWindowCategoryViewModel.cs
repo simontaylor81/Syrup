@@ -11,57 +11,33 @@ using SRPCommon.Logging;
 
 namespace ShaderEditorApp.ViewModel
 {
-	public class OutputWindowCategoryViewModel : ReactiveObject
+	public class OutputWindowCategoryViewModel : ILogger
 	{
 		public string Name { get; }
-		public ILogger Logger { get; }
+
+		private Subject<string> _messages = new Subject<string>();
+		private Subject<Unit> _cleared = new Subject<Unit>();
 
 		public IObservable<string> Messages { get; }
 		public IObservable<Unit> Cleared { get; }
-
-		private ObservableAsPropertyHelper<string> _text;
-		public string Text => _text.Value;
-
-		private StringBuilder _textBuilder = new StringBuilder();
 
 		public OutputWindowCategoryViewModel(string name)
 		{
 			Name = name;
 
-			var logger = new LoggerImpl();
-			Logger = logger;
-
-			// Subscribe to logger events to update the text output.
-			var message = logger.Messages.ObserveOn(RxApp.MainThreadScheduler).Do(msg => _textBuilder.Append(msg));
-			var cleared = logger.Cleared.ObserveOn(RxApp.MainThreadScheduler).Do(_ => _textBuilder.Clear());
-
-			// Update text property when either occur.
-			_text = message.Select(_ => Unit.Default).Merge(cleared)
-				.Select(_ => _textBuilder.ToString())
-				.ToProperty(this, x => x.Text, "");
-
-			Messages = message;
-			Cleared = cleared;
+			// Emit logger events on main thread for view consumption.
+			Messages = _messages.ObserveOn(RxApp.MainThreadScheduler);
+			Cleared = _cleared.ObserveOn(RxApp.MainThreadScheduler);
 		}
 
-		private class LoggerImpl : ILogger
+		public void Log(string message)
 		{
-			private Subject<string> _messages = new Subject<string>();
-			private Subject<Unit> _cleared = new Subject<Unit>();
-
-			public IObservable<string> Messages => _messages;
-			public IObservable<Unit> Cleared => _cleared;
-
-			public void Log(string message)
-			{
-				_messages.OnNext(message);
-			}
-
-			public void Clear()
-			{
-				_cleared.OnNext(Unit.Default);
-			}
+			_messages.OnNext(message);
 		}
 
+		public void Clear()
+		{
+			_cleared.OnNext(Unit.Default);
+		}
 	}
 }

@@ -44,7 +44,7 @@ namespace ShaderEditorApp.ViewModel
 				// Fire new categories observable.
 				_newCategories.OnNext(categoryVM);
 
-				return categoryVM.Logger;
+				return categoryVM;
 			});
 		}
 	}
