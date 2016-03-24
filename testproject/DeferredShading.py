@@ -1,4 +1,4 @@
-from SRPScripting import *8
+from SRPScripting import *
 import random
 
 # Compile shaders for base and deferred passes.

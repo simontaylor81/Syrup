@@ -16,6 +16,13 @@ namespace ShaderEditorApp.ViewModel
 	{
 		public ReactiveList<OutputWindowCategoryViewModel> Categories { get; } = new ReactiveList<OutputWindowCategoryViewModel>();
 
+		private OutputWindowCategoryViewModel _currentCategory;
+		public OutputWindowCategoryViewModel CurrentCategory
+		{
+			get { return _currentCategory; }
+			set { this.RaiseAndSetIfChanged(ref _currentCategory, value); }
+		}
+
 		// Existing loggers for the different categories. Can be accessed on multiple threads so must be concurrent.
 		private ConcurrentDictionary<string, ILogger> _loggers = new ConcurrentDictionary<string, ILogger>();
 
@@ -27,11 +34,18 @@ namespace ShaderEditorApp.ViewModel
 			_newCategories.ObserveOn(RxApp.MainThreadScheduler)
 				.Subscribe(category =>
 				{
-					// TEMP HACK
-					if (category.Name != "Log") return;
-
 					Categories.Add(category);
 				});
+
+			// Update visibilities when the current category changes.
+			// We keep all the text boxes around so things like caret position aren't lost when switching.
+			this.WhenAnyValue(x => x.CurrentCategory).Subscribe(current =>
+			{
+				foreach (var category in Categories)
+				{
+					category.IsVisible = category == current;
+				}
+			});
 		}
 
 		// ILoggerFactory interface

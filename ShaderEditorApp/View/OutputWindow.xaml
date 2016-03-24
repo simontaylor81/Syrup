@@ -19,6 +19,8 @@
             <Setter Property="VerticalScrollBarVisibility" Value="Visible"/>
             <!--<Setter Property="Visibility" Value="Collapsed"/>       --><!-- Hide text boxes by default. -->
         </Style>
+
+        <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
     </UserControl.Resources>
     
     <Grid x:Name="grid">
@@ -30,9 +32,12 @@
         <!-- Toolbar at the top of the control. -->
         <ToolBar ToolBarTray.IsLocked="True" BorderThickness="0" Background="{x:Null}">
             <Label Content="Category"/>
-            <ComboBox x:Name="categoryCombo"  Margin="0" Width="100">
-            </ComboBox>
+            <ComboBox x:Name="categoryCombo"
+                      ItemsSource="{Binding Categories}" SelectedItem="{Binding CurrentCategory}" DisplayMemberPath="Name"
+                      Margin="0" Width="100"/>
+
             <Separator/>
+            
             <Button x:Name="clearButton" Content="Clear"/>
         </ToolBar>
 
@@ -45,7 +50,7 @@
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <view:LogTextBox/>
+                    <view:LogTextBox Visibility="{Binding IsVisible, Converter={StaticResource booleanToVisibilityConverter}}"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

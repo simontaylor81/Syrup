@@ -11,7 +11,7 @@ using SRPCommon.Logging;
 
 namespace ShaderEditorApp.ViewModel
 {
-	public class OutputWindowCategoryViewModel : ILogger
+	public class OutputWindowCategoryViewModel : ReactiveObject, ILogger
 	{
 		public string Name { get; }
 
@@ -20,6 +20,13 @@ namespace ShaderEditorApp.ViewModel
 
 		public IObservable<string> Messages { get; }
 		public IObservable<Unit> Cleared { get; }
+
+		private bool _isVisible = false;
+		public bool IsVisible
+		{
+			get { return _isVisible; }
+			set { this.RaiseAndSetIfChanged(ref _isVisible, value); }
+		}
 
 		public OutputWindowCategoryViewModel(string name)
 		{
