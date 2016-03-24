@@ -23,6 +23,8 @@ namespace ShaderEditorApp.ViewModel
 			set { this.RaiseAndSetIfChanged(ref _currentCategory, value); }
 		}
 
+		public ReactiveCommand<object> ClearCurrent { get; }
+
 		// Existing loggers for the different categories. Can be accessed on multiple threads so must be concurrent.
 		private ConcurrentDictionary<string, ILogger> _loggers = new ConcurrentDictionary<string, ILogger>();
 
@@ -56,6 +58,9 @@ namespace ShaderEditorApp.ViewModel
 					category.IsVisible = category == current;
 				}
 			});
+
+			ClearCurrent = ReactiveCommand.Create(this.WhenAnyValue(x => x.CurrentCategory).Select(current => current != null));
+			ClearCurrent.Subscribe(_ => CurrentCategory.Clear());
 		}
 
 		// ILoggerFactory interface

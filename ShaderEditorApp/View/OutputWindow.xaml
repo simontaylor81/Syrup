@@ -32,13 +32,12 @@
         <!-- Toolbar at the top of the control. -->
         <ToolBar ToolBarTray.IsLocked="True" BorderThickness="0" Background="{x:Null}">
             <Label Content="Category"/>
-            <ComboBox x:Name="categoryCombo"
-                      ItemsSource="{Binding Categories}" SelectedItem="{Binding CurrentCategory}" DisplayMemberPath="Name"
+            <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding CurrentCategory}" DisplayMemberPath="Name"
                       Margin="0" Width="100"/>
 
             <Separator/>
-            
-            <Button x:Name="clearButton" Content="Clear"/>
+
+            <Button Content="Clear" Command="{Binding ClearCurrent}"/>
         </ToolBar>
 
         <ItemsControl Grid.Row="1" ItemsSource="{Binding Categories}">
