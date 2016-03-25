@@ -24,7 +24,7 @@ namespace SRPCommon.Logging
 
 		public void Log(string message)
 		{
-			Console.Write(_category.ToString() + ": " + message);
+			Console.Write(_category + ": " + message);
 		}
 
 		// Never clear the console.

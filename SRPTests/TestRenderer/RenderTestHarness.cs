@@ -12,6 +12,7 @@ using Xunit;
 using SRPScripting;
 using SRPCommon.Interfaces;
 using SRPCommon.Logging;
+using Xunit.Abstractions;
 
 namespace SRPTests.TestRenderer
 {
@@ -28,12 +29,11 @@ namespace SRPTests.TestRenderer
 
 		private static bool bLoggedDevice = false;
 
-		public RenderTestHarness(TestReporter reporter)
+		public RenderTestHarness(TestReporter reporter, ITestOutputHelper output)
 		{
 			_reporter = reporter;
 
-			// TODO: Test logging
-			var loggerFactory = CompositeLoggerFactory.Instance;
+			var loggerFactory = new TestLoggerFactory(output);
 
 			_renderer = new TestRenderer(64, 64);
 			_workspace = new TestWorkspace(_baseDir);

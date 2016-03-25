@@ -160,6 +160,7 @@
     <Compile Include="TestRenderer\ImageComparison.cs" />
     <Compile Include="TestRenderer\RenderTestHarness.cs" />
     <Compile Include="TestRenderer\TestDefinitions.cs" />
+    <Compile Include="TestRenderer\TestLogger.cs" />
     <Compile Include="TestRenderer\TestRenderer.cs" />
     <Compile Include="TestRenderer\HtmlReporter.cs" />
     <Compile Include="TestRenderer\TestReporter.cs" />
