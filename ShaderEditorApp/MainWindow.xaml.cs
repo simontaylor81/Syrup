@@ -43,14 +43,16 @@ namespace ShaderEditorApp
 		{
 			// Must create output window VM first as other stuff might need to log to it.
 			var outputWindowVM = new OutputWindowViewModel();
-			CompositeLoggerFactory.Instance.AddFactory(outputWindowVM);
+
+			// Create a logger factory for logging to the output window and console.
+			var loggerFactory = new CompositeLoggerFactory(outputWindowVM, new ConsoleLoggerFactory());
 
 			// Initialise D3D device.
 			_renderDevice = new RenderDevice();
 
 			// Create workspace and corresponding view model.
-			_workspace = new Workspace(_renderDevice, CompositeLoggerFactory.Instance);	// TODO: Don't use singleton.
-			_workspaceViewModel = new WorkspaceViewModel(_workspace, outputWindowVM, CompositeLoggerFactory.Instance);
+			_workspace = new Workspace(_renderDevice, loggerFactory);
+			_workspaceViewModel = new WorkspaceViewModel(_workspace, outputWindowVM, loggerFactory);
 
 			// Close ourselves when the Exit command is triggered.
 			_workspaceViewModel.Exit.Subscribe(_ => Close());
