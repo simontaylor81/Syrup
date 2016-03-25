@@ -37,7 +37,7 @@ namespace SRPTests.TestRenderer
 
 			_renderer = new TestRenderer(64, 64);
 			_workspace = new TestWorkspace(_baseDir);
-			_scripting = new Scripting(_workspace, CompositeLoggerFactory.Instance);
+			_scripting = new Scripting(_workspace, loggerFactory);
 
 			// Minor hack to avoid spamming the log with device names.
 			if (!bLoggedDevice)

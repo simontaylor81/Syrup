@@ -45,11 +45,5 @@ namespace SRPCommon.Logging
 		{
 			_factories.Clear();
 		}
-
-
-		// TEMP: single static instance as a temporary meause to ease the transition.
-		// TODO: Remove.
-		private static Lazy<CompositeLoggerFactory> instance = new Lazy<CompositeLoggerFactory>(() => new CompositeLoggerFactory(new ConsoleLoggerFactory()));
-		public static CompositeLoggerFactory Instance => instance.Value;
 	}
 }
