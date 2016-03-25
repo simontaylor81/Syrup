@@ -26,7 +26,7 @@ namespace SRPRendering
 	// Central render loop logic.
 	public class SyrupRenderer : IDisposable, IPropertySource
 	{
-		public SyrupRenderer(IWorkspace workspace, RenderDevice device, Scripting scripting)
+		public SyrupRenderer(IWorkspace workspace, RenderDevice device, Scripting scripting, ILoggerFactory loggerFactory)
 		{
 			Trace.Assert(workspace != null);
 			Trace.Assert(device != null);
@@ -36,14 +36,18 @@ namespace SRPRendering
 			_device = device;
 			_scripting = scripting;
 
+			_loggerFactory = loggerFactory;
+			_scriptLogger = loggerFactory.CreateLogger("Script");
+			_shaderCompileLogger = loggerFactory.CreateLogger("ShaderCompile");
+
 			// Create object for interacting with script.
-			_scriptRenderControl = new ScriptRenderControl(workspace, device);
+			_scriptRenderControl = new ScriptRenderControl(workspace, device, loggerFactory);
 			_disposables.Add(_scriptRenderControl);
 
 			// Generate wrapper proxy using Castle Dynamic Proxy to avoid direct script access to our internals.
 			ScriptInterface = new ProxyGenerator().CreateInterfaceProxyWithTarget<IRenderInterface>(_scriptRenderControl);
 
-			_overlayRenderer = new OverlayRenderer(device.GlobalResources);
+			_overlayRenderer = new OverlayRenderer(device.GlobalResources, _scriptLogger);
 
 			// Merge together change events of all current properties and fire redraw.
 			_disposables.Add(PropertiesObservable
@@ -150,7 +154,7 @@ namespace SRPRendering
 					DisposableUtil.SafeDispose(_renderScene);
 
 					// Create new one.
-					_renderScene = new RenderScene(_scene, _device);
+					_renderScene = new RenderScene(_scene, _device, _loggerFactory);
 
 					// Missing scene can cause rendering to fail -- give it another try with the new one.
 					bScriptRenderError = false;
@@ -246,7 +250,7 @@ namespace SRPRendering
 		// Pointer back to the workspace. Needed so we can access the project to get shaders from.
 		private IWorkspace _workspace;
 
-		private bool bScriptExecutionError = false;		// True if there was a problem executing the script
+		private bool bScriptExecutionError = false;     // True if there was a problem executing the script
 		private bool bScriptRenderError = false;        // True if there was a script error while rendering
 
 		// If true, previous rendering failed with a script problem, so we don't keep re-running until the script is fixed & re-run.
@@ -268,7 +272,8 @@ namespace SRPRendering
 		private readonly Scripting _scripting;
 		private bool _bInProgress;
 
-		private ILogger _scriptLogger = CompositeLoggerFactory.Instance.CreateLogger("Script");
-		private ILogger _shaderCompileLogger = CompositeLoggerFactory.Instance.CreateLogger("ShaderCompile");
+		private readonly ILoggerFactory _loggerFactory;
+		private readonly ILogger _scriptLogger;
+		private readonly ILogger _shaderCompileLogger;
 	}
 }

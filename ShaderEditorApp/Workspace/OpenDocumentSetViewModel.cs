@@ -17,9 +17,10 @@ namespace ShaderEditorApp.ViewModel
 	// View Model class for managing the set of open documents.
 	public class OpenDocumentSetViewModel : ReactiveObject
 	{
-		public OpenDocumentSetViewModel(WorkspaceViewModel workspaceVM)
+		public OpenDocumentSetViewModel(WorkspaceViewModel workspaceVM, ILoggerFactory loggerFactory)
 		{
 			WorkspaceVM = workspaceVM;
+			_logger = loggerFactory.CreateLogger("Log");
 
 			// Create documents list, and wrap in a read-only wrapper.
 			documents = new ObservableCollection<DocumentViewModel>();
@@ -65,8 +66,7 @@ namespace ShaderEditorApp.ViewModel
 			}
 			else
 			{
-				var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
-				logger.LogLine("File not found: " + path);
+				_logger.LogLine("File not found: " + path);
 				return;
 			}
 
@@ -144,8 +144,11 @@ namespace ShaderEditorApp.ViewModel
 
 		// Property that tracks the currently active document.
 		private ObservableAsPropertyHelper<DocumentViewModel> _activeDocument;
+
 		public DocumentViewModel ActiveDocument => _activeDocument.Value;
 
 		public WorkspaceViewModel WorkspaceVM { get; }
+
+		private readonly ILogger _logger;
 	}
 }

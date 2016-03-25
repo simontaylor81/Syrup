@@ -6,6 +6,7 @@ using SRPCommon.UserProperties;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Numerics;
+using SRPCommon.Logging;
 
 namespace SRPCommon.Scene
 {
@@ -29,7 +30,7 @@ namespace SRPCommon.Scene
 		[JsonProperty]
 		private Dictionary<string, string> textures = new Dictionary<string, string>();
 
-		internal void PostLoad()
+		internal void PostLoad(ILogger logger)
 		{
 			_userProperties = vectorParameters.Keys
 				.Select(key => (IUserProperty)new StructUserProperty(

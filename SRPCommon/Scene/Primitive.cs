@@ -73,7 +73,7 @@ namespace SRPCommon.Scene
 
 		private float ToRadians(float degrees) => degrees * ((float)Math.PI / 180.0f);
 
-		internal virtual void PostLoad(Scene scene)
+		internal virtual void PostLoad(Scene scene, ILogger logger)
 		{
 			if (MaterialName != null)
 			{
@@ -85,7 +85,6 @@ namespace SRPCommon.Scene
 				}
 				else
 				{
-					var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
 					logger.LogLine("Material not found: " + MaterialName);
 				}
 			}

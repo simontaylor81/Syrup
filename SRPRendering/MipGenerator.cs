@@ -17,6 +17,7 @@ using SharpDX.Mathematics.Interop;
 using SharpDX.Direct3D;
 using SRPRendering.Resources;
 using SRPRendering.Shaders;
+using SRPCommon.Logging;
 
 namespace SRPRendering
 {
@@ -26,11 +27,13 @@ namespace SRPRendering
 		private readonly RenderDevice _device;
 		private readonly IWorkspace _workspace;
 		private readonly Shader _vertexShader;
+		private readonly ILogger _scriptLogger;
 
-		public MipGenerator(RenderDevice device, IWorkspace workspace)
+		public MipGenerator(RenderDevice device, IWorkspace workspace, ILogger scriptLogger)
 		{
 			_device = device;
 			_workspace = workspace;
+			_scriptLogger = scriptLogger;
 
 			// Compile vertex shader.
 			_vertexShader = device.GlobalResources.ShaderCache.GetShader(
@@ -124,7 +127,7 @@ namespace SRPRendering
 					for (int arraySlice = 0; arraySlice < numArraySlices; arraySlice++)
 					{
 						arraySliceVariable?.SetValue(arraySlice);
-						pixelShader.UpdateVariables(context, null, null, null, _device.GlobalResources);
+						pixelShader.UpdateVariables(context, null, null, null, _device.GlobalResources, _scriptLogger);
 
 						// Render 'fullscreen' quad to downsample the mip.
 						_device.GlobalResources.FullscreenQuad.Draw(context);

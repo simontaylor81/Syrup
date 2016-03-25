@@ -7,6 +7,7 @@ using SharpDX.Direct3D11;
 using SharpDX.D3DCompiler;
 using SRPScripting.Shader;
 using System.Diagnostics;
+using SRPCommon.Logging;
 
 namespace SRPRendering.Shaders
 {
@@ -121,12 +122,18 @@ namespace SRPRendering.Shaders
 		}
 
 		// Upload constants if required.
-		public void UpdateVariables(DeviceContext context, ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides, IGlobalResources globalResources)
+		public void UpdateVariables(
+			DeviceContext context,
+			ViewInfo viewInfo,
+			IPrimitive primitive,
+			IDictionary<string, object> overrides,
+			IGlobalResources globalResources,
+			ILogger scriptLogger)
 		{
 			// First, update the value of bound and overridden variables.
 			foreach (var variable in ConstantVariables)
 			{
-				variable.Update(viewInfo, primitive, overrides);
+				variable.Update(viewInfo, primitive, overrides, scriptLogger);
 			}
 
 			// Next, do the actual upload the constant buffers.

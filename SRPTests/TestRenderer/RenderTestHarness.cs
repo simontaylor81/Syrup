@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Xunit;
 using SRPScripting;
 using SRPCommon.Interfaces;
+using SRPCommon.Logging;
 
 namespace SRPTests.TestRenderer
 {
@@ -31,9 +32,12 @@ namespace SRPTests.TestRenderer
 		{
 			_reporter = reporter;
 
+			// TODO: Test logging
+			var loggerFactory = CompositeLoggerFactory.Instance;
+
 			_renderer = new TestRenderer(64, 64);
 			_workspace = new TestWorkspace(_baseDir);
-			_scripting = new Scripting(_workspace);
+			_scripting = new Scripting(_workspace, CompositeLoggerFactory.Instance);
 
 			// Minor hack to avoid spamming the log with device names.
 			if (!bLoggedDevice)
@@ -46,7 +50,7 @@ namespace SRPTests.TestRenderer
 			}
 
 			// Create syrup renderer to drive the rendering.
-			_sr = new SyrupRenderer(_workspace, _renderer.Device, _scripting);
+			_sr = new SyrupRenderer(_workspace, _renderer.Device, _scripting, loggerFactory);
 			_scripting.RenderInterface = _sr.ScriptInterface;
 		}
 

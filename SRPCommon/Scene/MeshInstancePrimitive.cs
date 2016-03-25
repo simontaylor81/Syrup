@@ -20,9 +20,9 @@ namespace SRPCommon.Scene
 		[SuppressMessage("Language", "CSE0002:Use getter-only auto properties", Justification = "Needed for serialisation")]
 		private string MeshName { get; set; }
 
-		internal override void PostLoad(Scene scene)
+		internal override void PostLoad(Scene scene, ILogger logger)
 		{
-			base.PostLoad(scene);
+			base.PostLoad(scene, logger);
 
 			if (MeshName != null)
 			{
@@ -34,7 +34,6 @@ namespace SRPCommon.Scene
 				}
 				else
 				{
-					var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
 					logger.LogLine("Mesh not found: " + MeshName);
 				}
 			}

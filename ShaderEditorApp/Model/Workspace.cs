@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ReactiveUI;
 using ShaderEditorApp.Projects;
 using SRPCommon.Interfaces;
+using SRPCommon.Logging;
 using SRPCommon.Scene;
 using SRPCommon.Scripting;
 using SRPCommon.Util;
@@ -18,11 +19,14 @@ namespace ShaderEditorApp.Model
 	// Class for handling the workspace of the app (i.e. the central point of control).
 	public class Workspace : ReactiveObject, IWorkspace, IDisposable
 	{
-		public Workspace(RenderDevice device)
+		public Workspace(RenderDevice device, ILoggerFactory loggerFactory)
 		{
+			_loggerFactory = loggerFactory;
+			UserSettings = new UserSettings(loggerFactory);
+
 			// Create classes that handle scripting.
-			scripting = new Scripting(this);
-			Renderer = new SyrupRenderer(this, device, scripting);
+			scripting = new Scripting(this, loggerFactory);
+			Renderer = new SyrupRenderer(this, device, scripting, loggerFactory);
 			scripting.RenderInterface = Renderer.ScriptInterface;
 
 			// Create script execution commands.
@@ -119,7 +123,7 @@ namespace ShaderEditorApp.Model
 		public void SetCurrentScene(string path)
 		{
 			// Attempt to load the scene.
-			var newScene = Scene.LoadFromFile(path);
+			var newScene = Scene.LoadFromFile(path, _loggerFactory);
 			if (newScene != null)
 			{
 				CurrentScene = newScene;
@@ -185,7 +189,7 @@ namespace ShaderEditorApp.Model
 			set { this.RaiseAndSetIfChanged(ref _currentScene, value); }
 		}
 
-		public UserSettings UserSettings { get; } = new UserSettings();
+		public UserSettings UserSettings { get; }
 
 		// Script execution command.
 		// We use ReactiveCommand instead of just an async function as it tracks
@@ -207,5 +211,7 @@ namespace ShaderEditorApp.Model
 
 		// Script file that was last run.
 		private Script _lastRunScript;
+
+		private readonly ILoggerFactory _loggerFactory;
 	}
 }

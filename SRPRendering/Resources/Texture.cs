@@ -46,7 +46,7 @@ namespace SRPRendering.Resources
 		// Create a texture from a file.
 		// TODO: Not sure if this is the best strategy long term.
 		// Probably want to separate import from render resource creation.
-		public static Texture LoadFromFile(Device device, string filename, MipGenerationMode mipGenerationMode)
+		public static Texture LoadFromFile(Device device, string filename, MipGenerationMode mipGenerationMode, ILogger logger)
 		{
 			try
 			{
@@ -77,7 +77,6 @@ namespace SRPRendering.Resources
 			catch (Exception ex)
 			{
 				// TODO: Better error handling.
-				var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
 				logger.LogLine("Failed to load texture file {0} Error code: 0x{1:x8}", filename, ex.HResult);
 				throw;
 			}

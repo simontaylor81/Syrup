@@ -54,7 +54,7 @@ namespace SRPRendering.Shaders
 		private bool _hasWarnedAboutOverride = false;
 
 		// Update bindings prior to cbuffer upload.
-		public void Update(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides)
+		public void Update(ViewInfo viewInfo, IPrimitive primitive, IDictionary<string, object> overrides, ILogger scriptLogger)
 		{
 			if (Binding != null)
 			{
@@ -71,8 +71,7 @@ namespace SRPRendering.Shaders
 				// Only do this once to avoid spam.
 				_hasWarnedAboutOverride = true;
 
-				var logger = CompositeLoggerFactory.Instance.CreateLogger("Script");
-				logger.LogLine($"Warning: attempt to override shader variable {Name} which has not been marked as overridable. Call MarkAsScriptOverride to mark it thus.");
+				scriptLogger.LogLine($"Warning: attempt to override shader variable {Name} which has not been marked as overridable. Call MarkAsScriptOverride to mark it thus.");
 			}
 		}
 

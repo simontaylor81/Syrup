@@ -9,25 +9,25 @@ using SRPCommon.UserProperties;
 using SRPCommon.Util;
 using ShaderEditorApp.ViewModel.Projects;
 using ShaderEditorApp.ViewModel.Scene;
-using System.Reactive;
 using ReactiveUI;
 using System.Reactive.Linq;
 using ShaderEditorApp.Model;
 using System.Threading.Tasks;
 using ShaderEditorApp.Interfaces;
 using Splat;
+using SRPCommon.Logging;
 
 namespace ShaderEditorApp.ViewModel
 {
 	// ViewModel for the application workspace, containing documents, docking windows, etc.
 	public class WorkspaceViewModel : ReactiveObject
 	{
-		public WorkspaceViewModel(Workspace workspace, OutputWindowViewModel outputWindowViewModel, IUserPrompt userPrompt = null)
+		public WorkspaceViewModel(Workspace workspace, OutputWindowViewModel outputWindowViewModel, ILoggerFactory loggerFactory, IUserPrompt userPrompt = null)
 		{
 			Workspace = workspace;
 			OutputWindowViewModel = outputWindowViewModel;
 			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
-			OpenDocumentSet = new OpenDocumentSetViewModel(this);
+			OpenDocumentSet = new OpenDocumentSetViewModel(this, loggerFactory);
 
 			{
 				// Get properties from active window if it's a property source.

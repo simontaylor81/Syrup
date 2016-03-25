@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SharpDX.Direct3D11;
 using System.Numerics;
+using SRPCommon.Logging;
 
 namespace SRPRendering
 {
@@ -11,9 +12,10 @@ namespace SRPRendering
 	{
 		private readonly IGlobalResources _globalResources;
 
-		public OverlayRenderer(IGlobalResources globalResources)
+		public OverlayRenderer(IGlobalResources globalResources, ILogger scriptLogger)
 		{
 			_globalResources = globalResources;
+			_scriptLogger = scriptLogger;
 		}
 
 		// Render the overlay.
@@ -47,12 +49,14 @@ namespace SRPRendering
 			// Draw the selected mesh
 			var proxy = scene.Primitives.ElementAt(selectedMeshIndex);
 
-			_globalResources.BasicShaders.BasicSceneVS.UpdateVariables(deviceContext, viewInfo, proxy, null, _globalResources);
-			_globalResources.BasicShaders.SolidColourPS.UpdateVariables(deviceContext, viewInfo, proxy, null, _globalResources);
+			_globalResources.BasicShaders.BasicSceneVS.UpdateVariables(deviceContext, viewInfo, proxy, null, _globalResources, _scriptLogger);
+			_globalResources.BasicShaders.SolidColourPS.UpdateVariables(deviceContext, viewInfo, proxy, null, _globalResources, _scriptLogger);
 			proxy.Mesh.Draw(deviceContext);
 		}
 
 		// TEMP
 		private static int selectedMeshIndex = -1;
+
+		private readonly ILogger _scriptLogger;
 	}
 }

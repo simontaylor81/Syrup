@@ -22,10 +22,12 @@ namespace ShaderEditorApp.Model
 			GlobalConfig.AppName,
 			"settings.json");
 
-		private ILogger _logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
+		private ILogger _logger;
 
-		public UserSettings()
+		public UserSettings(ILoggerFactory loggerFactory)
 		{
+			_logger = loggerFactory.CreateLogger("Log");
+
 			try
 			{
 				// Load the settings from disk.
@@ -41,7 +43,6 @@ namespace ShaderEditorApp.Model
 			{
 				// Problem with the json, corrupted file?
 				// User loses the settings unfortunately, but better than crashing.
-				var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
 				_logger.LogLine($"Failed to read settings from {Filename}: {ex.Message}");
 			}
 		}

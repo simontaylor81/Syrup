@@ -12,4 +12,10 @@ namespace SRPCommon.Logging
 		public void Clear() { }
 		public void Log(string message) { }
 	}
+
+	// A logger factory that only creates null loggers.
+	public class NullLoggerFactory : ILoggerFactory
+	{
+		public ILogger CreateLogger(string category) => new NullLogger();
+	}
 }

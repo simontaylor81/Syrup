@@ -22,15 +22,14 @@ namespace SRPCommon.Scene
 		};
 
 		// Load an existing scene from disk.
-		public static Scene LoadFromFile(string filename)
+		public static Scene LoadFromFile(string filename, ILoggerFactory loggerFactory)
 		{
 			// Any relative paths are relative to the scene file itself.
 			// TODO: do this more elegantly.
 			var prevCurrentDir = Environment.CurrentDirectory;
 			Environment.CurrentDirectory = Path.GetDirectoryName(filename);
 
-			// TODO: Do this better: own category, pass to children.
-			var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
+			var logger = loggerFactory.CreateLogger("SceneLoad");
 
 			try
 			{
@@ -40,7 +39,7 @@ namespace SRPCommon.Scene
 
 				result._filename = filename;
 
-				result.PostLoad();
+				result.PostLoad(logger);
 
 				Environment.CurrentDirectory = prevCurrentDir;
 				return result;
@@ -74,7 +73,7 @@ namespace SRPCommon.Scene
 			File.WriteAllText(_filename, json);
 		}
 
-		private void PostLoad()
+		private void PostLoad(ILogger logger)
 		{
 			// Fix up mesh and material names after serialisation.
 			foreach (var kvp in Meshes)
@@ -87,9 +86,9 @@ namespace SRPCommon.Scene
 			}
 
 			// Call PostLoad on sub-objects.
-			Meshes.Values.ForEach(mesh => mesh.PostLoad());
-			Materials.Values.ForEach(mesh => mesh.PostLoad());
-			Primitives.ForEach(mesh => mesh.PostLoad(this));
+			Meshes.Values.ForEach(mesh => mesh.PostLoad(logger));
+			Materials.Values.ForEach(mesh => mesh.PostLoad(logger));
+			Primitives.ForEach(mesh => mesh.PostLoad(this, logger));
 
 			// ReactiveList resets its observales post-serialisation, so need to set ours up again.
 			InitObservables();

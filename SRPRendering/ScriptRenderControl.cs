@@ -21,12 +21,16 @@ namespace SRPRendering
 	// Class that takes commands from the script and controls the rendering.
 	class ScriptRenderControl : IDisposable, IRenderInterface
 	{
-		public ScriptRenderControl(IWorkspace workspace, RenderDevice device)
+		public ScriptRenderControl(IWorkspace workspace, RenderDevice device, ILoggerFactory loggerFactory)
 		{
 			_workspace = workspace;
 			_device = device;
 
-			_mipGenerator = new MipGenerator(device, workspace);
+			_logLogger = loggerFactory.CreateLogger("Log");
+			_scriptLogger = loggerFactory.CreateLogger("Script");
+			_shaderCompileLogger = loggerFactory.CreateLogger("ShaderCompile");
+
+			_mipGenerator = new MipGenerator(device, workspace, _scriptLogger);
 		}
 
 		public void Reset()
@@ -172,7 +176,7 @@ namespace SRPRendering
 			Texture texture;
 			try
 			{
-				texture = Texture.LoadFromFile(_device.Device, absPath, mipGenerationMode);
+				texture = Texture.LoadFromFile(_device.Device, absPath, mipGenerationMode, _logLogger);
 			}
 			catch (FileNotFoundException ex)
 			{
@@ -260,7 +264,8 @@ namespace SRPRendering
 				var renderContext = new DeferredRenderContext(
 					viewInfo,
 					renderScene,
-					_device.GlobalResources);
+					_device.GlobalResources,
+					_scriptLogger);
 
 				frameCallback(renderContext);
 
@@ -321,6 +326,8 @@ namespace SRPRendering
 
 		private readonly MipGenerator _mipGenerator;
 
-		private readonly ILogger _shaderCompileLogger = CompositeLoggerFactory.Instance.CreateLogger("ShaderCompile");
+		private readonly ILogger _logLogger;
+		private readonly ILogger _scriptLogger;
+		private readonly ILogger _shaderCompileLogger;
 	}
 }

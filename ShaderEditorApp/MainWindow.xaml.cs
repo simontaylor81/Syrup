@@ -49,8 +49,8 @@ namespace ShaderEditorApp
 			_renderDevice = new RenderDevice();
 
 			// Create workspace and corresponding view model.
-			_workspace = new Workspace(_renderDevice);
-			_workspaceViewModel = new WorkspaceViewModel(_workspace, outputWindowVM);
+			_workspace = new Workspace(_renderDevice, CompositeLoggerFactory.Instance);	// TODO: Don't use singleton.
+			_workspaceViewModel = new WorkspaceViewModel(_workspace, outputWindowVM, CompositeLoggerFactory.Instance);
 
 			// Close ourselves when the Exit command is triggered.
 			_workspaceViewModel.Exit.Subscribe(_ => Close());

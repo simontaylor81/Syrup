@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Scripting;
+using SRPCommon.Logging;
 using SRPCommon.Scripting;
 
 namespace SRPTests.Util
@@ -17,7 +18,7 @@ namespace SRPTests.Util
 		public ScriptTestHelper(params string[] imports)
 		{
 			// Create Scripting object, which initialises the script engine.
-			_scripting = new Scripting(null);
+			_scripting = new Scripting(null, new NullLoggerFactory());
 			_imports = imports;
 		}
 

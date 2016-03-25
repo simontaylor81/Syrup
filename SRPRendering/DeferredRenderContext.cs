@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX.Direct3D11;
 using SharpDX.Mathematics.Interop;
+using SRPCommon.Logging;
 using SRPCommon.Scripting;
 using SRPCommon.Util;
 using SRPRendering.Resources;
@@ -28,11 +29,13 @@ namespace SRPRendering
 		public DeferredRenderContext(
 			ViewInfo viewInfo,
 			RenderScene scene,
-			IGlobalResources globalResources)
+			IGlobalResources globalResources,
+			ILogger scriptLogger)
 		{
 			this.viewInfo = viewInfo;
 			this.scene = scene;
 			_globalResources = globalResources;
+			_scriptLogger = scriptLogger;
 		}
 
 		public void Execute(DeviceContext deviceContext)
@@ -276,7 +279,7 @@ namespace SRPRendering
 			IDictionary<string, object> shaderVariableOverrides)
 		{
 			cs.Set(deviceContext);
-			cs.UpdateVariables(deviceContext, viewInfo, null, shaderVariableOverrides, _globalResources);
+			cs.UpdateVariables(deviceContext, viewInfo, null, shaderVariableOverrides, _globalResources, _scriptLogger);
 			deviceContext.Dispatch(numGroupsX, numGroupsY, numGroupsZ);
 
 			// Enforce statelessness.
@@ -411,12 +414,12 @@ namespace SRPRendering
 		private void UpdateShaders(DeviceContext deviceContext, Shader vs, Shader ps, IPrimitive primitive, IDictionary<string, object> variableOverrides)
 		{
 			if (vs != null)
-				vs.UpdateVariables(deviceContext, viewInfo, primitive, variableOverrides, _globalResources);
+				vs.UpdateVariables(deviceContext, viewInfo, primitive, variableOverrides, _globalResources, _scriptLogger);
 			else
 				deviceContext.VertexShader.Set(null);
 
 			if (ps != null)
-				ps.UpdateVariables(deviceContext, viewInfo, primitive, variableOverrides, _globalResources);
+				ps.UpdateVariables(deviceContext, viewInfo, primitive, variableOverrides, _globalResources, _scriptLogger);
 			else
 				deviceContext.PixelShader.Set(null);
 		}
@@ -477,5 +480,6 @@ namespace SRPRendering
 		private RenderScene scene;
 		private ViewInfo viewInfo;
 		private IGlobalResources _globalResources;
+		private readonly ILogger _scriptLogger;
 	}
 }

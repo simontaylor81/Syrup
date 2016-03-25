@@ -31,7 +31,7 @@ namespace SRPCommon.Scripting
 
 		private const string _projectPathPrefix = "project:";
 
-		public Scripting(IWorkspace workspace)
+		public Scripting(IWorkspace workspace, ILoggerFactory loggerFactory)
 		{
 			_pal = new SRPPlatformAdaptationLayer(workspace);
 
@@ -49,7 +49,7 @@ namespace SRPCommon.Scripting
 			AddSearchPath(_projectPathPrefix);
 
 			// Hook up log stream to the runtime.
-			var writer = CompositeLoggerFactory.Instance.CreateLogger("Script").CreateStreamWriter();
+			var writer = loggerFactory.CreateLogger("Script").CreateStreamWriter();
 			pythonEngine.Runtime.IO.SetOutput(writer.BaseStream, writer);
 			pythonEngine.Runtime.IO.SetErrorOutput(writer.BaseStream, writer);
 		}

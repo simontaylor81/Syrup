@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using SRPCommon.Scene;
 using SharpDX.Direct3D11;
 using SRPRendering.Resources;
+using SRPCommon.Logging;
 
 namespace SRPRendering
 {
@@ -26,13 +27,15 @@ namespace SRPRendering
 		private readonly Scene _scene;
 		private readonly IDisposable _subscription;
 		private readonly SceneMeshCache _meshCache;
+		private readonly ILogger _logger;
 
 		public IEnumerable<IPrimitive> Primitives => primitiveProxies;
 
-		public RenderScene(Scene scene, RenderDevice device)
+		public RenderScene(Scene scene, RenderDevice device, ILoggerFactory loggerFactory)
 		{
 			_scene = scene;
 			_device = device;
+			_logger = loggerFactory.CreateLogger("Log");
 
 			_meshCache = new SceneMeshCache(device.Device);
 
@@ -132,7 +135,7 @@ namespace SRPRendering
 							try
 							{
 								// Always generate mips for scene textures (for now, at least).
-								textures.Add(file, Texture.LoadFromFile(_device.Device, file, MipGenerationMode.Full));
+								textures.Add(file, Texture.LoadFromFile(_device.Device, file, MipGenerationMode.Full, _logger));
 							}
 #pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
 							catch (Exception)

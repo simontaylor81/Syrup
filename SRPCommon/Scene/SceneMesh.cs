@@ -27,7 +27,7 @@ namespace SRPCommon.Scene
 		public IEnumerable<short> Indices { get; private set; }
 
 		// Load the mesh itself after serialisation.
-		internal void PostLoad()
+		internal void PostLoad(ILogger logger)
 		{
 			// Load the file if it exists.
 			if (File.Exists(Filename))
@@ -36,7 +36,6 @@ namespace SRPCommon.Scene
 			}
 			else
 			{
-				var logger = CompositeLoggerFactory.Instance.CreateLogger("Log");
 				logger.LogLine("Mesh not found: {0}", Filename);
 			}
 		}
@@ -47,9 +46,6 @@ namespace SRPCommon.Scene
 			{
 				// Set configuration. TODO: What does this stuff do?!
 				importer.SetConfig(new Assimp.Configs.NormalSmoothingAngleConfig(66.0f));
-
-				// Uncomment this line to echo assimp output to the log window.
-				//importer.AttachLogStream(new Assimp.LogStream((msg, userData) => OutputLogger.Instance.Log(LogCategory.Log, msg)));
 
 				// TODO: What do the post-process flags do?
 				var model = importer.ImportFile(Filename, PostProcessPreset.TargetRealTimeMaximumQuality | PostProcessSteps.FlipUVs);
