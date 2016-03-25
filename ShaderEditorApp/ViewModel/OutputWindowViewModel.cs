@@ -96,13 +96,28 @@ namespace ShaderEditorApp.ViewModel
 		{
 			var destination = new FileAndPosition();
 
-			var shaderErrorRegex = new Regex(@"([^\*\?""<>|]*)\(([0-9]+),([0-9]+)\):");
-			var match = shaderErrorRegex.Match(line);
-			if (match.Success)
+			// Look for pattern found in shader compiler errors.
 			{
-				destination.Filename = match.Groups[1].Value;
-				destination.LineNumber = int.Parse(match.Groups[2].Value);
-				destination.CharacterNumber = int.Parse(match.Groups[3].Value);
+				var shaderErrorRegex = new Regex(@"([^\*\?""<>|]*)\(([0-9]+),([0-9]+)\):");
+				var match = shaderErrorRegex.Match(line);
+				if (match.Success)
+				{
+					destination.Filename = match.Groups[1].Value;
+					destination.LineNumber = int.Parse(match.Groups[2].Value);
+					destination.CharacterNumber = int.Parse(match.Groups[3].Value);
+				}
+			}
+
+			// Look for pattern found in python exception traces.
+			{
+				var pythonRegex = new Regex(@"File ""([^\*\?""<>|]*)"", line ([0-9]+)");
+				var match = pythonRegex.Match(line);
+				if (match.Success)
+				{
+					destination.Filename = match.Groups[1].Value;
+					destination.LineNumber = int.Parse(match.Groups[2].Value);
+					destination.CharacterNumber = 0;
+				}
 			}
 
 			if (destination.Filename != null)
