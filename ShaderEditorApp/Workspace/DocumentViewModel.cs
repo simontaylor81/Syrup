@@ -246,6 +246,12 @@ namespace ShaderEditorApp.ViewModel
 		public int SelectionStart { get; set; }
 		public int SelectionLength { get; set; }
 
+		// Set caret to given line and character indices.
+		public void SetCaretPosition(int lineIndex, int charIndex)
+		{
+			// TODO
+		}
+
 		private ObservableAsPropertyHelper<IHighlightingDefinition> _syntaxHighlighting;
 		public IHighlightingDefinition SyntaxHighlighting => _syntaxHighlighting.Value;
 

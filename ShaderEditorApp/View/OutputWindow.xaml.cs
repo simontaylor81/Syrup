@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ShaderEditorApp.ViewModel;
 using SRPCommon.Logging;
 using SRPCommon.Util;
 
@@ -25,6 +26,17 @@ namespace ShaderEditorApp.View
 		public OutputWindow()
 		{
 			InitializeComponent();
+		}
+
+		private void LogTextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			var textbox = sender as TextBox;
+			var viewmodel = DataContext as OutputWindowViewModel;
+			if (e.ChangedButton == MouseButton.Left && textbox != null && viewmodel != null)
+			{
+				var line = textbox.GetLineText(textbox.GetLineIndexFromCharacterIndex(textbox.CaretIndex));
+				viewmodel.Goto(line);
+			}
 		}
 	}
 }

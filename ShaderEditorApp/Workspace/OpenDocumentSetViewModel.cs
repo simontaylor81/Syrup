@@ -48,7 +48,7 @@ namespace ShaderEditorApp.ViewModel
 			});
 		}
 
-		public void OpenDocument(string path, bool bReload)
+		public DocumentViewModel OpenDocument(string path, bool bReload)
 		{
 			// Look for an already open document.
 			var document = documents.FirstOrDefault(doc => PathUtils.PathsEqual(doc.FilePath, path));
@@ -67,11 +67,15 @@ namespace ShaderEditorApp.ViewModel
 			else
 			{
 				_logger.LogLine("File not found: " + path);
-				return;
 			}
 
 			// Make active document.
-			WorkspaceVM.ActiveWindow = document;
+			if (document != null)
+			{
+				WorkspaceVM.ActiveWindow = document;
+			}
+
+			return document;
 		}
 
 		// Open a document by asking the user for a file to open.

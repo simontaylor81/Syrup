@@ -156,6 +156,16 @@ namespace ShaderEditorApp.ViewModel
 				};
 			}
 
+			// When the user double clicks a filename in the output window, open it.
+			OutputWindowViewModel.GotoFile.Subscribe(fileAndPos =>
+			{
+				var document = OpenDocumentSet.OpenDocument(fileAndPos.Filename, false);
+				if (document != null)
+				{
+					document.SetCaretPosition(fileAndPos.LineNumber, fileAndPos.CharacterNumber);
+				}
+			});
+
 			// Create menu bar
 			// Must be after the commands are created, for obvious reasons.
 			MenuBar = new MenuBarViewModel(this);

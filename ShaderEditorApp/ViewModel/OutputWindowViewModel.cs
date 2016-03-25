@@ -6,12 +6,21 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ReactiveUI;
 using SRPCommon.Logging;
 
 namespace ShaderEditorApp.ViewModel
 {
+	// A filename and the position within it, for jumping to that file in the editor.
+	public struct FileAndPosition
+	{
+		public string Filename;
+		public int LineNumber;
+		public int CharacterNumber;
+	}
+
 	public class OutputWindowViewModel : ReactiveObject, ILoggerFactory
 	{
 		public ReactiveList<OutputWindowCategoryViewModel> Categories { get; } = new ReactiveList<OutputWindowCategoryViewModel>();
@@ -24,6 +33,9 @@ namespace ShaderEditorApp.ViewModel
 		}
 
 		public ReactiveCommand<object> ClearCurrent { get; }
+
+		private Subject<FileAndPosition> _gotoFile = new Subject<FileAndPosition>();
+		public IObservable<FileAndPosition> GotoFile => _gotoFile;
 
 		// Existing loggers for the different categories. Can be accessed on multiple threads so must be concurrent.
 		private ConcurrentDictionary<string, ILogger> _loggers = new ConcurrentDictionary<string, ILogger>();
@@ -61,6 +73,8 @@ namespace ShaderEditorApp.ViewModel
 
 			ClearCurrent = ReactiveCommand.Create(this.WhenAnyValue(x => x.CurrentCategory).Select(current => current != null));
 			ClearCurrent.Subscribe(_ => CurrentCategory.Clear());
+
+			// Trigger GotoFile whenever a category does.
 		}
 
 		// ILoggerFactory interface
@@ -75,6 +89,26 @@ namespace ShaderEditorApp.ViewModel
 
 				return categoryVM;
 			});
+		}
+
+		// Attempt to go to the file & line on the given line (i.e. the user double clicked it).
+		public void Goto(string line)
+		{
+			var destination = new FileAndPosition();
+
+			var shaderErrorRegex = new Regex(@"([^\*\?""<>|]*)\(([0-9]+),([0-9]+)\):");
+			var match = shaderErrorRegex.Match(line);
+			if (match.Success)
+			{
+				destination.Filename = match.Groups[1].Value;
+				destination.LineNumber = int.Parse(match.Groups[2].Value);
+				destination.CharacterNumber = int.Parse(match.Groups[3].Value);
+			}
+
+			if (destination.Filename != null)
+			{
+				_gotoFile.OnNext(destination);
+			}
 		}
 	}
 }
