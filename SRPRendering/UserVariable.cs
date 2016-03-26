@@ -41,7 +41,7 @@ namespace SRPRendering
 			try
 			{
 				var components = Enumerable.Range(0, numComponents)
-					.Select(i => new UserVariableScalar<T>(i.ToString(), dynamicDefault[i]))
+					.Select(i => new UserVariableScalar<T>(i.ToString(), (T)dynamicDefault[i]))
 					.ToArray();
 				return new UserVariableVector<T>(name, components);
 			}
