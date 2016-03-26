@@ -113,17 +113,14 @@ namespace SRPCommon.Scripting
 		public string FormatScriptError(Exception ex)
 		{
 			var eo = pythonEngine.GetService<ExceptionOperations>();
+			var message = eo.FormatException(ex) + "\n";
 
 			if (ex.InnerException != null)
 			{
-				string error = eo.FormatException(ex.InnerException);
-				return $"{ex.Message}\n{error}\n";
+				message += $"  (Inner exception: {ex.InnerException.Message})\n";
 			}
-			else
-			{
-				string error = eo.FormatException(ex);
-				return $"{error}\n";
-			}
+
+			return message;
 		}
 
 		// Custom script host class that uses our custom PAL.
