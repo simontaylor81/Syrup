@@ -132,11 +132,28 @@ namespace SRPRendering
 			=> AddUserVar(UserVariable.CreateVector<T>(numComponents, name, defaultValue));
 
 		// Add a user variable.
-		private dynamic AddUserVar<T>(UserVariable<T> userVar)
+		private Func<T> AddUserVar<T>(UserVariable<T> userVar)
 		{
 			_userVariables.Add(userVar);
-			return userVar.GetFunction();
+
+			// Wrap function to check safety.
+			var function = userVar.GetFunction();
+			return () =>
+			{
+				if (!_isUserVarEvalSafe)
+				{
+					throw new ScriptException("User variables cannot be evaluated during initial script execution");
+				}
+				return function();
+			};
 		}
+
+		// Is it safe to read user variables?
+		// Currently only true during rendering.
+		// Not safe during initial execution, as it won't be
+		// re-evaluated when the property is changed by the user.
+		private bool _isUserVarEvalSafe = false;
+
 		#endregion
 
 		// Create a render target of dimensions equal to the viewport.
@@ -267,7 +284,17 @@ namespace SRPRendering
 					_device.GlobalResources,
 					_scriptLogger);
 
-				frameCallback(renderContext);
+				try
+				{
+					// It's ok to evaluate user variables during the frame callback.
+					_isUserVarEvalSafe = true;
+
+					frameCallback(renderContext);
+				}
+				finally
+				{
+					_isUserVarEvalSafe = false;
+				}
 
 				renderContext.Execute(deviceContext);
 			}
