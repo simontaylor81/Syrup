@@ -236,20 +236,11 @@ namespace ShaderEditorApp.ViewModel
 		public bool IsScript => Path.GetExtension(FilePath).ToLowerInvariant() == ".py";
 		
 		// Position of caret in the editor.
-		public int CaretPosition { get; set; }
-
-		// Horizontal and vertical scroll positions.
-		public double HorizontalScrollPosition { get; set; }
-		public double VerticalScrollPosition { get; set; }
-
-		// Start point and length of selection.
-		public int SelectionStart { get; set; }
-		public int SelectionLength { get; set; }
-
-		// Set caret to given line and character indices.
-		public void SetCaretPosition(int lineIndex, int charIndex)
+		private TextLocation _caretPosition;
+		public TextLocation CaretPosition
 		{
-			// TODO
+			get { return _caretPosition; }
+			set { this.RaiseAndSetIfChanged(ref _caretPosition, value); }
 		}
 
 		private ObservableAsPropertyHelper<IHighlightingDefinition> _syntaxHighlighting;

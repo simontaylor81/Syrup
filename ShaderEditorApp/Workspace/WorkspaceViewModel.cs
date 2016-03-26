@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using ShaderEditorApp.Interfaces;
 using Splat;
 using SRPCommon.Logging;
+using ICSharpCode.AvalonEdit.Document;
 
 namespace ShaderEditorApp.ViewModel
 {
@@ -162,7 +163,7 @@ namespace ShaderEditorApp.ViewModel
 				var document = OpenDocumentSet.OpenDocument(fileAndPos.Filename, false);
 				if (document != null)
 				{
-					document.SetCaretPosition(fileAndPos.LineNumber, fileAndPos.CharacterNumber);
+					document.CaretPosition = new TextLocation(fileAndPos.LineNumber, fileAndPos.CharacterNumber);
 				}
 			});
 

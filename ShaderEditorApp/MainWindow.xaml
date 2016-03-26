@@ -25,13 +25,19 @@
             <Setter Property="ToolTip" Value="{Binding Model.FilePath}"/>
             <Setter Property="CloseCommand" Value="{Binding Model.Close}"/>
         </Style>
+        
+        <!-- Style for TextArea, which is part of the editor. -->
+        <Style TargetType="{x:Type avalonedit:TextArea}">
+            <Setter Property="SelectionCornerRadius" Value="0"/>
+        </Style>
 
         <!-- Data template to use for document panes. -->
         <DataTemplate x:Key="DocumentPaneTemplate">
             <avalonedit:TextEditor FontFamily="Consolas" FontSize="10pt" ShowLineNumbers="True"
                                    Document="{Binding Document}"
-                                   SyntaxHighlighting="{Binding SyntaxHighlighting}"
-                                   Initialized="TextEditor_Initialized"/>
+                                   srpview:TextEditorHelpers.EnableCustomTextEditorBindings="True"
+                                   srpview:TextEditorHelpers.CaretPosition="{Binding CaretPosition}"
+                                   SyntaxHighlighting="{Binding SyntaxHighlighting}"/>
         </DataTemplate>
 
         <!-- Style to use for the various tools windows. -->
