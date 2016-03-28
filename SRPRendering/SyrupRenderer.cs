@@ -68,7 +68,7 @@ namespace SRPRendering
 				_bInProgress = true;
 
 				// Create object for interacting with script.
-				_scriptRenderControl.Ref = new ScriptRenderControl(_workspace, _device, _loggerFactory);
+				_scriptRenderControl.Ref = new ScriptRenderControl(_workspace, _device, _loggerFactory, script.UserProperties);
 				_scriptRenderControl.Ref.Scene = Scene;
 
 				// Generate wrapper proxy using Castle Dynamic Proxy to avoid direct script access to our internals.
@@ -115,18 +115,9 @@ namespace SRPRendering
 			progress.Update("Gathering properties");
 			Properties = _scriptRenderControl.Ref.GetProperties();
 
-			// Attempt to copy over previous property values so they're not reset every
-			// time the user re-runs the script.
+			// Save user properties for use in subsequent runs.
 			foreach (var property in Properties)
 			{
-				IUserProperty prevProperty;
-				if (script.UserProperties.TryGetValue(property.Name, out prevProperty))
-				{
-					// Copy value from existing property.
-					property.TryCopyFrom(prevProperty);
-				}
-
-				// Save this property for next time.
 				script.UserProperties[property.Name] = property;
 			}
 

@@ -21,10 +21,15 @@ namespace SRPRendering
 	// Class that takes commands from the script and controls the rendering.
 	class ScriptRenderControl : IDisposable, IRenderInterface
 	{
-		public ScriptRenderControl(IWorkspace workspace, RenderDevice device, ILoggerFactory loggerFactory)
+		public ScriptRenderControl(
+			IWorkspace workspace,
+			RenderDevice device,
+			ILoggerFactory loggerFactory,
+			IDictionary<string, IUserProperty> existingUserProperties)
 		{
 			_workspace = workspace;
 			_device = device;
+			_existingUserProperties = existingUserProperties;
 
 			_logLogger = loggerFactory.CreateLogger("Log");
 			_scriptLogger = loggerFactory.CreateLogger("Script");
@@ -45,11 +50,24 @@ namespace SRPRendering
 								  group variable by variable.Name;
 
 			// Add shader variable property to the list for each unique name.
-			var result = variablesByName
-				.Select(variableGroup => ShaderUserProperties.Create(variableGroup));
+			var shaderProperties = variablesByName
+				.Select(variableGroup =>
+				{
+					var property = ShaderUserProperties.Create(variableGroup);
+
+					// Copy values from previous runs, if possible.
+					IUserProperty prevProperty;
+					if (_existingUserProperties.TryGetValue(property.Name, out prevProperty))
+					{
+						// Copy value from existing property.
+						property.TryCopyFrom(prevProperty);
+					}
+
+					return property;
+				});
 
 			// Add user variables too.
-			result = result.Concat(_userVariables);
+			var result = shaderProperties.Concat(_userVariables);
 
 			// Use ToList to reify the enumerable, forcing a single enumeration and any exceptions to be thrown.
 			return result.ToList();
@@ -118,6 +136,14 @@ namespace SRPRendering
 		// Add a user variable.
 		private Func<T> AddUserVar<T>(UserVariable<T> userVar)
 		{
+			// Copy value from previous runs, if possible.
+			IUserProperty prevProperty;
+			if (_existingUserProperties.TryGetValue(userVar.Name, out prevProperty))
+			{
+				// Copy value from existing property.
+				userVar.TryCopyFrom(prevProperty);
+			}
+
 			_userVariables.Add(userVar);
 
 			// Wrap function to check safety.
@@ -347,10 +373,14 @@ namespace SRPRendering
 		// User variables.
 		private List<IUserProperty> _userVariables = new List<IUserProperty>();
 
+		// User properties from previous runs to seed new properties with.
+		private readonly IDictionary<string, IUserProperty> _existingUserProperties;
+
 		private readonly MipGenerator _mipGenerator;
 
 		private readonly ILogger _logLogger;
 		private readonly ILogger _scriptLogger;
 		private readonly ILogger _shaderCompileLogger;
+
 	}
 }
