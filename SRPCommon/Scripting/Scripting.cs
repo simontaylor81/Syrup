@@ -21,8 +21,6 @@ namespace SRPCommon.Scripting
 {
 	public class Scripting
 	{
-		public IRenderInterface RenderInterface { get; set; }
-
 		// Allow access to underlying Python engine for custom use (i.e. unit tests).
 		public ScriptEngine PythonEngine => pythonEngine;
 
@@ -81,15 +79,6 @@ namespace SRPCommon.Scripting
 				.ToList());
 		}
 
-		public async Task RunScript(Script script)
-		{
-			await Task.Run(() =>
-				{
-					var source = pythonEngine.CreateScriptSourceFromFile(script.Filename);
-					RunSource(source, script.GlobalVariables);
-				});
-		}
-
 		public Task<ICompiledScript> Compile(Script script)
 		{
 			// Poor man's async: run on background thread.
@@ -99,25 +88,6 @@ namespace SRPCommon.Scripting
 				var compiled = source.Compile();
 				return (ICompiledScript)new CompiledPythonScript(pythonEngine, compiled, script.GlobalVariables);
 			});
-		}
-
-		private void RunSource(ScriptSource source, IDictionary<string, object> globals)
-		{
-			// Clear any cached modules (user may have edited them).
-			pythonEngine.GetSysModule().GetVariable("modules").Clear();
-
-			// Create scope and set the render interface as a variable.
-			Debug.Assert(RenderInterface != null);
-			var pythonScope = pythonEngine.CreateScope();
-			pythonScope.SetVariable("ri", RenderInterface);
-
-			// Set any given global variables too.
-			foreach (var global in globals)
-			{
-				pythonScope.SetVariable(global.Key, global.Value);
-			}
-
-			source.Execute(pythonScope);
 		}
 
 		// Helper for formatting script errors.

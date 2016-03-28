@@ -25,9 +25,8 @@ namespace ShaderEditorApp.Model
 			UserSettings = new UserSettings(loggerFactory);
 
 			// Create classes that handle scripting.
-			scripting = new Scripting(this, loggerFactory);
+			var scripting = new Scripting(this, loggerFactory);
 			Renderer = new SyrupRenderer(this, device, scripting, loggerFactory);
-			scripting.RenderInterface = Renderer.ScriptInterface;
 
 			// Create script execution commands.
 			RunScripts = ReactiveCommand.CreateAsyncTask(param => RunScriptImpl_DoNotCallDirectly((IEnumerable<Script>)param));
@@ -178,9 +177,7 @@ namespace ShaderEditorApp.Model
 			}
 		}
 
-		// Rendering/script related stuff.
 		public SyrupRenderer Renderer { get; }
-		private readonly Scripting scripting;
 
 		private Scene _currentScene;
 		public Scene CurrentScene

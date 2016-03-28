@@ -21,7 +21,6 @@ namespace SRPTests.TestRenderer
 		private readonly TestRenderer _renderer;
 		private readonly TestWorkspace _workspace;
 		private readonly SyrupRenderer _sr;
-		private readonly Scripting _scripting;
 		private readonly TestReporter _reporter;
 
 		private static readonly string _baseDir = Path.Combine(GlobalConfig.BaseDir, @"SRPTests\TestScripts");
@@ -37,7 +36,7 @@ namespace SRPTests.TestRenderer
 
 			_renderer = new TestRenderer(64, 64);
 			_workspace = new TestWorkspace(_baseDir);
-			_scripting = new Scripting(_workspace, loggerFactory);
+			var scripting = new Scripting(_workspace, loggerFactory);
 
 			// Minor hack to avoid spamming the log with device names.
 			if (!bLoggedDevice)
@@ -50,8 +49,7 @@ namespace SRPTests.TestRenderer
 			}
 
 			// Create syrup renderer to drive the rendering.
-			_sr = new SyrupRenderer(_workspace, _renderer.Device, _scripting, loggerFactory);
-			_scripting.RenderInterface = _sr.ScriptInterface;
+			_sr = new SyrupRenderer(_workspace, _renderer.Device, scripting, loggerFactory);
 		}
 
 		public void Dispose()
