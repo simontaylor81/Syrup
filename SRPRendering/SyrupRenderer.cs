@@ -77,7 +77,11 @@ namespace SRPRendering
 				try
 				{
 					progress.Update("Running script...");
-					await _scripting.RunScript(script);
+
+					// Compile and run script.
+					var compiledScript = await _scripting.Compile(script);
+					await compiledScript.ExecuteAsync(ScriptInterface);
+
 					await PostExecuteScript(script, progress);
 				}
 				catch (Exception ex)

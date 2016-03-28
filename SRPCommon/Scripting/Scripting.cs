@@ -90,6 +90,17 @@ namespace SRPCommon.Scripting
 				});
 		}
 
+		public Task<ICompiledScript> Compile(Script script)
+		{
+			// Poor man's async: run on background thread.
+			return Task.Run(() =>
+			{
+				var source = pythonEngine.CreateScriptSourceFromFile(script.Filename);
+				var compiled = source.Compile();
+				return (ICompiledScript)new CompiledPythonScript(pythonEngine, compiled, script.GlobalVariables);
+			});
+		}
+
 		private void RunSource(ScriptSource source, IDictionary<string, object> globals)
 		{
 			// Clear any cached modules (user may have edited them).
