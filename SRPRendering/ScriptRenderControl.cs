@@ -53,7 +53,7 @@ namespace SRPRendering
 		public IEnumerable<IUserProperty> GetProperties()
 		{
 			// Group variables by name so we don't create duplicate entries with the same name.
-			// Don't add bound variables, not event as read-only
+			// Don't add bound variables, not even as read-only
 			// (as they're too slow to update every time we render the frame).
 			var variablesByName = from shader in shaders
 								  from variable in shader.ConstantVariables
