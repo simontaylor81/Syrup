@@ -36,16 +36,11 @@ namespace SRPRendering
 			_device = device;
 			_scripting = scripting;
 
+			_disposables.Add(_scriptRenderControl);
+
 			_loggerFactory = loggerFactory;
 			_scriptLogger = loggerFactory.CreateLogger("Script");
 			_shaderCompileLogger = loggerFactory.CreateLogger("ShaderCompile");
-
-			// Create object for interacting with script.
-			_scriptRenderControl = new ScriptRenderControl(workspace, device, loggerFactory);
-			_disposables.Add(_scriptRenderControl);
-
-			// Generate wrapper proxy using Castle Dynamic Proxy to avoid direct script access to our internals.
-			ScriptInterface = new ProxyGenerator().CreateInterfaceProxyWithTarget<IRenderInterface>(_scriptRenderControl);
 
 			_overlayRenderer = new OverlayRenderer(device.GlobalResources, _scriptLogger);
 
@@ -72,6 +67,13 @@ namespace SRPRendering
 			{
 				_bInProgress = true;
 
+				// Create object for interacting with script.
+				_scriptRenderControl.Ref = new ScriptRenderControl(_workspace, _device, _loggerFactory);
+				_scriptRenderControl.Ref.Scene = Scene;
+
+				// Generate wrapper proxy using Castle Dynamic Proxy to avoid direct script access to our internals.
+				_scriptInterface = new ProxyGenerator().CreateInterfaceProxyWithTarget<IRenderInterface>(_scriptRenderControl.Ref);
+
 				PreExecuteScript();
 
 				try
@@ -80,7 +82,7 @@ namespace SRPRendering
 
 					// Compile and run script.
 					var compiledScript = await _scripting.Compile(script);
-					await compiledScript.ExecuteAsync(ScriptInterface);
+					await compiledScript.ExecuteAsync(_scriptInterface);
 
 					await PostExecuteScript(script, progress);
 				}
@@ -99,14 +101,7 @@ namespace SRPRendering
 
 		private void PreExecuteScript()
 		{
-			Reset();
-		}
-
-		private void Reset()
-		{
 			bScriptRenderError = false;
-
-			_scriptRenderControl.Reset();
 			Properties = null;
 		}
 
@@ -114,11 +109,11 @@ namespace SRPRendering
 		{
 			// Tell the script render control that we're done,
 			// so it can compile shaders, etc.
-			await _scriptRenderControl.ScriptExecutionComplete(progress);
+			await _scriptRenderControl.Ref.ScriptExecutionComplete(progress);
 
 			// Get properties from script render control.
 			progress.Update("Gathering properties");
-			Properties = _scriptRenderControl.GetProperties();
+			Properties = _scriptRenderControl.Ref.GetProperties();
 
 			// Attempt to copy over previous property values so they're not reset every
 			// time the user re-runs the script.
@@ -152,7 +147,11 @@ namespace SRPRendering
 				if (_scene != value)
 				{
 					_scene = value;
-					_scriptRenderControl.Scene = value;
+
+					if (_scriptRenderControl.Ref != null)
+					{
+						_scriptRenderControl.Ref.Scene = value;
+					}
 
 					// Dispose of the old render scene.
 					DisposableUtil.SafeDispose(_renderScene);
@@ -169,8 +168,6 @@ namespace SRPRendering
 
 		public void Dispose()
 		{
-			Reset();
-
 			_disposables.Dispose();
 			DisposableUtil.SafeDispose(_renderScene);
 			_device = null;
@@ -187,20 +184,23 @@ namespace SRPRendering
 			// Don't redraw viewports because of internal shader variable changes (e.g. bindings).
 			_bIgnoreRedrawRequests = true;
 
-			try
-			{
-				// Always clear the back buffer to black to avoid the script having to do so for trivial stuff.
-				deviceContext.ClearRenderTargetView(viewInfo.BackBuffer, new RawColor4());
+			// Always clear the back buffer to black to avoid the script having to do so for trivial stuff.
+			deviceContext.ClearRenderTargetView(viewInfo.BackBuffer, new RawColor4());
 
-				// Let the script do its thing.
-				_scriptRenderControl.Render(deviceContext, viewInfo, _renderScene);
-			}
-			catch (Exception ex)
+			if (_scriptRenderControl.Ref != null)
 			{
-				LogScriptError(ex);
+				try
+				{
+					// Let the script do its thing.
+					_scriptRenderControl.Ref.Render(deviceContext, viewInfo, _renderScene);
+				}
+				catch (Exception ex)
+				{
+					LogScriptError(ex);
 
-				// Remember that the script fails so we don't just fail over and over.
-				bScriptRenderError = true;
+					// Remember that the script fails so we don't just fail over and over.
+					bScriptRenderError = true;
+				}
 			}
 
 			// Make sure we're rendering to the back buffer before rendering the overlay.
@@ -226,9 +226,6 @@ namespace SRPRendering
 			_scriptLogger.LogLine("Script execution failed.");
 			_scriptLogger.Log(_scripting.FormatScriptError(ex));
 		}
-
-		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
-		public IRenderInterface ScriptInterface { get; }
 
 		// User properties exposed by the script.
 		private IEnumerable<IUserProperty> _properties = Enumerable.Empty<IUserProperty>();
@@ -272,7 +269,11 @@ namespace SRPRendering
 		// List of things to dispose.
 		private CompositeDisposable _disposables = new CompositeDisposable();
 
-		private readonly ScriptRenderControl _scriptRenderControl;
+		private DisposableRef<ScriptRenderControl> _scriptRenderControl;
+
+		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
+		private IRenderInterface _scriptInterface;
+
 		private readonly Scripting _scripting;
 		private bool _bInProgress;
 

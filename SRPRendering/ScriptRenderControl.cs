@@ -33,22 +33,6 @@ namespace SRPRendering
 			_mipGenerator = new MipGenerator(device, workspace, _scriptLogger);
 		}
 
-		public void Reset()
-		{
-			frameCallback = null;
-
-			// Clear shaders array. Don't need to dispose as they're held by the cache.
-			shaders.Clear();
-			_shaderHandles.Clear();
-			_userVariables.Clear();
-
-			// Clear render target handles and dispose the actual render targets.
-			DisposableUtil.DisposeList(_renderTargets);
-
-			// Dispose resources registered for cleanup.
-			DisposableUtil.DisposeList(_resources);
-		}
-
 		// Get the list of properties for a script run. Call after script execution.
 		public IEnumerable<IUserProperty> GetProperties()
 		{
@@ -225,7 +209,19 @@ namespace SRPRendering
 
 		public void Dispose()
 		{
-			Reset();
+			frameCallback = null;
+
+			// Clear shaders array. Don't need to dispose as they're held by the cache.
+			shaders.Clear();
+			_shaderHandles.Clear();
+			_userVariables.Clear();
+
+			// Clear render target handles and dispose the actual render targets.
+			DisposableUtil.DisposeList(_renderTargets);
+
+			// Dispose resources registered for cleanup.
+			DisposableUtil.DisposeList(_resources);
+
 			_device = null;
 		}
 

@@ -158,6 +158,7 @@
     <Compile Include="UserProperties\UserPropertyExtensions.cs" />
     <Compile Include="Util\CacheLatestObservable.cs" />
     <Compile Include="Util\DictionaryExtensions.cs" />
+    <Compile Include="Util\DisposableRef.cs" />
     <Compile Include="Util\DisposableUtil.cs" />
     <Compile Include="Util\DynamicHelpers.cs" />
     <Compile Include="Util\Extensions.cs" />
