@@ -13,6 +13,7 @@
       <include filename="lights.py" runAtStartup="false" />
       <include filename="DeferredShading.py" runAtStartup="true" />
       <include filename="LongRunningScript.py" runAtStartup="false" />
+      <include filename="UserPropertyTexture.py" runAtStartup="false" />
     </folder>
     <include filename="TankScene/tank.srpscene" runAtStartup="false" />
     <include filename="myscene.srpscene" runAtStartup="false" />
@@ -22,5 +23,6 @@
     <OpenDocument path="C:\github\Syrup\testproject\BasicShaders.hlsl" />
     <OpenDocument path="C:\GitHub\Syrup\testproject\DeferredShading.py" />
     <OpenDocument path="C:\GitHub\Syrup\testproject\DeferredShading.hlsl" />
+    <OpenDocument path="C:\GitHub\Syrup\testproject\UserPropertyTexture.py" />
   </OpenDocuments>
 </project>
