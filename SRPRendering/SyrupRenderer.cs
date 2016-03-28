@@ -46,9 +46,16 @@ namespace SRPRendering
 
 			// Merge together change events of all current properties and fire redraw.
 			_disposables.Add(PropertiesObservable
+				.Select(props => props.Where(p => !p.RequiresReExecute))
 				.Select(props => props.Merge())
 				.Switch()
 				.Subscribe(_redrawRequired));
+
+			// Fire re-execute when the subset of properties that need it change.
+			ReExecuteRequired = PropertiesObservable
+				.Select(props => props.Where(p => p.RequiresReExecute))
+				.Select(props => props.Merge())
+				.Switch();
 		}
 
 		// Execute a script using this renderer.
@@ -57,34 +64,23 @@ namespace SRPRendering
 			Trace.Assert(script != null);
 			Trace.Assert(progress != null);
 
-			// Clear output from previous runs.
-			// Clear script last so we select that in the output window.
-			_shaderCompileLogger.Clear();
-			_scriptLogger.Clear();
-
-			// Don't run if we're already running a script.
-			if (!_bInProgress)
+			// Should never try to run if we're already running.
+			Trace.Assert(!_bInProgress);
+			_bInProgress = true;
+			try
 			{
-				_bInProgress = true;
-
-				// Create object for interacting with script.
-				_scriptRenderControl.Ref = new ScriptRenderControl(_workspace, _device, _loggerFactory, script.UserProperties);
-				_scriptRenderControl.Ref.Scene = Scene;
-
-				// Generate wrapper proxy using Castle Dynamic Proxy to avoid direct script access to our internals.
-				_scriptInterface = new ProxyGenerator().CreateInterfaceProxyWithTarget<IRenderInterface>(_scriptRenderControl.Ref);
+				// Clear output from previous runs.
+				// Clear script last so we select that in the output window.
+				_shaderCompileLogger.Clear();
+				_scriptLogger.Clear();
 
 				PreExecuteScript();
 
+				// Try to compile the script.
+				ICompiledScript compiledScript;
 				try
 				{
-					progress.Update("Running script...");
-
-					// Compile and run script.
-					var compiledScript = await _scripting.Compile(script);
-					await compiledScript.ExecuteAsync(_scriptInterface);
-
-					await PostExecuteScript(script, progress);
+					compiledScript = await _scripting.Compile(script);
 				}
 				catch (Exception ex)
 				{
@@ -92,10 +88,66 @@ namespace SRPRendering
 					LogScriptError(ex);
 					throw;
 				}
-				finally
-				{
-					_bInProgress = false;
-				}
+
+				// Execute it.
+				await ExecuteCompiledScript(script, compiledScript, progress);
+
+				// Execution successful -- remember what we ran.
+				_previousScript = script;
+				_previousCompiledScript = compiledScript;
+			}
+			finally
+			{
+				_bInProgress = false;
+			}
+		}
+
+		// Re-execute the exact same script as the last run, without recompiling.
+		public async Task ReExecuteScript(IProgress progress)
+		{
+			Trace.Assert(progress != null);
+
+			// Must have executed something to re-execute it.
+			Trace.Assert(_previousScript != null);
+			Trace.Assert(_previousCompiledScript != null);
+
+			// Should never try to run if we're already running.
+			Trace.Assert(!_bInProgress);
+			_bInProgress = true;
+			try
+			{
+				// *Don't* clear logs for reruns.
+
+				PreExecuteScript();
+				await ExecuteCompiledScript(_previousScript, _previousCompiledScript, progress);
+			}
+			finally
+			{
+				_bInProgress = false;
+			}
+		}
+
+		private async Task ExecuteCompiledScript(Script script, ICompiledScript compiledScript, IProgress progress)
+		{
+			// Create object for interacting with script.
+			_scriptRenderControl.Ref = new ScriptRenderControl(_workspace, _device, _loggerFactory, script.UserProperties);
+			_scriptRenderControl.Ref.Scene = Scene;
+
+			// Generate wrapper proxy using Castle Dynamic Proxy to avoid direct script access to our internals.
+			var scriptInterface = new ProxyGenerator().CreateInterfaceProxyWithTarget<IRenderInterface>(_scriptRenderControl.Ref);
+
+			try
+			{
+				progress.Update("Running script...");
+
+				await compiledScript.ExecuteAsync(scriptInterface);
+				await PostExecuteScript(script, progress);
+			}
+			catch (Exception ex)
+			{
+				bScriptExecutionError = true;
+				LogScriptError(ex);
+				throw;
 			}
 		}
 
@@ -129,6 +181,8 @@ namespace SRPRendering
 
 		private readonly Subject<Unit> _redrawRequired = new Subject<Unit>();
 		private bool _bIgnoreRedrawRequests;
+
+		public IObservable<Unit> ReExecuteRequired { get; }
 
 		public Scene Scene
 		{
@@ -262,11 +316,11 @@ namespace SRPRendering
 
 		private DisposableRef<ScriptRenderControl> _scriptRenderControl;
 
-		// Wrapper class that gets given to the script, acting as a firewall to prevent it from accessing this class directly.
-		private IRenderInterface _scriptInterface;
-
 		private readonly Scripting _scripting;
 		private bool _bInProgress;
+
+		private Script _previousScript;
+		private ICompiledScript _previousCompiledScript;
 
 		private readonly ILoggerFactory _loggerFactory;
 		private readonly ILogger _scriptLogger;

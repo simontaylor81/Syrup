@@ -16,6 +16,7 @@ namespace SRPCommon.UserProperties
 		// IUserProperty interface
 		public string Name { get; }
 		public bool IsReadOnly => true;
+		public bool RequiresReExecute => false;
 
 		public Type Type => typeof(T);
 

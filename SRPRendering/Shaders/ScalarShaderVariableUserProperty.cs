@@ -29,6 +29,7 @@ namespace SRPRendering.Shaders
 		}
 
 		public bool IsReadOnly => false;
+		public bool RequiresReExecute => false;
 		public string Name => _variables.First().Name;
 
 		public Type Type => typeof(T);

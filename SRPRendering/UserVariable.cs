@@ -15,6 +15,8 @@ namespace SRPRendering
 		public string Name { get; }
 		public bool IsReadOnly => false;
 
+		public bool RequiresReExecute { get; set; } = false;
+
 		public abstract Func<TValue> GetFunction();
 
 		// IObservable interface

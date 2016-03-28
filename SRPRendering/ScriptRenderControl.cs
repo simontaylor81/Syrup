@@ -146,23 +146,19 @@ namespace SRPRendering
 
 			_userVariables.Add(userVar);
 
-			// Wrap function to check safety.
+			// Wrap function to track access.
 			var function = userVar.GetFunction();
 			return () =>
 			{
-				if (!_isUserVarEvalSafe)
+				// If the variable is accessed outside of the render callback, then we must re-execute
+				// the script to have changes take effect, so mark the variable as such.
+				if (!_bRendering)
 				{
-					throw new ScriptException("User variables cannot be evaluated during initial script execution");
+					userVar.RequiresReExecute = true;
 				}
 				return function();
 			};
 		}
-
-		// Is it safe to read user variables?
-		// Currently only true during rendering.
-		// Not safe during initial execution, as it won't be
-		// re-evaluated when the property is changed by the user.
-		private bool _isUserVarEvalSafe = false;
 
 		#endregion
 
@@ -308,14 +304,12 @@ namespace SRPRendering
 
 				try
 				{
-					// It's ok to evaluate user variables during the frame callback.
-					_isUserVarEvalSafe = true;
-
+					_bRendering = true;
 					frameCallback(renderContext);
 				}
 				finally
 				{
-					_isUserVarEvalSafe = false;
+					_bRendering = false;
 				}
 
 				renderContext.Execute(deviceContext);
@@ -377,6 +371,9 @@ namespace SRPRendering
 		private readonly IDictionary<string, IUserProperty> _existingUserProperties;
 
 		private readonly MipGenerator _mipGenerator;
+
+		// Are we currently rendering?
+		private bool _bRendering = false;
 
 		private readonly ILogger _logLogger;
 		private readonly ILogger _scriptLogger;

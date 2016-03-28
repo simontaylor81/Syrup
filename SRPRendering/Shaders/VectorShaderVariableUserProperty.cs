@@ -28,6 +28,7 @@ namespace SRPRendering.Shaders
 
 		public string Name => _variables.First().Name;
 		public bool IsReadOnly => false;
+		public bool RequiresReExecute => false;
 
 		public int NumComponents => _components.Length;
 		public IUserProperty GetComponent(int index) => _components[index];

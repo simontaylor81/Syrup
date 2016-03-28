@@ -30,6 +30,7 @@ namespace SRPRendering.Shaders
 
 		public string Name => _variables.First().Name;
 		public bool IsReadOnly => false;
+		public bool RequiresReExecute => false;
 		public int NumColumns => _components.GetLength(0);
 		public int NumRows => _components.GetLength(1);
 

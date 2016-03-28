@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using ReactiveUI;
 using ShaderEditorApp.Projects;
@@ -28,17 +29,18 @@ namespace ShaderEditorApp.Model
 			var scripting = new Scripting(this, loggerFactory);
 			Renderer = new SyrupRenderer(this, device, scripting, loggerFactory);
 
+			// Use BehaviorSubject so any subscriber will always get the most recent value.
+			var canRunScript = new BehaviorSubject<bool>(false);
+
 			// Create script execution commands.
-			RunScripts = ReactiveCommand.CreateAsyncTask(param => RunScriptImpl_DoNotCallDirectly((IEnumerable<Script>)param));
+			RunScripts = ReactiveCommand.CreateAsyncTask(canRunScript, param => RunScriptImpl_DoNotCallDirectly((IEnumerable<Script>)param));
+			ReExecuteScript = ReactiveCommand.CreateAsyncTask(canRunScript, _ => ReExecuteScriptImpl_DoNotCallDirectly());
 
-			// Use CacheLatest so any subscriber will always get the most recent value.
-			var canRunScript = RunScripts.CanExecuteObservable.CacheLatest(true);
-			canRunScript.Connect();
+			// Can execute scripts when none of the script-executing commands are running.
+			Observable.CombineLatest(RunScripts.IsExecuting, ReExecuteScript.IsExecuting, (rs, res) => !(rs || res))
+				.Subscribe(canRunScript);
+
 			CanRunScript = canRunScript;
-
-			var isScriptRunning = RunScripts.IsExecuting.CacheLatest(false);
-			isScriptRunning.Connect();
-			IsScriptRunning = isScriptRunning;
 
 			// Redraw is required when we run a script, the scene changes, or the renderer says so.
 			var sceneChanged = this.WhenAnyValue(x => x.CurrentScene)
@@ -46,8 +48,12 @@ namespace ShaderEditorApp.Model
 				.Switch();
 			RedrawRequired = Observable.Merge(
 				RunScripts,
+				ReExecuteScript,
 				sceneChanged,
 				Renderer.RedrawRequired);
+
+			// Re-execute the script when the renderer says so.
+			Renderer.ReExecuteRequired.InvokeCommand(ReExecuteScript);
 		}
 
 		public void Dispose()
@@ -110,6 +116,25 @@ namespace ShaderEditorApp.Model
 					// We don't care about exceptions, they're handled internally.
 					// They're only surfaced to get good callstacks in the test harness.
 				}
+			}
+
+			_progress.Complete();
+		}
+
+		// Re-execute the current script (e.g. to re-evaluate updated user variables).
+		// Do not call this directly, use the ReExecuteScript command.
+		private async Task ReExecuteScriptImpl_DoNotCallDirectly()
+		{
+			try
+			{
+				await Renderer.ReExecuteScript(_progress);
+			}
+#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
+			catch
+#pragma warning restore RECS0022 // A catch clause that catches System.Exception and has an empty body
+			{
+				// We don't care about exceptions, they're handled internally.
+				// They're only surfaced to get good callstacks in the test harness.
 			}
 
 			_progress.Complete();
@@ -193,9 +218,11 @@ namespace ShaderEditorApp.Model
 		// when it's executing for us. Could do it by hand, but why bother?
 		private ReactiveCommand<Unit> RunScripts { get; }
 
+		// Same for script re-execution.
+		private ReactiveCommand<Unit> ReExecuteScript { get; }
+
 		// Observables that indicate the state of script execution.
 		public IObservable<bool> CanRunScript { get; }
-		public IObservable<bool> IsScriptRunning { get; }
 		public IObservable<string> StatusMessage => _progress.Status;
 
 		// Observable that fires when the viewport should be redrawn.

@@ -126,6 +126,7 @@ namespace SRPTests.UnitTests
 
 			public string Name => "testprop";
 			public bool IsReadOnly => false;
+			public bool RequiresReExecute => false;
 
 			public int NumComponents => _values.Length;
 
@@ -153,6 +154,7 @@ namespace SRPTests.UnitTests
 
 			public string Name => "testprop";
 			public bool IsReadOnly => false;
+			public bool RequiresReExecute => false;
 
 			public int NumColumns => _values.GetLength(0);
 			public int NumRows => _values.GetLength(1);

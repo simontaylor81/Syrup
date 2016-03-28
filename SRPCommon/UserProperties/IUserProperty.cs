@@ -10,5 +10,8 @@ namespace SRPCommon.UserProperties
 	{
 		string Name { get; }
 		bool IsReadOnly { get; }
+
+		// If true, changing this property requires the script to be re-executed for the change to take effect.
+		bool RequiresReExecute { get; }
 	}
 }

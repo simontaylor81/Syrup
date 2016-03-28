@@ -19,6 +19,7 @@ namespace SRPCommon.UserProperties
 
 		public string Name { get; }
 		public bool IsReadOnly => false;
+		public bool RequiresReExecute => false;
 
 		public int NumComponents => _fields.Length;
 		public IUserProperty GetComponent(int index) => _fields[index];
@@ -54,6 +55,7 @@ namespace SRPCommon.UserProperties
 		}
 
 		public bool IsReadOnly => false;
+		public bool RequiresReExecute => false;
 
 		public string Name => _member.Name;
 
