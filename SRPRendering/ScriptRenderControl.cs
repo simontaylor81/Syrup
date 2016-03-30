@@ -174,33 +174,16 @@ namespace SRPRendering
 		}
 
 		// Create a 2D texture of the given size and format, and fill it with the given data.
-		public ITexture2D CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false)
+		public ITexture2D CreateTexture2D(int width, int height, Format format, dynamic contents)
 		{
-			return _deferredResources.AddAndReturn(new TextureHandleScript(width, height, format, contents, generateMips));
+			return _deferredResources.AddAndReturn(new TextureHandleScript(width, height, format, contents));
 		}
 
 		// Load a texture from disk.
-		public ITexture2D LoadTexture(string path, object generateMips = null)
+		public ITexture2D LoadTexture(string path)
 		{
 			var absPath = _workspace.GetAbsolutePath(path);
-
-			// Ugh, Castle DynamicProxy doesn't pass through the null default value, so detect it.
-			if (generateMips == System.Reflection.Missing.Value)
-			{
-				generateMips = null;
-			}
-
-			MipGenerationMode mipGenerationMode = MipGenerationMode.None;
-			if (generateMips == null || generateMips.Equals(true))
-			{
-				mipGenerationMode = MipGenerationMode.Full;
-			}
-			else if (generateMips is string)
-			{
-				mipGenerationMode = MipGenerationMode.CreateOnly;
-			}
-
-			return _deferredResources.AddAndReturn(new TextureHandleFile(absPath, mipGenerationMode, generateMips as string));
+			return _deferredResources.AddAndReturn(new TextureHandleFile(absPath));
 		}
 
 		// Create a buffer of the given size and format, and fill it with the given data.
@@ -340,9 +323,9 @@ namespace SRPRendering
 		public IDepthBuffer DepthBuffer => DepthBufferHandle.Default;
 		public IDepthBuffer NoDepthBuffer => DepthBufferHandle.Null;
 
-		public ITexture2D BlackTexture { get; }
-		public ITexture2D WhiteTexture { get; }
-		public ITexture2D DefaultNormalTexture { get; }
+		public IShaderResource BlackTexture { get; }
+		public IShaderResource WhiteTexture { get; }
+		public IShaderResource DefaultNormalTexture { get; }
 
 
 		public Scene Scene { get; set; }

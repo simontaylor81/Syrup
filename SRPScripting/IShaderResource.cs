@@ -19,6 +19,13 @@ namespace SRPScripting
 	// A 2D texture.
 	public interface ITexture2D : IShaderResource
 	{
+		// Sets whether or not to generate mipmaps for this texture.
+		// Returns the same object for convenience.
+		ITexture2D WithMips(bool generateMips);
+
+		// Generate custom mipmaps for this texture using the provided shader file.
+		// Returns the same object for convenience.
+		ITexture2D WithCustomMips(string shaderFilename);
 	}
 
 	// A render target.

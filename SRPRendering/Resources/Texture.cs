@@ -20,7 +20,7 @@ namespace SRPRendering.Resources
 		CreateOnly,	// Create the mip chain, but don't put any data in it.
 	}
 
-	public class Texture : ID3DShaderResource, ITexture2D, IDisposable
+	public class Texture : ID3DShaderResource, IDisposable
 	{
 		public int Width { get; }
 		public int Height { get; }
@@ -54,15 +54,7 @@ namespace SRPRendering.Resources
 
 				// Load the texture itself using DirectXTex.
 				var image = LoadImage(filename);
-
-				if (mipGenerationMode == MipGenerationMode.Full)
-				{
-					image.GenerateMipMaps();
-				}
-				else if (mipGenerationMode == MipGenerationMode.CreateOnly)
-				{
-					image.CreateEmptyMipChain();
-				}
+				CreateMipChain(image, mipGenerationMode);
 
 				var texture2D = new Texture2D(image.CreateTexture(device.NativePointer));
 
@@ -104,7 +96,7 @@ namespace SRPRendering.Resources
 
 		// Create a texture with data from script.
 		public static Texture CreateFromScript(
-			Device device, int width, int height, Format format, dynamic contents, bool generateMips = false)
+			Device device, int width, int height, Format format, dynamic contents, MipGenerationMode mipGenerationMode)
 		{
 			// Construct data stream from script data.
 			using (DataStream stream = StreamUtil.CreateStream2D(contents, width, height, format))
@@ -114,12 +106,7 @@ namespace SRPRendering.Resources
 				// Create DirectXTex representation (so we can apply the same operations as images loaded
 				// from disk, e.g. mip generation).
 				var image = DirectXTex.Create2D(initialData.DataPointer, initialData.Pitch, width, height, (uint)format.ToDXGI());
-
-				// Generate mipmaps if desired.
-				if (generateMips)
-				{
-					image.GenerateMipMaps();
-				}
+				CreateMipChain(image, mipGenerationMode);
 
 				// Create the actual texture resource.
 				var texture2D = new Texture2D(image.CreateTexture(device.NativePointer));
@@ -128,6 +115,18 @@ namespace SRPRendering.Resources
 				var srv = new ShaderResourceView(device, texture2D);
 
 				return new Texture(texture2D, srv);
+			}
+		}
+
+		private static void CreateMipChain(IScratchImage image, MipGenerationMode mode)
+		{
+			if (mode == MipGenerationMode.Full)
+			{
+				image.GenerateMipMaps();
+			}
+			else if (mode == MipGenerationMode.CreateOnly)
+			{
+				image.CreateEmptyMipChain();
 			}
 		}
 

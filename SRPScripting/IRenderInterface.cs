@@ -30,7 +30,7 @@ namespace SRPScripting
 		IRenderTarget CreateRenderTarget();
 
 		// Create a 2D texture of the given size and format, and fill it with the given data.
-		ITexture2D CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false);
+		ITexture2D CreateTexture2D(int width, int height, Format format, dynamic contents);
 
 		// Create a buffer of the given size and format, and fill it with the given data.
 		IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents, bool uav = false);
@@ -39,7 +39,7 @@ namespace SRPScripting
 		IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents, bool uav = false) where T : struct;
 
 		// Load a texture from a file.
-		ITexture2D LoadTexture(string path, object generateMips = null);
+		ITexture2D LoadTexture(string path);
 
 		#region User Variables
 		dynamic AddUserVar_Float(string name, float defaultValue);
@@ -65,8 +65,8 @@ namespace SRPScripting
 		IDepthBuffer DepthBuffer { get; }
 		IDepthBuffer NoDepthBuffer { get; }
 
-		ITexture2D BlackTexture { get; }
-		ITexture2D WhiteTexture { get; }
-		ITexture2D DefaultNormalTexture { get; }
+		IShaderResource BlackTexture { get; }
+		IShaderResource WhiteTexture { get; }
+		IShaderResource DefaultNormalTexture { get; }
 	}
 }

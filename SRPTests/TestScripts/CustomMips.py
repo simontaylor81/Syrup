@@ -4,5 +4,7 @@ import utils
 utils.TestSetting('sampler', 'linear', globals())
 utils.TestSetting('mip', 1, globals())
 filename = 'CustomDownsample_2D_' + sampler + '.hlsl'
-tex = ri.LoadTexture('Assets/Textures/ThisIsATest.png', generateMips = filename)
+tex = ri.LoadTexture('Assets/Textures/ThisIsATest.png'
+	).WithCustomMips(filename)
+
 utils.TestTextureLevel(ri, tex, mip)

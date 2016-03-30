@@ -15,6 +15,44 @@ namespace SRPRendering.Resources
 	{
 		public ID3DShaderResource Resource { get; protected set; }
 
+		protected bool? GenerateMips { get; private set; }
+		protected string CustomMipShaderFilename { get; private set; }
+
+		protected MipGenerationMode GetMipGenerationMode(bool generateMipsByDefault)
+		{
+			if (GenerateMips ?? generateMipsByDefault)
+			{
+				return MipGenerationMode.Full;
+			}
+			else if (CustomMipShaderFilename != null)
+			{
+				return MipGenerationMode.CreateOnly;
+			}
+			return MipGenerationMode.None;
+		}
+
+		public ITexture2D WithMips(bool generateMips = true)
+		{
+			if (generateMips && CustomMipShaderFilename != null)
+			{
+				throw new ScriptException("Textures cannot have custom and regular mips");
+			}
+
+			GenerateMips = generateMips;
+			return this;
+		}
+
+		public ITexture2D WithCustomMips(string shaderFilename)
+		{
+			if (GenerateMips == true)
+			{
+				throw new ScriptException("Textures cannot have custom and regular mips");
+			}
+
+			CustomMipShaderFilename = shaderFilename;
+			return this;
+		}
+
 		public abstract void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator);
 	}
 
@@ -22,14 +60,10 @@ namespace SRPRendering.Resources
 	class TextureHandleFile : TextureHandle
 	{
 		private readonly string _filename;
-		private readonly MipGenerationMode _mipGenerationMode;
-		private readonly string _mipGenerationShader;
 
-		public TextureHandleFile(string filename, MipGenerationMode mipGenerationMode, string mipGenerationShader)
+		public TextureHandleFile(string filename)
 		{
 			_filename = filename;
-			_mipGenerationMode = mipGenerationMode;
-			_mipGenerationShader = mipGenerationShader;
 		}
 
 		// Create the texture object.
@@ -38,7 +72,8 @@ namespace SRPRendering.Resources
 			Texture texture;
 			try
 			{
-				texture = Texture.LoadFromFile(renderDevice.Device, _filename, _mipGenerationMode, logger);
+				// Textures from a file generate mips by default.
+				texture = Texture.LoadFromFile(renderDevice.Device, _filename, GetMipGenerationMode(true), logger);
 			}
 			catch (FileNotFoundException ex)
 			{
@@ -51,11 +86,10 @@ namespace SRPRendering.Resources
 
 			// We want mip generation errors to be reported directly, so this is
 			// outside the above try-catch.
-			// TODO: Better interface for this.
-			if (_mipGenerationMode == MipGenerationMode.CreateOnly)
+			if (CustomMipShaderFilename != null)
 			{
 				// Generate custom mips.
-				mipGenerator.Generate(texture, _mipGenerationShader);
+				mipGenerator.Generate(texture, CustomMipShaderFilename);
 			}
 
 			Resource = texture;
@@ -69,20 +103,19 @@ namespace SRPRendering.Resources
 		private readonly int _height;
 		private readonly Format _format;
 		private readonly object _contents;
-		private readonly bool _generateMips;
 
-		public TextureHandleScript(int width, int height, Format format, object contents, bool generateMips)
+		public TextureHandleScript(int width, int height, Format format, object contents)
 		{
 			_width = width;
 			_height = height;
 			_format = format;
 			_contents = contents;
-			_generateMips = generateMips;
 		}
 
 		public override void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
 		{
-			Resource = Texture.CreateFromScript(renderDevice.Device, _width, _height, _format, _contents, _generateMips);
+			// Textures from a file do not generate mips by default.
+			Resource = Texture.CreateFromScript(renderDevice.Device, _width, _height, _format, _contents, GetMipGenerationMode(false));
 		}
 	}
 }

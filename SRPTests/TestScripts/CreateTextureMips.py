@@ -16,6 +16,7 @@ def getPixel(x, y):
 	set = x+1 == y or (w - x - 1) == y
 	return col1 if set else col2
 	
-tex = ri.CreateTexture2D(w, h, Format.R8G8B8A8_UNorm, getPixel, generateMips)
+tex = ri.CreateTexture2D(w, h, Format.R8G8B8A8_UNorm, getPixel
+	).WithMips(generateMips)
 
 utils.TestTextureLevel(ri, tex, 1)

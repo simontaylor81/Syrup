@@ -9,7 +9,7 @@ using SRPScripting;
 namespace SRPRendering.Resources
 {
 	// Handle to a default texture (e.g. the white texture).
-	class DefaultTextureHandle : ITexture2D, IDeferredResource
+	class DefaultTextureHandle : IShaderResource, IDeferredResource
 	{
 		public ID3DShaderResource Resource { get; }
 
