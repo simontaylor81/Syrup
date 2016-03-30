@@ -21,16 +21,16 @@ namespace SRPRendering.Shaders
 		public void Set(IShaderResource iresource)
 		{
 			var resource = iresource as IDeferredResource;
-			var renderTarget = iresource as RenderTargetHandle;
+			var viewDependentResource = iresource as IViewDependentResource;
 
 			if (iresource == null || resource != null)
 			{
 				Binding = new DeferredResourceShaderResourceVariableBinding(resource);
 			}
-			else if (renderTarget != null)
+			else if (viewDependentResource != null)
 			{
-				// Render targets, with their viewport-size specific properties, are special.
-				Binding = new RenderTargetShaderResourceVariableBinding(renderTarget);
+				// View-dependent resources (like render targets) are special.
+				Binding = new ViewDependentShaderResourceVariableBinding(viewDependentResource);
 			}
 			else
 			{

@@ -10,7 +10,7 @@ using SRPScripting;
 namespace SRPRendering.Resources
 {
 	// Indirection layer to actual render target resource, which may be recreated when the screen is resized.
-	class RenderTargetHandle : IRenderTarget, IDisposable
+	class RenderTargetHandle : IRenderTarget, IViewDependentRenderTarget, IDisposable
 	{
 		public Rational Width { get; }
 		public Rational Height { get; }
@@ -18,7 +18,11 @@ namespace SRPRendering.Resources
 
 		// The actual render target resource.
 		// TODO: Multiple sub-resource to handle multiple viewports.
-		public RenderTarget RenderTarget { get; private set; }
+		private RenderTarget _renderTarget;
+
+		// IViewDependentRenderTarget interface.
+		public ID3DShaderResource GetShaderResource(ViewInfo viewInfo) => _renderTarget;
+		public RenderTarget GetRenderTarget(ViewInfo viewInfo) => _renderTarget;
 
 		public RenderTargetHandle(Rational width, Rational height, bool viewportRelative)
 		{
@@ -44,8 +48,8 @@ namespace SRPRendering.Resources
 
 		public void Dispose()
 		{
-			RenderTarget?.Dispose();
-			RenderTarget = null;
+			_renderTarget?.Dispose();
+			_renderTarget = null;
 		}
 
 		// (Re-)allocate the resource if its size does not match the given viewport dimensions.
@@ -55,13 +59,13 @@ namespace SRPRendering.Resources
 			int height = GetHeight(viewportHeight);
 
 			// If there's no resource, or it's the wrong size, create a new one.
-			if (RenderTarget == null || RenderTarget.Width != width || RenderTarget.Height != height)
+			if (_renderTarget == null || _renderTarget.Width != width || _renderTarget.Height != height)
 			{
 				// Don't forget to release the old one.
-				RenderTarget?.Dispose();
+				_renderTarget?.Dispose();
 
 				// TODO: Custom format
-				RenderTarget = new RenderTarget(device, width, height, SharpDX.DXGI.Format.R8G8B8A8_UNorm);
+				_renderTarget = new RenderTarget(device, width, height, SharpDX.DXGI.Format.R8G8B8A8_UNorm);
 			}
 		}
 	}

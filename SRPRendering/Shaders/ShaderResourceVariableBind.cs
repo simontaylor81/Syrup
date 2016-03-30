@@ -62,18 +62,18 @@ namespace SRPRendering.Shaders
 
 	// Bind a shader resource variable to a render target.
 	// Not really anything special currently, but will get more complicated if we add multiple viewports.
-	class RenderTargetShaderResourceVariableBinding : IShaderResourceVariableBinding
+	class ViewDependentShaderResourceVariableBinding : IShaderResourceVariableBinding
 	{
-		private readonly RenderTargetHandle _renderTarget;
+		private readonly IViewDependentResource _renderTarget;
 
-		public RenderTargetShaderResourceVariableBinding(RenderTargetHandle renderTarget)
+		public ViewDependentShaderResourceVariableBinding(IViewDependentResource renderTarget)
 		{
 			_renderTarget = renderTarget;
 		}
 
 		public ShaderResourceView GetResource(IPrimitive primitive, ViewInfo viewInfo, IGlobalResources globalResources)
 		{
-			return _renderTarget.RenderTarget.SRV;
+			return _renderTarget.GetShaderResource(viewInfo).SRV;
 		}
 	}
 

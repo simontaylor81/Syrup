@@ -362,7 +362,7 @@ namespace SRPRendering
 				return null;
 			}
 
-			var handle = rt as RenderTargetHandle;
+			var handle = rt as IViewDependentRenderTarget;
 
 			// If it's not the right type, throw.
 			if (handle == null)
@@ -371,8 +371,9 @@ namespace SRPRendering
 			}
 
 			// Resource must have been allocated by now.
-			Trace.Assert(handle.RenderTarget != null);
-			return handle.RenderTarget;
+			var renderTarget = handle.GetRenderTarget(viewInfo);
+			Trace.Assert(renderTarget != null);
+			return renderTarget;
 		}
 
 		// Get list of render targets for a list of handles.
@@ -391,13 +392,13 @@ namespace SRPRendering
 				return viewInfo.DepthBuffer.DSV;
 			}
 
-			var db = handle as ID3DDepthBuffer;
+			var db = handle as IViewDependentDepthBuffer;
 			if (db == null)
 			{
 				throw new ScriptException("Invalid depth buffer.");
 			}
 
-			return db.DSV;
+			return db.GetDSV(viewInfo);
 		}
 
 		// Set the given shaders to the device.

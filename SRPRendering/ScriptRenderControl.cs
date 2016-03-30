@@ -306,9 +306,6 @@ namespace SRPRendering
 			{
 				rt.UpdateSize(_device.Device, viewInfo.ViewportWidth, viewInfo.ViewportHeight);
 			}
-
-			// Update default depth buffer too.
-			DepthBufferHandle.Default.DepthBuffer = viewInfo.DepthBuffer;
 		}
 
 		// Register a resource for later disposal, returning it for easy chaining.
