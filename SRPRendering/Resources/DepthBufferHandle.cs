@@ -31,6 +31,9 @@ namespace SRPRendering.Resources
 		public ShaderResourceView SRV => DepthBuffer.SRV;
 
 		public UnorderedAccessView UAV { get { throw new NotImplementedException("Depth Buffer UAVs are currently unsupported."); } }
+
+		// Nothing to dispose.
+		public void Dispose() { }
 	}
 
 	// IDepthBuffer implementation for the null handle.
@@ -40,5 +43,8 @@ namespace SRPRendering.Resources
 
 		public ShaderResourceView SRV { get { throw new NotImplementedException("Cannot bind null depth buffer to shaders."); } }
 		public UnorderedAccessView UAV { get { throw new NotImplementedException("Cannot bind null depth buffer to shaders."); } }
+
+		// Nothing to dispose.
+		public void Dispose() { }
 	}
 }

@@ -5,69 +5,53 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX.Direct3D11;
+using SRPCommon.Logging;
 using SRPCommon.Scripting;
 using SRPScripting;
 
 namespace SRPRendering.Resources
 {
-	internal class BufferHandle : IBuffer, ID3DShaderResource, IDisposable
+	// Handle to a deferred-creation script-generated buffer.
+	class BufferHandleDynamic : IBuffer, IDeferredResource
 	{
-		// Actual concrete buffer, lazily initialised.
-		private Buffer _buffer;
+		private readonly int _sizeInBytes;
+		private readonly bool _uav;
+		private readonly Format _format;
+		private readonly object _contents;
 
-		// Function for creating the buffer when it is required.
-		private readonly Func<Buffer> _createBuffer;
+		public ID3DShaderResource Resource { get; private set; }
 
-		public Buffer Buffer
+		public BufferHandleDynamic(int sizeInBytes, bool uav, Format format, object contents)
 		{
-			get
-			{
-				if (_buffer == null)
-				{
-					_buffer = _createBuffer();
-				}
-				return _buffer;
-			}
+			_sizeInBytes = sizeInBytes;
+			_uav = uav;
+			_format = format;
+			_contents = contents;
 		}
 
-		public int ElementCount => Buffer.ElementCount;
-		public int SizeInBytes => Buffer.SizeInBytes;
-
-		public ShaderResourceView SRV => Buffer.SRV;
-		public UnorderedAccessView UAV => Buffer.UAV;
-
-		// Use static members to create.
-		private BufferHandle(Func<Buffer> createBuffer)
+		public void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
 		{
-			Trace.Assert(createBuffer != null);
-			_createBuffer = createBuffer;
+			Resource = Buffer.CreateDynamic(renderDevice.Device, _sizeInBytes, _uav, _format, _contents);
+		}
+	}
+
+	// Handle to a deferred-creation structured buffer.
+	class BufferHandleStructured<T> : IBuffer, IDeferredResource where T : struct
+	{
+		private readonly bool _uav;
+		private readonly IEnumerable<T> _contents;
+
+		public ID3DShaderResource Resource { get; private set; }
+
+		public BufferHandleStructured(bool uav, IEnumerable<T> contents)
+		{
+			_uav = uav;
+			_contents = contents;
 		}
 
-		public static BufferHandle CreateDynamic(RenderDevice device, int sizeInBytes, bool uav, Format format, dynamic contents)
+		public void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
 		{
-			return new BufferHandle(() => Buffer.CreateDynamic(device.Device, sizeInBytes, uav, format, contents));
-		}
-
-		public static BufferHandle CreateStructured<T>(RenderDevice device, bool uav, IEnumerable<T> contents) where T : struct
-		{
-			return new BufferHandle(() => Buffer.CreateStructured(device.Device, uav, contents));
-		}
-
-		public IEnumerable<T> GetContents<T>() where T : struct
-		{
-			// Don't create a buffer just to get its contents!
-			if (_buffer == null)
-			{
-				throw new ScriptException("Attempting to read contents of a buffer that is never written to.");
-			}
-
-			return _buffer.GetContents<T>();
-		}
-
-		public void Dispose()
-		{
-			// If we have a buffer, dispose it.
-			_buffer?.Dispose();
+			Resource = Buffer.CreateStructured<T>(renderDevice.Device, _uav, _contents);
 		}
 	}
 }

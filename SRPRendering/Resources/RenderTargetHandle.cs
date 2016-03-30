@@ -10,7 +10,7 @@ using SRPScripting;
 namespace SRPRendering.Resources
 {
 	// Indirection layer to actual render target resource, which may be recreated when the screen is resized.
-	class RenderTargetHandle : IRenderTarget, ID3DShaderResource, IDisposable
+	class RenderTargetHandle : IRenderTarget, IDisposable
 	{
 		public Rational Width { get; }
 		public Rational Height { get; }
@@ -41,9 +41,6 @@ namespace SRPRendering.Resources
 			else
 				return Height.Numerator / Height.Denominator;
 		}
-
-		public ShaderResourceView SRV => RenderTarget?.SRV;
-		public UnorderedAccessView UAV => RenderTarget?.UAV;
 
 		public void Dispose()
 		{

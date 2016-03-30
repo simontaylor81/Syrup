@@ -13,6 +13,7 @@ using SRPScripting;
 using SRPCommon.Interfaces;
 using SRPCommon.Logging;
 using Xunit.Abstractions;
+using SRPRendering.Resources;
 
 namespace SRPTests.TestRenderer
 {
@@ -124,13 +125,18 @@ namespace SRPTests.TestRenderer
 				Assert.NotNull(expected);
 				Assert.NotNull(resultBuffer);
 
+				// Result buffer must be a deferred resource that has had its resource created.
+				var deferredResultBuffer = Assert.IsAssignableFrom<IDeferredResource>(resultBuffer);
+				Assert.NotNull(deferredResultBuffer.Resource);
+				var resultBufferBuffer = Assert.IsAssignableFrom<SRPRendering.Resources.Buffer>(deferredResultBuffer.Resource);
+
 				// Dispatch work.
 				_renderer.Dispatch(_sr);
 
 				Assert.False(_sr.HasScriptError, "Error executing script render callback");
 
 				// Read back the result from the buffer.
-				var result = resultBuffer.GetContents<float>();
+				var result = resultBufferBuffer.GetContents<float>();
 
 				// Compare the result to the expectation.
 				Assert.Equal(expected, result);

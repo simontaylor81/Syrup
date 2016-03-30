@@ -36,6 +36,10 @@ namespace SRPRendering
 			_shaderCompileLogger = loggerFactory.CreateLogger("ShaderCompile");
 
 			_mipGenerator = new MipGenerator(device, workspace, _scriptLogger);
+
+			BlackTexture = new DefaultTextureHandle(device.GlobalResources.BlackTexture);
+			WhiteTexture = new DefaultTextureHandle(device.GlobalResources.WhiteTexture);
+			DefaultNormalTexture = new DefaultTextureHandle(device.GlobalResources.DefaultNormalTexture);
 		}
 
 		// Get the list of properties for a script run. Call after script execution.
@@ -172,7 +176,7 @@ namespace SRPRendering
 		// Create a 2D texture of the given size and format, and fill it with the given data.
 		public ITexture2D CreateTexture2D(int width, int height, Format format, dynamic contents, bool generateMips = false)
 		{
-			return AddResource(Texture.CreateFromScript(_device.Device, width, height, format, contents, generateMips));
+			return _deferredResources.AddAndReturn(new TextureHandleScript(width, height, format, contents, generateMips));
 		}
 
 		// Load a texture from disk.
@@ -196,38 +200,16 @@ namespace SRPRendering
 				mipGenerationMode = MipGenerationMode.CreateOnly;
 			}
 
-			Texture texture;
-			try
-			{
-				texture = Texture.LoadFromFile(_device.Device, absPath, mipGenerationMode, _logLogger);
-			}
-			catch (FileNotFoundException ex)
-			{
-				throw new ScriptException("Could not file texture file: " + absPath, ex);
-			}
-			catch (Exception ex)
-			{
-				throw new ScriptException("Error loading texture file: " + absPath, ex);
-			}
-
-			// We want mip generation errors to be reported directly, so this is
-			// outside the above try-catch.
-			if (mipGenerationMode == MipGenerationMode.CreateOnly)
-			{
-				// Generate custom mips.
-				_mipGenerator.Generate(texture, generateMips as string);
-			}
-
-			return AddResource(texture);
+			return _deferredResources.AddAndReturn(new TextureHandleFile(absPath, mipGenerationMode, generateMips as string));
 		}
 
 		// Create a buffer of the given size and format, and fill it with the given data.
 		public IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents, bool uav = false) =>
-			AddResource(BufferHandle.CreateDynamic(_device, sizeInBytes, uav, format, contents));
+			_deferredResources.AddAndReturn(new BufferHandleDynamic(sizeInBytes, uav, format, contents));
 
 		// Create a structured buffer.
 		public IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents, bool uav = false) where T : struct =>
-			AddResource(BufferHandle.CreateStructured(_device, uav, contents));
+			_deferredResources.AddAndReturn(new BufferHandleStructured<T>(uav, contents));
 
 		public void Dispose()
 		{
@@ -237,6 +219,8 @@ namespace SRPRendering
 			shaders.Clear();
 			_shaderHandles.Clear();
 			_userVariables.Clear();
+
+			_deferredResources.Clear();
 
 			// Clear render target handles and dispose the actual render targets.
 			DisposableUtil.DisposeList(_renderTargets);
@@ -248,14 +232,17 @@ namespace SRPRendering
 		}
 
 		// Called after script has finished executing (successfull).
-		public Task ScriptExecutionComplete(IProgress progress)
+		public async Task ScriptExecutionComplete(IProgress progress)
 		{
 			progress.Update("Compiling shdaers...");
-			return CompileShaders();
+			await CompileShadersAsync();
+
+			progress.Update("Loading textures...");
+			await CreateResourcesAsync();
 		}
 
 		// Compile all shaders once we're done executing the script.
-		private async Task CompileShaders()
+		private async Task CompileShadersAsync()
 		{
 			// Run on background thread so UI remains responsive.
 			shaders = await Task.Run(() => _shaderHandles
@@ -286,6 +273,20 @@ namespace SRPRendering
 				// Don't rethrow here so we gather errors from all shaders (don't fail fast).
 				return null;
 			}
+		}
+
+		// Create all deferred-creation resources (texture, buffers, etc.)
+		private Task CreateResourcesAsync()
+		{
+			// Poor mans async: run on background thread.
+			return Task.Run(() =>
+			{
+				foreach (var handle in _deferredResources)
+				{
+					handle.CreateResource(_device, _logLogger, _mipGenerator);
+					_resources.Add(handle.Resource);
+				}
+			});
 		}
 
 		public void Render(SharpDX.Direct3D11.DeviceContext deviceContext, ViewInfo viewInfo, RenderScene renderScene)
@@ -339,9 +340,9 @@ namespace SRPRendering
 		public IDepthBuffer DepthBuffer => DepthBufferHandle.Default;
 		public IDepthBuffer NoDepthBuffer => DepthBufferHandle.Null;
 
-		public ITexture2D BlackTexture => _device.GlobalResources.BlackTexture;
-		public ITexture2D WhiteTexture => _device.GlobalResources.WhiteTexture;
-		public ITexture2D DefaultNormalTexture => _device.GlobalResources.DefaultNormalTexture;
+		public ITexture2D BlackTexture { get; }
+		public ITexture2D WhiteTexture { get; }
+		public ITexture2D DefaultNormalTexture { get; }
 
 
 		public Scene Scene { get; set; }
@@ -351,6 +352,9 @@ namespace SRPRendering
 		// List of shaders. Needed to gather user properties.
 		private List<Shader> shaders = new List<Shader>();
 		private List<ShaderHandle> _shaderHandles = new List<ShaderHandle>();
+
+		// Handles to textures requested by script (actual resource creation is deferred).
+		private List<IDeferredResource> _deferredResources = new List<IDeferredResource>();
 
 		// List of resource to be disposed of when reseting or disposing.
 		private List<IDisposable> _resources = new List<IDisposable>();

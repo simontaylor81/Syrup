@@ -16,7 +16,7 @@ namespace SRPRendering.Shaders
 		// IShaderVariable interface
 		public string Name { get; }
 
-		public UnorderedAccessView UAV { get; private set; }
+		public IDeferredResource UAV { get; private set; }
 
 		// IShaderUavVariable interface
 		public void Set(IShaderResource iresource)
@@ -26,13 +26,15 @@ namespace SRPRendering.Shaders
 				throw new ScriptException("Attempting to set already set UAV variable: " + Name);
 			}
 
-			var resource = iresource as ID3DShaderResource;
+			var resource = iresource as IDeferredResource;
 			if (iresource != null && resource == null)
 			{
 				throw new ScriptException("Invalid shader resource");
 			}
 
-			UAV = resource?.UAV;
+			// TODO: Some way to check that the resource has UAV enabled?
+
+			UAV = resource;
 		}
 
 		public ShaderUavVariableHandle(string name)

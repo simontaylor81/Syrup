@@ -135,8 +135,11 @@
   <ItemGroup>
     <Compile Include="BasicMesh.cs" />
     <Compile Include="Resources\Buffer.cs" />
+    <Compile Include="Resources\DefaultTextureHandle.cs" />
     <Compile Include="Resources\DepthBufferHandle.cs" />
+    <Compile Include="Resources\IDeferredResource.cs" />
     <Compile Include="Resources\RenderTargetHandle.cs" />
+    <Compile Include="Resources\TextureHandle.cs" />
     <Compile Include="Shaders\ConstantBuffer.cs" />
     <Compile Include="DepthBuffer.cs" />
     <Compile Include="Resources\BufferHandle.cs" />

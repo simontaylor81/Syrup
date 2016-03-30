@@ -8,7 +8,7 @@ using SRPScripting;
 
 namespace SRPRendering.Resources
 {
-	interface ID3DShaderResource : IShaderResource
+	interface ID3DShaderResource : IShaderResource, IDisposable
 	{
 		ShaderResourceView SRV { get; }
 		UnorderedAccessView UAV { get; }

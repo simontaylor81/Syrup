@@ -20,19 +20,28 @@ namespace SRPRendering.Shaders
 		// Set directly to a given resource.
 		public void Set(IShaderResource iresource)
 		{
-			var resource = iresource as ID3DShaderResource;
-			if (iresource != null && resource == null)
+			var resource = iresource as IDeferredResource;
+			var renderTarget = iresource as RenderTargetHandle;
+
+			if (iresource == null || resource != null)
+			{
+				Binding = new DeferredResourceShaderResourceVariableBinding(resource);
+			}
+			else if (renderTarget != null)
+			{
+				// Render targets, with their viewport-size specific properties, are special.
+				Binding = new RenderTargetShaderResourceVariableBinding(renderTarget);
+			}
+			else
 			{
 				throw new ScriptException("Invalid shader resource");
 			}
-
-			Binding = new DirectShaderResourceVariableBinding(resource);
 		}
 
 		// Bind to a material property.
 		public void BindToMaterial(string param, IShaderResource fallback = null)
 		{
-			var fallbackResource = fallback as ID3DShaderResource;
+			var fallbackResource = fallback as IDeferredResource;
 			if (fallback != null && fallbackResource == null)
 			{
 				throw new ScriptException("Invalid fallback resource");
