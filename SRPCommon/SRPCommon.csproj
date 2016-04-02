@@ -135,6 +135,7 @@
     <Compile Include="Scripting\CompiledPythonScript.cs" />
     <Compile Include="Scripting\ICompiledScript.cs" />
     <Compile Include="Scripting\Script.cs" />
+    <Compile Include="Scripting\ScriptException.cs" />
     <Compile Include="UserProperties\IChoiceProperty.cs" />
     <Compile Include="UserProperties\IMatrixProperty.cs" />
     <Compile Include="UserProperties\IPropertySource.cs" />
