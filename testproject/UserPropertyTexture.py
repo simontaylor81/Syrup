@@ -1,6 +1,6 @@
 # Script for testing generating a texture based on a user property.
 
-from SRPScripting import *
+from SRPScripting import *&
 import random
 
 vs = ri.CompileShader("BasicShaders.hlsl", "BasicVS", "vs_4_0")

@@ -12,13 +12,13 @@ namespace SRPTests.Util
 	// Utils for test working with script.
 	class ScriptTestHelper
 	{
-		private readonly Scripting _scripting;
+		private readonly PythonScripting _scripting;
 		private readonly string[] _imports;
 
 		public ScriptTestHelper(params string[] imports)
 		{
 			// Create Scripting object, which initialises the script engine.
-			_scripting = new Scripting(null, new NullLoggerFactory());
+			_scripting = new PythonScripting(null, new NullLoggerFactory());
 			_imports = imports;
 		}
 

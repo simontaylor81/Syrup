@@ -11,5 +11,8 @@ namespace SRPCommon.Scripting
 	public interface ICompiledScript
 	{
 		Task ExecuteAsync(IRenderInterface renderInterface);
+
+		// Format an error produced by this script.
+		string FormatError(Exception ex);
 	}
 }

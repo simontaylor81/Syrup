@@ -85,7 +85,8 @@ namespace SRPRendering
 				catch (Exception ex)
 				{
 					bScriptExecutionError = true;
-					LogScriptError(ex);
+					_scriptLogger.LogLine("Failed to compile script");
+					_scriptLogger.Log(ex.Message);
 					throw;
 				}
 
@@ -146,7 +147,7 @@ namespace SRPRendering
 			catch (Exception ex)
 			{
 				bScriptExecutionError = true;
-				LogScriptError(ex);
+				LogScriptError(ex, compiledScript);
 				throw;
 			}
 		}
@@ -232,7 +233,7 @@ namespace SRPRendering
 			// Always clear the back buffer to black to avoid the script having to do so for trivial stuff.
 			deviceContext.ClearRenderTargetView(viewInfo.BackBuffer, new RawColor4());
 
-			if (_scriptRenderControl.Ref != null)
+			if (_scriptRenderControl.Ref != null && _previousCompiledScript != null)
 			{
 				try
 				{
@@ -241,7 +242,7 @@ namespace SRPRendering
 				}
 				catch (Exception ex)
 				{
-					LogScriptError(ex);
+					LogScriptError(ex, _previousCompiledScript);
 
 					// Remember that the script fails so we don't just fail over and over.
 					bScriptRenderError = true;
@@ -266,10 +267,10 @@ namespace SRPRendering
 			_bIgnoreRedrawRequests = false;
 		}
 
-		private void LogScriptError(Exception ex)
+		private void LogScriptError(Exception ex, ICompiledScript compiledScript)
 		{
 			_scriptLogger.LogLine("Script execution failed.");
-			_scriptLogger.Log(_scripting.FormatScriptError(ex));
+			_scriptLogger.Log(compiledScript.FormatError(ex));
 		}
 
 		// User properties exposed by the script.
