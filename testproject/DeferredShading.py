@@ -1,5 +1,4 @@
 from SRPScripting import *
-import random
 
 # Compile shaders for base and deferred passes.
 basepassVS = ri.CompileShader("DeferredShading.hlsl", "BasePass_VS", "vs_4_0")
@@ -31,15 +30,6 @@ def InvSqrRadius(radius):
 	return 1.0 / (r*r)
 
 showlights = ri.AddUserVar_Bool("Show lights?", False)
-
-
-# Build a list of light positions and colours.
-lightPositions = []
-lightColours = []
-for z in xrange(0, 4):
-	for x in xrange(0, 4):
-		lightPositions.append((5.0 * x - 10.0, 1.0, 5.0 * z - 10.0))
-		lightColours.append((random.random(), random.random(), random.random()))
 
 
 # Get lights from scene
