@@ -187,12 +187,12 @@ namespace SRPRendering
 		}
 
 		// Create a buffer of the given size and format, and fill it with the given data.
-		public IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents, bool uav = false) =>
-			_deferredResources.AddAndReturn(new BufferHandleDynamic(sizeInBytes, uav, format, contents));
+		public IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents) =>
+			_deferredResources.AddAndReturn(new BufferHandleDynamic(sizeInBytes, format, contents));
 
 		// Create a structured buffer.
-		public IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents, bool uav = false) where T : struct =>
-			_deferredResources.AddAndReturn(new BufferHandleStructured<T>(uav, contents));
+		public IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents) where T : struct =>
+			_deferredResources.AddAndReturn(new BufferHandleStructured<T>(contents));
 
 		public void Dispose()
 		{

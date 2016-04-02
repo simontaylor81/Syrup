@@ -33,10 +33,10 @@ namespace SRPScripting
 		ITexture2D CreateTexture2D(int width, int height, Format format, dynamic contents);
 
 		// Create a buffer of the given size and format, and fill it with the given data.
-		IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents, bool uav = false);
+		IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents);
 
 		// Create a structured buffer.
-		IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents, bool uav = false) where T : struct;
+		IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents) where T : struct;
 
 		// Load a texture from a file.
 		ITexture2D LoadTexture(string path);

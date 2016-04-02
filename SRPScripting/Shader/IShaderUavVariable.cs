@@ -8,6 +8,6 @@ namespace SRPScripting.Shader
 {
 	public interface IShaderUavVariable : IShaderVariable
 	{
-		void Set(IShaderResource resource);
+		void Set(IUav resource);
 	}
 }

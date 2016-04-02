@@ -6,8 +6,8 @@ from SRPScripting import *
 cs = ri.CompileShader("ComputeTest.hlsl", "WriteToUAV", "cs_4_0")
 
 numElements = 16
-buffer = ri.CreateBuffer(numElements * 4, Format.R32_Float, None, uav = True)
-cs.FindUavVariable("OutUAV").Set(buffer)
+buffer = ri.CreateBuffer(numElements * 4, Format.R32_Float, None)
+cs.FindUavVariable("OutUAV").Set(buffer.CreateUav())
 
 expected = [2.0 * i + 10.0 for i in xrange(0, numElements)]
 

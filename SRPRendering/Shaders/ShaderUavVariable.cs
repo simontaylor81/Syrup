@@ -17,11 +17,11 @@ namespace SRPRendering.Shaders
 	{
 		public string Name { get; }
 
-		public IDeferredResource UAV { get; set; }
+		public UavHandle UAV { get; set; }
 
 		public void SetToDevice(DeviceContext context)
 		{
-			context.ComputeShader.SetUnorderedAccessView(_slot, UAV.Resource.UAV);
+			context.ComputeShader.SetUnorderedAccessView(_slot, UAV.UAV);
 		}
 
 		public void Reset()

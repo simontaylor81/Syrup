@@ -16,25 +16,23 @@ namespace SRPRendering.Shaders
 		// IShaderVariable interface
 		public string Name { get; }
 
-		public IDeferredResource UAV { get; private set; }
+		public UavHandle UAV { get; private set; }
 
 		// IShaderUavVariable interface
-		public void Set(IShaderResource iresource)
+		public void Set(IUav iuav)
 		{
 			if (UAV != null)
 			{
 				throw new ScriptException("Attempting to set already set UAV variable: " + Name);
 			}
 
-			var resource = iresource as IDeferredResource;
-			if (iresource != null && resource == null)
+			var handle = iuav as UavHandle;
+			if (iuav != null && handle == null)
 			{
-				throw new ScriptException("Invalid shader resource");
+				throw new ScriptException("Invalid UAV");
 			}
 
-			// TODO: Some way to check that the resource has UAV enabled?
-
-			UAV = resource;
+			UAV = handle;
 		}
 
 		public ShaderUavVariableHandle(string name)

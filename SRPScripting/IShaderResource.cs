@@ -14,6 +14,9 @@ namespace SRPScripting
 	// A 1D buffer.
 	public interface IBuffer : IShaderResource
 	{
+		// Create a UAV for this resource.
+		// TODO: Move to base interface and implement for textures.
+		IUav CreateUav();
 	}
 
 	// A 2D texture.
@@ -35,6 +38,11 @@ namespace SRPScripting
 
 	// A depth buffer.
 	public interface IDepthBuffer : IShaderResource
+	{
+	}
+
+	// A UAV
+	public interface IUav
 	{
 	}
 }

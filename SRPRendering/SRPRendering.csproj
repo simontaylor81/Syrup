@@ -141,6 +141,7 @@
     <Compile Include="Resources\IViewDependentResource.cs" />
     <Compile Include="Resources\RenderTargetHandle.cs" />
     <Compile Include="Resources\TextureHandle.cs" />
+    <Compile Include="Resources\UavHandle.cs" />
     <Compile Include="Shaders\ConstantBuffer.cs" />
     <Compile Include="DepthBuffer.cs" />
     <Compile Include="Resources\BufferHandle.cs" />

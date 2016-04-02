@@ -15,43 +15,67 @@ namespace SRPRendering.Resources
 	class BufferHandleDynamic : IBuffer, IDeferredResource
 	{
 		private readonly int _sizeInBytes;
-		private readonly bool _uav;
 		private readonly Format _format;
 		private readonly object _contents;
+		private UavHandle _uav;
 
 		public ID3DShaderResource Resource { get; private set; }
 
-		public BufferHandleDynamic(int sizeInBytes, bool uav, Format format, object contents)
+		public BufferHandleDynamic(int sizeInBytes, Format format, object contents)
 		{
 			_sizeInBytes = sizeInBytes;
-			_uav = uav;
 			_format = format;
 			_contents = contents;
 		}
 
+		public IUav CreateUav()
+		{
+			if (_uav == null)
+			{
+				_uav = new UavHandle();
+			}
+			return _uav;
+		}
+
 		public void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
 		{
-			Resource = Buffer.CreateDynamic(renderDevice.Device, _sizeInBytes, _uav, _format, _contents);
+			Resource = Buffer.CreateDynamic(renderDevice.Device, _sizeInBytes, _uav != null, _format, _contents);
+			if (_uav != null)
+			{
+				_uav.UAV = Resource.UAV;
+			}
 		}
 	}
 
 	// Handle to a deferred-creation structured buffer.
 	class BufferHandleStructured<T> : IBuffer, IDeferredResource where T : struct
 	{
-		private readonly bool _uav;
 		private readonly IEnumerable<T> _contents;
+		private UavHandle _uav;
 
 		public ID3DShaderResource Resource { get; private set; }
 
-		public BufferHandleStructured(bool uav, IEnumerable<T> contents)
+		public BufferHandleStructured(IEnumerable<T> contents)
 		{
-			_uav = uav;
 			_contents = contents;
+		}
+
+		public IUav CreateUav()
+		{
+			if (_uav == null)
+			{
+				_uav = new UavHandle();
+			}
+			return _uav;
 		}
 
 		public void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
 		{
-			Resource = Buffer.CreateStructured<T>(renderDevice.Device, _uav, _contents);
+			Resource = Buffer.CreateStructured(renderDevice.Device, _uav != null, _contents);
+			if (_uav != null)
+			{
+				_uav.UAV = Resource.UAV;
+			}
 		}
 	}
 }

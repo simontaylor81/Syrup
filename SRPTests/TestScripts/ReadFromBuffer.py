@@ -8,10 +8,10 @@ cs = ri.CompileShader("ComputeTest.hlsl", "ReadFromBuffer", "cs_4_0")
 numElements = 16
 input = range(0, numElements)
 
-inputBuffer = ri.CreateBuffer(numElements * 4, Format.R32_Float, input, uav = False)
-outputBuffer = ri.CreateBuffer(numElements * 4, Format.R32_Float, None, uav = True)
+inputBuffer = ri.CreateBuffer(numElements * 4, Format.R32_Float, input)
+outputBuffer = ri.CreateBuffer(numElements * 4, Format.R32_Float, None)
 cs.FindResourceVariable("InBuffer").Set(inputBuffer)
-cs.FindUavVariable("OutUAV").Set(outputBuffer)
+cs.FindUavVariable("OutUAV").Set(outputBuffer.CreateUav())
 
 expected = [2.0 * i + 12.0 for i in xrange(0, numElements)]
 
