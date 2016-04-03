@@ -113,7 +113,7 @@ namespace SRPRendering.Shaders
 			}
 			catch (ScriptException ex)
 			{
-				throw new ScriptException("Incorrect type for bound shader variable:" + variable.Name, ex);
+				throw new ScriptException("Incorrect type for bound shader variable: " + variable.Name, ex);
 			}
 		}
 
