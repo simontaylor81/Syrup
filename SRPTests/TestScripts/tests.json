@@ -1,24 +1,24 @@
 {
   "render": [
     {
-      "script": "Null.py"
+      "script": "Python/Null.py"
     },
     {
-      "script": "Clear.py"
+      "script": "Python/Clear.py"
     },
     {
-      "script": "SimplePixelShader.py"
+      "script": "Python/SimplePixelShader.py"
     },
     {
-      "script": "CreateTexture.py"
+      "script": "Python/CreateTexture.py"
     },
     {
-      "script": "CreateTextureCallback.py"
+      "script": "Python/CreateTextureCallback.py"
     },
 
     // Tests for loading textures from file.
     {
-      "script": "LoadTexture.py",
+      "script": "Python/LoadTexture.py",
       "name": "LoadTexture_{extension}",
       "vars": {
         "extension": [ "png", "bmp", "tga", "jpg" ]
@@ -27,7 +27,7 @@
 
     // Tests for texture mipmap generation.
     {
-      "script": "TextureMips.py",
+      "script": "Python/TextureMips.py",
       "name": "TextureMips_{mip}",
       "vars": {
         "mip": [ 1, 3, 6 ]
@@ -35,22 +35,22 @@
     },
 
     {
-      "script": "TextureCubemap.py"
+      "script": "Python/TextureCubemap.py"
     },
 
     {
-      "script": "WhiteTexture.py"
+      "script": "Python/WhiteTexture.py"
     },
     {
-      "script": "BlackTexture.py"
+      "script": "Python/BlackTexture.py"
     },
     {
-      "script": "DefaultNormalTexture.py"
+      "script": "Python/DefaultNormalTexture.py"
     },
 
     // Tests for cubemap mipmap generation.
     {
-      "script": "CubeMips.py",
+      "script": "Python/CubeMips.py",
       "name": "CubeMips_{mip}",
       "vars": {
         "mip": [ 3, 6 ]
@@ -59,7 +59,7 @@
 
     // Tests for script-created texture mipmap generation.
     {
-      "script": "CreateTextureMips.py",
+      "script": "Python/CreateTextureMips.py",
       "name": "CreateTextureMips_{generateMips}",
       "vars": {
         "generateMips": [ true, false ]
@@ -68,7 +68,7 @@
 
     // Tests for custom shader-driven mip generation.
     {
-      "script": "CustomMips.py",
+      "script": "Python/CustomMips.py",
       "name": "CustomMips_2D_{sampler}_{mip}",
       "vars": {
         "sampler": [ "linear", "point" ],
@@ -76,25 +76,25 @@
       }
     },
     {
-      "script": "CustomCubeMips.py",
+      "script": "Python/CustomCubeMips.py",
       "name": "CustomMips_Cube_{mip}",
       "vars": {
         "mip": [ 1, 2 ]
       }
     },
     {
-      "script": "RenderTarget.py"
+      "script": "Python/RenderTarget.py"
     },
     {
-      "script": "MissingShaderVars.py"
+      "script": "Python/MissingShaderVars.py"
     }
   ],
   "compute": [
     {
-      "script": "WriteToUav.py"
+      "script": "Python/WriteToUav.py"
     },
     {
-      "script": "ReadFromBuffer.py"
+      "script": "Python/ReadFromBuffer.py"
     }
   ]
 }
