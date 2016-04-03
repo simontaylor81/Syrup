@@ -10,11 +10,13 @@ namespace SRPCommon.Scripting
 {
 	class CompiledCSharpScript : ICompiledScript
 	{
-		private ScriptRunner<object> _runner;
+		private readonly ScriptRunner<object> _runner;
+		private readonly IDictionary<string, object> _testParams;
 
-		public CompiledCSharpScript(ScriptRunner<object> runner)
+		public CompiledCSharpScript(ScriptRunner<object> runner, IDictionary<string, object> testParams)
 		{
 			_runner = runner;
+			_testParams = testParams;
 		}
 
 		public Task ExecuteAsync(IRenderInterface renderInterface)
@@ -22,6 +24,7 @@ namespace SRPCommon.Scripting
 			var globals = new CSharpGlobals
 			{
 				ri = renderInterface,
+				_testParams = _testParams,
 			};
 
 			// C# script execution is async in that any awaits will work, but it doesn't

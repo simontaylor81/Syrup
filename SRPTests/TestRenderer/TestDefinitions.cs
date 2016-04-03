@@ -34,8 +34,14 @@ namespace SRPTests.TestRenderer
 		// Get actual test parameters from an array of definitions from the json.
 		private static IEnumerable<object[]> GetTests(IEnumerable<SerializedTestDefinition> tests)
 		{
+			return GetLanguageTests(tests.Where(test => test.python), "Python", ".py")
+				.Concat(GetLanguageTests(tests.Where(test => test.cs), "CS", ".cs"));
+		}
+
+		private static IEnumerable<object[]> GetLanguageTests(IEnumerable<SerializedTestDefinition> tests, string subdir, string extension)
+		{
 			// Script paths are relative to the json file.
-			var baseDir = Path.GetDirectoryName(_testDefinitionFile);
+			var baseDir = Path.Combine(Path.GetDirectoryName(_testDefinitionFile), subdir);
 
 			return tests
 				// Flatten all combinations of variables for each test definition.
@@ -45,8 +51,9 @@ namespace SRPTests.TestRenderer
 					var test = testAndVars.test;
 					var vars = testAndVars.vars;
 
-					var name = test.name != null ? FormatName(test.name, vars) : Path.GetFileNameWithoutExtension(test.script);
-					var definition = new TestDefinition(Path.Combine(baseDir, test.script), vars);
+					var name = test.name != null ? FormatName(test.name, vars) : test.script;
+					var filename = test.script + extension;
+					var definition = new TestDefinition(Path.Combine(baseDir, filename), vars);
 
 						// Pass test name as first paramater so you can see what's what when running tests.
 						return new object[] { name, definition };
@@ -106,6 +113,8 @@ namespace SRPTests.TestRenderer
 		private class SerializedTestDefinition
 		{
 			public string script;
+			public bool python;
+			public bool cs;
 			public string name;
 			public Dictionary<string, object> vars;
 		}
@@ -130,7 +139,7 @@ namespace SRPTests.TestRenderer
 				// Add vars as globals so they can be accessed from the script.
 				foreach (var kvp in _vars.EmptyIfNull())
 				{
-					script.GlobalVariables.Add(kvp.Key, kvp.Value);
+					script.TestParams.Add(kvp.Key, kvp.Value);
 				}
 
 				return script;

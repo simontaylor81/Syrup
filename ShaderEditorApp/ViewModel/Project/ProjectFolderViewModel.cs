@@ -72,11 +72,15 @@ namespace ShaderEditorApp.ViewModel.Projects
 			var dialog = new OpenFileDialog();
 			dialog.Filter = FileFilterExisting;
 			dialog.InitialDirectory = Project.BasePath;
+			dialog.Multiselect = true;
 
 			var result = dialog.ShowDialog();
 			if (result == true)
 			{
-				AddItem(dialog.FileName);
+				foreach (var file in dialog.FileNames)
+				{
+					AddItem(file);
+				}
 			}
 		}
 

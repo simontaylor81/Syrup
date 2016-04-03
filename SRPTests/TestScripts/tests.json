@@ -1,24 +1,36 @@
 {
   "render": [
     {
-      "script": "Python/Null.py"
+      "script": "Null",
+      "python": true,
+      "cs": true
     },
     {
-      "script": "Python/Clear.py"
+      "script": "Clear",
+      "python": true,
+      "cs": true
     },
     {
-      "script": "Python/SimplePixelShader.py"
+      "script": "SimplePixelShader",
+      "python": true,
+      "cs": true
     },
     {
-      "script": "Python/CreateTexture.py"
+      "script": "CreateTexture",
+      "python": true,
+      "cs": true
     },
     {
-      "script": "Python/CreateTextureCallback.py"
+      "script": "CreateTextureCallback",
+      "python": true,
+      "cs": false // TODO: re-enable
     },
 
     // Tests for loading textures from file.
     {
-      "script": "Python/LoadTexture.py",
+      "script": "LoadTexture",
+      "python": true,
+      "cs": true,
       "name": "LoadTexture_{extension}",
       "vars": {
         "extension": [ "png", "bmp", "tga", "jpg" ]
@@ -27,7 +39,9 @@
 
     // Tests for texture mipmap generation.
     {
-      "script": "Python/TextureMips.py",
+      "script": "TextureMips",
+      "python": true,
+      "cs": true,
       "name": "TextureMips_{mip}",
       "vars": {
         "mip": [ 1, 3, 6 ]
@@ -35,22 +49,32 @@
     },
 
     {
-      "script": "Python/TextureCubemap.py"
+      "script": "TextureCubemap",
+      "python": true,
+      "cs": true
     },
 
     {
-      "script": "Python/WhiteTexture.py"
+      "script": "WhiteTexture",
+      "python": true,
+      "cs": true
     },
     {
-      "script": "Python/BlackTexture.py"
+      "script": "BlackTexture",
+      "python": true,
+      "cs": true
     },
     {
-      "script": "Python/DefaultNormalTexture.py"
+      "script": "DefaultNormalTexture",
+      "python": true,
+      "cs": true
     },
 
     // Tests for cubemap mipmap generation.
     {
-      "script": "Python/CubeMips.py",
+      "script": "CubeMips",
+      "python": true,
+      "cs": true,
       "name": "CubeMips_{mip}",
       "vars": {
         "mip": [ 3, 6 ]
@@ -59,7 +83,9 @@
 
     // Tests for script-created texture mipmap generation.
     {
-      "script": "Python/CreateTextureMips.py",
+      "script": "CreateTextureMips",
+      "python": true,
+      "cs": false,  // TODO: re-enable
       "name": "CreateTextureMips_{generateMips}",
       "vars": {
         "generateMips": [ true, false ]
@@ -68,7 +94,9 @@
 
     // Tests for custom shader-driven mip generation.
     {
-      "script": "Python/CustomMips.py",
+      "script": "CustomMips",
+      "python": true,
+      "cs": true,
       "name": "CustomMips_2D_{sampler}_{mip}",
       "vars": {
         "sampler": [ "linear", "point" ],
@@ -76,25 +104,35 @@
       }
     },
     {
-      "script": "Python/CustomCubeMips.py",
+      "script": "CustomCubeMips",
+      "python": true,
+      "cs": true,
       "name": "CustomMips_Cube_{mip}",
       "vars": {
         "mip": [ 1, 2 ]
       }
     },
     {
-      "script": "Python/RenderTarget.py"
+      "script": "RenderTarget",
+      "python": true,
+      "cs": true
     },
     {
-      "script": "Python/MissingShaderVars.py"
+      "script": "MissingShaderVars",
+      "python": true,
+      "cs": true
     }
   ],
   "compute": [
     {
-      "script": "Python/WriteToUav.py"
+      "script": "WriteToUav",
+      "python": true,
+      "cs": true
     },
     {
-      "script": "Python/ReadFromBuffer.py"
+      "script": "ReadFromBuffer",
+      "python": true,
+      "cs": true
     }
   ]
 }

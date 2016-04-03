@@ -10,5 +10,6 @@ namespace SRPCommon.Scripting
 	public class CSharpGlobals
 	{
 		public IRenderInterface ri;
+		public IDictionary<string, object> _testParams;
 	}
 }

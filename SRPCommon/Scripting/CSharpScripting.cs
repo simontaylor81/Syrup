@@ -35,7 +35,7 @@ namespace SRPCommon.Scripting
 
 			var compiled = CSharpScript.Create(code, options: options, globalsType: typeof(CSharpGlobals));
 			var runner = compiled.CreateDelegate();
-			return new CompiledCSharpScript(runner);
+			return new CompiledCSharpScript(runner, script.TestParams);
 		}
 
 		private async Task<string> ReadAllTextAsync(string filename)

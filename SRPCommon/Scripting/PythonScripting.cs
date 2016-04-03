@@ -82,7 +82,7 @@ namespace SRPCommon.Scripting
 				{
 					var source = pythonEngine.CreateScriptSourceFromFile(script.Filename);
 					var compiled = source.Compile();
-					return (ICompiledScript)new CompiledPythonScript(compiled, script.GlobalVariables);
+					return (ICompiledScript)new CompiledPythonScript(compiled, script.TestParams);
 				}
 				catch (Exception ex)
 				{

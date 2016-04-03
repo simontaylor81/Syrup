@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project>
   <folder>
-    <folder name="Utils">
-      <include filename="Python/Utils/utils.py" runAtStartup="false" />
-    </folder>
     <folder name="Shaders">
       <include filename="Shaders/FullscreenTexture.hlsl" runAtStartup="false" />
       <include filename="Shaders/ConstantColour.hlsl" runAtStartup="false" />
@@ -11,26 +8,69 @@
       <include filename="Shaders/CustomDownsample_2D_Point.hlsl" runAtStartup="false" />
       <include filename="Shaders/CustomDownsample_Cube.hlsl" runAtStartup="false" />
     </folder>
-    <folder name="Textures">
-      <include filename="Python/CreateTexture.py" runAtStartup="false" />
-      <include filename="Python/CreateTextureCallback.py" runAtStartup="false" />
-      <include filename="Python/TextureCubemap.py" runAtStartup="false" />
-      <include filename="Python/CreateTextureMips.py" runAtStartup="false" />
-      <include filename="Python/TextureMips.py" runAtStartup="false" />
-      <include filename="Python/LoadTexture.py" runAtStartup="false" />
-      <include filename="Python/CubeMips.py" runAtStartup="false" />
-      <include filename="Python/CustomMips.py" runAtStartup="false" />
-      <include filename="Python/CustomCubeMips.py" runAtStartup="false" />
-      <include filename="Python/WhiteTexture.py" runAtStartup="false" />
-      <include filename="Python/BlackTexture.py" runAtStartup="false" />
-      <include filename="Python/DefaultNormalTexture.py" runAtStartup="false" />
+    <folder name="Python">
+      <folder name="Utils">
+        <include filename="Python/Utils/utils.py" runAtStartup="false" />
+      </folder>
+      <folder name="Textures">
+        <include filename="Python/CreateTexture.py" runAtStartup="false" />
+        <include filename="Python/CreateTextureCallback.py" runAtStartup="false" />
+        <include filename="Python/TextureCubemap.py" runAtStartup="false" />
+        <include filename="Python/CreateTextureMips.py" runAtStartup="false" />
+        <include filename="Python/TextureMips.py" runAtStartup="false" />
+        <include filename="Python/LoadTexture.py" runAtStartup="false" />
+        <include filename="Python/CubeMips.py" runAtStartup="false" />
+        <include filename="Python/CustomMips.py" runAtStartup="false" />
+        <include filename="Python/CustomCubeMips.py" runAtStartup="false" />
+        <include filename="Python/WhiteTexture.py" runAtStartup="false" />
+        <include filename="Python/BlackTexture.py" runAtStartup="false" />
+        <include filename="Python/DefaultNormalTexture.py" runAtStartup="false" />
+      </folder>
+      <include filename="Python/Clear.py" runAtStartup="false" />
+      <include filename="Python/Null.py" runAtStartup="false" />
+      <include filename="Python/SimplePixelShader.py" runAtStartup="false" />
+      <include filename="Python/RenderTarget.py" runAtStartup="false" />
+      <include filename="Python/MissingShaderVars.py" runAtStartup="false" />
     </folder>
-    <include filename="Python/Clear.py" runAtStartup="false" />
-    <include filename="Python/Null.py" runAtStartup="false" />
-    <include filename="Python/SimplePixelShader.py" runAtStartup="false" />
-    <include filename="Python/RenderTarget.py" runAtStartup="false" />
-    <include filename="Python/MissingShaderVars.py" runAtStartup="false" />
+    <folder name="C#">
+      <folder name="Utils">
+        <include filename="CS/Utils/utils.cs" runAtStartup="false" />
+      </folder>
+      <folder name="Textures">
+        <include filename="CS/BlackTexture.cs" runAtStartup="false" />
+        <include filename="CS/CreateTexture.cs" runAtStartup="false" />
+        <include filename="CS/CreateTextureCallback.cs" runAtStartup="false" />
+        <include filename="CS/CreateTextureMips.cs" runAtStartup="false" />
+        <include filename="CS/CubeMips.cs" runAtStartup="false" />
+        <include filename="CS/CustomCubeMips.cs" runAtStartup="false" />
+        <include filename="CS/CustomMips.cs" runAtStartup="false" />
+        <include filename="CS/DefaultNormalTexture.cs" runAtStartup="false" />
+        <include filename="CS/LoadTexture.cs" runAtStartup="false" />
+        <include filename="CS/TextureCubemap.cs" runAtStartup="false" />
+        <include filename="CS/TextureMips.cs" runAtStartup="false" />
+        <include filename="CS/WhiteTexture.cs" runAtStartup="false" />
+      </folder>
+      <include filename="CS/Clear.cs" runAtStartup="false" />
+      <include filename="CS/MissingShaderVars.cs" runAtStartup="false" />
+      <include filename="CS/Null.cs" runAtStartup="false" />
+      <include filename="CS/SimplePixelShader.cs" runAtStartup="false" />
+      <include filename="CS/RenderTarget.cs" runAtStartup="false" />
+    </folder>
   </folder>
   <OpenDocuments>
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\Utils\utils.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\TextureMips.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\LoadTexture.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\CustomMips.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\CustomCubeMips.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\CubeMips.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\CreateTextureMips.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\CreateTextureCallback.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\CreateTexture.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\BlackTexture.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\DefaultNormalTexture.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\TextureCubemap.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\WhiteTexture.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\SRPTests\TestScripts\CS\RenderTarget.cs" />
   </OpenDocuments>
 </project>

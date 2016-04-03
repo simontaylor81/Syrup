@@ -109,12 +109,12 @@ namespace SRPTests.TestRenderer
 				// Add callback for setting expected result.
 				// Only float results supported.
 				IEnumerable<float> expected = null;
-				script.GlobalVariables.Add("SetExpected", (Action<IEnumerable<dynamic>>)(
+				script.TestParams.Add("SetExpected", (Action<IEnumerable<dynamic>>)(
 					newExpected => expected = newExpected.Select(x => (float)x)));
 
 				// Add callback for setting output buffer.
 				IBuffer resultBuffer = null;
-				script.GlobalVariables.Add("SetResultBuffer", (Action<IBuffer>)(buffer => resultBuffer = buffer));
+				script.TestParams.Add("SetResultBuffer", (Action<IBuffer>)(buffer => resultBuffer = buffer));
 
 				await _sr.ExecuteScript(script, new NullProgress());
 
