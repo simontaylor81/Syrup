@@ -20,17 +20,6 @@ namespace SRPRendering.Resources
 		public ShaderResourceView SRV { get; }
 		public UnorderedAccessView UAV { get; }
 
-		// Create with initial contents from dynamic (list or callback function).
-		// Currently only supports single-element buffers, not structured buffers.
-		public static Buffer CreateDynamic(Device device, int sizeInBytes, bool uav, Format format, dynamic contents)
-		{
-			var stride = format.Size();
-			using (DataStream initialData = contents != null ? SRPRendering.StreamUtil.CreateStream1DDynamic(contents, sizeInBytes / stride, format) : null)
-			{
-				return new Buffer(device, sizeInBytes, stride, uav, initialData);
-			}
-		}
-
 		// Create a structured buffer with typed initial data, for when calling from C# directly.
 		public static Buffer CreateStructured<T>(Device device, bool uav, IEnumerable<T> contents) where T : struct
 		{
