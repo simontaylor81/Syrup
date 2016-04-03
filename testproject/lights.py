@@ -1,5 +1,4 @@
 from SRPScripting import *
-import random
 
 vs = ri.CompileShader("Lights.hlsl", "VSMain", "vs_4_0")
 ps = ri.CompileShader("Lights.hlsl", "ForwardLightPS", "ps_4_0")
@@ -9,22 +8,20 @@ copytexPS = ri.CompileShader("CopyTex.hlsl", "CopyTex_PS", "ps_4_0")
 
 rt = ri.CreateRenderTarget()
 
-ri.BindShaderVariable(vs, "WorldToProjectionMatrix", ShaderVariableBindSource.WorldToProjectionMatrix)
-ri.BindShaderVariable(vs, "LocalToWorldMatrix", ShaderVariableBindSource.LocalToWorldMatrix)
-ri.BindShaderVariable(ps, "CameraPos", ShaderVariableBindSource.CameraPosition);
+ps.FindConstantVariable("CameraPos").Bind(ShaderConstantVariableBindSource.CameraPosition)
 
-ri.SetShaderResourceVariable(copytexPS, "tex", rt)
+copytexPS.FindResourceVariable("tex").Set(rt)
 
 # Expose radius rather than inverse-square-radius.
 radius = ri.AddUserVar_Float("Radius", 20)
 def InvSqrRadius():
 	r = max(0.0001, radius())
 	return 1.0 / (r*r)
-ri.SetShaderVariable(ps, "LightInvSqrRadius", InvSqrRadius)
+ps.FindConstantVariable("LightInvSqrRadius").Set(InvSqrRadius)
 
 wireframe = ri.AddUserVar_Bool("Wireframe?", False)
 
-ri.BindShaderResourceToMaterial(ps, "DiffuseTex", "DiffuseTexture")
+ps.FindResourceVariable("DiffuseTex").BindToMaterial("DiffuseTexture")
 
 
 def RenderFrame(context):
@@ -37,14 +34,3 @@ def RenderFrame(context):
 	context.DrawFullscreenQuad(copytexVS, copytexPS)
 
 ri.SetFrameCallback(RenderFrame)
-
-# TEST
-dict = {'a': 40, 'c': 23}
-list = [8, 9, 7]
-#ri.Args(**dict)
-
-#state = RastState(fillMode = FillMode.Wireframe,
-#				  depthBias = 22,
-#				  enableScissor = True)
-#ri.ComplexArg(state)
-
