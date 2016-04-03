@@ -21,16 +21,29 @@ namespace SRPCommon.Scripting
 {
 	public class Scripting
 	{
+		private readonly CSharpScripting _csharpScripting;
 		private readonly PythonScripting _pythonScripting;
 
 		public Scripting(IWorkspace workspace, ILoggerFactory loggerFactory)
 		{
 			_pythonScripting = new PythonScripting(workspace, loggerFactory);
+			_csharpScripting = new CSharpScripting(workspace, loggerFactory);
 		}
 
 		public Task<ICompiledScript> Compile(Script script)
 		{
-			return _pythonScripting.Compile(script);
+			switch (Path.GetExtension(script.Filename).ToLowerInvariant())
+			{
+				case ".py":
+					return _pythonScripting.Compile(script);
+
+				case ".cs":
+				case ".csx":
+					return _csharpScripting.Compile(script);
+
+				default:
+					throw new ScriptException($"Unknown script file type: {Path.GetExtension(script.Filename)}");
+			}
 		}
 	}
 }

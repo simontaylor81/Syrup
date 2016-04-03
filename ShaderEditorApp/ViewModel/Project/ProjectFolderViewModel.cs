@@ -164,17 +164,19 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 		// Get the file filter to use for the open dialog.
 		private static string FileFilterExisting
-			=> "Supported file types|*.hlsl;*.fx;*.py;*.srpscene" +
+			=> "Supported file types|*.hlsl;*.fx;*.py;*.cs;*.csx;*.srpscene" +
 				"|Shader files|*.hlsl;*.fx" +
 				"|Python files|*.py" +
+				"|C# files|*.cs;*.csx" +
 				"|Scene files|*.srpscene" +
 				"|All Files|*.*";
 
 		// Get the file filter to use for the new dialog (excludes scene files).
 		private static string FileFilterNew
-			=> "Supported file types|*.hlsl;*.fx;*.py" +
+			=> "Supported file types|*.hlsl;*.fx;*.py;*.cs;*.csx" +
 				"|Shader files|*.hlsl;*.fx" +
 				"|Python files|*.py" +
+				"|C# files|*.cs;*.csx" +
 				"|All Files|*.*";
 
 		#region IHierarchicalBrowserNodeViewModel interface

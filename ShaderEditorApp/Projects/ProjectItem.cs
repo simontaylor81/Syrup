@@ -45,6 +45,8 @@ namespace ShaderEditorApp.Projects
 				switch (Extension.ToLowerInvariant())
 				{
 					case ".py":
+					case ".cs":
+					case ".csx":
 						return ProjectItemType.Script;
 					case ".hlsl":
 					case ".fx":

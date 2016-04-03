@@ -233,7 +233,14 @@ namespace ShaderEditorApp.ViewModel
 			private set { this.RaiseAndSetIfChanged(ref _bDirty, value); }
 		}
 
-		public bool IsScript => Path.GetExtension(FilePath).ToLowerInvariant() == ".py";
+		public bool IsScript
+		{
+			get
+			{
+				var ext = Path.GetExtension(FilePath).ToLowerInvariant();
+				return ext == ".py" || ext == ".cs" || ext == ".csx";
+			}
+		}
 		
 		// Position of caret in the editor.
 		private TextLocation _caretPosition;
