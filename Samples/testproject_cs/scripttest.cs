@@ -24,7 +24,6 @@ var dummyVar = ri.AddUserVar_Float4("FloatUserVar", new [] { 0,1,2,45 });
 
 var choiceVar = ri.AddUserVar_Choice("A choice", new object [] {'A', 'B', 'C'}, 'A');
 
-
 float errorfunc()
 {
 	var x = 10;
@@ -41,6 +40,8 @@ FillMode GetFillMode()
 {
 	return FillMode.Solid;
 }
+
+ri.Log("Hello from C#");
 	
 ps.FindConstantVariable("SolidColour").BindToMaterial("DiffuseColour");
 //ps.FindConstantVariable("SolidColour").Set(func);

@@ -317,6 +317,11 @@ namespace SRPRendering
 
 		public dynamic GetScene() => Scene;
 
+		public void Log(string line)
+		{
+			_scriptLogger.LogLine(line);
+		}
+
 		public IDepthBuffer DepthBuffer => DepthBufferHandle.Default;
 		public IDepthBuffer NoDepthBuffer => DepthBufferHandle.Null;
 

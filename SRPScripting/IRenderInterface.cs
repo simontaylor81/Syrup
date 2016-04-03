@@ -61,6 +61,10 @@ namespace SRPScripting
 		// Get access to the scene.
 		dynamic GetScene();
 
+		// Write a string to the log.
+		// (Unfortunately Roslyn scripting does not appear to let us redirect console output like IronPython does).
+		void Log(string line);
+
 		// Handles to special resources.
 		IDepthBuffer DepthBuffer { get; }
 		IDepthBuffer NoDepthBuffer { get; }
