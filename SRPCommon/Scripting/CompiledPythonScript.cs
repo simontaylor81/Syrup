@@ -30,9 +30,9 @@ namespace SRPCommon.Scripting
 				scope.SetVariable(global.Key, global.Value);
 			}
 
-			// Add the render interface.
+			// Add dynamic wrapper around the render interface.
 			Trace.Assert(renderInterface != null);
-			scope.SetVariable("ri", renderInterface);
+			scope.SetVariable("ri", new DynamicRenderInterfaceWrapper(renderInterface));
 
 			// Execute on background thread.
 			return Task.Run(() => _script.Execute(scope));

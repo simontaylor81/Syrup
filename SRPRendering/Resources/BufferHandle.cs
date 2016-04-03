@@ -11,35 +11,62 @@ using SRPScripting;
 
 namespace SRPRendering.Resources
 {
-	// Handle to a deferred-creation script-generated buffer.
-	class BufferHandleDynamic : IBuffer, IDeferredResource
+	// Base class for buffer handles.
+	abstract class BufferHandle : IBuffer, IDeferredResource
 	{
-		private readonly int _sizeInBytes;
-		private readonly Format _format;
-		private readonly object _contents;
-		private UavHandle _uav;
+		protected UavHandle _uav;
 
-		public ID3DShaderResource Resource { get; private set; }
+		public ID3DShaderResource Resource { get; protected set; }
 
-		public BufferHandleDynamic(int sizeInBytes, Format format, object contents)
+		public abstract void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator);
+
+		public IUav CreateUav()
 		{
-			_sizeInBytes = sizeInBytes;
+			_uav = _uav ?? new UavHandle();
+			return _uav;
+		}
+	}
+
+	// Handle to a deferred-creation script-generated buffer.
+	class BufferHandleFormatted<T> : BufferHandle
+	{
+		private readonly int _numElements;
+		private readonly Format _format;
+		private readonly IEnumerable<T> _contents;
+
+		public BufferHandleFormatted(int numElements, Format format, IEnumerable<T> contents)
+		{
+			_numElements = numElements;
 			_format = format;
 			_contents = contents;
 		}
 
-		public IUav CreateUav()
+		public override void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
 		{
-			if (_uav == null)
+			using (var stream = _contents != null ? StreamUtil.CreateStream(_contents.Cast<object>(), _numElements, _format) : null)
 			{
-				_uav = new UavHandle();
+				Resource = new Buffer(renderDevice.Device, _numElements * _format.Size(), _format.Size(), _uav != null, stream);
+				if (_uav != null)
+				{
+					_uav.UAV = Resource.UAV;
+				}
 			}
-			return _uav;
+		}
+	}
+
+	// Handle to a deferred-creation structured buffer.
+	class BufferHandleStructured<T> : BufferHandle where T : struct
+	{
+		private readonly IEnumerable<T> _contents;
+
+		public BufferHandleStructured(IEnumerable<T> contents)
+		{
+			_contents = contents;
 		}
 
-		public void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
+		public override void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
 		{
-			Resource = Buffer.CreateDynamic(renderDevice.Device, _sizeInBytes, _uav != null, _format, _contents);
+			Resource = Buffer.CreateStructured(renderDevice.Device, _uav != null, _contents);
 			if (_uav != null)
 			{
 				_uav.UAV = Resource.UAV;
@@ -47,31 +74,21 @@ namespace SRPRendering.Resources
 		}
 	}
 
-	// Handle to a deferred-creation structured buffer.
-	class BufferHandleStructured<T> : IBuffer, IDeferredResource where T : struct
+	// Handle to a deferred-creation unitialised buffer.
+	class BufferHandleUnitialised : BufferHandle
 	{
-		private readonly IEnumerable<T> _contents;
-		private UavHandle _uav;
+		private readonly int _sizeInBytes;
+		private readonly int _stride;
 
-		public ID3DShaderResource Resource { get; private set; }
-
-		public BufferHandleStructured(IEnumerable<T> contents)
+		public BufferHandleUnitialised(int sizeInBytes, int stride)
 		{
-			_contents = contents;
+			_sizeInBytes = sizeInBytes;
+			_stride = stride;
 		}
 
-		public IUav CreateUav()
+		public override void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
 		{
-			if (_uav == null)
-			{
-				_uav = new UavHandle();
-			}
-			return _uav;
-		}
-
-		public void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
-		{
-			Resource = Buffer.CreateStructured(renderDevice.Device, _uav != null, _contents);
+			Resource = new Buffer(renderDevice.Device, _sizeInBytes, _stride, _uav != null, null);
 			if (_uav != null)
 			{
 				_uav.UAV = Resource.UAV;

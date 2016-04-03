@@ -14,24 +14,24 @@ namespace SRPRendering
 	// Helpers for filling SlimDX streams from dynamic (script) sources.
 	static class StreamUtil
 	{
-		public static DataStream CreateStream1D(dynamic contents, int sizeX, Format format)
+		public static DataStream CreateStream1DDynamic(dynamic contents, int sizeX, Format format)
 		{
 			Func<int, int, int, dynamic> callbackAdapter = (x, y, z) => contents(x);
-			return CreateStream(contents, sizeX, 1, 1, format, callbackAdapter);
+			return CreateStreamDynamic(contents, sizeX, 1, 1, format, callbackAdapter);
 		}
-		public static DataStream CreateStream2D(dynamic contents, int sizeX, int sizeY, Format format)
+		public static DataStream CreateStream2DDynamic(dynamic contents, int sizeX, int sizeY, Format format)
 		{
 			Func<int, int, int, dynamic> callbackAdapter = (x, y, z) => contents(x, y);
-			return CreateStream(contents, sizeX, sizeY, 1, format, callbackAdapter);
+			return CreateStreamDynamic(contents, sizeX, sizeY, 1, format, callbackAdapter);
 		}
-		public static DataStream CreateStream3D(dynamic contents, int sizeX, int sizeY, int sizeZ, Format format)
+		public static DataStream CreateStream3DDynamic(dynamic contents, int sizeX, int sizeY, int sizeZ, Format format)
 		{
 			Func<int, int, int, dynamic> callbackAdapter = (x, y, z) => contents(x, y, z);
-			return CreateStream(contents, sizeX, sizeY, sizeZ, format, callbackAdapter);
+			return CreateStreamDynamic(contents, sizeX, sizeY, sizeZ, format, callbackAdapter);
 		}
 
 		// Create a SlimDX raw data stream based on the given dynamic object.
-		private static DataStream CreateStream(dynamic contents, int sizeX, int sizeY, int sizeZ, Format format, Func<int, int, int, dynamic> callbackAdapter)
+		private static DataStream CreateStreamDynamic(dynamic contents, int sizeX, int sizeY, int sizeZ, Format format, Func<int, int, int, dynamic> callbackAdapter)
 		{
 			var stream = new DataStream(sizeX * sizeY * sizeZ * format.Size(), true, true);
 
@@ -55,8 +55,44 @@ namespace SRPRendering
 			return stream;
 		}
 
+		// Create a stream from an enumerable (with format conversion).
+		public static DataStream CreateStream(IEnumerable<object> contents, int numElements, Format format)
+		{
+			var stream = new DataStream(numElements * format.Size(), true, true);
+			FillStream(contents, stream, numElements, format);
+
+			// Reset position
+			stream.Position = 0;
+			return stream;
+		}
+
+		// Create a SlimDX raw data stream from a 1D callback.
+		public static DataStream CreateStream1D(Func<int, object> callback, int sizeX, Format format)
+		{
+			Func<int, int, int, dynamic> callbackAdapter = (x, y, z) => callback(x);
+			return CreateStream3D(callbackAdapter, sizeX, 1, 1, format);
+		}
+
+		// Create a SlimDX raw data stream from a 2D callback.
+		public static DataStream CreateStream2D(Func<int, int, object> callback, int sizeX, int sizeY, Format format)
+		{
+			Func<int, int, int, dynamic> callbackAdapter = (x, y, z) => callback(x, y);
+			return CreateStream3D(callbackAdapter, sizeX, sizeY, 1, format);
+		}
+
+		// Create a SlimDX raw data stream from a 3D callback.
+		public static DataStream CreateStream3D(Func<int, int, int, object> callback, int sizeX, int sizeY, int sizeZ, Format format)
+		{
+			var stream = new DataStream(sizeX * sizeY * sizeZ * format.Size(), true, true);
+			FillStream(callback, stream, sizeX, sizeY, sizeZ, format);
+
+			// Reset position
+			stream.Position = 0;
+			return stream;
+		}
+
 		// Fill a data stream from a dynamic enumerable.
-		private static void FillStream(IEnumerable<dynamic> enumerable, DataStream stream, int numElements, Format format)
+		private static void FillStream(IEnumerable<object> enumerable, DataStream stream, int numElements, Format format)
 		{
 			foreach (var element in enumerable.Take(numElements))
 			{
@@ -65,7 +101,7 @@ namespace SRPRendering
 		}
 
 		// Fill a data stream from a function taking the element index.
-		private static void FillStream(Func<int, int, int, dynamic> fn, DataStream stream, int sizeX, int sizeY, int sizeZ, Format format)
+		private static void FillStream(Func<int, int, int, object> fn, DataStream stream, int sizeX, int sizeY, int sizeZ, Format format)
 		{
 			for (int z = 0; z < sizeZ; z++)
 			{

@@ -96,15 +96,15 @@ namespace SRPRendering.Resources
 		}
 	}
 
-	// Handle to a texture created procedurally by the script.
-	class TextureHandleScript : TextureHandle
+	// Handle to a texture created procedurally by the script from an enumerable.
+	class TextureHandleEnumerable<T> : TextureHandle
 	{
 		private readonly int _width;
 		private readonly int _height;
 		private readonly Format _format;
-		private readonly object _contents;
+		private readonly IEnumerable<T> _contents;
 
-		public TextureHandleScript(int width, int height, Format format, object contents)
+		public TextureHandleEnumerable(int width, int height, Format format, IEnumerable<T> contents)
 		{
 			_width = width;
 			_height = height;
@@ -114,8 +114,65 @@ namespace SRPRendering.Resources
 
 		public override void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
 		{
-			// Textures from a file do not generate mips by default.
-			Resource = Texture.CreateFromScript(renderDevice.Device, _width, _height, _format, _contents, GetMipGenerationMode(false));
+			// TODO: Stronger typing here?
+			using (var stream = StreamUtil.CreateStream(_contents.Cast<object>(), _width * _height, _format))
+			{
+				// Textures from script do not generate mips by default.
+				Resource = Texture.CreateFromStream(renderDevice.Device, _width, _height, _format, stream, GetMipGenerationMode(false));
+			}
+		}
+	}
+
+	// Handle to a texture created procedurally by the script.
+	class TextureHandleCallback : TextureHandle
+	{
+		private readonly int _width;
+		private readonly int _height;
+		private readonly Format _format;
+		private readonly Func<int, int, object> _contentsCallback;
+
+		public TextureHandleCallback(int width, int height, Format format, Func<int, int, object> contentsCallback)
+		{
+			_width = width;
+			_height = height;
+			_format = format;
+			_contentsCallback = contentsCallback;
+		}
+
+		public override void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
+		{
+			using (var stream = StreamUtil.CreateStream2D(_contentsCallback, _width, _height, _format))
+			{
+				// Textures from script do not generate mips by default.
+				Resource = Texture.CreateFromStream(renderDevice.Device, _width, _height, _format, stream, GetMipGenerationMode(false));
+			}
+		}
+	}
+
+	// Handle to a texture created procedurally by the script.
+	// TODO: Remove?
+	class TextureHandleDynamic : TextureHandle
+	{
+		private readonly int _width;
+		private readonly int _height;
+		private readonly Format _format;
+		private readonly object _contents;
+
+		public TextureHandleDynamic(int width, int height, Format format, object contents)
+		{
+			_width = width;
+			_height = height;
+			_format = format;
+			_contents = contents;
+		}
+
+		public override void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
+		{
+			using (var stream = StreamUtil.CreateStream2DDynamic(_contents, _width, _height, _format))
+			{
+				// Textures from script do not generate mips by default.
+				Resource = Texture.CreateFromStream(renderDevice.Device, _width, _height, _format, stream, GetMipGenerationMode(false));
+			}
 		}
 	}
 }

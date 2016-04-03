@@ -115,18 +115,18 @@ namespace SRPRendering
 		}
 
 		#region User Variables
-		public dynamic AddUserVar_Float(string name, float defaultValue) => AddScalarUserVar<float>(name, defaultValue);
-		public dynamic AddUserVar_Float2(string name, object defaultValue) => AddVectorUserVar<float>(2, name, defaultValue);
-		public dynamic AddUserVar_Float3(string name, object defaultValue) => AddVectorUserVar<float>(3, name, defaultValue);
-		public dynamic AddUserVar_Float4(string name, object defaultValue) => AddVectorUserVar<float>(4, name, defaultValue);
-		public dynamic AddUserVar_Int(string name, int defaultValue) => AddScalarUserVar<int>(name, defaultValue);
-		public dynamic AddUserVar_Int2(string name, object defaultValue) => AddVectorUserVar<int>(2, name, defaultValue);
-		public dynamic AddUserVar_Int3(string name, object defaultValue) => AddVectorUserVar<int>(3, name, defaultValue);
-		public dynamic AddUserVar_Int4(string name, object defaultValue) => AddVectorUserVar<int>(4, name, defaultValue);
-		public dynamic AddUserVar_Bool(string name, bool defaultValue) => AddScalarUserVar<bool>(name, defaultValue);
-		public dynamic AddUserVar_String(string name, string defaultValue) => AddScalarUserVar<string>(name, defaultValue);
+		public Func<float> AddUserVar_Float(string name, float defaultValue) => AddScalarUserVar<float>(name, defaultValue);
+		public Func<float[]> AddUserVar_Float2(string name, object defaultValue) => AddVectorUserVar<float>(2, name, defaultValue);
+		public Func<float[]> AddUserVar_Float3(string name, object defaultValue) => AddVectorUserVar<float>(3, name, defaultValue);
+		public Func<float[]> AddUserVar_Float4(string name, object defaultValue) => AddVectorUserVar<float>(4, name, defaultValue);
+		public Func<int> AddUserVar_Int(string name, int defaultValue) => AddScalarUserVar<int>(name, defaultValue);
+		public Func<int[]> AddUserVar_Int2(string name, object defaultValue) => AddVectorUserVar<int>(2, name, defaultValue);
+		public Func<int[]> AddUserVar_Int3(string name, object defaultValue) => AddVectorUserVar<int>(3, name, defaultValue);
+		public Func<int[]> AddUserVar_Int4(string name, object defaultValue) => AddVectorUserVar<int>(4, name, defaultValue);
+		public Func<bool> AddUserVar_Bool(string name, bool defaultValue) => AddScalarUserVar<bool>(name, defaultValue);
+		public Func<string> AddUserVar_String(string name, string defaultValue) => AddScalarUserVar<string>(name, defaultValue);
 
-		public dynamic AddUserVar_Choice(string name, IEnumerable<object> choices, object defaultValue)
+		public Func<object> AddUserVar_Choice(string name, IEnumerable<object> choices, object defaultValue)
 			=> AddUserVar(UserVariable.CreateChoice(name, choices, defaultValue));
 
 		// Add a single-component user variable.
@@ -174,9 +174,15 @@ namespace SRPRendering
 		}
 
 		// Create a 2D texture of the given size and format, and fill it with the given data.
-		public ITexture2D CreateTexture2D(int width, int height, Format format, dynamic contents)
+		public ITexture2D CreateTexture2D<T>(int width, int height, Format format, IEnumerable<T> contents)
 		{
-			return _deferredResources.AddAndReturn(new TextureHandleScript(width, height, format, contents));
+			return _deferredResources.AddAndReturn(new TextureHandleEnumerable<T>(width, height, format, contents));
+		}
+
+		// Create a 2D texture of the given size and format, and fill it with data from the given callback.
+		public ITexture2D CreateTexture2D(int width, int height, Format format, Func<int, int, object> contentCallback)
+		{
+			return _deferredResources.AddAndReturn(new TextureHandleCallback(width, height, format, contentCallback));
 		}
 
 		// Load a texture from disk.
@@ -186,13 +192,17 @@ namespace SRPRendering
 			return _deferredResources.AddAndReturn(new TextureHandleFile(absPath));
 		}
 
-		// Create a buffer of the given size and format, and fill it with the given data.
-		public IBuffer CreateBuffer(int sizeInBytes, Format format, dynamic contents) =>
-			_deferredResources.AddAndReturn(new BufferHandleDynamic(sizeInBytes, format, contents));
-
-		// Create a structured buffer.
+		// Create a structured buffer containing the given contents exactly as it is.
 		public IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents) where T : struct =>
 			_deferredResources.AddAndReturn(new BufferHandleStructured<T>(contents));
+
+		// Create an buffer of the given size and format, optionally with initial data that is converted to the correct format.
+		public IBuffer CreateFormattedBuffer<T>(int numElements, Format format, IEnumerable<T> contents) =>
+			_deferredResources.AddAndReturn(new BufferHandleFormatted<T>(numElements, format, contents));
+
+		// Create an uninitialised buffer of the given size and format, to be written to by the GPU.
+		public IBuffer CreateUninitialisedBuffer(int sizeInBytes, int stride) =>
+			_deferredResources.AddAndReturn(new BufferHandleUnitialised(sizeInBytes, stride));
 
 		public void Dispose()
 		{

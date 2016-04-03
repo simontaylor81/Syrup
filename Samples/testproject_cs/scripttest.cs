@@ -16,7 +16,7 @@ psTex.FindResourceVariable("DiffuseTex").Set(tex);
 
 var dummyVar = ri.AddUserVar_Float4("FloatUserVar", new [] { 0,1,2,45 });
 
-var choiceVar = ri.AddUserVar_Choice("A choice", new object [] {'A', 'B', 'C'}, 'A');
+var choiceVar = ri.AddUserVar_Choice("A choice", new object [] {"A", "B", "C"}, "A");
 
 float errorfunc()
 {
@@ -43,9 +43,10 @@ ps.FindConstantVariable("SolidColour").BindToMaterial("DiffuseColour");
 void RenderFrame(IRenderContext context)
 {
 	var rastState = new RastState(fillMode: GetFillMode(), cullMode: CullMode.None);
-	if (choiceVar() == 'B')
+	var choice = (string)choiceVar();
+	if (choice == "B")
 		context.DrawSphere(vs, psTex, rastState);
-	else if (choiceVar() == 'C')
+	else if (choice == "C")
 		context.DrawScene(vs, ps, rastState);
 	else
 		context.DrawScene(vs, psTex, rastState);

@@ -95,27 +95,24 @@ namespace SRPRendering.Resources
 		}
 
 		// Create a texture with data from script.
-		public static Texture CreateFromScript(
-			Device device, int width, int height, Format format, dynamic contents, MipGenerationMode mipGenerationMode)
+		public static Texture CreateFromStream(
+			Device device, int width, int height, Format format, DataStream contents, MipGenerationMode mipGenerationMode)
 		{
 			// Construct data stream from script data.
-			using (DataStream stream = StreamUtil.CreateStream2D(contents, width, height, format))
-			{
-				var initialData = new DataRectangle(stream.DataPointer, width * format.Size());
+			var initialData = new DataRectangle(contents.DataPointer, width * format.Size());
 
-				// Create DirectXTex representation (so we can apply the same operations as images loaded
-				// from disk, e.g. mip generation).
-				var image = DirectXTex.Create2D(initialData.DataPointer, initialData.Pitch, width, height, (uint)format.ToDXGI());
-				CreateMipChain(image, mipGenerationMode);
+			// Create DirectXTex representation (so we can apply the same operations as images loaded
+			// from disk, e.g. mip generation).
+			var image = DirectXTex.Create2D(initialData.DataPointer, initialData.Pitch, width, height, (uint)format.ToDXGI());
+			CreateMipChain(image, mipGenerationMode);
 
-				// Create the actual texture resource.
-				var texture2D = new Texture2D(image.CreateTexture(device.NativePointer));
+			// Create the actual texture resource.
+			var texture2D = new Texture2D(image.CreateTexture(device.NativePointer));
 
-				// Create the SRV.
-				var srv = new ShaderResourceView(device, texture2D);
+			// Create the SRV.
+			var srv = new ShaderResourceView(device, texture2D);
 
-				return new Texture(texture2D, srv);
-			}
+			return new Texture(texture2D, srv);
 		}
 
 		private static void CreateMipChain(IScratchImage image, MipGenerationMode mode)

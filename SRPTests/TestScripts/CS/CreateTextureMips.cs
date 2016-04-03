@@ -10,7 +10,7 @@ int w = 16;
 int h = 16;
 
 // Create the texture.
-Vector4 getPixel(int x, int y)
+object getPixel(int x, int y)
 {
 	bool set = x+1 == y || (w - x - 1) == y;
 	return set ? col1 : col2;

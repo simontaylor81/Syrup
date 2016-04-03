@@ -7,7 +7,7 @@ using System.Linq;
 var cs = ri.CompileShader("ComputeTest.hlsl", "WriteToUAV", "cs_4_0");
 
 int numElements = 16;
-var buffer = ri.CreateBuffer(numElements * 4, Format.R32_Float, null);
+var buffer = ri.CreateUninitialisedBuffer(numElements * 4, 4);
 cs.FindUavVariable("OutUAV").Set(buffer.CreateUav());
 
 var expected = Enumerable.Range(0, numElements)

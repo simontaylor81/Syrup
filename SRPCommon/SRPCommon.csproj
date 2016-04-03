@@ -176,6 +176,7 @@
     <Compile Include="Scripting\CompiledPythonScript.cs" />
     <Compile Include="Scripting\CSharpGlobals.cs" />
     <Compile Include="Scripting\CSharpScripting.cs" />
+    <Compile Include="Scripting\DynamicRenderInterfaceWrapper.cs" />
     <Compile Include="Scripting\ICompiledScript.cs" />
     <Compile Include="Scripting\PythonScripting.cs" />
     <Compile Include="Scripting\Script.cs" />
@@ -206,6 +207,7 @@
     <Compile Include="Util\DisposableRef.cs" />
     <Compile Include="Util\DisposableUtil.cs" />
     <Compile Include="Util\DynamicHelpers.cs" />
+    <Compile Include="Util\EnumerableUtil.cs" />
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\GlobalConfig.cs" />
     <Compile Include="Util\NumericsUtil.cs" />

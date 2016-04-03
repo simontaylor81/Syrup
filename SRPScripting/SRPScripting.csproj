@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Format.cs" />
     <Compile Include="IRenderContext.cs" />
+    <Compile Include="IDynamicRenderInterface.cs" />
     <Compile Include="IRenderInterface.cs" />
     <Compile Include="IShaderResource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

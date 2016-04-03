@@ -23,7 +23,7 @@
     {
       "script": "CreateTextureCallback",
       "python": true,
-      "cs": false // TODO: re-enable
+      "cs": true
     },
 
     // Tests for loading textures from file.
@@ -85,7 +85,7 @@
     {
       "script": "CreateTextureMips",
       "python": true,
-      "cs": false,  // TODO: re-enable
+      "cs": true,
       "name": "CreateTextureMips_{generateMips}",
       "vars": {
         "generateMips": [ true, false ]
