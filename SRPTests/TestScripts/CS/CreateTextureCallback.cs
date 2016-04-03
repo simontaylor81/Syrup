@@ -1,8 +1,5 @@
 // Test texture generation
 #load "Utils/utils.cs"
-using System;
-using System.Numerics;
-using SRPScripting;
 
 // Create the texture.
 Vector4 getPixel(int x, int y)

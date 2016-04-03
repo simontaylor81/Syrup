@@ -1,7 +1,5 @@
 // Test script-created texture mip generation
 #load "Utils/utils.cs"
-using SRPScripting;
-using System.Numerics;
 
 var generateMips = TestSetting<bool>("generateMips", true);
 

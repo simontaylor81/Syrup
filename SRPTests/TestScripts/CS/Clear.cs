@@ -1,5 +1,4 @@
 // Test clearing the back buffer.
-using System.Numerics;
 
 ri.SetFrameCallback(context =>
 {

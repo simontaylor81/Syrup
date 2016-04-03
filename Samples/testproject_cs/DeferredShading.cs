@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using SRPScripting;
-using System.Numerics;
-
 // Compile shaders for base and deferred passes.
 var basepassVS = ri.CompileShader("DeferredShading.hlsl", "BasePass_VS", "vs_4_0");
 var basepassPS = ri.CompileShader("DeferredShading.hlsl", "BasePass_PS", "ps_4_0");

@@ -1,4 +1,3 @@
-using SRPScripting;
 using System.Threading;
 
 var vs = ri.CompileShader("BasicShaders.hlsl", "BasicVS", "vs_4_0");

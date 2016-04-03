@@ -1,6 +1,5 @@
 // Test for creating custom render targets.
 #load "Utils/utils.cs"
-using System.Numerics;
 
 var rt = ri.CreateRenderTarget();
 

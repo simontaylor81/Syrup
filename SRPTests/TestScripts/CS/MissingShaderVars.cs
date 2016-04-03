@@ -1,6 +1,5 @@
 // Test the attempting to bind missing shader variables silently fails
 // (this simulates variables that are compiled out).
-using SRPScripting;
 
 var ps = ri.CompileShader("ConstantColour.hlsl", "PS", "ps_4_0");
 

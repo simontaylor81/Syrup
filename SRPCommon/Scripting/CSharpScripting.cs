@@ -31,7 +31,14 @@ namespace SRPCommon.Scripting
 				.WithReferences(
 					typeof(SRPScripting.IRenderInterface).Assembly,
 					typeof(System.Dynamic.DynamicObject).Assembly,
-					typeof(Microsoft.CSharp.RuntimeBinder.RuntimeBinderException).Assembly);
+					typeof(Microsoft.CSharp.RuntimeBinder.RuntimeBinderException).Assembly)
+				// Add some common imports to avoid typing.
+				.WithImports(
+					"System",
+					"System.Linq",
+					"System.Collections.Generic",
+					"System.Numerics",
+					"SRPScripting");
 
 			var compiled = CSharpScript.Create(code, options: options, globalsType: typeof(CSharpGlobals));
 			var runner = compiled.CreateDelegate();

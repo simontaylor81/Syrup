@@ -1,10 +1,4 @@
 // Script for testing generating a texture based on a user property.
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using SRPScripting;
-using System.Numerics;
-
 var vs = ri.CompileShader("BasicShaders.hlsl", "BasicVS", "vs_4_0");
 var ps = ri.CompileShader("BasicShaders.hlsl", "TexturedPS", "ps_4_0");
 ps.FindSamplerVariable("mySampler").Set(SamplerState.PointWrap);
