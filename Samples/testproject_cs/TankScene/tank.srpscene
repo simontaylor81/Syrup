@@ -1,0 +1,406 @@
+{
+  "primitives": [
+    {
+      "type": "MeshInstance",
+      "mesh": "ground_planeShape_subset0_ground",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "material": "ground"
+    },
+    {
+      "type": "MeshInstance",
+      "mesh": "polySurfaceShape371_subset0_left_engine_phong",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "material": "left_engine_phong"
+    },
+    {
+      "type": "MeshInstance",
+      "mesh": "polySurfaceShape376_subset0_left_engine_phong",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "material": "left_engine_phong"
+    },
+    {
+      "type": "MeshInstance",
+      "mesh": "polySurfaceShape380_subset0_left_engine_phong",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "material": "left_engine_phong"
+    },
+    {
+      "type": "MeshInstance",
+      "mesh": "polySurfaceShape381_subset0_left_engine_phong",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "material": "left_engine_phong"
+    },
+    {
+      "type": "MeshInstance",
+      "mesh": "polySurfaceShape382_subset0_left_engine_phong",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "material": "left_engine_phong"
+    },
+    {
+      "type": "MeshInstance",
+      "mesh": "tank_geoShape_subset0_left_engine_phong",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "material": "left_engine_phong"
+    },
+    {
+      "type": "MeshInstance",
+      "mesh": "tank_geoShape_subset1_right_engine_phong",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "material": "right_engine_phong"
+    },
+    {
+      "type": "MeshInstance",
+      "mesh": "tank_geoShape_subset2_turret_phong",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "material": "turret_phong"
+    },
+    {
+      "type": "MeshInstance",
+      "mesh": "barricade_geoShape_subset0_barricade_phong",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "material": "barricade_phong"
+    }
+  ],
+  "meshes": {
+    "ground_planeShape_subset0_ground": {
+      "filename": "ground_planeShape_subset0_ground.obj"
+    },
+    "polySurfaceShape371_subset0_left_engine_phong": {
+      "filename": "polySurfaceShape371_subset0_left_engine_phong.obj"
+    },
+    "polySurfaceShape376_subset0_left_engine_phong": {
+      "filename": "polySurfaceShape376_subset0_left_engine_phong.obj"
+    },
+    "polySurfaceShape380_subset0_left_engine_phong": {
+      "filename": "polySurfaceShape380_subset0_left_engine_phong.obj"
+    },
+    "polySurfaceShape381_subset0_left_engine_phong": {
+      "filename": "polySurfaceShape381_subset0_left_engine_phong.obj"
+    },
+    "polySurfaceShape382_subset0_left_engine_phong": {
+      "filename": "polySurfaceShape382_subset0_left_engine_phong.obj"
+    },
+    "tank_geoShape_subset0_left_engine_phong": {
+      "filename": "tank_geoShape_subset0_left_engine_phong.obj"
+    },
+    "tank_geoShape_subset1_right_engine_phong": {
+      "filename": "tank_geoShape_subset1_right_engine_phong.obj"
+    },
+    "tank_geoShape_subset2_turret_phong": {
+      "filename": "tank_geoShape_subset2_turret_phong.obj"
+    },
+    "barricade_geoShape_subset0_barricade_phong": {
+      "filename": "barricade_geoShape_subset0_barricade_phong.obj"
+    }
+  },
+  "materials": {
+    "ground": {
+      "vectorParams": {
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
+      },
+      "textures": {
+        "DiffuseTexture": "ground_diff.dds",
+        "NormalTexture": "ground_norm.dds"
+      }
+    },
+    "left_engine_phong": {
+      "vectorParams": {
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
+      },
+      "textures": {
+        "DiffuseTexture": "left_engine_diff.dds",
+        "NormalTexture": "left_engine_norm.dds"
+      }
+    },
+    "right_engine_phong": {
+      "vectorParams": {
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
+      },
+      "textures": {
+        "DiffuseTexture": "left_engine_diff.dds",
+        "NormalTexture": "left_engine_norm.dds"
+      }
+    },
+    "turret_phong": {
+      "vectorParams": {
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
+      },
+      "textures": {
+        "DiffuseTexture": "turret_diff.dds",
+        "NormalTexture": "turret_norm.dds"
+      }
+    },
+    "lambert1": {
+      "vectorParams": {
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
+      },
+      "textures": {
+        "DiffuseTexture": "default.dds",
+        "NormalTexture": "default-normalmap.dds"
+      }
+    },
+    "barricade_phong": {
+      "vectorParams": {
+        "Diffuse": { "x": 1, "y": 1, "z": 1, "w": 1 },
+        "Ambient": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Specular": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Emissive": { "x": 0, "y": 0, "z": 0, "w": 0 },
+        "Power": { "x": 1, "y": 0, "z": 0, "w": 0 }
+      },
+      "textures": {
+        "DiffuseTexture": "turret_diff.dds",
+        "NormalTexture": "turret_norm.dds"
+      }
+    }
+  },
+  "lights": [
+    {
+      "position": {
+        "x": -10,
+        "y": 1,
+        "z": -10
+      },
+      "colour": {
+        "r": 0.035,
+        "g": 0.03,
+        "b": 0.488
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": -5,
+        "y": 1,
+        "z": -10
+      },
+      "colour": {
+        "r": 0.47,
+        "g": 0.567,
+        "b": 0.028
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": -10
+      },
+      "colour": {
+        "r": 0.143,
+        "g": 0.888,
+        "b": 0.216
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": 5,
+        "y": 1,
+        "z": -10
+      },
+      "colour": {
+        "r": 0.905,
+        "g": 0.208,
+        "b": 0.083
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": -10,
+        "y": 1,
+        "z": -5
+      },
+      "colour": {
+        "r": 0.493,
+        "g": 0.464,
+        "b": 0.264
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": -5,
+        "y": 1,
+        "z": -5
+      },
+      "colour": {
+        "r": 0.138,
+        "g": 0.826,
+        "b": 0.624
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": -5
+      },
+      "colour": {
+        "r": 0.717,
+        "g": 0.35,
+        "b": 0.619
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": 5,
+        "y": 1,
+        "z": -5
+      },
+      "colour": {
+        "r": 0.964,
+        "g": 0.913,
+        "b": 0.617
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": -10,
+        "y": 1,
+        "z": 0
+      },
+      "colour": {
+        "r": 0.976,
+        "g": 0.443,
+        "b": 0.297
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": -5,
+        "y": 1,
+        "z": 0
+      },
+      "colour": {
+        "r": 0.129,
+        "g": 0.26,
+        "b": 0.995
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "colour": {
+        "r": 0.236,
+        "g": 0.342,
+        "b": 0.491
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": 5,
+        "y": 1,
+        "z": 0
+      },
+      "colour": {
+        "r": 0.995,
+        "g": 0.284,
+        "b": 0.87
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": -10,
+        "y": 1,
+        "z": 5
+      },
+      "colour": {
+        "r": 0.082,
+        "g": 0.87,
+        "b": 0.93
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": -5,
+        "y": 1,
+        "z": 5
+      },
+      "colour": {
+        "r": 0.86,
+        "g": 0.303,
+        "b": 0.316
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": 5
+      },
+      "colour": {
+        "r": 0.995,
+        "g": 0.884,
+        "b": 0.305
+      },
+      "radius": 20
+    },
+    {
+      "position": {
+        "x": 5,
+        "y": 1,
+        "z": 5
+      },
+      "colour": {
+        "r": 0.868,
+        "g": 0.469,
+        "b": 0.442
+      },
+      "radius": 20
+    }
+  ]
+}

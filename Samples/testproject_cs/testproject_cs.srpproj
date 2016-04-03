@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project DefaultScene="/tank.srpscene">
+  <folder>
+    <folder name="shaders">
+      <include filename="BasicShaders.hlsl" runAtStartup="false" />
+      <include filename="Lights.hlsl" runAtStartup="false" />
+      <include filename="CopyTex.hlsl" runAtStartup="false" />
+      <include filename="DeferredShading.hlsl" runAtStartup="false" />
+      <include filename="includetest.hlsl" runAtStartup="false" />
+    </folder>
+    <folder name="Scripts">
+      <include filename="scripttest.cs" runAtStartup="false" />
+      <include filename="lights.cs" runAtStartup="false" />
+      <include filename="DeferredShading.cs" runAtStartup="true" />
+      <include filename="LongRunningScript.cs" runAtStartup="false" />
+      <include filename="UserPropertyTexture.cs" runAtStartup="false" />
+    </folder>
+    <include filename="TankScene/tank.srpscene" runAtStartup="false" />
+    <include filename="myscene.srpscene" runAtStartup="false" />
+  </folder>
+  <OpenDocuments>
+    <OpenDocument path="C:\github\Syrup\testproject\scripttest.cs" />
+    <OpenDocument path="C:\github\Syrup\testproject\BasicShaders.hlsl" />
+    <OpenDocument path="C:\GitHub\Syrup\testproject\DeferredShading.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\testproject\DeferredShading.hlsl" />
+    <OpenDocument path="C:\GitHub\Syrup\testproject\UserPropertyTexture.cs" />
+  </OpenDocuments>
+</project>
