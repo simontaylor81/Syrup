@@ -182,7 +182,8 @@ namespace SRPRendering
 		// Create a 2D texture of the given size and format, and fill it with data from the given callback.
 		public ITexture2D CreateTexture2D(int width, int height, Format format, Func<int, int, object> contentCallback)
 		{
-			return _deferredResources.AddAndReturn(new TextureHandleCallback(width, height, format, contentCallback));
+			var contents = EnumerableUtil.Range2D(width, height, contentCallback);
+			return _deferredResources.AddAndReturn(new TextureHandleEnumerable<object>(width, height, format, contents));
 		}
 
 		// Load a texture from disk.
