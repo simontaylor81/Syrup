@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -44,7 +45,9 @@ namespace SRPRendering
 			}
 			else
 			{
-				FillStream(contents, stream, sizeX * sizeY * sizeZ, format);
+				// IEnumerables from C# won't convert directly to IEnumerable<dynamic> for some reason so hack around it.
+				// TODO: Replace with proper statically typed API for use from C#.
+				FillStream(Enumerable.Cast<dynamic>(contents), stream, sizeX * sizeY * sizeZ, format);
 			}
 
 			// Reset position

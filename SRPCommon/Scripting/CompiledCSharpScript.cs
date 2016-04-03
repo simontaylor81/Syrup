@@ -23,7 +23,11 @@ namespace SRPCommon.Scripting
 			{
 				ri = renderInterface,
 			};
-			return _runner(globals);
+
+			// C# script execution is async in that any awaits will work, but it doesn't
+			// actually run on a background thread, so any long running CPU work will still block the UI thread.
+			// We don't want the user to be able to shoot themselves in the foot, so force background execution.
+			return Task.Run(() => _runner(globals));
 		}
 
 		public string FormatError(Exception ex)

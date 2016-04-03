@@ -28,7 +28,10 @@ namespace SRPCommon.Scripting
 
 			var options = ScriptOptions.Default
 				.WithFilePath(script.Filename)
-				.WithReferences(typeof(SRPScripting.IRenderInterface).Assembly);
+				.WithReferences(
+					typeof(SRPScripting.IRenderInterface).Assembly,
+					typeof(System.Dynamic.DynamicObject).Assembly,
+					typeof(Microsoft.CSharp.RuntimeBinder.RuntimeBinderException).Assembly);
 
 			var compiled = CSharpScript.Create(code, options: options, globalsType: typeof(CSharpGlobals));
 			var runner = compiled.CreateDelegate();
