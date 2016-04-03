@@ -19,10 +19,9 @@
     <include filename="myscene.srpscene" runAtStartup="false" />
   </folder>
   <OpenDocuments>
-    <OpenDocument path="C:\github\Syrup\testproject\scripttest.py" />
-    <OpenDocument path="C:\github\Syrup\testproject\BasicShaders.hlsl" />
-    <OpenDocument path="C:\GitHub\Syrup\testproject\DeferredShading.py" />
-    <OpenDocument path="C:\GitHub\Syrup\testproject\DeferredShading.hlsl" />
-    <OpenDocument path="C:\GitHub\Syrup\testproject\UserPropertyTexture.py" />
+    <OpenDocument path="C:\GitHub\Syrup\Samples\testproject\scripttest.py" />
+    <OpenDocument path="C:\GitHub\Syrup\Samples\testproject\DeferredShading.py" />
+    <OpenDocument path="C:\GitHub\Syrup\Samples\testproject\DeferredShading.hlsl" />
+    <OpenDocument path="C:\GitHub\Syrup\Samples\testproject\BasicShaders.hlsl" />
   </OpenDocuments>
 </project>
