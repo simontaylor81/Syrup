@@ -19,13 +19,36 @@ namespace ShaderEditorApp.ViewModel.Workspace
 	public class DocumentViewModel : ReactiveObject, IDisposable
 	{
 		// Create a new (empty) document.
-		public DocumentViewModel(OpenDocumentSetViewModel openDocumentSet, IUserPrompt userPrompt = null, IIsForegroundService isForeground = null)
+		public static DocumentViewModel CreateEmpty(OpenDocumentSetViewModel openDocumentSet)
+		{
+			return new DocumentViewModel(openDocumentSet, null, null);
+		}
+
+		// Create a document backed by a file.
+		public static DocumentViewModel CreateFromFile(OpenDocumentSetViewModel openDocumentSet, string path, IUserPrompt userPrompt = null, IIsForegroundService isForeground = null)
+		{
+			// TODO: Async?
+			var contents = File.ReadAllText(path);
+
+			return new DocumentViewModel(openDocumentSet, contents, path);
+		}
+
+		private DocumentViewModel(
+			OpenDocumentSetViewModel openDocumentSet,
+			string contents,
+			string filePath,
+			IUserPrompt userPrompt = null,
+			IIsForegroundService isForeground = null)
 		{
 			_openDocumentSet = openDocumentSet;
-			Document = new TextDocument();
+			FilePath = filePath;
+
+			Document = new TextDocument(contents);
 
 			// Dirty when document changes.
 			Document.TextChanged += (o, e) => IsDirty = true;
+
+			Close = CommandUtil.Create(_ => _openDocumentSet.CloseDocument(this));
 
 			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
 			_isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
@@ -81,23 +104,11 @@ namespace ShaderEditorApp.ViewModel.Workspace
 				.Subscribe();
 		}
 
-		// Create a document backed by a file.
-		public DocumentViewModel(OpenDocumentSetViewModel openDocumentSet, string path)
-			: this(openDocumentSet)
-		{
-			FilePath = path;
-
-			Close = CommandUtil.Create(_ => _openDocumentSet.CloseDocument(this));
-
-			// Load the contents of the file into memory.
-			LoadContents();
-		}
-
 		// (Re)load the contents of the file.
-		public void LoadContents()
+		public void ReloadContents()
 		{
 			// TODO: Async?
-			Contents = File.ReadAllText(FilePath);
+			Document.Text = File.ReadAllText(FilePath);
 
 			// Contents now match the file's, so clear dirty flag.
 			IsDirty = false;
@@ -113,7 +124,11 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 				// Write contents of file to disk.
 				// TODO: Async?
-				File.WriteAllText(FilePath, Contents);
+				using (var writer = new StreamWriter(FilePath))
+				{
+					Document.WriteTextTo(writer);
+				}
+
 				IsDirty = false;
 
 				// Add to recent file list.
@@ -213,15 +228,8 @@ namespace ShaderEditorApp.ViewModel.Workspace
 				$"{Path.GetFileName(FilePath)} was modified by an external program. Would you like to reload it?");
 			if (result == UserPromptResult.Yes)
 			{
-				LoadContents();
+				ReloadContents();
 			}
-		}
-
-		// Contents of the document.
-		public string Contents
-		{
-			get { return Document.Text; }
-			private set { Document.Text = value; }
 		}
 
 		// AvalonEdit document object.

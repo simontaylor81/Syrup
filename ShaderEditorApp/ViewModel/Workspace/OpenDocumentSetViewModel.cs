@@ -56,12 +56,12 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			{
 				// Force reload if required.
 				if (bReload)
-					document.LoadContents();
+					document.ReloadContents();
 			}
 			else if (File.Exists(path))
 			{
 				// Create a new document.
-				document = new DocumentViewModel(this, path);
+				document = DocumentViewModel.CreateFromFile(this, path);
 				documents.Add(document);
 			}
 			else
@@ -111,7 +111,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		// Create a new document.
 		public void NewDocument()
 		{
-			var document = new DocumentViewModel(this);
+			var document = DocumentViewModel.CreateEmpty(this);
 			documents.Add(document);
 			WorkspaceVM.ActiveWindow = document;
 		}
