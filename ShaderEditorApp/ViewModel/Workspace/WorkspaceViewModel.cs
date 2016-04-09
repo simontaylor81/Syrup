@@ -268,7 +268,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		// Saves all dirty documents, plus the project if it is dirty.
 		private bool SaveAllDirty()
 		{
-			if (Workspace.Project.IsDirty)
+			if (Workspace.Project != null && Workspace.Project.IsDirty)
 			{
 				Workspace.Project.Save();
 			}
