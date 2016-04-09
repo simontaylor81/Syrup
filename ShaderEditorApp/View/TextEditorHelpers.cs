@@ -8,6 +8,7 @@ using System.Windows.Threading;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
+using ICSharpCode.AvalonEdit.Search;
 
 namespace ShaderEditorApp.View
 {
@@ -91,6 +92,9 @@ namespace ShaderEditorApp.View
 			if (value)
 			{
 				textEditor.TextArea.Caret.PositionChanged += (o, _) => CaretMoved(o, textEditor);
+
+				// Enable Find box.
+				SearchPanel.Install(textEditor);
 			}
 			else
 			{
