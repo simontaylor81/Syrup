@@ -14,6 +14,8 @@ namespace ShaderEditorApp.View
 {
 	public class TextEditorHelpers
 	{
+		#region CaretPosition
+
 		public static TextLocation GetCaretPosition(DependencyObject obj)
 		{
 			return (TextLocation)obj.GetValue(CaretPositionProperty);
@@ -44,11 +46,7 @@ namespace ShaderEditorApp.View
 			{
 				textEditor.TextArea.Caret.Location = newValue;
 
-				// Bring the new caret position into view.
-				// HACK: BringCaretToView will fail if we've only just opened this document,
-				// as it does not yet have a width/height/etc. So we schedule it to
-				// the dispatcher to give it time to get laid out.
-				Dispatcher.CurrentDispatcher.InvokeAsync(() => textEditor.TextArea.Caret.BringCaretToView());
+				ScrollToCaret(textEditor);
 			}
 		}
 
@@ -58,6 +56,83 @@ namespace ShaderEditorApp.View
 			var caret = (Caret)sender;
 			SetCaretPosition(textEditor, caret.Location);
 		}
+
+		#endregion
+
+
+		#region Selection
+
+		public static int GetSelectionStart(DependencyObject obj)
+		{
+			return (int)obj.GetValue(SelectionStartProperty);
+		}
+
+		public static void SetSelectionStart(DependencyObject obj, int value)
+		{
+			obj.SetValue(SelectionStartProperty, value);
+		}
+
+		// Using a DependencyProperty as the backing store for SelectionStart. This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty SelectionStartProperty =
+			DependencyProperty.RegisterAttached(
+				"SelectionStart",
+				typeof(int),
+				typeof(TextEditorHelpers),
+				new FrameworkPropertyMetadata(0, OnSelectionStartChanged)
+				{
+					BindsTwoWayByDefault = true
+				});
+
+		// Called when the 'SelectionStart' property changes.
+		private static void OnSelectionStartChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			var textEditor = d as TextEditor;
+			if (textEditor != null)
+			{
+				textEditor.SelectionStart = (int)e.NewValue;
+				ScrollToCaret(textEditor);
+			}
+		}
+
+		public static int GetSelectionLength(DependencyObject obj)
+		{
+			return (int)obj.GetValue(SelectionLengthProperty);
+		}
+
+		public static void SetSelectionLength(DependencyObject obj, int value)
+		{
+			obj.SetValue(SelectionLengthProperty, value);
+		}
+
+		// Using a DependencyProperty as the backing store for SelectionLength. This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty SelectionLengthProperty =
+			DependencyProperty.RegisterAttached(
+				"SelectionLength",
+				typeof(int),
+				typeof(TextEditorHelpers),
+				new FrameworkPropertyMetadata(0, OnSelectionLengthChanged)
+				{
+					BindsTwoWayByDefault = true
+				});
+
+		// Called when the 'SelectionLength' property changes.
+		private static void OnSelectionLengthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			var textEditor = d as TextEditor;
+			if (textEditor != null)
+			{
+				textEditor.SelectionLength = (int)e.NewValue;
+			}
+		}
+
+		// Called when the actual selection in the document moves.
+		private static void SelectionChanged(TextEditor textEditor)
+		{
+			SetSelectionStart(textEditor, textEditor.SelectionStart);
+			SetSelectionLength(textEditor, textEditor.SelectionLength);
+		}
+
+		#endregion
 
 
 		public static bool GetEnableCustomTextEditorBindings(DependencyObject obj)
@@ -92,6 +167,7 @@ namespace ShaderEditorApp.View
 			if (value)
 			{
 				textEditor.TextArea.Caret.PositionChanged += (o, _) => CaretMoved(o, textEditor);
+				textEditor.TextArea.SelectionChanged += (o, _) => SelectionChanged(textEditor);
 
 				// Enable Find box.
 				SearchPanel.Install(textEditor);
@@ -101,6 +177,16 @@ namespace ShaderEditorApp.View
 				// We don't need to disable this ever, so don't bother with the complixity.
 				throw new NotSupportedException("Disabling EnableCustomTextEditorBindings is not supported.");
 			}
+		}
+
+		// Helper to scroll a text editor to the location of the caret.
+		private static void ScrollToCaret(TextEditor textEditor)
+		{
+			// Bring the new caret position into view.
+			// HACK: BringCaretToView will fail if we've only just opened this document,
+			// as it does not yet have a width/height/etc. So we schedule it to
+			// the dispatcher to give it time to get laid out.
+			Dispatcher.CurrentDispatcher.InvokeAsync(() => textEditor.TextArea.Caret.BringCaretToView());
 		}
 	}
 }

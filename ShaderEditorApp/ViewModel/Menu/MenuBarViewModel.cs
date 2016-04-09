@@ -52,7 +52,9 @@ namespace ShaderEditorApp.ViewModel.Menu
 					SeparatorViewModel.Instance,
 					new RoutedCommandMenuItemViewModel(ApplicationCommands.Cut),
 					new RoutedCommandMenuItemViewModel(ApplicationCommands.Copy),
-					new RoutedCommandMenuItemViewModel(ApplicationCommands.Paste)
+					new RoutedCommandMenuItemViewModel(ApplicationCommands.Paste),
+					SeparatorViewModel.Instance,
+					new CommandMenuItem(workspace.GoToDefinition)
 				),
 
 				// View menu

@@ -12,6 +12,7 @@ using ReactiveUI;
 using ShaderEditorApp.Interfaces;
 using ShaderEditorApp.MVVMUtil;
 using Splat;
+using SRPCommon.Editor.CSharp;
 
 namespace ShaderEditorApp.ViewModel.Workspace
 {
@@ -45,11 +46,16 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 			Document = new TextDocument(contents);
 
+			// Create a text source container for this file.
+			// TEMP: Currently doing this for all files, not just C#.
+			_sourceTextContainer = new DocumentSourceTextContainer(Document);
+			_editorServices = new RoslynDocumentServices(_sourceTextContainer, FilePath);
+
 			// Get 'dirtiness' from the document's undo stack.
 			_isDirty = this.WhenAny(x => x.Document.UndoStack.IsOriginalFile, change => !change.Value)
 				.ToProperty(this, x => x.IsDirty);
 
-			Close = CommandUtil.Create(_ => _openDocumentSet.CloseDocument(this));
+			GoToDefinition = ReactiveCommand.CreateAsyncTask(_ => GoToDefinitionImpl());
 
 			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
 			isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
@@ -233,6 +239,17 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			}
 		}
 
+		private async Task GoToDefinitionImpl()
+		{
+			// Use the language service to get the location of the symbol underneath the caret.
+			var span = await _editorServices.FindDefinition(Document.GetOffset(CaretPosition));
+			if (span.HasValue)
+			{
+				SelectionStart = span.Value.Start;
+				SelectionLength = span.Value.Length;
+			}
+		}
+
 		// AvalonEdit document object.
 		public TextDocument Document { get; }
 
@@ -247,13 +264,27 @@ namespace ShaderEditorApp.ViewModel.Workspace
 				return ext == ".py" || ext == ".cs" || ext == ".csx";
 			}
 		}
-		
+
 		// Position of caret in the editor.
 		private TextLocation _caretPosition;
 		public TextLocation CaretPosition
 		{
 			get { return _caretPosition; }
 			set { this.RaiseAndSetIfChanged(ref _caretPosition, value); }
+		}
+
+		// Selection start and length (separate properties to avoid messing about with another type).
+		private int _selectionStart;
+		public int SelectionStart
+		{
+			get { return _selectionStart; }
+			set { this.RaiseAndSetIfChanged(ref _selectionStart, value); }
+		}
+		private int _selectionLength;
+		public int SelectionLength
+		{
+			get { return _selectionLength; }
+			set { this.RaiseAndSetIfChanged(ref _selectionLength, value); }
 		}
 
 		private ObservableAsPropertyHelper<IHighlightingDefinition> _syntaxHighlighting;
@@ -267,9 +298,10 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private FileSystemWatcher Watcher => _watcher.Value;
 
 		private readonly IUserPrompt _userPrompt;
+		private readonly DocumentSourceTextContainer _sourceTextContainer;
+		private readonly RoslynDocumentServices _editorServices;
 
-		// Command to close this document.
-		public ReactiveCommand<object> Close { get; }
+		public ReactiveCommand<Unit> GoToDefinition { get; }
 
 		// Command to notify the user about the document being externally modified.
 		private ReactiveCommand<Unit> NotifyModified { get; }

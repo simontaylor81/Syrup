@@ -34,6 +34,8 @@
                                    Document="{Binding Document}"
                                    srpview:TextEditorHelpers.EnableCustomTextEditorBindings="True"
                                    srpview:TextEditorHelpers.CaretPosition="{Binding CaretPosition}"
+                                   srpview:TextEditorHelpers.SelectionStart="{Binding SelectionStart}"
+                                   srpview:TextEditorHelpers.SelectionLength="{Binding SelectionLength}"
                                    SyntaxHighlighting="{Binding SyntaxHighlighting}"/>
         </DataTemplate>
 

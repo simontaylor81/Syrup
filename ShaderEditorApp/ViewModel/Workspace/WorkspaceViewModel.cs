@@ -152,10 +152,17 @@ namespace ShaderEditorApp.ViewModel.Workspace
 					menuHeader: "E_xit",
 					keyGesture: new KeyGesture(Key.F4, ModifierKeys.Alt));
 
+				GoToDefinition = new CommandViewModel(
+					"Go To Definition",
+					ReactiveCommand.CreateAsyncObservable(hasActiveDocument, param => OpenDocumentSet.ActiveDocument.GoToDefinition.ExecuteAsync()),
+					menuHeader: "_Go To Definition",
+					keyGesture: new KeyGesture(Key.F12));
+
 				// Add commands with a key binding to the big list. Don't include Exit -- it's binding is part of Windows.
 				KeyBoundCommands = new[]
 				{
 					OpenProject, NewProject, OpenDocument, NewDocument, CloseActiveDocument, SaveActiveDocument, SaveAll, RunActiveScript,
+					GoToDefinition,
 				};
 			}
 
@@ -359,6 +366,8 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		// Command actually does nothing. It's up to the view to subscribe to it and do the actual exiting.
 		public ReactiveCommand<object> Exit { get; }
 		public CommandViewModel ExitCommand { get; }
+
+		public CommandViewModel GoToDefinition { get; }
 
 		#endregion
 	}
