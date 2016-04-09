@@ -5,7 +5,7 @@ using System.Xml.Linq;
 using System.IO;
 using System.Reactive.Subjects;
 
-namespace ShaderEditorApp.Projects
+namespace ShaderEditorApp.Model.Projects
 {
 	// A collection of files that makes up a project.
 	public class Project

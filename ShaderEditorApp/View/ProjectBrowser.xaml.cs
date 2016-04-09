@@ -15,7 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ShaderEditorApp.ViewModel;
 
-namespace ShaderEditorApp.Projects
+namespace ShaderEditorApp.View
 {
 	/// <summary>
 	/// Interaction logic for ProjectBrowser.xaml

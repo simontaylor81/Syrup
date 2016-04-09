@@ -11,19 +11,21 @@ using ShaderEditorApp.ViewModel.Projects;
 using ShaderEditorApp.ViewModel.Scene;
 using ReactiveUI;
 using System.Reactive.Linq;
-using ShaderEditorApp.Model;
 using System.Threading.Tasks;
 using ShaderEditorApp.Interfaces;
 using Splat;
 using SRPCommon.Logging;
 using ICSharpCode.AvalonEdit.Document;
+using ShaderEditorApp.ViewModel.Properties;
+using ShaderEditorApp.ViewModel.Menu;
+using ShaderEditorApp.MVVMUtil;
 
-namespace ShaderEditorApp.ViewModel
+namespace ShaderEditorApp.ViewModel.Workspace
 {
 	// ViewModel for the application workspace, containing documents, docking windows, etc.
 	public class WorkspaceViewModel : ReactiveObject
 	{
-		public WorkspaceViewModel(Workspace workspace, OutputWindowViewModel outputWindowViewModel, ILoggerFactory loggerFactory, IUserPrompt userPrompt = null)
+		public WorkspaceViewModel(Model.Workspace workspace, OutputWindowViewModel outputWindowViewModel, ILoggerFactory loggerFactory, IUserPrompt userPrompt = null)
 		{
 			Workspace = workspace;
 			OutputWindowViewModel = outputWindowViewModel;
@@ -300,7 +302,7 @@ namespace ShaderEditorApp.ViewModel
 		private ObservableAsPropertyHelper<string> _statusBarText;
 		public string StatusBarText => _statusBarText.Value;
 
-		public Workspace Workspace { get; }
+		public Model.Workspace Workspace { get; }
 		public OpenDocumentSetViewModel OpenDocumentSet { get; }
 
 		public OutputWindowViewModel OutputWindowViewModel { get; }

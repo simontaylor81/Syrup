@@ -7,7 +7,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using ReactiveUI;
-using ShaderEditorApp.Projects;
+using ShaderEditorApp.Model.Projects;
 using SRPCommon.Interfaces;
 using SRPCommon.Logging;
 using SRPCommon.Scene;

@@ -189,6 +189,7 @@
     <Compile Include="Model\RecentFileList.cs" />
     <Compile Include="Model\UserSettings.cs" />
     <Compile Include="Model\Workspace.cs" />
+    <Compile Include="MVVMUtil\CommandUtil.cs" />
     <Compile Include="MVVMUtil\Converters.cs" />
     <Compile Include="Interfaces\IUserPrompt.cs" />
     <Compile Include="ViewModel\OutputWindowCategoryViewModel.cs" />
@@ -197,35 +198,35 @@
     <Compile Include="View\OutputWindow.xaml.cs">
       <DependentUpon>OutputWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Projects\ProjectFolder.cs" />
+    <Compile Include="Model\Projects\ProjectFolder.cs" />
     <Compile Include="SampleData\DummyViewModels.cs" />
     <Compile Include="Services\WpfIsForegroundService.cs" />
-    <Compile Include="ViewModel\ChoicePropertyViewModel.cs" />
-    <Compile Include="ViewModel\CommandViewModel.cs" />
+    <Compile Include="ViewModel\Properties\ChoicePropertyViewModel.cs" />
+    <Compile Include="ViewModel\Menu\CommandViewModel.cs" />
     <Compile Include="ViewModel\IHierarchicalBrowserRootViewModel.cs" />
-    <Compile Include="ViewModel\MenuBarViewModel.cs" />
-    <Compile Include="ViewModel\MenuItemViewModels.cs" />
+    <Compile Include="ViewModel\Menu\MenuBarViewModel.cs" />
+    <Compile Include="ViewModel\Menu\MenuItemViewModels.cs" />
     <Compile Include="ViewModel\Project\ProjectFolderViewModel.cs" />
-    <Compile Include="Projects\ProjectItem.cs" />
+    <Compile Include="Model\Projects\ProjectItem.cs" />
     <Compile Include="ViewModel\Project\ProjectItemViewModel.cs" />
-    <Compile Include="Projects\Project.cs" />
-    <Compile Include="Projects\ProjectBrowser.xaml.cs">
+    <Compile Include="Model\Projects\Project.cs" />
+    <Compile Include="View\ProjectBrowser.xaml.cs">
       <DependentUpon>ProjectBrowser.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\Project\ProjectViewModel.cs" />
-    <Compile Include="Selectors.cs" />
+    <Compile Include="View\Selectors.cs" />
     <Compile Include="ViewModel\IHierarchicalBrowserNodeViewModel.cs" />
-    <Compile Include="ViewModel\PropertyViewModel.cs" />
-    <Compile Include="ViewModel\PropertyViewModelFactory.cs" />
-    <Compile Include="ViewModel\ScalarPropertyViewModel.cs" />
+    <Compile Include="ViewModel\Properties\PropertyViewModel.cs" />
+    <Compile Include="ViewModel\Properties\PropertyViewModelFactory.cs" />
+    <Compile Include="ViewModel\Properties\ScalarPropertyViewModel.cs" />
     <Compile Include="ViewModel\Scene\MeshInstancePrimitiveViewModel.cs" />
     <Compile Include="ViewModel\Scene\SceneMaterialsViewModel.cs" />
     <Compile Include="ViewModel\Scene\SceneMaterialViewModel.cs" />
     <Compile Include="ViewModel\Scene\ScenePrimitivesViewModel.cs" />
     <Compile Include="ViewModel\Scene\ScenePrimitiveViewModel.cs" />
     <Compile Include="ViewModel\Scene\SceneViewModel.cs" />
-    <Compile Include="ViewModel\MatrixPropertyViewModel.cs" />
-    <Compile Include="ViewModel\VectorPropertyViewModel.cs" />
+    <Compile Include="ViewModel\Properties\MatrixPropertyViewModel.cs" />
+    <Compile Include="ViewModel\Properties\VectorPropertyViewModel.cs" />
     <Compile Include="ViewModel\ViewportViewModel.cs" />
     <Compile Include="View\Camera.cs" />
     <Compile Include="View\PropertiesWindow.xaml.cs">
@@ -239,9 +240,9 @@
       <DependentUpon>ViewportFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="Services\WpfUserPrompt.cs" />
-    <Compile Include="Workspace\DocumentViewModel.cs" />
-    <Compile Include="Workspace\OpenDocumentSetViewModel.cs" />
-    <Compile Include="Workspace\WorkspaceViewModel.cs" />
+    <Compile Include="ViewModel\Workspace\DocumentViewModel.cs" />
+    <Compile Include="ViewModel\Workspace\OpenDocumentSetViewModel.cs" />
+    <Compile Include="ViewModel\Workspace\WorkspaceViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -258,7 +259,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Projects\ProjectBrowser.xaml">
+    <Page Include="View\ProjectBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

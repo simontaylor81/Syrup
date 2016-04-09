@@ -6,9 +6,12 @@ using System.Windows;
 using Microsoft.Win32;
 using SRPCommon.UserProperties;
 using System.Windows.Input;
-using ShaderEditorApp.Projects;
+using ShaderEditorApp.Model.Projects;
 using ReactiveUI;
 using System.Reactive.Linq;
+using ShaderEditorApp.ViewModel.Workspace;
+using ShaderEditorApp.ViewModel.Menu;
+using ShaderEditorApp.MVVMUtil;
 
 namespace ShaderEditorApp.ViewModel.Projects
 {

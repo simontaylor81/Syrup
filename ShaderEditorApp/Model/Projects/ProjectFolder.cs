@@ -7,7 +7,7 @@ using System.Xml.Linq;
 using SRPCommon.Util;
 using ReactiveUI;
 
-namespace ShaderEditorApp.Projects
+namespace ShaderEditorApp.Model.Projects
 {
 	// A sub-folder in a project tree.
 	public class ProjectFolder

@@ -11,6 +11,7 @@ using SharpDX.Direct3D11;
 using SRPRendering;
 using ShaderEditorApp.ViewModel;
 using SharpDX.DXGI;
+using ShaderEditorApp.ViewModel.Workspace;
 
 namespace ShaderEditorApp.View
 {

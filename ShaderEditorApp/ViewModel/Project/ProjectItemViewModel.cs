@@ -4,12 +4,14 @@ using System.Windows;
 using System.Linq;
 using SRPCommon.UserProperties;
 using System.Windows.Input;
-using ShaderEditorApp.Projects;
+using ShaderEditorApp.Model.Projects;
 using ReactiveUI;
 using System.Reactive.Linq;
 using ShaderEditorApp.MVVMUtil;
 using System.Reactive;
 using SRPCommon.Util;
+using ShaderEditorApp.ViewModel.Workspace;
+using ShaderEditorApp.ViewModel.Menu;
 
 namespace ShaderEditorApp.ViewModel.Projects
 {

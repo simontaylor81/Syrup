@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using ShaderEditorApp.MVVMUtil;
 using SRPCommon.UserProperties;
-using ShaderEditorApp.Projects;
+using ShaderEditorApp.Model.Projects;
 using ReactiveUI;
 using System.Reactive.Linq;
 using GongSolutions.Wpf.DragDrop;
 using System.Windows;
+using ShaderEditorApp.ViewModel.Workspace;
+using ShaderEditorApp.ViewModel.Menu;
 
 namespace ShaderEditorApp.ViewModel.Projects
 {

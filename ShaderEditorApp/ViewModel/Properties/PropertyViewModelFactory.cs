@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SRPCommon.UserProperties;
 
-namespace ShaderEditorApp.ViewModel
+namespace ShaderEditorApp.ViewModel.Properties
 {
 	static class PropertyViewModelFactory
 	{

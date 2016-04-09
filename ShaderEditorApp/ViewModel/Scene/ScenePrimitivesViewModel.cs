@@ -8,6 +8,7 @@ using ReactiveUI;
 using SRPCommon.UserProperties;
 using SRPCommon.Scene;
 using ShaderEditorApp.MVVMUtil;
+using ShaderEditorApp.ViewModel.Menu;
 
 namespace ShaderEditorApp.ViewModel.Scene
 {

@@ -8,7 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
-using ShaderEditorApp.ViewModel;
+using ShaderEditorApp.ViewModel.Properties;
 using ShaderEditorApp.SampleData;
 
 namespace ShaderEditorApp.View

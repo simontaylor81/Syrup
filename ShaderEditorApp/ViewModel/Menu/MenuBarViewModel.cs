@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Input;
+using ShaderEditorApp.ViewModel.Workspace;
 
-namespace ShaderEditorApp.ViewModel
+namespace ShaderEditorApp.ViewModel.Menu
 {
 	// View model for the main menu bar of the application.
 	public class MenuBarViewModel : ReactiveUI.ReactiveObject

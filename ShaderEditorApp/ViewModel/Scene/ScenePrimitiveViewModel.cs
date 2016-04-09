@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 using ReactiveUI;
+using ShaderEditorApp.MVVMUtil;
+using ShaderEditorApp.ViewModel.Menu;
 using SRPCommon.Scene;
 using SRPCommon.UserProperties;
 

@@ -16,6 +16,7 @@ using ShaderEditorApp.Model;
 using ShaderEditorApp.Services;
 using ShaderEditorApp.View;
 using ShaderEditorApp.ViewModel;
+using ShaderEditorApp.ViewModel.Workspace;
 using SRPCommon.Logging;
 using SRPCommon.Util;
 using SRPRendering;

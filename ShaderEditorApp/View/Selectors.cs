@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using ShaderEditorApp.ViewModel;
+using ShaderEditorApp.ViewModel.Workspace;
 
-namespace ShaderEditorApp
+namespace ShaderEditorApp.View
 {
 	class PaneStyleSelector : StyleSelector
 	{

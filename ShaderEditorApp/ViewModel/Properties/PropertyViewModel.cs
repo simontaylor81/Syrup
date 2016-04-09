@@ -6,7 +6,7 @@ using System.Text;
 using SRPCommon.UserProperties;
 using ReactiveUI;
 
-namespace ShaderEditorApp.ViewModel
+namespace ShaderEditorApp.ViewModel.Properties
 {
 	// Represents a property that can be displayed and edited in the properties window.
 	// Properties have a type, a name and a value.

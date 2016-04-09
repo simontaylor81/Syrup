@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
 
-namespace ShaderEditorApp.ViewModel
+namespace ShaderEditorApp.ViewModel.Menu
 {
 	// The view-model for a command, that can be put on menus, bound to a key, etc.
 	// Immutable, so no need for property notifications or any Rx nonsense.
@@ -35,17 +34,6 @@ namespace ShaderEditorApp.ViewModel
 			Command = command;
 			MenuHeader = menuHeader ?? name;
 			KeyGesture = keyGesture;
-		}
-	}
-
-	// Simple helper that probably should have been in ReactiveUI.
-	public static class CommandUtil
-	{
-		public static ReactiveCommand<object> Create(Action<object> execute, IObservable<bool> canExecute = null)
-		{
-			var command = ReactiveCommand.Create(canExecute);
-			command.Subscribe(execute);
-			return command;
 		}
 	}
 }

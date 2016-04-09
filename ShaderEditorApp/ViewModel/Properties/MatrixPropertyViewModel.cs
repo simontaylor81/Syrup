@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShaderEditorApp.ViewModel
+namespace ShaderEditorApp.ViewModel.Properties
 {
 	// View-model class for vector properties. I.e. those with multiple values of a particular type.
 	class MatrixPropertyViewModel : PropertyViewModel

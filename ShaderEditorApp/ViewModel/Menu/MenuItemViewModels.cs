@@ -9,7 +9,7 @@ using ReactiveUI;
 using ShaderEditorApp.Model;
 using SRPCommon.Util;
 
-namespace ShaderEditorApp.ViewModel
+namespace ShaderEditorApp.ViewModel.Menu
 {
 	// Base class for items on the menu.
 	// Most things do nothing, but should be defined anyway to avoid spurious binding error messages in the log.

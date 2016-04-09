@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Xml.Linq;
 
-namespace ShaderEditorApp.Projects
+namespace ShaderEditorApp.Model.Projects
 {
 	// Types of file that can be included in the project.
 	public enum ProjectItemType

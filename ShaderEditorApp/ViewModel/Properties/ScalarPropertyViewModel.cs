@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShaderEditorApp.ViewModel
+namespace ShaderEditorApp.ViewModel.Properties
 {
 	// View-model class for scalar properties (i.e. properties with a single value).
 	class ScalarPropertyViewModel<T> : PropertyViewModel

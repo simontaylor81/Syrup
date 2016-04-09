@@ -10,9 +10,10 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using Microsoft.Win32;
 using ReactiveUI;
 using ShaderEditorApp.Interfaces;
+using ShaderEditorApp.MVVMUtil;
 using Splat;
 
-namespace ShaderEditorApp.ViewModel
+namespace ShaderEditorApp.ViewModel.Workspace
 {
 	// ViewModel class representing an open document.
 	public class DocumentViewModel : ReactiveObject, IDisposable

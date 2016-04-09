@@ -5,11 +5,8 @@
         xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
         xmlns:avalondock="http://schemas.xceed.com/wpf/xaml/avalondock"
         xmlns:winforms="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
-        xmlns:srp="clr-namespace:ShaderEditorApp"
-        xmlns:srpprojects="clr-namespace:ShaderEditorApp.Projects"
         xmlns:srpview="clr-namespace:ShaderEditorApp.View"
-        xmlns:vm="clr-namespace:ShaderEditorApp.ViewModel"
-        xmlns:mvvm="clr-namespace:ShaderEditorApp.MVVMUtil"
+        xmlns:menuvm="clr-namespace:ShaderEditorApp.ViewModel.Menu"
         mc:Ignorable="d"
         x:Class="ShaderEditorApp.MainWindow"
         Name="mainWindow"
@@ -44,12 +41,12 @@
         <Style x:Key="ToolPaneStyle" TargetType="{x:Type avalondock:LayoutAnchorableItem}"/>
 
         <!-- Selector that picks a style for the various elements in the dock layout. -->
-        <srp:PaneStyleSelector x:Key="PaneStyleSelector"
+        <srpview:PaneStyleSelector x:Key="PaneStyleSelector"
                                DocumentStyle="{StaticResource DocumentPaneStyle}"
                                ToolStyle="{StaticResource ToolPaneStyle}"/>
 
         <!-- Selector that picks the data template for docked elements. -->
-        <srp:PaneTemplateSelector x:Key="PaneTemplateSelector"
+        <srpview:PaneTemplateSelector x:Key="PaneTemplateSelector"
                                   DocumentTemplate="{StaticResource DocumentPaneTemplate}"/>
 
     </Window.Resources>
@@ -65,7 +62,7 @@
         <Menu Grid.Row="0" ItemsSource="{Binding MenuBar.Items}"
               UsesItemContainerTemplate="True">
             <Menu.Resources>
-                <ItemContainerTemplate  DataType="{x:Type vm:MenuItemViewModel}">
+                <ItemContainerTemplate  DataType="{x:Type menuvm:MenuItemViewModel}">
                     <MenuItem UsesItemContainerTemplate="True"
                               ItemsSource="{Binding Items}"
                               Header="{Binding Header}"
@@ -76,7 +73,7 @@
                               IsCheckable="{Binding IsCheckable}"
                               IsChecked="{Binding IsChecked}" />
                 </ItemContainerTemplate>
-                <ItemContainerTemplate DataType="{x:Type vm:SeparatorViewModel}">
+                <ItemContainerTemplate DataType="{x:Type menuvm:SeparatorViewModel}">
                     <Separator />
                 </ItemContainerTemplate>
             </Menu.Resources>
@@ -97,14 +94,14 @@
                         <avalondock:LayoutAnchorablePane>
                             <!-- Project Browser panel -->
                             <avalondock:LayoutAnchorable ContentId="ProjectBrowser" Title="Project">
-                                <srpprojects:ProjectBrowser x:Name="projectBrowser" DataContext="{Binding ProjectViewModel}"/>
+                                <srpview:ProjectBrowser x:Name="projectBrowser" DataContext="{Binding ProjectViewModel}"/>
                             </avalondock:LayoutAnchorable>
                         </avalondock:LayoutAnchorablePane>
                         
                         <avalondock:LayoutAnchorablePane>
                             <!-- Scene Browser panel -->
                             <avalondock:LayoutAnchorable ContentId="ProjectBrowser" Title="Scene">
-                                <srpprojects:ProjectBrowser x:Name="sceneBrowser" DataContext="{Binding SceneViewModel}"/>
+                                <srpview:ProjectBrowser x:Name="sceneBrowser" DataContext="{Binding SceneViewModel}"/>
                             </avalondock:LayoutAnchorable>
                         </avalondock:LayoutAnchorablePane>
                     </avalondock:LayoutPanel>

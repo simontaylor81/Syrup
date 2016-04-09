@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using SRPCommon.Logging;
 
-namespace ShaderEditorApp.ViewModel
+namespace ShaderEditorApp.ViewModel.Workspace
 {
 	// View Model class for managing the set of open documents.
 	public class OpenDocumentSetViewModel : ReactiveObject

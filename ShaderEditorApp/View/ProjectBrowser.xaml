@@ -1,11 +1,10 @@
-﻿<UserControl x:Class="ShaderEditorApp.Projects.ProjectBrowser"
+﻿<UserControl x:Class="ShaderEditorApp.View.ProjectBrowser"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:srpvm="clr-namespace:ShaderEditorApp.ViewModel"
              xmlns:mvvm="clr-namespace:ShaderEditorApp.MVVMUtil"
-             xmlns:vm="clr-namespace:ShaderEditorApp.ViewModel"
+             xmlns:menuvm="clr-namespace:ShaderEditorApp.ViewModel.Menu"
              xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="200">
@@ -24,7 +23,7 @@
                     <ContextMenu ItemsSource="{Binding MenuItems}"
                                  UsesItemContainerTemplate="True">
                         <ContextMenu.Resources>
-                            <ItemContainerTemplate  DataType="{x:Type vm:MenuItemViewModel}">
+                            <ItemContainerTemplate  DataType="{x:Type menuvm:MenuItemViewModel}">
                                 <MenuItem UsesItemContainerTemplate="True"
                                           ItemsSource="{Binding Items}"
                                           Header="{Binding Header}"
@@ -34,7 +33,7 @@
                                           IsCheckable="{Binding IsCheckable}"
                                           IsChecked="{Binding IsChecked}" />
                             </ItemContainerTemplate>
-                            <ItemContainerTemplate DataType="{x:Type vm:SeparatorViewModel}">
+                            <ItemContainerTemplate DataType="{x:Type menuvm:SeparatorViewModel}">
                                 <Separator />
                             </ItemContainerTemplate>
                         </ContextMenu.Resources>
