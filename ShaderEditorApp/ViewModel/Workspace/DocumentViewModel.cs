@@ -45,8 +45,9 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 			Document = new TextDocument(contents);
 
-			// Dirty when document changes.
-			Document.TextChanged += (o, e) => IsDirty = true;
+			// Get 'dirtiness' from the document's undo stack.
+			_isDirty = this.WhenAny(x => x.Document.UndoStack.IsOriginalFile, change => !change.Value)
+				.ToProperty(this, x => x.IsDirty);
 
 			Close = CommandUtil.Create(_ => _openDocumentSet.CloseDocument(this));
 
@@ -111,7 +112,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			Document.Text = File.ReadAllText(FilePath);
 
 			// Contents now match the file's, so clear dirty flag.
-			IsDirty = false;
+			Document.UndoStack.MarkAsOriginalFile();
 		}
 
 		// Save the file to disk.
@@ -129,7 +130,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 					Document.WriteTextTo(writer);
 				}
 
-				IsDirty = false;
+				Document.UndoStack.MarkAsOriginalFile();
 
 				// Add to recent file list.
 				_openDocumentSet.WorkspaceVM.Workspace.UserSettings.RecentFiles.AddFile(FilePath);
@@ -235,12 +236,8 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		// AvalonEdit document object.
 		public TextDocument Document { get; }
 
-		private bool _bDirty = false;
-		public bool IsDirty
-		{
-			get { return _bDirty; }
-			private set { this.RaiseAndSetIfChanged(ref _bDirty, value); }
-		}
+		private readonly ObservableAsPropertyHelper<bool> _isDirty;
+		public bool IsDirty => _isDirty.Value;
 
 		public bool IsScript
 		{
