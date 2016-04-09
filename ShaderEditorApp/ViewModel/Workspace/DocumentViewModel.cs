@@ -52,7 +52,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			Close = CommandUtil.Create(_ => _openDocumentSet.CloseDocument(this));
 
 			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
-			_isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
+			isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
 
 			// Update display name based on filename and dirtiness.
 			this.WhenAnyValue(x => x.FilePath, x => x.IsDirty, (filename, isDirty) => GetDisplayName(filename, isDirty))
@@ -69,8 +69,8 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			NotifyModified = ReactiveCommand.CreateAsyncTask(async _ =>
 			{
 				// Wait until the app is foreground, dispatch back to main thread.
-				await _isForeground.WhenAnyValue(x => x.IsAppForeground)
-					.StartWith(_isForeground.IsAppForeground)
+				await isForeground.WhenAnyValue(x => x.IsAppForeground)
+					.StartWith(isForeground.IsAppForeground)
 					.Where(x => x == true)
 					.ObserveOn(RxApp.MainThreadScheduler)
 					.FirstAsync();
@@ -266,7 +266,6 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private ObservableAsPropertyHelper<FileSystemWatcher> _watcher;
 		private FileSystemWatcher Watcher => _watcher.Value;
 
-		private readonly IIsForegroundService _isForeground;
 		private readonly IUserPrompt _userPrompt;
 
 		// Command to close this document.
