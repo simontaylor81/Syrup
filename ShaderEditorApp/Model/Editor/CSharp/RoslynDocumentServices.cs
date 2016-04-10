@@ -31,9 +31,20 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			// Is adhoc workspace sufficient?
 			_roslynWorkspace = new RoslynScriptWorkspace();
 
+			// TODO: Share this list with the scripting system.
+			var usings = new[]
+			{
+				"System",
+				"System.Linq",
+				"System.Collections.Generic",
+				"System.Numerics",
+				"SRPScripting",
+			};
+
 			// TODO: Source file resolver.
 			var compilationOptions = new CSharpCompilationOptions(
 				OutputKind.DynamicallyLinkedLibrary,
+				usings: usings,
 				sourceReferenceResolver: SourceFileResolver.Default);
 
 			var parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Script);
@@ -43,6 +54,18 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 
 			_projectId = ProjectId.CreateNewId(projectName);
 			_documentId = DocumentId.CreateNewId(_projectId, documentName);
+
+			// TODO: Share this list with the scripting system.
+			var imports = new[]
+			{
+				typeof(object).Assembly,							// mscorlib.dll
+				typeof(Uri).Assembly,								// System.
+				typeof(Enumerable).Assembly,						// System.Core
+				typeof(SRPScripting.IRenderInterface).Assembly,
+				typeof(System.Numerics.Vector3).Assembly,
+			};
+			// TODO: This stuff is fairly expensive and should be shared by all documents!
+			var metadataReferences = imports.Select(a => MetadataReference.CreateFromFile(a.Location));
 
 			var documentInfo = DocumentInfo.Create(
 				_documentId,
@@ -60,11 +83,12 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 				compilationOptions: compilationOptions,
 				parseOptions: parseOptions,
 				documents: new[] { documentInfo },
+				metadataReferences: metadataReferences,
 				isSubmission: true,
 				hostObjectType: typeof(CSharpGlobals)
 				));
 
-			var success =_roslynWorkspace.TryApplyChanges(solution);
+			var success = _roslynWorkspace.TryApplyChanges(solution);
 			Trace.Assert(success);
 
 			_roslynWorkspace.OpenDocument(_documentId, sourceTextContainer);
