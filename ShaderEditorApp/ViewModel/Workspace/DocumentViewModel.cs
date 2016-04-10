@@ -242,7 +242,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private async Task GoToDefinitionImpl()
 		{
 			// Use the language service to get the location of the symbol underneath the caret.
-			var span = await _editorServices.FindDefinition(Document.GetOffset(CaretPosition));
+			var span = await _editorServices.FindDefinitionAsync(Document.GetOffset(CaretPosition));
 			if (span.HasValue)
 			{
 				SelectionStart = span.Value.Start;

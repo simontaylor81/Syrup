@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -30,7 +32,9 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			_roslynWorkspace = new RoslynScriptWorkspace();
 
 			// TODO: Source file resolver.
-			var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+			var compilationOptions = new CSharpCompilationOptions(
+				OutputKind.DynamicallyLinkedLibrary,
+				sourceReferenceResolver: SourceFileResolver.Default);
 
 			var parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Script);
 
@@ -66,10 +70,9 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			_roslynWorkspace.OpenDocument(_documentId, sourceTextContainer);
 		}
 
-		public async Task<TextSpan?> FindDefinition(int position)
+		public async Task<TextSpan?> FindDefinitionAsync(int position)
 		{
 			var document = _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
-			var semanticModel = await document.GetSemanticModelAsync().ConfigureAwait(false);
 			var symbol = await SymbolFinder.FindSymbolAtPositionAsync(document, position);
 
 			if (symbol != null)
@@ -80,6 +83,13 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			}
 
 			return null;
+		}
+
+		public async Task<ImmutableArray<Diagnostic>> GetDiagnosticsAsync(CancellationToken cancellationToken)
+		{
+			var document = _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
+			var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
+			return semanticModel.GetDiagnostics();
 		}
 	}
 }
