@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
@@ -164,9 +165,34 @@ namespace ShaderEditorApp.ViewModel.Menu
 			_subitems = recentFiles.Files.Changed
 				.StartWithDefault()
 				.Select(_ => recentFiles.Files.Any()
-					? recentFiles.Files.Select(file => (object)new RawCommandMenuItem(file, openCommand, file))
+					? recentFiles.Files.Select((file, index) => (object)new RawCommandMenuItem(GetHeader(file, index), openCommand, file))
 					: emptyMenu)
 				.ToProperty(this, x => x.Items);
+		}
+
+		private string GetHeader(string path, int index)
+		{
+			// Indices should be one based in the UI.
+			Trace.Assert(index >= 0);
+			index++;
+
+			// Mnemonic on the index for 1-9, on the 0 for 10, and nothing for >10.
+			string prefix;
+			if (index < 10)
+			{
+				prefix = $"_{index} ";
+			}
+			else if (index == 10)
+			{
+				prefix = "1_0 ";
+			}
+			else
+			{
+				prefix = $"{index} ";
+			}
+
+			// Escape any underscores in the path with double-underscores.
+			return prefix + path.Replace("_", "__");
 		}
 	}
 }
