@@ -62,6 +62,7 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 				typeof(Uri).Assembly,								// System.
 				typeof(Enumerable).Assembly,						// System.Core
 				typeof(SRPScripting.IRenderInterface).Assembly,
+				typeof(CSharpGlobals).Assembly,
 				typeof(System.Numerics.Vector3).Assembly,
 			};
 			// TODO: This stuff is fairly expensive and should be shared by all documents!
@@ -88,8 +89,7 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 				hostObjectType: typeof(CSharpGlobals)
 				));
 
-			var success = _roslynWorkspace.TryApplyChanges(solution);
-			Trace.Assert(success);
+			_roslynWorkspace.SetSolution(solution);
 
 			_roslynWorkspace.OpenDocument(_documentId, sourceTextContainer);
 		}

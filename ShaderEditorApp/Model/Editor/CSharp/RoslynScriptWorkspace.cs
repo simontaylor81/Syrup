@@ -29,5 +29,13 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 		// Support all changes.
 		public override bool CanApplyChange(ApplyChangesKind feature) => true;
 		public override bool CanOpenDocuments => true;
+
+		// Set a new Current Solution.
+		public void SetSolution(Solution solution)
+		{
+			var oldSolution = CurrentSolution;
+			var newSolution = base.SetCurrentSolution(solution);
+			RaiseWorkspaceChangedEventAsync(WorkspaceChangeKind.SolutionChanged, oldSolution, newSolution);
+		}
 	}
 }
