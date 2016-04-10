@@ -2,7 +2,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
         xmlns:avalondock="http://schemas.xceed.com/wpf/xaml/avalondock"
         xmlns:winforms="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:srpview="clr-namespace:ShaderEditorApp.View"
@@ -22,34 +21,23 @@
             <Setter Property="ToolTip" Value="{Binding Model.FilePath}"/>
             <Setter Property="CloseCommand" Value="{Binding Model.Close}"/>
         </Style>
-        
-        <!-- Style for TextArea, which is part of the editor. -->
-        <Style TargetType="{x:Type avalonedit:TextArea}">
-            <Setter Property="SelectionCornerRadius" Value="0"/>
-        </Style>
-
-        <!-- Data template to use for document panes. -->
-        <DataTemplate x:Key="DocumentPaneTemplate">
-            <avalonedit:TextEditor FontFamily="Consolas" FontSize="10pt" ShowLineNumbers="True"
-                                   Document="{Binding Document}"
-                                   srpview:TextEditorHelpers.EnableCustomTextEditorBindings="True"
-                                   srpview:TextEditorHelpers.CaretPosition="{Binding CaretPosition}"
-                                   srpview:TextEditorHelpers.SelectionStart="{Binding SelectionStart}"
-                                   srpview:TextEditorHelpers.SelectionLength="{Binding SelectionLength}"
-                                   SyntaxHighlighting="{Binding SyntaxHighlighting}"/>
-        </DataTemplate>
 
         <!-- Style to use for the various tools windows. -->
         <Style x:Key="ToolPaneStyle" TargetType="{x:Type avalondock:LayoutAnchorableItem}"/>
 
         <!-- Selector that picks a style for the various elements in the dock layout. -->
         <srpview:PaneStyleSelector x:Key="PaneStyleSelector"
-                               DocumentStyle="{StaticResource DocumentPaneStyle}"
-                               ToolStyle="{StaticResource ToolPaneStyle}"/>
+                                   DocumentStyle="{StaticResource DocumentPaneStyle}"
+                                   ToolStyle="{StaticResource ToolPaneStyle}"/>
 
         <!-- Selector that picks the data template for docked elements. -->
-        <srpview:PaneTemplateSelector x:Key="PaneTemplateSelector"
-                                  DocumentTemplate="{StaticResource DocumentPaneTemplate}"/>
+        <srpview:PaneTemplateSelector x:Key="PaneTemplateSelector">
+            <srpview:PaneTemplateSelector.DocumentTemplate>
+                <DataTemplate>
+                    <srpview:DocumentView/>
+                </DataTemplate>
+            </srpview:PaneTemplateSelector.DocumentTemplate>
+        </srpview:PaneTemplateSelector>
 
     </Window.Resources>
 

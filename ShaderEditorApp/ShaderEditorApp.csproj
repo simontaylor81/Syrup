@@ -253,6 +253,9 @@
     <Compile Include="ViewModel\OutputWindowCategoryViewModel.cs" />
     <Compile Include="ViewModel\OutputWindowViewModel.cs" />
     <Compile Include="ViewModel\Workspace\DocumentSourceTextContainer.cs" />
+    <Compile Include="View\DocumentView.xaml.cs">
+      <DependentUpon>DocumentView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\LogTextBox.cs" />
     <Compile Include="View\OutputWindow.xaml.cs">
       <DependentUpon>OutputWindow.xaml</DependentUpon>
@@ -314,6 +317,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\DocumentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\OutputWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
