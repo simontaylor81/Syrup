@@ -10,9 +10,9 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using Microsoft.Win32;
 using ReactiveUI;
 using ShaderEditorApp.Interfaces;
+using ShaderEditorApp.Model.Editor.CSharp;
 using ShaderEditorApp.MVVMUtil;
 using Splat;
-using SRPCommon.Editor.CSharp;
 
 namespace ShaderEditorApp.ViewModel.Workspace
 {

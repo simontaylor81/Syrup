@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ using Microsoft.CodeAnalysis.FindSymbols;
 using Microsoft.CodeAnalysis.Text;
 using SRPCommon.Scripting;
 
-namespace SRPCommon.Editor.CSharp
+namespace ShaderEditorApp.Model.Editor.CSharp
 {
 	// Wrapper for all sorts of Roslyn stuff.
 	// Currently just one-per-document for simplicity.
@@ -20,13 +21,13 @@ namespace SRPCommon.Editor.CSharp
 	{
 		private readonly DocumentId _documentId;
 		private readonly ProjectId _projectId;
-		private readonly AdhocWorkspace _roslynWorkspace;
+		private readonly RoslynScriptWorkspace _roslynWorkspace;
 
 		public RoslynDocumentServices(SourceTextContainer sourceTextContainer, string path)
 		{
 			// Create a Roslyn workspace.
 			// Is adhoc workspace sufficient?
-			_roslynWorkspace = new AdhocWorkspace();
+			_roslynWorkspace = new RoslynScriptWorkspace();
 
 			// TODO: Source file resolver.
 			var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
@@ -46,7 +47,7 @@ namespace SRPCommon.Editor.CSharp
 				loader: TextLoader.From(TextAndVersion.Create(sourceTextContainer.CurrentText, VersionStamp.Create())),
 				filePath: path);
 
-			_roslynWorkspace.AddProject(ProjectInfo.Create(
+			var solution = _roslynWorkspace.CurrentSolution.AddProject(ProjectInfo.Create(
 				_projectId,
 				VersionStamp.Default,
 				projectName,
@@ -59,7 +60,10 @@ namespace SRPCommon.Editor.CSharp
 				hostObjectType: typeof(CSharpGlobals)
 				));
 
-			_roslynWorkspace.OpenDocument(_documentId);
+			var success =_roslynWorkspace.TryApplyChanges(solution);
+			Trace.Assert(success);
+
+			_roslynWorkspace.OpenDocument(_documentId, sourceTextContainer);
 		}
 
 		public async Task<TextSpan?> FindDefinition(int position)
