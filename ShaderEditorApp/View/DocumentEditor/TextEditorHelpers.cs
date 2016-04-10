@@ -9,7 +9,7 @@ using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 
-namespace ShaderEditorApp.View
+namespace ShaderEditorApp.View.DocumentEditor
 {
 	public class TextEditorHelpers
 	{

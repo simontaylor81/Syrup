@@ -1,4 +1,4 @@
-var vs = ri.CompileShader("BasicShaders.hlsl", "BasicVS", "vs_4_0");
+var vs = ri.CompileShader("BasicShaders.hlsl", "BasicVS", "vs_4_0")
 var ps = ri.CompileShader("BasicShaders.hlsl", "SolidColourPS", "ps_4_0");
 var psTex = ri.CompileShader("BasicShaders.hlsl", "TexturedPS", "ps_4_0");
 

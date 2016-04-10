@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -7,12 +8,15 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
+using Microsoft.CodeAnalysis;
 using Microsoft.Win32;
 using ReactiveUI;
 using ShaderEditorApp.Interfaces;
 using ShaderEditorApp.Model.Editor.CSharp;
 using ShaderEditorApp.MVVMUtil;
 using Splat;
+
+using TextDocument = ICSharpCode.AvalonEdit.Document.TextDocument;
 
 namespace ShaderEditorApp.ViewModel.Workspace
 {
@@ -44,6 +48,9 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			_openDocumentSet = openDocumentSet;
 			FilePath = filePath;
 
+			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
+			isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
+
 			Document = new TextDocument(contents);
 
 			// Create a text source container for this file.
@@ -55,10 +62,19 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			_isDirty = this.WhenAny(x => x.Document.UndoStack.IsOriginalFile, change => !change.Value)
 				.ToProperty(this, x => x.IsDirty);
 
+			Close = CommandUtil.Create(_ => _openDocumentSet.CloseDocument(this));
+
 			GoToDefinition = ReactiveCommand.CreateAsyncTask(_ => GoToDefinitionImpl());
 
-			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
-			isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
+			// TODO: Can diagnostics be for other files?
+			GetDiagnostics = ReactiveCommand.CreateAsyncTask((_, ct) => _editorServices.GetDiagnosticsAsync(ct));
+			GetDiagnostics.ToProperty(this, x => x.Diagnostics, out _diagnostics, ImmutableArray<Diagnostic>.Empty);
+
+			// Update diagnostics when the document changes.
+			var documentChanged = Observable.FromEventPattern<DocumentChangeEventArgs>(h => Document.Changed += h, h => Document.Changed -= h);
+			documentChanged
+				.Throttle(TimeSpan.FromMilliseconds(500))
+				.InvokeCommand(GetDiagnostics);
 
 			// Update display name based on filename and dirtiness.
 			this.WhenAnyValue(x => x.FilePath, x => x.IsDirty, (filename, isDirty) => GetDisplayName(filename, isDirty))
@@ -301,7 +317,14 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private readonly DocumentSourceTextContainer _sourceTextContainer;
 		private readonly RoslynDocumentServices _editorServices;
 
+		// Command to close this document.
+		public ReactiveCommand<object> Close { get; }
+
 		public ReactiveCommand<Unit> GoToDefinition { get; }
+		public ReactiveCommand<ImmutableArray<Microsoft.CodeAnalysis.Diagnostic>> GetDiagnostics { get; }
+
+		private ObservableAsPropertyHelper<ImmutableArray<Diagnostic>> _diagnostics;
+		public ImmutableArray<Diagnostic> Diagnostics => _diagnostics.Value;
 
 		// Command to notify the user about the document being externally modified.
 		private ReactiveCommand<Unit> NotifyModified { get; }

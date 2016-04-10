@@ -253,9 +253,11 @@
     <Compile Include="ViewModel\OutputWindowCategoryViewModel.cs" />
     <Compile Include="ViewModel\OutputWindowViewModel.cs" />
     <Compile Include="ViewModel\Workspace\DocumentSourceTextContainer.cs" />
-    <Compile Include="View\DocumentView.xaml.cs">
+    <Compile Include="View\DocumentEditor\DocumentView.xaml.cs">
       <DependentUpon>DocumentView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\DocumentEditor\ITextMarker.cs" />
+    <Compile Include="View\DocumentEditor\TextMarkerService.cs" />
     <Compile Include="View\LogTextBox.cs" />
     <Compile Include="View\OutputWindow.xaml.cs">
       <DependentUpon>OutputWindow.xaml</DependentUpon>
@@ -297,7 +299,7 @@
     <Compile Include="View\RenderWindow.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="View\TextEditorHelpers.cs" />
+    <Compile Include="View\DocumentEditor\TextEditorHelpers.cs" />
     <Compile Include="View\ViewportFrame.xaml.cs">
       <DependentUpon>ViewportFrame.xaml</DependentUpon>
     </Compile>
@@ -317,7 +319,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="View\DocumentView.xaml">
+    <Page Include="View\DocumentEditor\DocumentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
