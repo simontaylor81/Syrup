@@ -29,6 +29,7 @@ namespace ShaderEditorApp.View
 	public partial class DocumentView : UserControl
 	{
 		private ITextMarkerService _markerService;
+		private CodeTipService _codeTipService;
 
 		public DocumentView()
 		{
@@ -38,6 +39,7 @@ namespace ShaderEditorApp.View
 			SearchPanel.Install(textEditor);
 
 			// Defer various bits of setup until the view model is bound and the Document set on the editor.
+			// TODO: Is there a better way to do this, it's a bit messy.
 			textEditor.DocumentChanged += TextEditor_DocumentChanged;
 		}
 
@@ -49,6 +51,8 @@ namespace ShaderEditorApp.View
 			textEditor.TextArea.TextView.BackgroundRenderers.Add(markerService);
 			textEditor.TextArea.TextView.LineTransformers.Add(markerService);
 			_markerService = markerService;
+
+			_codeTipService = new CodeTipService(textEditor);
 
 			// Update squigglies when the diagnostics change.
 			viewModel.WhenAnyValue(x => x.Diagnostics).Subscribe(AddDiagnosticMarkers);
@@ -68,6 +72,13 @@ namespace ShaderEditorApp.View
 				marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
 				marker.MarkerColor = Colors.Red;
 			}
+
+			_codeTipService.SetTips(diagnostics.Select(diagnostic => new CodeTip
+			{
+				Contents = diagnostic.GetMessage(),
+				StartOffset = diagnostic.Location.SourceSpan.Start,
+				Length = diagnostic.Location.SourceSpan.Length,
+			}));
 		}
 	}
 }
