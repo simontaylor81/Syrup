@@ -256,8 +256,7 @@
     <Compile Include="View\DocumentEditor\DocumentView.xaml.cs">
       <DependentUpon>DocumentView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\DocumentEditor\ITextMarker.cs" />
-    <Compile Include="View\DocumentEditor\TextMarkerService.cs" />
+    <Compile Include="View\DocumentEditor\SquigglyService.cs" />
     <Compile Include="View\DocumentEditor\CodeTipService.cs" />
     <Compile Include="View\LogTextBox.cs" />
     <Compile Include="View\OutputWindow.xaml.cs">

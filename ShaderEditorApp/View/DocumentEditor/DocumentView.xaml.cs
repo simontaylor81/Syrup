@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,8 +29,8 @@ namespace ShaderEditorApp.View
 	/// It exists to give us an easy place in code-behind to customise the TextEditor control itself.
 	public partial class DocumentView : UserControl
 	{
-		private ITextMarkerService _markerService;
 		private CodeTipService _codeTipService;
+		private SquigglyService _squigglyService;
 
 		public DocumentView()
 		{
@@ -47,15 +48,23 @@ namespace ShaderEditorApp.View
 		{
 			var viewModel = (DocumentViewModel)DataContext;
 
-			var markerService = new TextMarkerService(viewModel.Document);
-			textEditor.TextArea.TextView.BackgroundRenderers.Add(markerService);
-			textEditor.TextArea.TextView.LineTransformers.Add(markerService);
-			_markerService = markerService;
-
 			_codeTipService = new CodeTipService(textEditor);
 
 			// Update squigglies when the diagnostics change.
-			viewModel.WhenAnyValue(x => x.Diagnostics).Subscribe(AddDiagnosticMarkers);
+			var diagnosticsChanged = viewModel.WhenAnyValue(x => x.Diagnostics);
+			diagnosticsChanged.Subscribe(AddDiagnosticMarkers);
+
+
+			_squigglyService = new SquigglyService(textEditor.TextArea.TextView, diagnosticsChanged
+				.Select(diagnostics => Tuple.Create(
+					viewModel.Document,
+					diagnostics.Select(diagnostic => new Squiggly
+					{
+						Colour = GetDiagnosticColour(diagnostic.Severity),
+						StartOffset = diagnostic.Location.SourceSpan.Start,
+						Length = diagnostic.Location.SourceSpan.Length,
+					}))));
+			textEditor.TextArea.TextView.BackgroundRenderers.Add(_squigglyService);
 
 			// Get initial set of diagnostics.
 			viewModel.GetDiagnostics.ExecuteAsync().Subscribe();
@@ -63,22 +72,28 @@ namespace ShaderEditorApp.View
 
 		private void AddDiagnosticMarkers(ImmutableArray<Diagnostic> diagnostics)
 		{
-			// Remove all existing markers.
-			_markerService.RemoveAll(x => true);
-
-			foreach (var diagnostic in diagnostics)
-			{
-				var marker = _markerService.Create(diagnostic.Location.SourceSpan.Start, diagnostic.Location.SourceSpan.Length);
-				marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
-				marker.MarkerColor = Colors.Red;
-			}
-
 			_codeTipService.SetTips(diagnostics.Select(diagnostic => new CodeTip
 			{
 				Contents = diagnostic.GetMessage(),
 				StartOffset = diagnostic.Location.SourceSpan.Start,
 				Length = diagnostic.Location.SourceSpan.Length,
 			}));
+		}
+
+		private Color GetDiagnosticColour(DiagnosticSeverity severity)
+		{
+			switch (severity)
+			{
+				case DiagnosticSeverity.Info:
+					return Colors.Blue;
+				case DiagnosticSeverity.Warning:
+					return Colors.Green;
+
+				case DiagnosticSeverity.Hidden:
+				case DiagnosticSeverity.Error:
+				default:
+					return Colors.Red;
+			}
 		}
 	}
 }
