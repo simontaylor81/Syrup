@@ -39,7 +39,7 @@ namespace ShaderEditorApp.View.DocumentEditor
 		// Provider for pulling tips from the compiler infrastructure.
 		private readonly ICodeTipProvider _tipProvider;
 
-		public CodeTipService(TextEditor textEditor, ICodeTipProvider tipProvider)
+		public CodeTipService(TextEditor textEditor, ICodeTipProvider tipProvider, IObservable<Tuple<TextDocument, IEnumerable<CodeTip>>> pushTips)
 		{
 			_tipProvider = tipProvider;
 			_textEditor = textEditor;
@@ -54,13 +54,17 @@ namespace ShaderEditorApp.View.DocumentEditor
 			_toolTip.PlacementTarget = _textEditor;
 			_toolTip.Placement = PlacementMode.Relative;
 
-			 _pushTips = new TextSegmentCollection<CodeTip>(textEditor.Document);
+			// Set new push tips when we get a new set from the observable.
+			pushTips.Subscribe(x => SetPushTips(x.Item1, x.Item2));
+
+			_pushTips = new TextSegmentCollection<CodeTip>(textEditor.Document);
 		}
 
 		// Push tips associated with spans of text.
-		public void SetTips(IEnumerable<CodeTip> tips)
+		private void SetPushTips(TextDocument document, IEnumerable<CodeTip> tips)
 		{
-			_pushTips.Clear();
+			// Just recreate a new segment collection from scratch each time.
+			_pushTips = new TextSegmentCollection<CodeTip>(document);
 			foreach (var tip in tips)
 			{
 				_pushTips.Add(tip);

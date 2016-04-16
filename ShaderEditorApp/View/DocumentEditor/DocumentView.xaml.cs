@@ -48,36 +48,38 @@ namespace ShaderEditorApp.View
 		{
 			var viewModel = (DocumentViewModel)DataContext;
 
-			_codeTipService = new CodeTipService(textEditor, viewModel.CodeTipProvider);
-
-			// Update squigglies when the diagnostics change.
+			// Update squigglies and code tips when the diagnostics change.
 			var diagnosticsChanged = viewModel.WhenAnyValue(x => x.Diagnostics);
-			diagnosticsChanged.Subscribe(AddDiagnosticMarkers);
 
-
-			_squigglyService = new SquigglyService(textEditor.TextArea.TextView, diagnosticsChanged
-				.Select(diagnostics => Tuple.Create(
-					viewModel.Document,
-					diagnostics.Select(diagnostic => new Squiggly
-					{
-						Colour = GetDiagnosticColour(diagnostic.Severity),
-						StartOffset = diagnostic.Location.SourceSpan.Start,
-						Length = diagnostic.Location.SourceSpan.Length,
-					}))));
+			_squigglyService = new SquigglyService(textEditor.TextArea.TextView,
+				diagnosticsChanged.Select(diagnostics => Tuple.Create(viewModel.Document, CreateSquigglies(diagnostics))));
 			textEditor.TextArea.TextView.BackgroundRenderers.Add(_squigglyService);
+
+			_codeTipService = new CodeTipService(textEditor, viewModel.CodeTipProvider,
+				diagnosticsChanged.Select(diagnostics => Tuple.Create(viewModel.Document, CreateCodeTips(diagnostics))));
 
 			// Get initial set of diagnostics.
 			viewModel.GetDiagnostics.ExecuteAsync().Subscribe();
 		}
 
-		private void AddDiagnosticMarkers(ImmutableArray<Diagnostic> diagnostics)
+		private IEnumerable<Squiggly> CreateSquigglies(ImmutableArray<Diagnostic> diagnostics)
 		{
-			_codeTipService.SetTips(diagnostics.Select(diagnostic => new CodeTip
+			return diagnostics.Select(diagnostic => new Squiggly
+			{
+				Colour = GetDiagnosticColour(diagnostic.Severity),
+				StartOffset = diagnostic.Location.SourceSpan.Start,
+				Length = diagnostic.Location.SourceSpan.Length,
+			});
+		}
+
+		private IEnumerable<CodeTip> CreateCodeTips(ImmutableArray<Diagnostic> diagnostics)
+		{
+			return diagnostics.Select(diagnostic => new CodeTip
 			{
 				Contents = diagnostic.GetMessage(),
 				StartOffset = diagnostic.Location.SourceSpan.Start,
 				Length = diagnostic.Location.SourceSpan.Length,
-			}));
+			});
 		}
 
 		private Color GetDiagnosticColour(DiagnosticSeverity severity)
