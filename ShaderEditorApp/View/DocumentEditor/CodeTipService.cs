@@ -33,130 +33,38 @@ namespace ShaderEditorApp.View.DocumentEditor
 
 		private CancellationTokenSource _outstandingRequest;
 
-		public TextSegmentCollection<CodeTip> _tips;
+		// Tips that are pushed at us by the diagnostic system.
+		private TextSegmentCollection<CodeTip> _pushTips;
+
+		// Provider for pulling tips from the compiler infrastructure.
 		private readonly ICodeTipProvider _tipProvider;
-
-		private class DummyTipProvider : ICodeTipProvider
-		{
-			public async Task<string> GetCodeTipAsync(int offset, CancellationToken cancellationToken)
-			{
-				try
-				{
-					Console.WriteLine("Getting tip...");
-					await Task.Delay(500, cancellationToken);
-					Console.WriteLine("Got tip.");
-					return "Awesome code!";
-				}
-				catch (TaskCanceledException)
-				{
-					Console.WriteLine("Canceled");
-					throw;
-				}
-			}
-		}
-
-		private class TipWithPosition
-		{
-			public string Contents { get; set; }
-			public TextViewPosition Position { get; set; }
-		}
 
 		public CodeTipService(TextEditor textEditor, ICodeTipProvider tipProvider)
 		{
 			_tipProvider = tipProvider;
 			_textEditor = textEditor;
 
-			/*
-			var mouseHover = Observable.FromEventPattern<MouseEventHandler, MouseEventArgs>(h => textEditor.MouseHover += h, h => textEditor.MouseHover -= h);
-			var mouseHoverStopped = Observable.FromEventPattern<MouseEventHandler, MouseEventArgs>(h => textEditor.MouseHoverStopped += h, h => textEditor.MouseHoverStopped -= h);
-
-			var cancel = mouseHover.Merge(mouseHoverStopped);
-
-			// Get new tips when hovering.
-			var positions = mouseHover
-				.Select(e => GetTextPosition(e.EventArgs))
-				.WhereHasValue()
-				.Select(position => new { position, offset = GetOffset(position) });
-
-			var providerTips = positions
-				.Select(location => Observable.FromAsync(ct => tipProvider.GetCodeTipAsync(location.offset, ct))
-					.Select(tip => new TipWithPosition { Contents = tip, Position = location.position }));
-
-			//var diagnosticTips = positions
-			//	.Select(pos => )
-
-			// Clear tips when stopped hovering.
-			var clearTips = mouseHoverStopped
-				.Select(x => Observable.Return<TipWithPosition>(null));
-
-			// Combine new tip and clear tip observables, switch on it and null-subscribe.
-			// This unsubscribes to any previous tip task when either asking for a new tip
-			// or clearing the tip, ensuring that the underlying task is cancelled.
-			providerTips.Merge(clearTips).Switch().Subscribe();
-
-			//tipStream.Subscribe(tip => Console.WriteLine(tip?.Contents));
-			providerTips
-				.Switch()
-				.ObserveOn(RxApp.MainThreadScheduler)
-				.Subscribe(SetToolTip);
-			*/
-
+			// Hook mouse hover events to show/clear tool tip.
 			_textEditor.MouseHover += OnMouseHover;
 			_textEditor.MouseHoverStopped += OnMouseHoverStopped;
 
+			// Create a single WPF tooltip object that we show and hide as appropriate.
 			_toolTip = new ToolTip();
 			ToolTipService.SetInitialShowDelay(_toolTip, 0);
 			_toolTip.PlacementTarget = _textEditor;
 			_toolTip.Placement = PlacementMode.Relative;
 
-			 _tips = new TextSegmentCollection<CodeTip>(textEditor.Document);
+			 _pushTips = new TextSegmentCollection<CodeTip>(textEditor.Document);
 		}
 
-		private void SetToolTip(TipWithPosition tip)
-		{
-			if (tip != null)
-			{
-				// Position the tooltip at the line base instead of the mouse cursor.
-				var textView = _textEditor.TextArea.TextView;
-				var basePosition = textView.GetVisualPosition(tip.Position, VisualYPosition.LineBottom) - textView.ScrollOffset;
-
-				_toolTip.Content = tip.Contents;
-				_toolTip.PlacementRectangle = new Rect(basePosition, basePosition);
-				_toolTip.IsOpen = true;
-			}
-			else
-			{
-				_toolTip.IsOpen = false;
-			}
-		}
-
+		// Push tips associated with spans of text.
 		public void SetTips(IEnumerable<CodeTip> tips)
 		{
-			_tips.Clear();
+			_pushTips.Clear();
 			foreach (var tip in tips)
 			{
-				_tips.Add(tip);
+				_pushTips.Add(tip);
 			}
-		}
-
-		// Convert mouse coords to text position.
-		private int GetOffset(TextViewPosition position)
-		{
-			return _textEditor.Document.GetOffset(position.Location);
-		}
-
-		// Convert mouse coords to text position.
-		private TextViewPosition? GetTextPosition(MouseEventArgs e)
-		{
-			var textView = _textEditor.TextArea.TextView;
-			var position = textView.GetPositionFloor(e.GetPosition(textView) + textView.ScrollOffset);
-			if (!position.HasValue || position.Value.Location.IsEmpty)
-			{
-				// Mouse is not at a valid text position.
-				return null;
-			}
-
-			return position;
 		}
 
 		private async void OnMouseHover(object sender, MouseEventArgs e)
@@ -174,12 +82,12 @@ namespace ShaderEditorApp.View.DocumentEditor
 			}
 
 			var offset = _textEditor.Document.GetOffset(position.Value.Location);
-			var relaventTips = _tips.FindSegmentsContaining(offset);
+			var relaventPushTips = _pushTips.FindSegmentsContaining(offset);
 
-			if (relaventTips.Any())
+			if (relaventPushTips.Any())
 			{
-				// Show diagnostic tips straight away.
-				ShowTip(CombineTips(relaventTips), position.Value);
+				// Show push tips straight away.
+				ShowTip(CombineTips(relaventPushTips), position.Value);
 			}
 
 			_outstandingRequest = new CancellationTokenSource();
@@ -190,7 +98,7 @@ namespace ShaderEditorApp.View.DocumentEditor
 				var providerTip = await _tipProvider.GetCodeTipAsync(offset, _outstandingRequest.Token);
 				if (providerTip != null)
 				{
-					ShowTip(CombineTips(relaventTips, providerTip), position.Value);
+					ShowTip(CombineTips(relaventPushTips, providerTip), position.Value);
 				}
 			}
 			catch (TaskCanceledException)
@@ -211,11 +119,11 @@ namespace ShaderEditorApp.View.DocumentEditor
 		}
 
 		// Combine all tips into a single string.
-		private string CombineTips(IEnumerable<CodeTip> diagnosticTips, string providerTip = null)
+		private string CombineTips(IEnumerable<CodeTip> pushTips, string providerTip = null)
 		{
 			// Maybe want some formatting here?
 
-			var tips = diagnosticTips.Select(x => x.Contents);
+			var tips = pushTips.Select(x => x.Contents);
 
 			if (providerTip != null)
 			{
