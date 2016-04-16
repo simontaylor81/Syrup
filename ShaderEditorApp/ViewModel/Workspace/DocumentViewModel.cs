@@ -24,9 +24,9 @@ namespace ShaderEditorApp.ViewModel.Workspace
 	public class DocumentViewModel : ReactiveObject, IDisposable
 	{
 		// Create a new (empty) document.
-		public static DocumentViewModel CreateEmpty(OpenDocumentSetViewModel openDocumentSet)
+		public static DocumentViewModel CreateEmpty(OpenDocumentSetViewModel openDocumentSet, IUserPrompt userPrompt = null, IIsForegroundService isForeground = null)
 		{
-			return new DocumentViewModel(openDocumentSet, null, null);
+			return new DocumentViewModel(openDocumentSet, null, null, userPrompt, isForeground);
 		}
 
 		// Create a document backed by a file.
@@ -35,15 +35,15 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			// TODO: Async?
 			var contents = File.ReadAllText(path);
 
-			return new DocumentViewModel(openDocumentSet, contents, path);
+			return new DocumentViewModel(openDocumentSet, contents, path, userPrompt, isForeground);
 		}
 
 		private DocumentViewModel(
 			OpenDocumentSetViewModel openDocumentSet,
 			string contents,
 			string filePath,
-			IUserPrompt userPrompt = null,
-			IIsForegroundService isForeground = null)
+			IUserPrompt userPrompt,
+			IIsForegroundService isForeground)
 		{
 			_openDocumentSet = openDocumentSet;
 			FilePath = filePath;
@@ -64,17 +64,20 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 			Close = CommandUtil.Create(_ => _openDocumentSet.CloseDocument(this));
 
-			GoToDefinition = ReactiveCommand.CreateAsyncTask(_ => GoToDefinitionImpl());
+			// Roslyn stuff. This really needs to be factored out somewhere C#-specific.
+			{
+				GoToDefinition = ReactiveCommand.CreateAsyncTask(_ => GoToDefinitionImpl());
 
-			// TODO: Can diagnostics be for other files?
-			GetDiagnostics = ReactiveCommand.CreateAsyncTask((_, ct) => _editorServices.GetDiagnosticsAsync(ct));
-			GetDiagnostics.ToProperty(this, x => x.Diagnostics, out _diagnostics, ImmutableArray<Diagnostic>.Empty);
+				// TODO: Can diagnostics be for other files?
+				GetDiagnostics = ReactiveCommand.CreateAsyncTask((_, ct) => _editorServices.GetDiagnosticsAsync(ct));
+				GetDiagnostics.ToProperty(this, x => x.Diagnostics, out _diagnostics, ImmutableArray<Diagnostic>.Empty);
 
-			// Update diagnostics when the document changes.
-			var documentChanged = Observable.FromEventPattern<DocumentChangeEventArgs>(h => Document.Changed += h, h => Document.Changed -= h);
-			documentChanged
-				.Throttle(TimeSpan.FromMilliseconds(500))
-				.InvokeCommand(GetDiagnostics);
+				// Update diagnostics when the document changes.
+				var documentChanged = Observable.FromEventPattern<DocumentChangeEventArgs>(h => Document.Changed += h, h => Document.Changed -= h);
+				documentChanged
+					.Throttle(TimeSpan.FromMilliseconds(500))
+					.InvokeCommand(GetDiagnostics);
+			}
 
 			// Update display name based on filename and dirtiness.
 			this.WhenAnyValue(x => x.FilePath, x => x.IsDirty, (filename, isDirty) => GetDisplayName(filename, isDirty))
