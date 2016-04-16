@@ -39,48 +39,45 @@ namespace ShaderEditorApp.View
 			// Enable Find box.
 			SearchPanel.Install(textEditor);
 
-			// Defer various bits of setup until the view model is bound and the Document set on the editor.
-			// TODO: Is there a better way to do this, it's a bit messy.
-			textEditor.DocumentChanged += TextEditor_DocumentChanged;
+			// Defer various bits of setup until the view model is bound.
+			textEditor.DataContextChanged += TextEditor_DataContextChanged;
 		}
 
-		private void TextEditor_DocumentChanged(object sender, EventArgs e)
+		private void TextEditor_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
 		{
 			var viewModel = (DocumentViewModel)DataContext;
 
 			// Update squigglies and code tips when the diagnostics change.
 			var diagnosticsChanged = viewModel.WhenAnyValue(x => x.Diagnostics);
 
-			_squigglyService = new SquigglyService(textEditor.TextArea.TextView,
-				diagnosticsChanged.Select(diagnostics => Tuple.Create(viewModel.Document, CreateSquigglies(diagnostics))));
+			_squigglyService = new SquigglyService(textEditor.TextArea.TextView, viewModel.Document,
+				diagnosticsChanged.Select(diagnostics => CreateSquigglies(diagnostics)));
 			textEditor.TextArea.TextView.BackgroundRenderers.Add(_squigglyService);
 
-			_codeTipService = new CodeTipService(textEditor, viewModel.CodeTipProvider,
-				diagnosticsChanged.Select(diagnostics => Tuple.Create(viewModel.Document, CreateCodeTips(diagnostics))));
+			_codeTipService = new CodeTipService(textEditor, viewModel.Document, viewModel.CodeTipProvider,
+				diagnosticsChanged.Select(diagnostics => CreateCodeTips(diagnostics)));
 
 			// Get initial set of diagnostics.
 			viewModel.GetDiagnostics.ExecuteAsync().Subscribe();
 		}
 
-		private IEnumerable<Squiggly> CreateSquigglies(ImmutableArray<Diagnostic> diagnostics)
-		{
-			return diagnostics.Select(diagnostic => new Squiggly
+		// Create squigglies for code diagnostics.
+		private IEnumerable<Squiggly> CreateSquigglies(ImmutableArray<Diagnostic> diagnostics) => diagnostics
+			.Select(diagnostic => new Squiggly
 			{
 				Colour = GetDiagnosticColour(diagnostic.Severity),
 				StartOffset = diagnostic.Location.SourceSpan.Start,
 				Length = diagnostic.Location.SourceSpan.Length,
 			});
-		}
 
-		private IEnumerable<CodeTip> CreateCodeTips(ImmutableArray<Diagnostic> diagnostics)
-		{
-			return diagnostics.Select(diagnostic => new CodeTip
+		// Create code tips for diagnostics.
+		private IEnumerable<CodeTip> CreateCodeTips(ImmutableArray<Diagnostic> diagnostics) => diagnostics
+			.Select(diagnostic => new CodeTip
 			{
 				Contents = diagnostic.GetMessage(),
 				StartOffset = diagnostic.Location.SourceSpan.Start,
 				Length = diagnostic.Location.SourceSpan.Length,
 			});
-		}
 
 		private Color GetDiagnosticColour(DiagnosticSeverity severity)
 		{

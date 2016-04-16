@@ -28,21 +28,23 @@ namespace ShaderEditorApp.View.DocumentEditor
 	// Class for handling editor tool tips (errors, type info, etc.)
 	class CodeTipService
 	{
-		private TextEditor _textEditor;
-		private ToolTip _toolTip;
+		private readonly TextEditor _textEditor;
+		private readonly TextDocument _document;
+		private readonly ToolTip _toolTip;
+
+		// Provider for pulling tips from the compiler infrastructure.
+		private readonly ICodeTipProvider _tipProvider;
 
 		private CancellationTokenSource _outstandingRequest;
 
 		// Tips that are pushed at us by the diagnostic system.
 		private TextSegmentCollection<CodeTip> _pushTips;
 
-		// Provider for pulling tips from the compiler infrastructure.
-		private readonly ICodeTipProvider _tipProvider;
-
-		public CodeTipService(TextEditor textEditor, ICodeTipProvider tipProvider, IObservable<Tuple<TextDocument, IEnumerable<CodeTip>>> pushTips)
+		public CodeTipService(TextEditor textEditor, TextDocument document, ICodeTipProvider tipProvider, IObservable<IEnumerable<CodeTip>> pushTips)
 		{
-			_tipProvider = tipProvider;
 			_textEditor = textEditor;
+			_document = document;
+			_tipProvider = tipProvider;
 
 			// Hook mouse hover events to show/clear tool tip.
 			_textEditor.MouseHover += OnMouseHover;
@@ -55,16 +57,14 @@ namespace ShaderEditorApp.View.DocumentEditor
 			_toolTip.Placement = PlacementMode.Relative;
 
 			// Set new push tips when we get a new set from the observable.
-			pushTips.Subscribe(x => SetPushTips(x.Item1, x.Item2));
-
-			_pushTips = new TextSegmentCollection<CodeTip>(textEditor.Document);
+			pushTips.Subscribe(SetPushTips);
 		}
 
 		// Push tips associated with spans of text.
-		private void SetPushTips(TextDocument document, IEnumerable<CodeTip> tips)
+		private void SetPushTips(IEnumerable<CodeTip> tips)
 		{
 			// Just recreate a new segment collection from scratch each time.
-			_pushTips = new TextSegmentCollection<CodeTip>(document);
+			_pushTips = new TextSegmentCollection<CodeTip>(_document);
 			foreach (var tip in tips)
 			{
 				_pushTips.Add(tip);

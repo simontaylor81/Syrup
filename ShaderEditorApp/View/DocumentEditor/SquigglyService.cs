@@ -22,12 +22,14 @@ namespace ShaderEditorApp.View.DocumentEditor
 	class SquigglyService : IBackgroundRenderer
 	{
 		private readonly TextView _textView;
+		private readonly TextDocument _document;
 		private TextSegmentCollection<Squiggly> _squigglies;
 
-		public SquigglyService(TextView textView, IObservable<Tuple<TextDocument, IEnumerable<Squiggly>>> squigglies)
+		public SquigglyService(TextView textView, TextDocument document, IObservable<IEnumerable<Squiggly>> squigglies)
 		{
 			_textView = textView;
-			squigglies.Subscribe(x => SetSquigglies(x.Item1, x.Item2));
+			_document = document;
+			squigglies.Subscribe(SetSquigglies);
 		}
 
 		public KnownLayer Layer => KnownLayer.Selection;
@@ -86,10 +88,10 @@ namespace ShaderEditorApp.View.DocumentEditor
 		}
 
 		// Set the set of squigglies to draw.
-		private void SetSquigglies(TextDocument document, IEnumerable<Squiggly> squigglies)
+		private void SetSquigglies(IEnumerable<Squiggly> squigglies)
 		{
 			// Just recreate a new segment collection from scratch each time.
-			_squigglies = new TextSegmentCollection<Squiggly>(document);
+			_squigglies = new TextSegmentCollection<Squiggly>(_document);
 			foreach (var squiggly in squigglies)
 			{
 				_squigglies.Add(squiggly);
