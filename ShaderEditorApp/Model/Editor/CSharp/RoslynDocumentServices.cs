@@ -112,7 +112,7 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			var symbol = await GetSymbol(position);
 			if (symbol != null)
 			{
-				return symbol.ToDisplayString();
+				return CodeTipFormatter.FormatCodeTip(symbol);
 			}
 
 			return null;
