@@ -243,6 +243,7 @@
     <Compile Include="Interfaces\IIsForegroundService.cs" />
     <Compile Include="Model\Editor\CSharp\RoslynDocumentServices.cs" />
     <Compile Include="Model\Editor\CSharp\RoslynScriptWorkspace.cs" />
+    <Compile Include="Model\Editor\ICodeTipProvider.cs" />
     <Compile Include="Model\Progress.cs" />
     <Compile Include="Model\RecentFileList.cs" />
     <Compile Include="Model\UserSettings.cs" />

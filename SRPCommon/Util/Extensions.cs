@@ -47,5 +47,21 @@ namespace SRPCommon.Util
 			compositeDisposable.Add(newDisposable);
 			return newDisposable;
 		}
+
+		// Filter on Optional values that are valid, and select the underlying value.
+		public static IObservable<T> WhereHasValue<T>(this IObservable<T?> source) where T : struct
+		{
+			return source
+				.Where(x => x.HasValue)
+				.Select(x => x.Value);
+		}
+
+		// Filter on Optional values that are valid, and select the underlying value.
+		public static IEnumerable<T> WhereHasValue<T>(this IEnumerable<T?> source) where T : struct
+		{
+			return source
+				.Where(x => x.HasValue)
+				.Select(x => x.Value);
+		}
 	}
 }

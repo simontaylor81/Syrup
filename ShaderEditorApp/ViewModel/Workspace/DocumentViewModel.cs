@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.Win32;
 using ReactiveUI;
 using ShaderEditorApp.Interfaces;
+using ShaderEditorApp.Model.Editor;
 using ShaderEditorApp.Model.Editor.CSharp;
 using ShaderEditorApp.MVVMUtil;
 using Splat;
@@ -319,6 +320,8 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private readonly IUserPrompt _userPrompt;
 		private readonly DocumentSourceTextContainer _sourceTextContainer;
 		private readonly RoslynDocumentServices _editorServices;
+
+		public ICodeTipProvider CodeTipProvider => _editorServices;
 
 		// Command to close this document.
 		public ReactiveCommand<object> Close { get; }

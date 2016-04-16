@@ -48,7 +48,7 @@ namespace ShaderEditorApp.View
 		{
 			var viewModel = (DocumentViewModel)DataContext;
 
-			_codeTipService = new CodeTipService(textEditor);
+			_codeTipService = new CodeTipService(textEditor, viewModel.CodeTipProvider);
 
 			// Update squigglies when the diagnostics change.
 			var diagnosticsChanged = viewModel.WhenAnyValue(x => x.Diagnostics);

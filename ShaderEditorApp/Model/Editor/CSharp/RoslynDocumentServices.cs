@@ -19,7 +19,7 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 	// Currently just one-per-document for simplicity.
 	// We'll probably want to have multiple documents in a single workspace
 	// eventually so we can get e.g. go to definition across files (without saving).
-	public class RoslynDocumentServices
+	public class RoslynDocumentServices : ICodeTipProvider
 	{
 		private readonly DocumentId _documentId;
 		private readonly ProjectId _projectId;
@@ -96,9 +96,7 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 
 		public async Task<TextSpan?> FindDefinitionAsync(int position)
 		{
-			var document = _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
-			var symbol = await SymbolFinder.FindSymbolAtPositionAsync(document, position);
-
+			var symbol = await GetSymbol(position);
 			if (symbol != null)
 			{
 				// TODO: Handle multiple locations?
@@ -109,11 +107,28 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			return null;
 		}
 
+		public async Task<string> GetCodeTipAsync(int position, CancellationToken cancellationToken)
+		{
+			var symbol = await GetSymbol(position);
+			if (symbol != null)
+			{
+				return symbol.ToDisplayString();
+			}
+
+			return null;
+		}
+
 		public async Task<ImmutableArray<Diagnostic>> GetDiagnosticsAsync(CancellationToken cancellationToken)
 		{
 			var document = _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
 			var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
 			return semanticModel.GetDiagnostics();
+		}
+
+		private Task<ISymbol> GetSymbol(int position)
+		{
+			var document = _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
+			return SymbolFinder.FindSymbolAtPositionAsync(document, position);
 		}
 	}
 }
