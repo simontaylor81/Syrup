@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
@@ -58,6 +59,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			// TEMP: Currently doing this for all files, not just C#.
 			_sourceTextContainer = new DocumentSourceTextContainer(Document);
 			_editorServices = new RoslynDocumentServices(_sourceTextContainer, FilePath);
+			_completionService = new CompletionService(_editorServices);
 
 			// Get 'dirtiness' from the document's undo stack.
 			_isDirty = this.WhenAny(x => x.Document.UndoStack.IsOriginalFile, change => !change.Value)
@@ -193,6 +195,10 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			return false;
 		}
 
+		// Get potential completions for the current position.
+		public Task<CompletionList> GetCompletions(char? triggerChar)
+			=> _completionService.GetCompletions(CaretOffset, triggerChar);
+
 		public void Dispose()
 		{
 			Watcher?.Dispose();
@@ -262,7 +268,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private async Task GoToDefinitionImpl()
 		{
 			// Use the language service to get the location of the symbol underneath the caret.
-			var span = await _editorServices.FindDefinitionAsync(Document.GetOffset(CaretPosition));
+			var span = await _editorServices.FindDefinitionAsync(CaretOffset);
 			if (span.HasValue)
 			{
 				SelectionStart = span.Value.Start;
@@ -307,6 +313,9 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			set { this.RaiseAndSetIfChanged(ref _selectionLength, value); }
 		}
 
+		// Offset in the document of the caret.
+		public int CaretOffset => Document.GetOffset(CaretPosition);
+
 		private ObservableAsPropertyHelper<IHighlightingDefinition> _syntaxHighlighting;
 		public IHighlightingDefinition SyntaxHighlighting => _syntaxHighlighting.Value;
 
@@ -320,6 +329,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private readonly IUserPrompt _userPrompt;
 		private readonly DocumentSourceTextContainer _sourceTextContainer;
 		private readonly RoslynDocumentServices _editorServices;
+		private readonly CompletionService _completionService;
 
 		public ICodeTipProvider CodeTipProvider => _editorServices;
 
@@ -327,7 +337,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		public ReactiveCommand<object> Close { get; }
 
 		public ReactiveCommand<Unit> GoToDefinition { get; }
-		public ReactiveCommand<ImmutableArray<Microsoft.CodeAnalysis.Diagnostic>> GetDiagnostics { get; }
+		public ReactiveCommand<ImmutableArray<Diagnostic>> GetDiagnostics { get; }
 
 		private ObservableAsPropertyHelper<ImmutableArray<Diagnostic>> _diagnostics;
 		public ImmutableArray<Diagnostic> Diagnostics => _diagnostics.Value;

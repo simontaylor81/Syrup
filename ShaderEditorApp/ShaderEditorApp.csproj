@@ -73,8 +73,16 @@
       <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.1.2.1\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp.Features, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.Features.1.2.1\lib\net45\Microsoft.CodeAnalysis.CSharp.Features.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeAnalysis.CSharp.Workspaces, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.Workspaces.1.2.1\lib\net45\Microsoft.CodeAnalysis.CSharp.Workspaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.Features, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Features.1.2.1\lib\net45\Microsoft.CodeAnalysis.Features.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis.VisualBasic, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -241,10 +249,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Interfaces\IIsForegroundService.cs" />
+    <Compile Include="Model\Editor\CompletionItem.cs" />
     <Compile Include="Model\Editor\CSharp\CodeTipFormatter.cs" />
+    <Compile Include="Model\Editor\CSharp\CompletionServiceWrapper.cs" />
     <Compile Include="Model\Editor\CSharp\RoslynDocumentServices.cs" />
     <Compile Include="Model\Editor\CSharp\RoslynScriptWorkspace.cs" />
     <Compile Include="Model\Editor\ICodeTipProvider.cs" />
+    <Compile Include="View\DocumentEditor\SimpleCompletionData.cs" />
     <Compile Include="Model\Progress.cs" />
     <Compile Include="Model\RecentFileList.cs" />
     <Compile Include="Model\UserSettings.cs" />
@@ -254,6 +265,7 @@
     <Compile Include="Interfaces\IUserPrompt.cs" />
     <Compile Include="ViewModel\OutputWindowCategoryViewModel.cs" />
     <Compile Include="ViewModel\OutputWindowViewModel.cs" />
+    <Compile Include="ViewModel\Workspace\CompletionService.cs" />
     <Compile Include="ViewModel\Workspace\DocumentSourceTextContainer.cs" />
     <Compile Include="View\DocumentEditor\DocumentView.xaml.cs">
       <DependentUpon>DocumentView.xaml</DependentUpon>

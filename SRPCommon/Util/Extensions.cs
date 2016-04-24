@@ -41,6 +41,24 @@ namespace SRPCommon.Util
 			return newElement;
 		}
 
+		// List<T> has AddRange but IList<T> does not, which is annoying.
+		public static void AddRange<T>(this IList<T> ilist, IEnumerable<T> collection)
+		{
+			// Use List<T> implementation if available (it should be more efficient).
+			var list = ilist as List<T>;
+			if (list != null)
+			{
+				list.AddRange(collection);
+				return;
+			}
+
+			// Add each item one-by-one.
+			foreach (var item in collection)
+			{
+				ilist.Add(item);
+			}
+		}
+
 		// Add a disposable to the composite, and return the added item.
 		public static T AddAndReturn<T>(this CompositeDisposable compositeDisposable, T newDisposable) where T : IDisposable
 		{

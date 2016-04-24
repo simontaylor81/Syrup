@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
@@ -14,11 +15,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ICSharpCode.AvalonEdit.CodeCompletion;
+using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Search;
 using Microsoft.CodeAnalysis;
 using ReactiveUI;
 using ShaderEditorApp.View.DocumentEditor;
 using ShaderEditorApp.ViewModel.Workspace;
+using SRPCommon.Util;
 
 namespace ShaderEditorApp.View
 {
@@ -31,6 +36,7 @@ namespace ShaderEditorApp.View
 	{
 		private CodeTipService _codeTipService;
 		private SquigglyService _squigglyService;
+		private CompletionWindow _completionWindow;
 
 		public DocumentView()
 		{
@@ -59,6 +65,76 @@ namespace ShaderEditorApp.View
 
 			// Get initial set of diagnostics.
 			viewModel.GetDiagnostics.ExecuteAsync().Subscribe();
+
+			textEditor.TextArea.TextEntered += TextArea_TextEntered;
+			textEditor.TextArea.TextEntering += TextArea_TextEntering;
+		}
+
+		private async void TextArea_TextEntered(object sender, TextCompositionEventArgs e)
+		{
+			if (_completionWindow != null)
+			{
+				// Don't show a new completion window if we already have one.
+				return;
+			}
+
+			try
+			{
+				Trace.Assert(e.Text.Length == 1);
+				char triggerChar = e.Text[0];
+
+				var viewModel = (DocumentViewModel)DataContext;
+				var completionList = await viewModel.GetCompletions(triggerChar);
+
+				if (completionList.Completions.Any())
+				{
+					// Open completion window
+					_completionWindow = new CompletionWindow(textEditor.TextArea);
+					_completionWindow.CompletionList.CompletionData.AddRange(completionList.Completions
+						.Select(completion => new SimpleCompletionData(completion)));
+
+					// Set initial filter based on typed text.
+					if (ShouldFilterCompletion(triggerChar))
+					{
+						_completionWindow.CompletionList.SelectItem(e.Text);
+
+						// The trigger character is already entered, so make sure it is included
+						// in the completion window's view of things.
+						_completionWindow.StartOffset--;
+					}
+
+					_completionWindow.Closed += (o_, e_) => _completionWindow = null;
+					_completionWindow.Show();
+				}
+			}
+			catch (OperationCanceledException)
+			{
+				// Ignore cancelled tasks.
+			}
+		}
+
+
+		void TextArea_TextEntering(object sender, TextCompositionEventArgs e)
+		{
+			if (e.Text.Length > 0 && _completionWindow != null)
+			{
+				if (!ShouldFilterCompletion(e.Text[0]))
+				{
+					// Whenever a non-letter is typed while the completion window is open,
+					// insert the currently selected element.
+					_completionWindow.CompletionList.RequestInsertion(e);
+				}
+			}
+			// Do not set e.Handled=true.
+			// We still want to insert the character that was typed.
+		}
+
+		// True if the given character should filter the completion window when typed.
+		// This is very messy and doesn't really belong here.
+		private bool ShouldFilterCompletion(char triggerChar)
+		{
+			// Is the character a valid identifier character?
+			return char.IsLetterOrDigit(triggerChar) || triggerChar == '_';
 		}
 
 		// Create squigglies for code diagnostics.

@@ -4,12 +4,15 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.FindSymbols;
+using Microsoft.CodeAnalysis.Host.Mef;
+using Microsoft.CodeAnalysis.Recommendations;
 using Microsoft.CodeAnalysis.Text;
 using SRPCommon.Scripting;
 
@@ -25,11 +28,21 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 		private readonly ProjectId _projectId;
 		private readonly RoslynScriptWorkspace _roslynWorkspace;
 
+		private readonly CompletionServiceWrapper _completionService = new CompletionServiceWrapper();
+
 		public RoslynDocumentServices(SourceTextContainer sourceTextContainer, string path)
 		{
+			// Load "Features" assemblies to get things like auto-complete.
+			var additionalAssemblies = new[]
+			{
+				Assembly.Load("Microsoft.CodeAnalysis.Features"),
+				Assembly.Load("Microsoft.CodeAnalysis.CSharp.Features"),
+			};
+
+			var host = MefHostServices.Create(MefHostServices.DefaultAssemblies.Concat(additionalAssemblies));
+
 			// Create a Roslyn workspace.
-			// Is adhoc workspace sufficient?
-			_roslynWorkspace = new RoslynScriptWorkspace();
+			_roslynWorkspace = new RoslynScriptWorkspace(host);
 
 			// TODO: Share this list with the scripting system.
 			var usings = new[]
@@ -123,6 +136,19 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			var document = _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
 			var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
 			return semanticModel.GetDiagnostics();
+		}
+
+		public async Task<IEnumerable<CompletionItem>> GetCompletions(int position, char? triggerChar, CancellationToken cancellationToken)
+		{
+			var document = _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
+
+			// If we have a trigger character, check if it should trigger stuff.
+			if (triggerChar == null ||
+				await _completionService.IsCompletionTriggerCharacterAsync(document, position - 1, cancellationToken))
+			{
+				return await _completionService.GetCompletionListAsync(document, position, triggerChar, cancellationToken);
+			}
+			return Enumerable.Empty<CompletionItem>();
 		}
 
 		private Task<ISymbol> GetSymbol(int position)

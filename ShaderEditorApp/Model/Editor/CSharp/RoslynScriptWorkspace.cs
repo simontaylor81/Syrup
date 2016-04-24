@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Host;
-using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.Text;
 
 namespace ShaderEditorApp.Model.Editor.CSharp
@@ -14,9 +13,8 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 	// AdhocWorkspace comes close, but can't handle document change notifications.
 	class RoslynScriptWorkspace : Microsoft.CodeAnalysis.Workspace
 	{
-		// TODO: What are HostServices? Do we need them?
-		public RoslynScriptWorkspace()
-			: base(MefHostServices.DefaultHost, WorkspaceKind.Host)
+		public RoslynScriptWorkspace(HostServices host)
+			: base(host, WorkspaceKind.Host)
 		{
 		}
 
