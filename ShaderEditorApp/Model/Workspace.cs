@@ -7,7 +7,9 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using ReactiveUI;
+using ShaderEditorApp.Interfaces;
 using ShaderEditorApp.Model.Projects;
+using Splat;
 using SRPCommon.Interfaces;
 using SRPCommon.Logging;
 using SRPCommon.Scene;
@@ -20,10 +22,10 @@ namespace ShaderEditorApp.Model
 	// Class for handling the workspace of the app (i.e. the central point of control).
 	public class Workspace : ReactiveObject, IWorkspace, IDisposable
 	{
-		public Workspace(RenderDevice device, ILoggerFactory loggerFactory)
+		public Workspace(RenderDevice device, ILoggerFactory loggerFactory, IUserSettings userSettings = null)
 		{
 			_loggerFactory = loggerFactory;
-			UserSettings = new UserSettings(loggerFactory);
+			_userSettings = userSettings ?? Locator.Current.GetService<IUserSettings>();
 
 			// Create classes that handle scripting.
 			var scripting = new Scripting(this, loggerFactory);
@@ -59,7 +61,7 @@ namespace ShaderEditorApp.Model
 		public void Dispose()
 		{
 			// Save settings on exit.
-			UserSettings.Save();
+			_userSettings.Save();
 
 			Renderer.Dispose();
 		}
@@ -68,8 +70,8 @@ namespace ShaderEditorApp.Model
 		public void OpenProject(string filename)
 		{
 			Project = Project.LoadFromFile(filename);
-			UserSettings.RecentProjects.AddFile(filename);
-			UserSettings.Save();
+			_userSettings.RecentProjects.AddFile(filename);
+			_userSettings.Save();
 		}
 
 		// Create a new project.
@@ -77,8 +79,8 @@ namespace ShaderEditorApp.Model
 		{
 			// Create a new project, and immediately save it to the given file.
 			Project = Project.CreateNew(filename);
-			UserSettings.RecentProjects.AddFile(filename);
-			UserSettings.Save();
+			_userSettings.RecentProjects.AddFile(filename);
+			_userSettings.Save();
 		}
 
 		// Run a single script file.
@@ -211,7 +213,7 @@ namespace ShaderEditorApp.Model
 			set { this.RaiseAndSetIfChanged(ref _currentScene, value); }
 		}
 
-		public UserSettings UserSettings { get; }
+		private IUserSettings _userSettings;
 
 		// Script execution command.
 		// We use ReactiveCommand instead of just an async function as it tracks

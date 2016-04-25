@@ -12,11 +12,13 @@ using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ReactiveUI;
+using ShaderEditorApp.Interfaces;
 using ShaderEditorApp.Model;
 using ShaderEditorApp.Services;
 using ShaderEditorApp.View;
 using ShaderEditorApp.ViewModel;
 using ShaderEditorApp.ViewModel.Workspace;
+using Splat;
 using SRPCommon.Logging;
 using SRPCommon.Util;
 using SRPRendering;
@@ -47,6 +49,9 @@ namespace ShaderEditorApp
 
 			// Create a logger factory for logging to the output window and console.
 			var loggerFactory = new CompositeLoggerFactory(outputWindowVM, new ConsoleLoggerFactory());
+
+			// Register user settings provider.
+			Locator.CurrentMutable.RegisterConstant(new UserSettings(loggerFactory), typeof(IUserSettings));
 
 			// Initialise D3D device.
 			_renderDevice = new RenderDevice();

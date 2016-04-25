@@ -26,32 +26,39 @@ namespace ShaderEditorApp.ViewModel.Workspace
 	public class DocumentViewModel : ReactiveObject, IDisposable
 	{
 		// Create a new (empty) document.
-		public static DocumentViewModel CreateEmpty(OpenDocumentSetViewModel openDocumentSet, IUserPrompt userPrompt = null, IIsForegroundService isForeground = null)
+		public static DocumentViewModel CreateEmpty(
+			IUserPrompt userPrompt = null,
+			IIsForegroundService isForeground = null,
+			IUserSettings userSettings = null)
 		{
-			return new DocumentViewModel(openDocumentSet, null, null, userPrompt, isForeground);
+			return new DocumentViewModel(null, null, userPrompt, isForeground, userSettings);
 		}
 
 		// Create a document backed by a file.
-		public static DocumentViewModel CreateFromFile(OpenDocumentSetViewModel openDocumentSet, string path, IUserPrompt userPrompt = null, IIsForegroundService isForeground = null)
+		public static DocumentViewModel CreateFromFile(
+			string path,
+			IUserPrompt userPrompt = null,
+			IIsForegroundService isForeground = null,
+			IUserSettings userSettings = null)
 		{
 			// TODO: Async?
 			var contents = File.ReadAllText(path);
 
-			return new DocumentViewModel(openDocumentSet, contents, path, userPrompt, isForeground);
+			return new DocumentViewModel(contents, path, userPrompt, isForeground, userSettings);
 		}
 
 		private DocumentViewModel(
-			OpenDocumentSetViewModel openDocumentSet,
 			string contents,
 			string filePath,
 			IUserPrompt userPrompt,
-			IIsForegroundService isForeground)
+			IIsForegroundService isForeground,
+			IUserSettings userSettings)
 		{
-			_openDocumentSet = openDocumentSet;
 			FilePath = filePath;
 
 			_userPrompt = userPrompt ?? Locator.Current.GetService<IUserPrompt>();
 			isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
+			_userSettings = userSettings ?? Locator.Current.GetService<IUserSettings>();
 
 			Document = new TextDocument(contents);
 
@@ -65,7 +72,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			_isDirty = this.WhenAny(x => x.Document.UndoStack.IsOriginalFile, change => !change.Value)
 				.ToProperty(this, x => x.IsDirty);
 
-			Close = CommandUtil.Create(_ => _openDocumentSet.CloseDocument(this));
+			Close = ReactiveCommand.Create();
 
 			// Roslyn stuff. This really needs to be factored out somewhere C#-specific.
 			{
@@ -161,8 +168,8 @@ namespace ShaderEditorApp.ViewModel.Workspace
 				Document.UndoStack.MarkAsOriginalFile();
 
 				// Add to recent file list.
-				_openDocumentSet.WorkspaceVM.Workspace.UserSettings.RecentFiles.AddFile(FilePath);
-				_openDocumentSet.WorkspaceVM.Workspace.UserSettings.Save();
+				_userSettings.RecentFiles.AddFile(FilePath);
+				_userSettings.Save();
 
 				// Re-enable the watcher.
 				Watcher.EnableRaisingEvents = true;
@@ -319,14 +326,12 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private ObservableAsPropertyHelper<IHighlightingDefinition> _syntaxHighlighting;
 		public IHighlightingDefinition SyntaxHighlighting => _syntaxHighlighting.Value;
 
-		// Back-pointer to the open document set we're in.
-		private readonly OpenDocumentSetViewModel _openDocumentSet;
-
 		// Watcher to look for external modifications.
 		private ObservableAsPropertyHelper<FileSystemWatcher> _watcher;
 		private FileSystemWatcher Watcher => _watcher.Value;
 
 		private readonly IUserPrompt _userPrompt;
+		private readonly IUserSettings _userSettings;
 		private readonly DocumentSourceTextContainer _sourceTextContainer;
 		private readonly RoslynDocumentServices _editorServices;
 		private readonly CompletionService _completionService;
@@ -340,6 +345,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		public ReactiveCommand<ImmutableArray<Diagnostic>> GetDiagnostics { get; }
 
 		private ObservableAsPropertyHelper<ImmutableArray<Diagnostic>> _diagnostics;
+
 		public ImmutableArray<Diagnostic> Diagnostics => _diagnostics.Value;
 
 		// Command to notify the user about the document being externally modified.

@@ -2,6 +2,28 @@ var vs = ri.CompileShader("BasicShaders.hlsl", "BasicVS", "vs_4_0");
 var ps = ri.CompileShader("BasicShaders.hlsl", "SolidColourPS", "ps_4_0");
 var psTex = ri.CompileShader("BasicShaders.hlsl", "TexturedPS", "ps_4_0");
 
+class MyClass
+{
+	int Property => 12;
+	int field;
+	void Method()
+	{
+	}
+}
+
+class Outer
+{
+	class Inner
+	{
+ 		private int Prop => 12;
+ 		class InnerInner { }
+	}
+}
+
+interface MyInterface
+{
+}
+
 // Test: create a checkerboard texture
 var checker = Enumerable.Range(0, 16 * 16)
 	.Select(x => (x % 2 + (x / 16) % 2) % 2);
@@ -18,6 +40,9 @@ var dummyVar = ri.AddUserVar_Float4("FloatUserVar", new [] { 0,1,2,45 });
 
 var choiceVar = ri.AddUserVar_Choice("A choice", new object [] {"A", "B", "C"}, "A");
 
+dynamic x = 10;
+var n = new { x = 10, y = 12, };
+
 float errorfunc()
 {
 	var x = 10;
@@ -33,6 +58,10 @@ int funcWithArgs(int x, int y)
 FillMode GetFillMode()
 {
 	return FillMode.Solid;
+}
+
+void VoidFunc()
+{
 }
 
 ri.Log("Hello from C#");

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
+using ShaderEditorApp.Interfaces;
 using ShaderEditorApp.Model;
 using SRPCommon.Util;
 
@@ -150,7 +151,7 @@ namespace ShaderEditorApp.ViewModel.Menu
 		private string _header;
 		public override string Header => _header;
 
-		public RecentFilesMenuItem(string header, string noFilesText, RecentFileList recentFiles, ICommand openCommand)
+		public RecentFilesMenuItem(string header, string noFilesText, IRecentFileList recentFiles, ICommand openCommand)
 		{
 			_header = header;
 

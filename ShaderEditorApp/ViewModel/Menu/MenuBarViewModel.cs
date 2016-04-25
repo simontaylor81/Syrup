@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Input;
+using ShaderEditorApp.Interfaces;
 using ShaderEditorApp.ViewModel.Workspace;
+using Splat;
 
 namespace ShaderEditorApp.ViewModel.Menu
 {
@@ -11,8 +13,10 @@ namespace ShaderEditorApp.ViewModel.Menu
 		// Items that make up the menu. Untyped to allow menu items and separators.
 		public IEnumerable<object> Items { get; }
 
-		public MenuBarViewModel(WorkspaceViewModel workspace)
+		public MenuBarViewModel(WorkspaceViewModel workspace, IUserSettings userSettings = null)
 		{
+			userSettings = userSettings ?? Locator.Current.GetService<IUserSettings>();
+
 			Items = new object[]
 			{
 				// File menu
@@ -36,9 +40,9 @@ namespace ShaderEditorApp.ViewModel.Menu
 
 					// Recently opened projects and files sub-menus.
 					new RecentFilesMenuItem(
-						"Recent Pro_jects", "No Projects", workspace.Workspace.UserSettings.RecentProjects, workspace.OpenProjectFile),
+						"Recent Pro_jects", "No Projects", userSettings.RecentProjects, workspace.OpenProjectFile),
 					new RecentFilesMenuItem(
-						"Recent _Files", "No Files", workspace.Workspace.UserSettings.RecentFiles, workspace.OpenDocumentFile),
+						"Recent _Files", "No Files", userSettings.RecentFiles, workspace.OpenDocumentFile),
 
 					SeparatorViewModel.Instance,
 

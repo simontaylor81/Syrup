@@ -255,10 +255,12 @@
     <Compile Include="Model\Editor\CSharp\RoslynDocumentServices.cs" />
     <Compile Include="Model\Editor\CSharp\RoslynScriptWorkspace.cs" />
     <Compile Include="Model\Editor\ICodeTipProvider.cs" />
+    <Compile Include="Interfaces\IUserSettings.cs" />
+    <Compile Include="Interfaces\IRecentFileList.cs" />
     <Compile Include="View\DocumentEditor\SimpleCompletionData.cs" />
     <Compile Include="Model\Progress.cs" />
-    <Compile Include="Model\RecentFileList.cs" />
-    <Compile Include="Model\UserSettings.cs" />
+    <Compile Include="Services\RecentFileList.cs" />
+    <Compile Include="Services\UserSettings.cs" />
     <Compile Include="Model\Workspace.cs" />
     <Compile Include="MVVMUtil\CommandUtil.cs" />
     <Compile Include="MVVMUtil\Converters.cs" />
