@@ -1,0 +1,3 @@
+#load "referenced.csx"
+
+externalFunc();

@@ -14,15 +14,14 @@
       <include filename="DeferredShading.cs" runAtStartup="true" />
       <include filename="LongRunningScript.cs" runAtStartup="false" />
       <include filename="UserPropertyTexture.cs" runAtStartup="false" />
+      <include filename="referencer.csx" runAtStartup="false" />
+      <include filename="referenced.csx" runAtStartup="false" />
     </folder>
     <include filename="TankScene/tank.srpscene" runAtStartup="false" />
     <include filename="myscene.srpscene" runAtStartup="false" />
   </folder>
   <OpenDocuments>
-    <OpenDocument path="C:\github\Syrup\testproject\scripttest.cs" />
-    <OpenDocument path="C:\github\Syrup\testproject\BasicShaders.hlsl" />
-    <OpenDocument path="C:\GitHub\Syrup\testproject\DeferredShading.cs" />
-    <OpenDocument path="C:\GitHub\Syrup\testproject\DeferredShading.hlsl" />
-    <OpenDocument path="C:\GitHub\Syrup\testproject\UserPropertyTexture.cs" />
+    <OpenDocument path="C:\GitHub\Syrup\Samples\testproject_cs\referencer.csx" />
+    <OpenDocument path="C:\GitHub\Syrup\Samples\testproject_cs\referenced.csx" />
   </OpenDocuments>
 </project>

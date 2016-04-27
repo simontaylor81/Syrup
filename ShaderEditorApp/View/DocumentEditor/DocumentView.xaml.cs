@@ -60,7 +60,7 @@ namespace ShaderEditorApp.View
 				diagnosticsChanged.Select(diagnostics => CreateSquigglies(diagnostics)));
 			textEditor.TextArea.TextView.BackgroundRenderers.Add(_squigglyService);
 
-			_codeTipService = new CodeTipService(textEditor, viewModel.Document, viewModel.CodeTipProvider,
+			_codeTipService = new CodeTipService(textEditor, viewModel.Document, viewModel.DocumentServices,
 				diagnosticsChanged.Select(diagnostics => CreateCodeTips(diagnostics)));
 
 			// Get initial set of diagnostics.

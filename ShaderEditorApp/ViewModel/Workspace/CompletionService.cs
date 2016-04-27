@@ -20,14 +20,13 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		}
 	}
 
-	// Class for handling code completion requests.
-	// Currently C# only.
+	// Class for handling async code completion requests.
 	internal class CompletionService
 	{
-		private readonly RoslynDocumentServices _editorServices;
+		private readonly IDocumentServices _editorServices;
 		private CancellationTokenSource _completionCancellation;
 
-		public CompletionService(RoslynDocumentServices editorServices)
+		public CompletionService(IDocumentServices editorServices)
 		{
 			_editorServices = editorServices;
 		}

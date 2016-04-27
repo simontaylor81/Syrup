@@ -27,16 +27,18 @@ namespace ShaderEditorApp.ViewModel.Workspace
 	{
 		// Create a new (empty) document.
 		public static DocumentViewModel CreateEmpty(
+			RoslynWorkspaceServices csharpEditorServices,
 			IUserPrompt userPrompt = null,
 			IIsForegroundService isForeground = null,
 			IUserSettings userSettings = null)
 		{
-			return new DocumentViewModel(null, null, userPrompt, isForeground, userSettings);
+			return new DocumentViewModel(null, null, csharpEditorServices, userPrompt, isForeground, userSettings);
 		}
 
 		// Create a document backed by a file.
 		public static DocumentViewModel CreateFromFile(
 			string path,
+			RoslynWorkspaceServices csharpEditorServices,
 			IUserPrompt userPrompt = null,
 			IIsForegroundService isForeground = null,
 			IUserSettings userSettings = null)
@@ -44,12 +46,13 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			// TODO: Async?
 			var contents = File.ReadAllText(path);
 
-			return new DocumentViewModel(contents, path, userPrompt, isForeground, userSettings);
+			return new DocumentViewModel(contents, path, csharpEditorServices, userPrompt, isForeground, userSettings);
 		}
 
 		private DocumentViewModel(
 			string contents,
 			string filePath,
+			RoslynWorkspaceServices csharpEditorServices,
 			IUserPrompt userPrompt,
 			IIsForegroundService isForeground,
 			IUserSettings userSettings)
@@ -65,7 +68,9 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			// Create a text source container for this file.
 			// TEMP: Currently doing this for all files, not just C#.
 			_sourceTextContainer = new DocumentSourceTextContainer(Document);
-			_editorServices = new RoslynDocumentServices(_sourceTextContainer, FilePath);
+
+			// Add the document to the workspace.
+			_editorServices = csharpEditorServices.OpenDocument(_sourceTextContainer, FilePath);
 			_completionService = new CompletionService(_editorServices);
 
 			// Get 'dirtiness' from the document's undo stack.
@@ -209,6 +214,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		public void Dispose()
 		{
 			Watcher?.Dispose();
+			_editorServices.Dispose();
 		}
 
 		// Name to display on the document tab.
@@ -333,10 +339,10 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private readonly IUserPrompt _userPrompt;
 		private readonly IUserSettings _userSettings;
 		private readonly DocumentSourceTextContainer _sourceTextContainer;
-		private readonly RoslynDocumentServices _editorServices;
+		private readonly IDocumentServices _editorServices;
 		private readonly CompletionService _completionService;
 
-		public ICodeTipProvider CodeTipProvider => _editorServices;
+		public IDocumentServices DocumentServices => _editorServices;
 
 		// Command to close this document.
 		public ReactiveCommand<object> Close { get; }

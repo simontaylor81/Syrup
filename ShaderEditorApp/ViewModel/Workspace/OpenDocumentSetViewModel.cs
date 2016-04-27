@@ -13,6 +13,7 @@ using System.Windows;
 using SRPCommon.Logging;
 using ShaderEditorApp.Interfaces;
 using Splat;
+using ShaderEditorApp.Model.Editor.CSharp;
 
 namespace ShaderEditorApp.ViewModel.Workspace
 {
@@ -27,6 +28,8 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			WorkspaceVM = workspaceVM;
 			_logger = loggerFactory.CreateLogger("Log");
 			_userSettings = userSettings ?? Locator.Current.GetService<IUserSettings>();
+
+			_csharpEditorServices = new RoslynWorkspaceServices(WorkspaceVM.Workspace);
 
 			// Create documents list, and wrap in a read-only wrapper.
 			documents = new ObservableCollection<DocumentViewModel>();
@@ -67,7 +70,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			else if (File.Exists(path))
 			{
 				// Create a new document.
-				document = DocumentViewModel.CreateFromFile(path);
+				document = DocumentViewModel.CreateFromFile(path, _csharpEditorServices);
 				AddDocument(document);
 			}
 			else
@@ -117,7 +120,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		// Create a new document.
 		public void NewDocument()
 		{
-			var document = DocumentViewModel.CreateEmpty();
+			var document = DocumentViewModel.CreateEmpty(_csharpEditorServices);
 			AddDocument(document);
 			WorkspaceVM.ActiveWindow = document;
 		}
@@ -167,5 +170,6 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 		private readonly SRPCommon.Logging.ILogger _logger;
 		private readonly IUserSettings _userSettings;
+		private readonly RoslynWorkspaceServices _csharpEditorServices;
 	}
 }

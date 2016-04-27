@@ -181,6 +181,7 @@
     <Compile Include="Scripting\PythonScripting.cs" />
     <Compile Include="Scripting\Script.cs" />
     <Compile Include="Scripting\ScriptException.cs" />
+    <Compile Include="Scripting\WorkspaceReferenceResolver.cs" />
     <Compile Include="UserProperties\IChoiceProperty.cs" />
     <Compile Include="UserProperties\IMatrixProperty.cs" />
     <Compile Include="UserProperties\IPropertySource.cs" />

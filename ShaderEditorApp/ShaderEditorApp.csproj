@@ -252,9 +252,11 @@
     <Compile Include="Model\Editor\CompletionItem.cs" />
     <Compile Include="Model\Editor\CSharp\CodeTipFormatter.cs" />
     <Compile Include="Model\Editor\CSharp\CompletionServiceWrapper.cs" />
+    <Compile Include="Model\Editor\CSharp\IDocumentServices.cs" />
+    <Compile Include="Model\Editor\CSharp\OpenDocumentReferenceResolver.cs" />
+    <Compile Include="Model\Editor\CSharp\RoslynWorkspaceServices.cs" />
     <Compile Include="Model\Editor\CSharp\RoslynDocumentServices.cs" />
     <Compile Include="Model\Editor\CSharp\RoslynScriptWorkspace.cs" />
-    <Compile Include="Model\Editor\ICodeTipProvider.cs" />
     <Compile Include="Interfaces\IUserSettings.cs" />
     <Compile Include="Interfaces\IRecentFileList.cs" />
     <Compile Include="View\DocumentEditor\SimpleCompletionData.cs" />

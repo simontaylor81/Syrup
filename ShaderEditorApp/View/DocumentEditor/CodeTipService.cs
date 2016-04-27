@@ -14,6 +14,7 @@ using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 using ReactiveUI;
 using ShaderEditorApp.Model.Editor;
+using ShaderEditorApp.Model.Editor.CSharp;
 using SRPCommon.Util;
 
 namespace ShaderEditorApp.View.DocumentEditor
@@ -33,14 +34,14 @@ namespace ShaderEditorApp.View.DocumentEditor
 		private readonly ToolTip _toolTip;
 
 		// Provider for pulling tips from the compiler infrastructure.
-		private readonly ICodeTipProvider _tipProvider;
+		private readonly IDocumentServices _tipProvider;
 
 		private CancellationTokenSource _outstandingRequest;
 
 		// Tips that are pushed at us by the diagnostic system.
 		private TextSegmentCollection<CodeTip> _pushTips;
 
-		public CodeTipService(TextEditor textEditor, TextDocument document, ICodeTipProvider tipProvider, IObservable<IEnumerable<CodeTip>> pushTips)
+		public CodeTipService(TextEditor textEditor, TextDocument document, IDocumentServices tipProvider, IObservable<IEnumerable<CodeTip>> pushTips)
 		{
 			_textEditor = textEditor;
 			_document = document;
