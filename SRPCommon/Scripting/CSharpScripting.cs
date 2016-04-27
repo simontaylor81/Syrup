@@ -13,12 +13,12 @@ namespace SRPCommon.Scripting
 {
 	class CSharpScripting
 	{
-		private ILoggerFactory _loggerFactory;
-		private IWorkspace _workspace;
+		private readonly ILoggerFactory _loggerFactory;
+		private readonly WorkspaceReferenceResolver _referenceResolver;
 
 		public CSharpScripting(IWorkspace workspace, ILoggerFactory loggerFactory)
 		{
-			_workspace = workspace;
+			_referenceResolver = new WorkspaceReferenceResolver(workspace);
 			_loggerFactory = loggerFactory;
 		}
 
@@ -38,7 +38,8 @@ namespace SRPCommon.Scripting
 					"System.Linq",
 					"System.Collections.Generic",
 					"System.Numerics",
-					"SRPScripting");
+					"SRPScripting")
+				.WithSourceResolver(_referenceResolver);
 
 			var compiled = CSharpScript.Create(code, options: options, globalsType: typeof(CSharpGlobals));
 			var runner = compiled.CreateDelegate();
