@@ -78,9 +78,7 @@ namespace ShaderEditorApp
 				InputBindings.Add(new KeyBinding(cmd.Command, cmd.KeyGesture));
 			}
 
-			// Set up syntax highlighting for the editor control.
-			LoadSyntaxHighlightingDefinition("Python");
-			LoadSyntaxHighlightingDefinition("HLSL");
+			InitHighlighting();
 
 			// Load a file specified on the commandline.
 			var commandlineParams = Environment.GetCommandLineArgs();
@@ -144,6 +142,17 @@ namespace ShaderEditorApp
 		void CompositionTarget_Rendering(object sender, EventArgs e)
 		{
 			renderWindow.Tick();
+		}
+
+		// Set up syntax highlighting for the editor control.
+		private void InitHighlighting()
+		{
+			LoadSyntaxHighlightingDefinition("Python");
+			LoadSyntaxHighlightingDefinition("HLSL");
+
+			// Add C# highlighting definitions for .csx files.
+			HighlightingManager.Instance.RegisterHighlighting(null, new[] { ".csx" },
+				HighlightingManager.Instance.GetDefinition("C#"));
 		}
 
 		private void LoadSyntaxHighlightingDefinition(string language)
