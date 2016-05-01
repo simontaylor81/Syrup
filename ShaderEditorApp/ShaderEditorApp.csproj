@@ -259,6 +259,7 @@
     <Compile Include="Model\Editor\CSharp\RoslynScriptWorkspace.cs" />
     <Compile Include="Interfaces\IUserSettings.cs" />
     <Compile Include="Interfaces\IRecentFileList.cs" />
+    <Compile Include="Model\Editor\CSharp\TaskReflectionHelper.cs" />
     <Compile Include="View\DocumentEditor\SimpleCompletionData.cs" />
     <Compile Include="Model\Progress.cs" />
     <Compile Include="Services\RecentFileList.cs" />

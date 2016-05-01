@@ -19,12 +19,12 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 		private readonly MethodInfo _isCompletionTriggerCharacterAsync;
 		private readonly MethodInfo _createInvokeCompletionTriggerInfo;
 		private readonly MethodInfo _createTypeCharTriggerInfo;
-		private readonly PropertyInfo _task_CompletionList_Result;
 		private readonly PropertyInfo _completionList_Items;
 		private readonly PropertyInfo _completionItem_DisplayText;
 		private readonly PropertyInfo _completionItem_FilterText;
 		private readonly PropertyInfo _completionItem_FilterSpan;
-		private readonly PropertyInfo _task_bool_Result;
+		private readonly TaskReflectionHelper _completionListTaskHelper;
+		private readonly TaskReflectionHelper<bool> _boolTaskHelper;
 
 		public CompletionServiceWrapper()
 		{
@@ -40,9 +40,9 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			_createTypeCharTriggerInfo = completionTriggerInfoType.GetMethod("CreateTypeCharTriggerInfo");
 
 			var completionListType = assembly.GetType("Microsoft.CodeAnalysis.Completion.CompletionList");
-			_task_CompletionList_Result = typeof(Task<>).MakeGenericType(completionListType).GetProperty("Result");
+			_completionListTaskHelper = new TaskReflectionHelper(completionListType);
 
-			_task_bool_Result = typeof(Task<>).MakeGenericType(typeof(bool)).GetProperty("Result");
+			_boolTaskHelper = new TaskReflectionHelper<bool>();
 
 			_completionList_Items = completionListType.GetProperty("Items");
 
@@ -65,7 +65,7 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			await task.ConfigureAwait(false);
 
 			// Extract result from generic task.
-			var completionList = _task_CompletionList_Result.GetValue(task);
+			var completionList = _completionListTaskHelper.GetResult(task);
 			if (completionList != null)
 			{
 				var items = (IEnumerable<object>)_completionList_Items.GetValue(completionList);
@@ -85,7 +85,7 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			await task.ConfigureAwait(false);
 
 			// Extract result from generic task.
-			return (bool)_task_bool_Result.GetValue(task);
+			return _boolTaskHelper.GetResult(task);
 		}
 
 		private object CreateTriggerInfo(char? triggerChar)
