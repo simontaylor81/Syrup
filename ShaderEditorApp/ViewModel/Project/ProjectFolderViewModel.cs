@@ -102,6 +102,9 @@ namespace ShaderEditorApp.ViewModel.Projects
 
 				// Add it to the project.
 				AddItem(dialog.FileName);
+
+				// Open the new document.
+				WorkspaceVM.OpenDocumentFile.Execute(dialog.FileName);
 			}
 		}
 
