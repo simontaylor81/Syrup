@@ -36,10 +36,10 @@ namespace SRPScripting
 		ITexture2D CreateTexture2D(int width, int height, Format format, Func<int, int, object> contentCallback);
 
 		// Create a structured buffer containing the given contents exactly as it is.
-		IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents) where T : struct;
+		IBuffer CreateBuffer<T>(IEnumerable<T> contents) where T : struct;
 
 		// Create an buffer of the given size and format, optionally with initial data that is converted to the correct format.
-		IBuffer CreateFormattedBuffer<T>(int numElements, Format format, IEnumerable<T> contents);
+		IBuffer CreateTypedBuffer<T>(int numElements, Format format, IEnumerable<T> contents);
 
 		// Create an uninitialised buffer of the given size and format, to be written to by the GPU.
 		IBuffer CreateUninitialisedBuffer(int sizeInBytes, int stride);

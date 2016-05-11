@@ -133,6 +133,11 @@
       "script": "ReadFromBuffer",
       "python": true,
       "cs": true
+    },
+    {
+      "script": "DispatchIndirect",
+      "python": false,
+      "cs": true
     }
   ]
 }

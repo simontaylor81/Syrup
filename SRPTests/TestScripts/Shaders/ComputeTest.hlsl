@@ -28,3 +28,9 @@ void ReadFromComplexBuffer(uint3 id : SV_DispatchThreadID)
 	BufferElement element = InBufferComplex[id.x];
 	OutUAV[id.x] = element.Vec2.x + element.Vec2.y + element.Uint;
 }
+
+[numthreads(1, 1, 1)]
+void IndirectDispatchTest(uint3 id : SV_DispatchThreadID)
+{
+	OutUAV[id.x] = id.x;
+}

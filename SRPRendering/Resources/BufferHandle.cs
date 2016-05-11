@@ -16,7 +16,10 @@ namespace SRPRendering.Resources
 	{
 		protected UavHandle _uav;
 
-		public ID3DShaderResource Resource { get; protected set; }
+		public bool HasDrawIndirectArgs { get; private set; }
+
+		public Buffer Buffer { get; protected set; }
+		public ID3DShaderResource Resource => Buffer;
 
 		public abstract void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator);
 
@@ -24,6 +27,13 @@ namespace SRPRendering.Resources
 		{
 			_uav = _uav ?? new UavHandle();
 			return _uav;
+		}
+
+		// Mark this buffer as containing indirect draw arguments.
+		public IBuffer ContainsDrawIndirectArgs()
+		{
+			HasDrawIndirectArgs = true;
+			return this;
 		}
 	}
 
@@ -45,7 +55,8 @@ namespace SRPRendering.Resources
 		{
 			using (var stream = _contents != null ? StreamUtil.CreateStream(_contents.Cast<object>(), _numElements, _format) : null)
 			{
-				Resource = new Buffer(renderDevice.Device, _numElements * _format.Size(), _format.Size(), _uav != null, stream);
+				Buffer = new Buffer(renderDevice.Device, _numElements * _format.Size(),
+					_format.Size(), _uav != null, HasDrawIndirectArgs, stream);
 				if (_uav != null)
 				{
 					_uav.UAV = Resource.UAV;
@@ -66,7 +77,7 @@ namespace SRPRendering.Resources
 
 		public override void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
 		{
-			Resource = Buffer.CreateStructured(renderDevice.Device, _uav != null, _contents);
+			Buffer = Buffer.CreateStructured(renderDevice.Device, _uav != null, HasDrawIndirectArgs, _contents);
 			if (_uav != null)
 			{
 				_uav.UAV = Resource.UAV;
@@ -88,7 +99,7 @@ namespace SRPRendering.Resources
 
 		public override void CreateResource(RenderDevice renderDevice, ILogger logger, MipGenerator mipGenerator)
 		{
-			Resource = new Buffer(renderDevice.Device, _sizeInBytes, _stride, _uav != null, null);
+			Buffer = new Buffer(renderDevice.Device, _sizeInBytes, _stride, _uav != null, HasDrawIndirectArgs, null);
 			if (_uav != null)
 			{
 				_uav.UAV = Resource.UAV;

@@ -9,7 +9,7 @@ var cs = ri.CompileShader("ComputeTest.hlsl", "ReadFromBuffer", "cs_4_0");
 int numElements = 16;
 var input = Enumerable.Range(0, numElements).Select(x => (float)x);
 
-var inputBuffer = ri.CreateStructuredBuffer(input);
+var inputBuffer = ri.CreateBuffer(input);
 var outputBuffer = ri.CreateUninitialisedBuffer(numElements * 4, 4);
 cs.FindResourceVariable("InBuffer").Set(inputBuffer);
 cs.FindUavVariable("OutUAV").Set(outputBuffer.CreateUav());

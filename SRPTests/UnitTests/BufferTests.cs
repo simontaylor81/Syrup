@@ -27,7 +27,7 @@ namespace SRPTests.UnitTests
 		[Fact]
 		public void Buffer_without_initial_data_is_all_zeros()
 		{
-			using (var buffer = new Buffer(_device.Device, 4 * sizeof(float), sizeof(float), false, null))
+			using (var buffer = new Buffer(_device.Device, 4 * sizeof(float), sizeof(float), false, false, null))
 			{
 				var contents = buffer.GetContents<float>();
 				Assert.Equal(contents, new[] { 0.0f, 0.0f, 0.0f, 0.0f });

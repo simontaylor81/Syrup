@@ -45,7 +45,7 @@ namespace SRPCommon.Scripting
 				contentsEnumerable = contents;
 			}
 
-			return _typedInterface.CreateFormattedBuffer(numElements, format, contentsEnumerable);
+			return _typedInterface.CreateTypedBuffer(numElements, format, contentsEnumerable);
 		}
 
 		public IRenderTarget CreateRenderTarget() => _typedInterface.CreateRenderTarget();

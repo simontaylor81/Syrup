@@ -42,6 +42,10 @@ namespace SRPScripting
 		void Dispatch(IShader shader, int numGroupsX, int numGroupsY, int numGroupsZ,
 			IDictionary<string, object> shaderVariableOverrides = null);
 
+		// Indirect compute shader dispatch.
+		void DispatchIndirect(IShader shader, IBuffer argBuffer, int argOffset,
+			IDictionary<string, object> shaderVariableOverrides = null);
+
 		// Clear render targets.
 		void Clear(dynamic colour, IEnumerable<IRenderTarget> renderTargets = null);
 

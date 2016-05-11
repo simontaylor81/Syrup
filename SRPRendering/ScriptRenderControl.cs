@@ -194,11 +194,11 @@ namespace SRPRendering
 		}
 
 		// Create a structured buffer containing the given contents exactly as it is.
-		public IBuffer CreateStructuredBuffer<T>(IEnumerable<T> contents) where T : struct =>
+		public IBuffer CreateBuffer<T>(IEnumerable<T> contents) where T : struct =>
 			_deferredResources.AddAndReturn(new BufferHandleStructured<T>(contents));
 
 		// Create an buffer of the given size and format, optionally with initial data that is converted to the correct format.
-		public IBuffer CreateFormattedBuffer<T>(int numElements, Format format, IEnumerable<T> contents) =>
+		public IBuffer CreateTypedBuffer<T>(int numElements, Format format, IEnumerable<T> contents) =>
 			_deferredResources.AddAndReturn(new BufferHandleFormatted<T>(numElements, format, contents));
 
 		// Create an uninitialised buffer of the given size and format, to be written to by the GPU.

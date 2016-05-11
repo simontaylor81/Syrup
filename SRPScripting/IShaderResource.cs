@@ -17,6 +17,9 @@ namespace SRPScripting
 		// Create a UAV for this resource.
 		// TODO: Move to base interface and implement for textures.
 		IUav CreateUav();
+
+		// Mark this buffer as containing indirect draw arguments.
+		IBuffer ContainsDrawIndirectArgs();
 	}
 
 	// A 2D texture.

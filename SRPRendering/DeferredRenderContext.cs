@@ -43,6 +43,9 @@ namespace SRPRendering
 			foreach (var command in _commands)
 			{
 				command(deviceContext);
+
+				// Enforce statelessness.
+				deviceContext.ClearState();
 			}
 		}
 
@@ -138,6 +141,29 @@ namespace SRPRendering
 			_commands.Add(deviceContext => DispatchImpl(deviceContext, cs, numGroupsX, numGroupsY, numGroupsZ, shaderVariableOverrides));
 		}
 
+		public void DispatchIndirect(IShader shader, IBuffer argBuffer, int argOffset, IDictionary<string, object> shaderVariableOverrides = null)
+		{
+			Shader cs = GetShader(shader);
+			if (cs == null)
+			{
+				throw new ScriptException("DispatchIndirect: compute shader is required");
+			}
+
+			var argBufferHandle = argBuffer as BufferHandle;
+			if (argBufferHandle == null)
+			{
+				throw new ScriptException("DispatchIndirect: invalid argument buffer");
+			}
+			if (!argBufferHandle.HasDrawIndirectArgs)
+			{
+				throw new ScriptException(
+					"DispatchIndirect: argument buffer must be marked as containing indirect arguments using ContainsIndirectDrawArgs");
+			}
+
+			_usedShaders.Add(cs);
+			_commands.Add(deviceContext => DispatchIndirectImpl(deviceContext, cs, argBufferHandle.Buffer, argOffset, shaderVariableOverrides));
+		}
+
 		public void Clear(dynamic colour, IEnumerable<IRenderTarget> renderTargetInterfaces = null)
 		{
 			// Convert list of floats to a colour.
@@ -206,9 +232,6 @@ namespace SRPRendering
 				UpdateShaders(deviceContext, vertexShader, pixelShader, proxy, shaderVariableOverrides);
 				proxy.Mesh.Draw(deviceContext);
 			}
-
-			// Force all state to defaults -- we're completely stateless.
-			deviceContext.ClearState();
 		}
 
 		// Draw a unit sphere.
@@ -237,9 +260,6 @@ namespace SRPRendering
 			// Draw the sphere mesh.
 			UpdateShaders(deviceContext, vertexShader, pixelShader, null, shaderVariableOverrides);        // TODO: Pass a valid proxy here?
 			_globalResources.SphereMesh.Draw(deviceContext);
-
-			// Force all state to defaults -- we're completely stateless.
-			deviceContext.ClearState();
 		}
 
 		// Draw a fullscreen quad.
@@ -264,9 +284,6 @@ namespace SRPRendering
 			// Draw the quad.
 			UpdateShaders(deviceContext, vertexShader, pixelShader, null, shaderVariableOverrides);
 			_globalResources.FullscreenQuad.Draw(deviceContext);
-
-			// Force all state to defaults -- we're completely stateless.
-			deviceContext.ClearState();
 		}
 
 		// Dispatch a compute shader.
@@ -281,9 +298,19 @@ namespace SRPRendering
 			cs.Set(deviceContext);
 			cs.UpdateVariables(deviceContext, viewInfo, null, shaderVariableOverrides, _globalResources, _scriptLogger);
 			deviceContext.Dispatch(numGroupsX, numGroupsY, numGroupsZ);
+		}
 
-			// Enforce statelessness.
-			deviceContext.ClearState();
+		// Indirect compute shader dispatch.
+		private void DispatchIndirectImpl(
+			DeviceContext deviceContext,
+			Shader cs,
+			Resources.Buffer buffer,
+			int argOffset,
+			IDictionary<string, object> shaderVariableOverrides)
+		{
+			cs.Set(deviceContext);
+			cs.UpdateVariables(deviceContext, viewInfo, null, shaderVariableOverrides, _globalResources, _scriptLogger);
+			deviceContext.DispatchIndirect(buffer.RawBuffer, argOffset);
 		}
 
 		// Clear render targets.
@@ -329,9 +356,6 @@ namespace SRPRendering
 
 			// Draw the sphere.
 			_globalResources.SphereMesh.Draw(deviceContext);
-
-			// Force all state to defaults -- we're completely stateless.
-			deviceContext.ClearState();
 		}
 
 		#endregion
@@ -356,6 +380,8 @@ namespace SRPRendering
 		// Access a render target by handle.
 		private RenderTarget GetRenderTarget(IRenderTarget rt, [CallerMemberName] string caller = null)
 		{
+			Trace.Assert(caller != null);
+
 			// Null has special meaning (using backbuffer).
 			if (rt == null)
 			{
@@ -377,10 +403,10 @@ namespace SRPRendering
 		}
 
 		// Get list of render targets for a list of handles.
-		private IEnumerable<RenderTarget> GetRenderTargets(IEnumerable<IRenderTarget> renderTargets)
+		private IEnumerable<RenderTarget> GetRenderTargets(IEnumerable<IRenderTarget> renderTargets, [CallerMemberName] string caller = null)
 			=> renderTargets
 				.EmptyIfNull()
-				.Select(handle => GetRenderTarget(handle))
+				.Select(handle => GetRenderTarget(handle, caller))
 				.ToList();
 
 		// Get the depth buffer corresponding to a handle.
