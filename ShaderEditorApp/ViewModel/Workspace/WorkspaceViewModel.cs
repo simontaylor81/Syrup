@@ -158,11 +158,20 @@ namespace ShaderEditorApp.ViewModel.Workspace
 					menuHeader: "_Go To Definition",
 					keyGesture: new KeyGesture(Key.F12));
 
+				ShowCompletions = new CommandViewModel(
+					"Auto Complete",
+					ReactiveCommand.CreateAsyncObservable(hasActiveDocument, param => OpenDocumentSet.ActiveDocument.ShowCompletions.ExecuteAsync()),
+					keyGesture: new KeyGesture(Key.Space, ModifierKeys.Control));
+				ShowSignatureHelp = new CommandViewModel(
+					"Parameter Info",
+					ReactiveCommand.CreateAsyncObservable(hasActiveDocument, param => OpenDocumentSet.ActiveDocument.ShowSignatureHelp.ExecuteAsync()),
+					keyGesture: new KeyGesture(Key.Space, ModifierKeys.Control | ModifierKeys.Shift));
+
 				// Add commands with a key binding to the big list. Don't include Exit -- it's binding is part of Windows.
 				KeyBoundCommands = new[]
 				{
 					OpenProject, NewProject, OpenDocument, NewDocument, CloseActiveDocument, SaveActiveDocument, SaveAll, RunActiveScript,
-					GoToDefinition,
+					GoToDefinition, ShowCompletions, ShowSignatureHelp,
 				};
 			}
 
@@ -368,6 +377,8 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		public CommandViewModel ExitCommand { get; }
 
 		public CommandViewModel GoToDefinition { get; }
+		public CommandViewModel ShowCompletions { get; }
+		public CommandViewModel ShowSignatureHelp { get; }
 
 		#endregion
 	}

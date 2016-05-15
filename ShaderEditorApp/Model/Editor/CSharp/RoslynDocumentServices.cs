@@ -20,6 +20,8 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 
 		private readonly CompletionServiceWrapper _completionService = new CompletionServiceWrapper();
 
+		private Document Document => _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
+
 		public RoslynDocumentServices(
 			RoslynScriptWorkspace roslynWorkspace,
 			DocumentId documentId,
@@ -62,28 +64,24 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 
 		public async Task<ImmutableArray<Diagnostic>> GetDiagnosticsAsync(CancellationToken cancellationToken)
 		{
-			var document = _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
-			var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
+			var semanticModel = await Document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
 			return semanticModel.GetDiagnostics();
 		}
 
 		public async Task<IEnumerable<CompletionItem>> GetCompletions(int position, char? triggerChar, CancellationToken cancellationToken)
 		{
-			var document = _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
-
 			// If we have a trigger character, check if it should trigger stuff.
 			if (triggerChar == null ||
-				await _completionService.IsCompletionTriggerCharacterAsync(document, position - 1, cancellationToken))
+				await _completionService.IsCompletionTriggerCharacterAsync(Document, position - 1, cancellationToken))
 			{
-				return await _completionService.GetCompletionListAsync(document, position, triggerChar, cancellationToken);
+				return await _completionService.GetCompletionListAsync(Document, position, triggerChar, cancellationToken);
 			}
 			return Enumerable.Empty<CompletionItem>();
 		}
 
-		private Task<ISymbol> GetSymbol(int position)
-		{
-			var document = _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
-			return SymbolFinder.FindSymbolAtPositionAsync(document, position);
-		}
+		public Task<SignatureHelp> GetSignatureHelp(int position, CancellationToken cancellationToken)
+			=> SignatureHelpService.GetSignatureHelp(Document, position, cancellationToken);
+
+		private Task<ISymbol> GetSymbol(int position) => SymbolFinder.FindSymbolAtPositionAsync(Document, position);
 	}
 }

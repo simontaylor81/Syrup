@@ -159,8 +159,8 @@ namespace ShaderEditorApp.Model
 
 		public string FindProjectFile(string name)
 		{
-			var shaderFileItem = Project.AllItems.FirstOrDefault(item => string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase));
-			return shaderFileItem != null ? shaderFileItem.AbsolutePath : null;
+			var fileItem = Project?.AllItems?.FirstOrDefault(item => string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase));
+			return fileItem != null ? fileItem.AbsolutePath : null;
 		}
 
 		// Given an absolute or project-relative path, get an absolute path.

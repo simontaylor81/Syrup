@@ -19,6 +19,7 @@ using ShaderEditorApp.MVVMUtil;
 using Splat;
 
 using TextDocument = ICSharpCode.AvalonEdit.Document.TextDocument;
+using ILogger = SRPCommon.Logging.ILogger;
 
 namespace ShaderEditorApp.ViewModel.Workspace
 {
@@ -28,17 +29,19 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		// Create a new (empty) document.
 		public static DocumentViewModel CreateEmpty(
 			RoslynWorkspaceServices csharpEditorServices,
+			ILogger logger,
 			IUserPrompt userPrompt = null,
 			IIsForegroundService isForeground = null,
 			IUserSettings userSettings = null)
 		{
-			return new DocumentViewModel(null, null, csharpEditorServices, userPrompt, isForeground, userSettings);
+			return new DocumentViewModel(null, null, csharpEditorServices, logger, userPrompt, isForeground, userSettings);
 		}
 
 		// Create a document backed by a file.
 		public static DocumentViewModel CreateFromFile(
 			string path,
 			RoslynWorkspaceServices csharpEditorServices,
+			ILogger logger,
 			IUserPrompt userPrompt = null,
 			IIsForegroundService isForeground = null,
 			IUserSettings userSettings = null)
@@ -46,13 +49,14 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			// TODO: Async?
 			var contents = File.ReadAllText(path);
 
-			return new DocumentViewModel(contents, path, csharpEditorServices, userPrompt, isForeground, userSettings);
+			return new DocumentViewModel(contents, path, csharpEditorServices, logger, userPrompt, isForeground, userSettings);
 		}
 
 		private DocumentViewModel(
 			string contents,
 			string filePath,
 			RoslynWorkspaceServices csharpEditorServices,
+			ILogger logger,
 			IUserPrompt userPrompt,
 			IIsForegroundService isForeground,
 			IUserSettings userSettings)
@@ -71,7 +75,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 			// Add the document to the workspace.
 			_editorServices = csharpEditorServices.OpenDocument(_sourceTextContainer, FilePath);
-			_completionService = new CompletionService(_editorServices);
+			CompletionService = new CompletionService(_editorServices, logger);
 
 			// Get 'dirtiness' from the document's undo stack.
 			_isDirty = this.WhenAny(x => x.Document.UndoStack.IsOriginalFile, change => !change.Value)
@@ -92,6 +96,10 @@ namespace ShaderEditorApp.ViewModel.Workspace
 				documentChanged
 					.Throttle(TimeSpan.FromMilliseconds(500))
 					.InvokeCommand(GetDiagnostics);
+
+				// Trigger fetch of completions/signature help when requested.
+				ShowCompletions = CommandUtil.Create(_ => CompletionService.TriggerCompletions(CaretOffset, null));
+				ShowSignatureHelp = CommandUtil.Create(_ => CompletionService.TriggerSignatureHelp(CaretOffset));
 			}
 
 			// Update display name based on filename and dirtiness.
@@ -207,9 +215,11 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			return false;
 		}
 
-		// Get potential completions for the current position.
-		public Task<CompletionList> GetCompletions(char? triggerChar)
-			=> _completionService.GetCompletions(CaretOffset, triggerChar);
+		// Manually invoke completion fetch when typing a character.
+		public void TriggerCompletions(char triggerChar)
+		{
+			CompletionService.TriggerCompletions(CaretOffset, triggerChar);
+		}
 
 		public void Dispose()
 		{
@@ -340,7 +350,6 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private readonly IUserSettings _userSettings;
 		private readonly DocumentSourceTextContainer _sourceTextContainer;
 		private readonly IDocumentServices _editorServices;
-		private readonly CompletionService _completionService;
 
 		public IDocumentServices DocumentServices => _editorServices;
 
@@ -349,6 +358,12 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 		public ReactiveCommand<Unit> GoToDefinition { get; }
 		public ReactiveCommand<ImmutableArray<Diagnostic>> GetDiagnostics { get; }
+
+		// Commands for manually-invoked intellisense operations.
+		public ReactiveCommand<object> ShowCompletions { get; }
+		public ReactiveCommand<object> ShowSignatureHelp { get; }
+
+		public CompletionService CompletionService { get; }
 
 		private ObservableAsPropertyHelper<ImmutableArray<Diagnostic>> _diagnostics;
 

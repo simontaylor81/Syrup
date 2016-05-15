@@ -70,7 +70,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			else if (File.Exists(path))
 			{
 				// Create a new document.
-				document = DocumentViewModel.CreateFromFile(path, _csharpEditorServices);
+				document = DocumentViewModel.CreateFromFile(path, _csharpEditorServices, _logger);
 				AddDocument(document);
 			}
 			else
@@ -120,7 +120,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		// Create a new document.
 		public void NewDocument()
 		{
-			var document = DocumentViewModel.CreateEmpty(_csharpEditorServices);
+			var document = DocumentViewModel.CreateEmpty(_csharpEditorServices, _logger);
 			AddDocument(document);
 			WorkspaceVM.ActiveWindow = document;
 		}
