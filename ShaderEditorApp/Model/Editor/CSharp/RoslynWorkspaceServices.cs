@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Build.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.FindSymbols;
@@ -28,6 +29,9 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 		private readonly IEnumerable<PortableExecutableReference> _metadataReferences;
 		private readonly MefHostServices _host;
 		private readonly OpenDocumentReferenceResolver _referenceResolver;
+		private readonly CompletionServiceWrapper _completionService;
+		private readonly SignatureHelpService _signatureHelpService;
+		private readonly DocumentationHelper _documentationHelper;
 
 		public RoslynWorkspaceServices(IWorkspace workspace)
 		{
@@ -69,7 +73,12 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 				typeof(System.Numerics.Vector3).Assembly,
 			};
 			// TODO: This stuff is fairly expensive and should be done only once!
-			_metadataReferences = imports.Select(a => MetadataReference.CreateFromFile(a.Location));
+			_metadataReferences = imports.Select(a => MetadataReference.CreateFromFile(
+				a.Location, documentation: CreateDocumentationProvider(a.Location)));
+
+			_documentationHelper = new DocumentationHelper();
+			_completionService = new CompletionServiceWrapper();
+			_signatureHelpService = new SignatureHelpService(_documentationHelper);
 		}
 
 		public IDocumentServices OpenDocument(SourceTextContainer sourceTextContainer, string path)
@@ -115,13 +124,39 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			// use the in-memory version rather than the version on disk.
 			_referenceResolver.OpenDocument(path, sourceTextContainer);
 
-			return new RoslynDocumentServices(roslynWorkspace, documentId, () =>
-			{
-				// Roslyn workspace is just discarded so no need to close or remove anything.
+			return new RoslynDocumentServices(
+				roslynWorkspace,
+				documentId,
+				_completionService,
+				_signatureHelpService,
+				_documentationHelper,
+				() =>
+				{
+					// Roslyn workspace is just discarded so no need to close or remove anything.
 
-				// Remove from reference resolver so we return to looking up references on disk.
-				_referenceResolver.CloseDocument(path);
-			});
+					// Remove from reference resolver so we return to looking up references on disk.
+					_referenceResolver.CloseDocument(path);
+				});
+		}
+
+		private DocumentationProvider CreateDocumentationProvider(string assemblyPath)
+		{
+			// Look for a .xml file in the same place as the assembly.
+			var docPath = Path.ChangeExtension(assemblyPath, "xml");
+			if (!File.Exists(docPath))
+			{
+				// If that doesn't exist, try the reference assemblies directory.
+				var refAssembliesDir = ToolLocationHelper.GetPathToDotNetFrameworkReferenceAssemblies(TargetDotNetFrameworkVersion.Version46);
+				docPath = Path.ChangeExtension(Path.Combine(refAssembliesDir, Path.GetFileName(assemblyPath)), "xml");
+			}
+
+			if (File.Exists(docPath))
+			{
+				return new RoslynXmlDocumentationProvider(docPath);
+			}
+
+			// No xml file found.
+			return null;
 		}
 	}
 }

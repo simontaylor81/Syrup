@@ -18,18 +18,26 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 		private readonly RoslynScriptWorkspace _roslynWorkspace;
 		private readonly Action _onDispose;
 
-		private readonly CompletionServiceWrapper _completionService = new CompletionServiceWrapper();
+		private readonly CompletionServiceWrapper _completionService;
+		private readonly SignatureHelpService _signatureHelpService;
+		private readonly DocumentationHelper _documentationHelper;
 
 		private Document Document => _roslynWorkspace.CurrentSolution.GetDocument(_documentId);
 
 		public RoslynDocumentServices(
 			RoslynScriptWorkspace roslynWorkspace,
 			DocumentId documentId,
+			CompletionServiceWrapper completionService,
+			SignatureHelpService signatureHelpService,
+			DocumentationHelper documentationHelper,
 			Action onDispose)
 		{
 			_roslynWorkspace = roslynWorkspace;
 			_documentId = documentId;
 			_onDispose = onDispose;
+			_completionService = completionService;
+			_signatureHelpService = signatureHelpService;
+			_documentationHelper = documentationHelper;
 		}
 
 		public void Dispose()
@@ -56,7 +64,7 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			var symbol = await GetSymbol(position);
 			if (symbol != null)
 			{
-				return CodeTipFormatter.FormatCodeTip(symbol);
+				return CodeTipFormatter.FormatCodeTip(symbol, _documentationHelper);
 			}
 
 			return null;
@@ -80,10 +88,10 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 		}
 
 		public Task<SignatureHelp> GetSignatureHelp(int position, CancellationToken cancellationToken)
-			=> SignatureHelpService.GetSignatureHelp(Document, position, cancellationToken);
+			=> _signatureHelpService.GetSignatureHelp(Document, position, cancellationToken);
 
-		public bool IsSignatureHelpTriggerChar(char c) => SignatureHelpService.IsSignatureHelpTriggerChar(c);
-		public bool IsSignatureHelpEndChar(char c) => SignatureHelpService.IsSignatureHelpEndChar(c);
+		public bool IsSignatureHelpTriggerChar(char c) => _signatureHelpService.IsSignatureHelpTriggerChar(c);
+		public bool IsSignatureHelpEndChar(char c) => _signatureHelpService.IsSignatureHelpEndChar(c);
 
 		private Task<ISymbol> GetSymbol(int position) => SymbolFinder.FindSymbolAtPositionAsync(Document, position);
 	}

@@ -13,9 +13,16 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 	// I.e. parameter info for function calls.
 	// All this code owes a great dept to Omnisharp (https://github.com/OmniSharp/omnisharp-roslyn), and
 	// some of it is a direct copy-and-paste (MIT license).
-	internal static class SignatureHelpService
+	internal class SignatureHelpService
 	{
-		public static async Task<SignatureHelp> GetSignatureHelp(Document document, int position, CancellationToken cancellationToken)
+		private readonly DocumentationHelper _documentationHelper;
+
+		public SignatureHelpService(DocumentationHelper documentationHelper)
+		{
+			_documentationHelper = documentationHelper;
+		}
+
+		public async Task<SignatureHelp> GetSignatureHelp(Document document, int position, CancellationToken cancellationToken)
 		{
 			var invocation = await FindInvocation(document, position, cancellationToken);
 			if (invocation == null)
@@ -44,21 +51,21 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 					{
 						Name = nameSymbol.Name,
 						Label = nameSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
-						Documentation = overload.GetDocumentationCommentXml(cancellationToken: cancellationToken),
+						Documentation = _documentationHelper.GetDocumentationString(overload),
 						Parameters = GetParameters(overload)
 							.Select(param => new SignatureHelpParameter
 							{
 								Name = param.Name,
 								Label = param.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
-								Documentation = param.GetDocumentationCommentXml(cancellationToken: cancellationToken),
+								Documentation = _documentationHelper.GetDocumentationString(param),
 							}),
 					};
 				})
 			};
 		}
 
-		public static bool IsSignatureHelpTriggerChar(char c) => c == '(' || c == ',';
-		public static bool IsSignatureHelpEndChar(char c) => c == ')';
+		public bool IsSignatureHelpTriggerChar(char c) => c == '(' || c == ',';
+		public bool IsSignatureHelpEndChar(char c) => c == ')';
 
 		// Find the syntax node of the invocation that the caret is in.
 		private static async Task<Tuple<SyntaxNode, ArgumentListSyntax>> FindInvocation(

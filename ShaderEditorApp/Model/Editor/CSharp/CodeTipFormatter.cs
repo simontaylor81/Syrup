@@ -31,10 +31,19 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 					SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
 					SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
 
-		public static string FormatCodeTip(ISymbol symbol)
+		public static string FormatCodeTip(ISymbol symbol, DocumentationHelper documentationHelper)
 		{
 			// Combind kind-specific prefix with the (customised) display string.
-			return GetPrefix(symbol) + symbol.ToDisplayString(_displayFormat);
+			var result = GetPrefix(symbol) + symbol.ToDisplayString(_displayFormat);
+
+			// Add documentation string if we have one.
+			var docString = documentationHelper.GetDocumentationString(symbol);
+			if (!string.IsNullOrEmpty(docString))
+			{
+				result += "\n" + docString;
+			}
+
+			return result;
 		}
 
 		// Get a prefix to prepend before the display string.

@@ -17,11 +17,11 @@ namespace ShaderEditorApp.View
 
 			this.WhenAnyValue(x => x.SelectedIndex)
 				.Select(index => _signatureHelp.Overloads.ElementAt(index).Label)
-				.ToProperty(this, x => x.CurrentContent, out _currentContent);
+				.ToProperty(this, x => x.CurrentHeader, out _currentHeader);
 
 			this.WhenAnyValue(x => x.SelectedIndex)
-				.Select(index => _signatureHelp.Overloads.ElementAt(index).Name)
-				.ToProperty(this, x => x.CurrentHeader, out _currentHeader);
+				.Select(index => _signatureHelp.Overloads.ElementAt(index).Documentation)
+				.ToProperty(this, x => x.CurrentContent, out _currentContent);
 
 			this.WhenAnyValue(x => x.SelectedIndex)
 				.Select(index => $"{index + 1} of {Count}")
@@ -32,11 +32,11 @@ namespace ShaderEditorApp.View
 
 		public int Count => _signatureHelp.Overloads.Count();
 
-		private ObservableAsPropertyHelper<object> _currentContent;
-		public object CurrentContent => _currentContent.Value;
-
 		private ObservableAsPropertyHelper<object> _currentHeader;
 		public object CurrentHeader => _currentHeader.Value;
+
+		private ObservableAsPropertyHelper<object> _currentContent;
+		public object CurrentContent => _currentContent.Value;
 
 		private ObservableAsPropertyHelper<string> _currentIndexText;
 		public string CurrentIndexText => _currentIndexText.Value;
