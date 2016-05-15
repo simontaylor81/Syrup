@@ -16,5 +16,8 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 		Task<ImmutableArray<Diagnostic>> GetDiagnosticsAsync(CancellationToken cancellationToken);
 		Task<IEnumerable<CompletionItem>> GetCompletions(int position, char? triggerChar, CancellationToken cancellationToken);
 		Task<SignatureHelp> GetSignatureHelp(int position, CancellationToken cancellationToken);
+
+		bool IsSignatureHelpTriggerChar(char c);
+		bool IsSignatureHelpEndChar(char c);
 	}
 }

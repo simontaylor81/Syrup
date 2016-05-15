@@ -221,6 +221,12 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			CompletionService.TriggerCompletions(CaretOffset, triggerChar);
 		}
 
+		// Manually invoke signature help.
+		public void TriggerSignatureHelp()
+		{
+			CompletionService.TriggerSignatureHelp(CaretOffset);
+		}
+
 		public void Dispose()
 		{
 			Watcher?.Dispose();

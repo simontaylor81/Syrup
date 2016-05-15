@@ -82,6 +82,9 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 		public Task<SignatureHelp> GetSignatureHelp(int position, CancellationToken cancellationToken)
 			=> SignatureHelpService.GetSignatureHelp(Document, position, cancellationToken);
 
+		public bool IsSignatureHelpTriggerChar(char c) => SignatureHelpService.IsSignatureHelpTriggerChar(c);
+		public bool IsSignatureHelpEndChar(char c) => SignatureHelpService.IsSignatureHelpEndChar(c);
+
 		private Task<ISymbol> GetSymbol(int position) => SymbolFinder.FindSymbolAtPositionAsync(Document, position);
 	}
 }

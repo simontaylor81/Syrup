@@ -57,6 +57,9 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			};
 		}
 
+		public static bool IsSignatureHelpTriggerChar(char c) => c == '(' || c == ',';
+		public static bool IsSignatureHelpEndChar(char c) => c == ')';
+
 		// Find the syntax node of the invocation that the caret is in.
 		private static async Task<Tuple<SyntaxNode, ArgumentListSyntax>> FindInvocation(
 			Document document, int position, CancellationToken cancellationToken)

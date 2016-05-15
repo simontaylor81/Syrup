@@ -38,6 +38,7 @@ namespace ShaderEditorApp.View
 		private CodeTipService _codeTipService;
 		private SquigglyService _squigglyService;
 		private CompletionWindow _completionWindow;
+		private OverloadInsightWindow _overloadInsightWindow;
 
 		private DocumentViewModel ViewModel => (DocumentViewModel)DataContext;
 
@@ -74,17 +75,27 @@ namespace ShaderEditorApp.View
 			ViewModel.CompletionService.SignatureHelp.ObserveOn(RxApp.MainThreadScheduler).Subscribe(ShowSignatureHelp);
 		}
 
-		// TODO: Can any of this logic be moved to the view-model?
 		private void TextArea_TextEntered(object sender, TextCompositionEventArgs e)
 		{
-			if (_completionWindow != null)
+			Trace.Assert(e.Text.Length == 1);
+			var c = e.Text[0];
+
+			if (ViewModel.DocumentServices.IsSignatureHelpTriggerChar(c))
+			{
+				ViewModel.TriggerSignatureHelp();
+			}
+			else if (ViewModel.DocumentServices.IsSignatureHelpEndChar(c))
+			{
+				_overloadInsightWindow?.Close();
+			}
+			else
 			{
 				// Don't show a new completion window if we already have one.
-				return;
+				if (_completionWindow == null)
+				{
+					ViewModel.TriggerCompletions(c);
+				}
 			}
-
-			Trace.Assert(e.Text.Length == 1);
-			ViewModel.TriggerCompletions(e.Text[0]);
 		}
 
 		private void TextArea_TextEntering(object sender, TextCompositionEventArgs e)
@@ -137,9 +148,10 @@ namespace ShaderEditorApp.View
 
 		private void ShowSignatureHelp(SignatureHelp signatureHelp)
 		{
-			var overloadInsightWindow = new OverloadInsightWindow(textEditor.TextArea);
-			overloadInsightWindow.Provider = new OverloadProvider(signatureHelp);
-			overloadInsightWindow.Show();
+			_overloadInsightWindow = new OverloadInsightWindow(textEditor.TextArea);
+			_overloadInsightWindow.Provider = new OverloadProvider(signatureHelp);
+			_overloadInsightWindow.Closed += (o, e) => _overloadInsightWindow = null;
+			_overloadInsightWindow.Show();
 		}
 
 		// True if the given character should filter the completion window when typed.
