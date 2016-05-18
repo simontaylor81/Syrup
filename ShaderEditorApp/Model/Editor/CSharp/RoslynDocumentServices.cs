@@ -45,15 +45,24 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 			_onDispose?.Invoke();
 		}
 
-		public async Task<TextSpan?> FindDefinitionAsync(int position)
+		public async Task<CodeLocation> FindDefinitionAsync(int position)
 		{
 			var symbol = await GetSymbol(position);
 			if (symbol != null)
 			{
-				// TODO: Handle symbols in other files.
-				// TODO: Handle multiple locations?
-				var location = symbol.Locations.First();
-				return location.SourceSpan;
+				// TODO: Handle multiple locations? Can this ever happen?
+				var location = symbol.Locations.Single();
+
+				// We only support definitions in local files.
+				if (location.IsInSource)
+				{
+					return new CodeLocation
+					{
+						Filename = location.GetMappedLineSpan().Path,
+						Offset = location.SourceSpan.Start,
+						Length = location.SourceSpan.Length,
+					};
+				}
 			}
 
 			return null;

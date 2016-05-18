@@ -85,8 +85,6 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 			// Roslyn stuff. This really needs to be factored out somewhere C#-specific.
 			{
-				GoToDefinition = ReactiveCommand.CreateAsyncTask(_ => GoToDefinitionImpl());
-
 				// TODO: Can diagnostics be for other files?
 				GetDiagnostics = ReactiveCommand.CreateAsyncTask((_, ct) => _editorServices.GetDiagnosticsAsync(ct));
 				GetDiagnostics.ToProperty(this, x => x.Diagnostics, out _diagnostics, ImmutableArray<Diagnostic>.Empty);
@@ -294,16 +292,8 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			}
 		}
 
-		private async Task GoToDefinitionImpl()
-		{
-			// Use the language service to get the location of the symbol underneath the caret.
-			var span = await _editorServices.FindDefinitionAsync(CaretOffset);
-			if (span.HasValue)
-			{
-				SelectionStart = span.Value.Start;
-				SelectionLength = span.Value.Length;
-			}
-		}
+		// Use the language service to get the location of the symbol underneath the caret.
+		public Task<CodeLocation> GetDefinitionAtCaret() => _editorServices.FindDefinitionAsync(CaretOffset);
 
 		// AvalonEdit document object.
 		public TextDocument Document { get; }
@@ -362,7 +352,6 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		// Command to close this document.
 		public ReactiveCommand<object> Close { get; }
 
-		public ReactiveCommand<Unit> GoToDefinition { get; }
 		public ReactiveCommand<ImmutableArray<Diagnostic>> GetDiagnostics { get; }
 
 		// Commands for manually-invoked intellisense operations.

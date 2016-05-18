@@ -19,6 +19,7 @@ using ICSharpCode.AvalonEdit.Document;
 using ShaderEditorApp.ViewModel.Properties;
 using ShaderEditorApp.ViewModel.Menu;
 using ShaderEditorApp.MVVMUtil;
+using System.Diagnostics;
 
 namespace ShaderEditorApp.ViewModel.Workspace
 {
@@ -154,7 +155,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 				GoToDefinition = new CommandViewModel(
 					"Go To Definition",
-					ReactiveCommand.CreateAsyncObservable(hasActiveDocument, param => OpenDocumentSet.ActiveDocument.GoToDefinition.ExecuteAsync()),
+					ReactiveCommand.CreateAsyncTask(hasActiveDocument, param => GoToDefinitionImpl()),
 					menuHeader: "_Go To Definition",
 					keyGesture: new KeyGesture(Key.F12));
 
@@ -188,6 +189,25 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			// Create menu bar
 			// Must be after the commands are created, for obvious reasons.
 			MenuBar = new MenuBarViewModel(this);
+		}
+
+		private async Task GoToDefinitionImpl()
+		{
+			// Find the location of the symbol under the caret in the active document.
+			Trace.Assert(OpenDocumentSet.ActiveDocument != null);
+			var location = await OpenDocumentSet.ActiveDocument.GetDefinitionAtCaret();
+			if (location != null)
+			{
+				// Open the file if it's not already.
+				var document = OpenDocumentSet.OpenDocument(location.Filename, false);
+				if (document != null)
+				{
+					// Select the symbol's definition.
+					document.SelectionStart = location.Offset;
+					document.SelectionLength = location.Length;
+				}
+
+			}
 		}
 
 		// Called when the app is about to exit. Returns true to allow exit to proceed, false to cancel.

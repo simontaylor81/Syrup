@@ -250,6 +250,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Interfaces\IIsForegroundService.cs" />
+    <Compile Include="Model\Editor\CodeLocation.cs" />
     <Compile Include="Model\Editor\CompletionItem.cs" />
     <Compile Include="Model\Editor\CSharp\CodeTipFormatter.cs" />
     <Compile Include="Model\Editor\CSharp\CompletionServiceWrapper.cs" />
