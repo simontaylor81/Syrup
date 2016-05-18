@@ -148,10 +148,13 @@ namespace ShaderEditorApp.View
 
 		private void ShowSignatureHelp(SignatureHelp signatureHelp)
 		{
-			_overloadInsightWindow = new OverloadInsightWindow(textEditor.TextArea);
-			_overloadInsightWindow.Provider = new OverloadProvider(signatureHelp);
-			_overloadInsightWindow.Closed += (o, e) => _overloadInsightWindow = null;
-			_overloadInsightWindow.Show();
+			if (signatureHelp != null)
+			{
+				_overloadInsightWindow = new OverloadInsightWindow(textEditor.TextArea);
+				_overloadInsightWindow.Provider = new OverloadProvider(signatureHelp);
+				_overloadInsightWindow.Closed += (o, e) => _overloadInsightWindow = null;
+				_overloadInsightWindow.Show();
+			}
 		}
 
 		// True if the given character should filter the completion window when typed.

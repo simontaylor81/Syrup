@@ -28,19 +28,19 @@ namespace ShaderEditorApp.ViewModel.Workspace
 	{
 		// Create a new (empty) document.
 		public static DocumentViewModel CreateEmpty(
-			RoslynWorkspaceServices csharpEditorServices,
+			DocumentServicesFactory documentServicesFactory,
 			ILogger logger,
 			IUserPrompt userPrompt = null,
 			IIsForegroundService isForeground = null,
 			IUserSettings userSettings = null)
 		{
-			return new DocumentViewModel(null, null, csharpEditorServices, logger, userPrompt, isForeground, userSettings);
+			return new DocumentViewModel(null, null, documentServicesFactory, logger, userPrompt, isForeground, userSettings);
 		}
 
 		// Create a document backed by a file.
 		public static DocumentViewModel CreateFromFile(
 			string path,
-			RoslynWorkspaceServices csharpEditorServices,
+			DocumentServicesFactory documentServicesFactory,
 			ILogger logger,
 			IUserPrompt userPrompt = null,
 			IIsForegroundService isForeground = null,
@@ -49,13 +49,13 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			// TODO: Async?
 			var contents = File.ReadAllText(path);
 
-			return new DocumentViewModel(contents, path, csharpEditorServices, logger, userPrompt, isForeground, userSettings);
+			return new DocumentViewModel(contents, path, documentServicesFactory, logger, userPrompt, isForeground, userSettings);
 		}
 
 		private DocumentViewModel(
 			string contents,
 			string filePath,
-			RoslynWorkspaceServices csharpEditorServices,
+			DocumentServicesFactory documentServicesFactory,
 			ILogger logger,
 			IUserPrompt userPrompt,
 			IIsForegroundService isForeground,
@@ -67,15 +67,23 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			isForeground = isForeground ?? Locator.Current.GetService<IIsForegroundService>();
 			_userSettings = userSettings ?? Locator.Current.GetService<IUserSettings>();
 
+			// Update display name based on filename and dirtiness.
+			this.WhenAnyValue(x => x.FilePath, x => x.IsDirty, (filename, isDirty) => GetDisplayName(filename, isDirty))
+				.ToProperty(this, x => x.DisplayName, out _displayName);
+
+			// Helper for getting the extension.
+			this.WhenAnyValue(x => x.FilePath)
+				.Select(path => Path.GetExtension(path)?.ToLowerInvariant())
+				.ToProperty(this, x => x.Extension, out _extension, initialValue: Path.GetExtension(filePath)?.ToLowerInvariant());
+
+			// Set syntax highlighting definition to use based on extension.
+			_syntaxHighlighting = this.WhenAnyValue(x => x.Extension)
+				.Select(ext => ext != null
+					? HighlightingManager.Instance.GetDefinitionByExtension(ext)
+					: null)
+				.ToProperty(this, x => x.SyntaxHighlighting);
+
 			Document = new TextDocument(contents);
-
-			// Create a text source container for this file.
-			// TEMP: Currently doing this for all files, not just C#.
-			_sourceTextContainer = new DocumentSourceTextContainer(Document);
-
-			// Add the document to the workspace.
-			_editorServices = csharpEditorServices.OpenDocument(_sourceTextContainer, FilePath);
-			CompletionService = new CompletionService(_editorServices, logger);
 
 			// Get 'dirtiness' from the document's undo stack.
 			_isDirty = this.WhenAny(x => x.Document.UndoStack.IsOriginalFile, change => !change.Value)
@@ -83,9 +91,27 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 			Close = ReactiveCommand.Create();
 
-			// Roslyn stuff. This really needs to be factored out somewhere C#-specific.
+			// Intellisense stuff.
 			{
-				GetDiagnostics = ReactiveCommand.CreateAsyncTask((_, ct) => _editorServices.GetDiagnosticsAsync(ct));
+				// Create a text source container for this file.
+				// TODO: This is very C#-specific.
+				_sourceTextContainer = new DocumentSourceTextContainer(Document);
+
+				// Re-create document services when the filename changes.
+				this.WhenAnyValue(x => x.FilePath)
+					.Select(path => documentServicesFactory.OpenDocument(path, _sourceTextContainer))
+					.ToProperty(this, x => x.DocumentServices, out _documentServices);
+
+				// Dispose previous document services when setting a new one.
+				this.ObservableForProperty(x => x.DocumentServices, beforeChange: true)
+					.Subscribe(change => change.GetValue()?.Dispose());
+
+				// And re-create the completion services when *that* changes.
+				this.WhenAnyValue(x => x.DocumentServices)
+					.Select(docServices => new CompletionService(docServices, logger))
+					.ToProperty(this, x => x.CompletionService, out _completionService);
+
+				GetDiagnostics = ReactiveCommand.CreateAsyncTask((_, ct) => DocumentServices.GetDiagnosticsAsync(ct));
 				GetDiagnostics.ToProperty(this, x => x.Diagnostics, out _diagnostics, ImmutableArray<Diagnostic>.Empty);
 
 				// Update diagnostics when the document changes.
@@ -98,17 +124,6 @@ namespace ShaderEditorApp.ViewModel.Workspace
 				ShowCompletions = CommandUtil.Create(_ => CompletionService.TriggerCompletions(CaretOffset, null));
 				ShowSignatureHelp = CommandUtil.Create(_ => CompletionService.TriggerSignatureHelp(CaretOffset));
 			}
-
-			// Update display name based on filename and dirtiness.
-			this.WhenAnyValue(x => x.FilePath, x => x.IsDirty, (filename, isDirty) => GetDisplayName(filename, isDirty))
-				.ToProperty(this, x => x.DisplayName, out _displayName);
-
-			// Set syntax highlighting definition to use based on extension.
-			_syntaxHighlighting = this.WhenAnyValue(x => x.FilePath)
-				.Select(path => path != null
-					? HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(path))
-					: null)
-				.ToProperty(this, x => x.SyntaxHighlighting);
 
 			// Create modified notification command.
 			NotifyModified = ReactiveCommand.CreateAsyncTask(async _ =>
@@ -227,7 +242,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		public void Dispose()
 		{
 			Watcher?.Dispose();
-			_editorServices.Dispose();
+			DocumentServices.Dispose();
 		}
 
 		// Name to display on the document tab.
@@ -292,7 +307,7 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		}
 
 		// Use the language service to get the location of the symbol underneath the caret.
-		public Task<CodeLocation> GetDefinitionAtCaret() => _editorServices.FindDefinitionAsync(CaretOffset);
+		public Task<CodeLocation> GetDefinitionAtCaret() => DocumentServices.FindDefinitionAsync(CaretOffset);
 
 		// AvalonEdit document object.
 		public TextDocument Document { get; }
@@ -300,14 +315,10 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private readonly ObservableAsPropertyHelper<bool> _isDirty;
 		public bool IsDirty => _isDirty.Value;
 
-		public bool IsScript
-		{
-			get
-			{
-				var ext = Path.GetExtension(FilePath).ToLowerInvariant();
-				return ext == ".py" || ext == ".cs" || ext == ".csx";
-			}
-		}
+		private readonly ObservableAsPropertyHelper<string> _extension;
+		public string Extension => _extension.Value;
+
+		public bool IsScript => Extension == ".py" || Extension == ".cs" || Extension == ".csx";
 
 		// Position of caret in the editor.
 		private TextLocation _caretPosition;
@@ -344,9 +355,12 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		private readonly IUserPrompt _userPrompt;
 		private readonly IUserSettings _userSettings;
 		private readonly DocumentSourceTextContainer _sourceTextContainer;
-		private readonly IDocumentServices _editorServices;
 
-		public IDocumentServices DocumentServices => _editorServices;
+		private ObservableAsPropertyHelper<IDocumentServices> _documentServices;
+		public IDocumentServices DocumentServices => _documentServices.Value;
+
+		private ObservableAsPropertyHelper<CompletionService> _completionService;
+		public CompletionService CompletionService => _completionService.Value;
 
 		// Command to close this document.
 		public ReactiveCommand<object> Close { get; }
@@ -356,8 +370,6 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		// Commands for manually-invoked intellisense operations.
 		public ReactiveCommand<object> ShowCompletions { get; }
 		public ReactiveCommand<object> ShowSignatureHelp { get; }
-
-		public CompletionService CompletionService { get; }
 
 		private ObservableAsPropertyHelper<ImmutableArray<Diagnostic>> _diagnostics;
 

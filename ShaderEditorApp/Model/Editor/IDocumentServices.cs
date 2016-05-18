@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace ShaderEditorApp.Model.Editor.CSharp
+namespace ShaderEditorApp.Model.Editor
 {
 	// Services for a single open document.
 	public interface IDocumentServices : IDisposable

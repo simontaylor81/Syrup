@@ -255,7 +255,9 @@
     <Compile Include="Model\Editor\CSharp\CodeTipFormatter.cs" />
     <Compile Include="Model\Editor\CSharp\CompletionServiceWrapper.cs" />
     <Compile Include="Model\Editor\CSharp\DocumentationHelper.cs" />
-    <Compile Include="Model\Editor\CSharp\IDocumentServices.cs" />
+    <Compile Include="Model\Editor\DocumentServicesFactory.cs" />
+    <Compile Include="Model\Editor\NullDocumentServices.cs" />
+    <Compile Include="Model\Editor\IDocumentServices.cs" />
     <Compile Include="Model\Editor\CSharp\OpenDocumentReferenceResolver.cs" />
     <Compile Include="Model\Editor\CSharp\RoslynWorkspaceServices.cs" />
     <Compile Include="Model\Editor\CSharp\RoslynDocumentServices.cs" />
