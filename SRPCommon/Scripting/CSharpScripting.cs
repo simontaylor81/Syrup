@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
@@ -11,10 +12,31 @@ using SRPCommon.Logging;
 
 namespace SRPCommon.Scripting
 {
-	class CSharpScripting
+	public class CSharpScripting
 	{
 		private readonly ILoggerFactory _loggerFactory;
 		private readonly WorkspaceReferenceResolver _referenceResolver;
+
+		// Common usings to avoid typing.
+		public static string[] Usings =
+		{
+			"System",
+			"System.Linq",
+			"System.Collections.Generic",
+			"System.Numerics",
+			"SRPScripting",
+		};
+
+		// References required to reproduce the script compilation environment.
+		public static Assembly[] RequiredReferences =
+		{
+			typeof(object).Assembly,							// mscorlib.dll
+			typeof(Uri).Assembly,								// System.
+			typeof(Enumerable).Assembly,						// System.Core
+			typeof(SRPScripting.IRenderInterface).Assembly,
+			typeof(CSharpGlobals).Assembly,
+			typeof(System.Numerics.Vector3).Assembly,
+		};
 
 		public CSharpScripting(IWorkspace workspace, ILoggerFactory loggerFactory)
 		{
@@ -29,16 +51,12 @@ namespace SRPCommon.Scripting
 			var options = ScriptOptions.Default
 				.WithFilePath(script.Filename)
 				.WithReferences(
+					// We don't use RequiredReferences here as many of them are automatically added by the script framework.
 					typeof(SRPScripting.IRenderInterface).Assembly,
+					typeof(System.Numerics.Vector3).Assembly,
 					typeof(System.Dynamic.DynamicObject).Assembly,
 					typeof(Microsoft.CSharp.RuntimeBinder.RuntimeBinderException).Assembly)
-				// Add some common imports to avoid typing.
-				.WithImports(
-					"System",
-					"System.Linq",
-					"System.Collections.Generic",
-					"System.Numerics",
-					"SRPScripting")
+				.WithImports(Usings)
 				.WithSourceResolver(_referenceResolver);
 
 			var compiled = CSharpScript.Create(code, options: options, globalsType: typeof(CSharpGlobals));

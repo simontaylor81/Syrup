@@ -44,37 +44,16 @@ namespace ShaderEditorApp.Model.Editor.CSharp
 
 			_host = MefHostServices.Create(MefHostServices.DefaultAssemblies.Concat(additionalAssemblies));
 
-			// TODO: Share this list with the scripting system.
-			var usings = new[]
-			{
-				"System",
-				"System.Linq",
-				"System.Collections.Generic",
-				"System.Numerics",
-				"SRPScripting",
-			};
-
 			_referenceResolver = new OpenDocumentReferenceResolver(workspace);
 			_compilationOptions = new CSharpCompilationOptions(
 				OutputKind.DynamicallyLinkedLibrary,
-				usings: usings,
+				usings: CSharpScripting.Usings,
 				sourceReferenceResolver: _referenceResolver);
 
 			_parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Script);
 
-			// TODO: Share this list with the scripting system.
-			var imports = new[]
-			{
-				typeof(object).Assembly,							// mscorlib.dll
-				typeof(Uri).Assembly,								// System.
-				typeof(Enumerable).Assembly,						// System.Core
-				typeof(SRPScripting.IRenderInterface).Assembly,
-				typeof(CSharpGlobals).Assembly,
-				typeof(System.Numerics.Vector3).Assembly,
-			};
-			// TODO: This stuff is fairly expensive and should be done only once!
-			_metadataReferences = imports.Select(a => MetadataReference.CreateFromFile(
-				a.Location, documentation: CreateDocumentationProvider(a.Location)));
+			_metadataReferences = CSharpScripting.RequiredReferences
+				.Select(a => MetadataReference.CreateFromFile(a.Location, documentation: CreateDocumentationProvider(a.Location)));
 
 			_documentationHelper = new DocumentationHelper();
 			_completionService = new CompletionServiceWrapper();
