@@ -85,7 +85,6 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 			// Roslyn stuff. This really needs to be factored out somewhere C#-specific.
 			{
-				// TODO: Can diagnostics be for other files?
 				GetDiagnostics = ReactiveCommand.CreateAsyncTask((_, ct) => _editorServices.GetDiagnosticsAsync(ct));
 				GetDiagnostics.ToProperty(this, x => x.Diagnostics, out _diagnostics, ImmutableArray<Diagnostic>.Empty);
 
