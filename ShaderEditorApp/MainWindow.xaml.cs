@@ -12,11 +12,13 @@ using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ReactiveUI;
+using ShaderEditorApp.Interfaces;
 using ShaderEditorApp.Model;
 using ShaderEditorApp.Services;
 using ShaderEditorApp.View;
 using ShaderEditorApp.ViewModel;
 using ShaderEditorApp.ViewModel.Workspace;
+using Splat;
 using SRPCommon.Logging;
 using SRPCommon.Util;
 using SRPRendering;
@@ -48,6 +50,9 @@ namespace ShaderEditorApp
 			// Create a logger factory for logging to the output window and console.
 			var loggerFactory = new CompositeLoggerFactory(outputWindowVM, new ConsoleLoggerFactory());
 
+			// Register user settings provider.
+			Locator.CurrentMutable.RegisterConstant(new UserSettings(loggerFactory), typeof(IUserSettings));
+
 			// Initialise D3D device.
 			_renderDevice = new RenderDevice();
 
@@ -73,9 +78,7 @@ namespace ShaderEditorApp
 				InputBindings.Add(new KeyBinding(cmd.Command, cmd.KeyGesture));
 			}
 
-			// Set up syntax highlighting for the editor control.
-			LoadSyntaxHighlightingDefinition("Python");
-			LoadSyntaxHighlightingDefinition("HLSL");
+			InitHighlighting();
 
 			// Load a file specified on the commandline.
 			var commandlineParams = Environment.GetCommandLineArgs();
@@ -139,6 +142,17 @@ namespace ShaderEditorApp
 		void CompositionTarget_Rendering(object sender, EventArgs e)
 		{
 			renderWindow.Tick();
+		}
+
+		// Set up syntax highlighting for the editor control.
+		private void InitHighlighting()
+		{
+			LoadSyntaxHighlightingDefinition("Python");
+			LoadSyntaxHighlightingDefinition("HLSL");
+
+			// Add C# highlighting definitions for .csx files.
+			HighlightingManager.Instance.RegisterHighlighting(null, new[] { ".csx" },
+				HighlightingManager.Instance.GetDefinition("C#"));
 		}
 
 		private void LoadSyntaxHighlightingDefinition(string language)

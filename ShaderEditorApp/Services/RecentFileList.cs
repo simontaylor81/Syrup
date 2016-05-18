@@ -1,13 +1,14 @@
-﻿using ReactiveUI;
-using SRPCommon.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ReactiveUI;
+using ShaderEditorApp.Interfaces;
+using SRPCommon.Util;
 
-namespace ShaderEditorApp.Model
+namespace ShaderEditorApp.Services
 {
 	// Class representing a list of recently open files.
-	public class RecentFileList
+	public class RecentFileList : IRecentFileList
 	{
 		// The actual list of files. We don't cap this by MaxSize so that changing the size down
 		// then back up again doesn't lose everything.

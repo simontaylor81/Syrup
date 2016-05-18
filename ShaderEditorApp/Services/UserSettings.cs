@@ -1,21 +1,22 @@
-﻿using Newtonsoft.Json;
-using SRPCommon.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using ShaderEditorApp.Interfaces;
 using SRPCommon.Logging;
+using SRPCommon.Util;
 
-namespace ShaderEditorApp.Model
+namespace ShaderEditorApp.Services
 {
 	// Class encapsulating all user settings, whether they be configuration options
 	// or saved state like recently opened files.
-	public class UserSettings
+	public class UserSettings : IUserSettings
 	{
-		public RecentFileList RecentProjects { get; } = new RecentFileList(10);
-		public RecentFileList RecentFiles { get; } = new RecentFileList(10);
+		public IRecentFileList RecentProjects { get; } = new RecentFileList(10);
+		public IRecentFileList RecentFiles { get; } = new RecentFileList(10);
 
 		private string Filename => Path.Combine(
 			Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

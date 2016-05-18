@@ -19,6 +19,7 @@ using ICSharpCode.AvalonEdit.Document;
 using ShaderEditorApp.ViewModel.Properties;
 using ShaderEditorApp.ViewModel.Menu;
 using ShaderEditorApp.MVVMUtil;
+using System.Diagnostics;
 
 namespace ShaderEditorApp.ViewModel.Workspace
 {
@@ -152,10 +153,26 @@ namespace ShaderEditorApp.ViewModel.Workspace
 					menuHeader: "E_xit",
 					keyGesture: new KeyGesture(Key.F4, ModifierKeys.Alt));
 
+				GoToDefinition = new CommandViewModel(
+					"Go To Definition",
+					ReactiveCommand.CreateAsyncTask(hasActiveDocument, param => GoToDefinitionImpl()),
+					menuHeader: "_Go To Definition",
+					keyGesture: new KeyGesture(Key.F12));
+
+				ShowCompletions = new CommandViewModel(
+					"Auto Complete",
+					ReactiveCommand.CreateAsyncObservable(hasActiveDocument, param => OpenDocumentSet.ActiveDocument.ShowCompletions.ExecuteAsync()),
+					keyGesture: new KeyGesture(Key.Space, ModifierKeys.Control));
+				ShowSignatureHelp = new CommandViewModel(
+					"Parameter Info",
+					ReactiveCommand.CreateAsyncObservable(hasActiveDocument, param => OpenDocumentSet.ActiveDocument.ShowSignatureHelp.ExecuteAsync()),
+					keyGesture: new KeyGesture(Key.Space, ModifierKeys.Control | ModifierKeys.Shift));
+
 				// Add commands with a key binding to the big list. Don't include Exit -- it's binding is part of Windows.
 				KeyBoundCommands = new[]
 				{
 					OpenProject, NewProject, OpenDocument, NewDocument, CloseActiveDocument, SaveActiveDocument, SaveAll, RunActiveScript,
+					GoToDefinition, ShowCompletions, ShowSignatureHelp,
 				};
 			}
 
@@ -172,6 +189,25 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			// Create menu bar
 			// Must be after the commands are created, for obvious reasons.
 			MenuBar = new MenuBarViewModel(this);
+		}
+
+		private async Task GoToDefinitionImpl()
+		{
+			// Find the location of the symbol under the caret in the active document.
+			Trace.Assert(OpenDocumentSet.ActiveDocument != null);
+			var location = await OpenDocumentSet.ActiveDocument.GetDefinitionAtCaret();
+			if (location != null)
+			{
+				// Open the file if it's not already.
+				var document = OpenDocumentSet.OpenDocument(location.Filename, false);
+				if (document != null)
+				{
+					// Select the symbol's definition.
+					document.SelectionStart = location.Offset;
+					document.SelectionLength = location.Length;
+				}
+
+			}
 		}
 
 		// Called when the app is about to exit. Returns true to allow exit to proceed, false to cancel.
@@ -359,6 +395,10 @@ namespace ShaderEditorApp.ViewModel.Workspace
 		// Command actually does nothing. It's up to the view to subscribe to it and do the actual exiting.
 		public ReactiveCommand<object> Exit { get; }
 		public CommandViewModel ExitCommand { get; }
+
+		public CommandViewModel GoToDefinition { get; }
+		public CommandViewModel ShowCompletions { get; }
+		public CommandViewModel ShowSignatureHelp { get; }
 
 		#endregion
 	}

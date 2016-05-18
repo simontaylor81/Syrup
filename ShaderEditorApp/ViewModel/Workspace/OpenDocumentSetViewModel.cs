@@ -11,16 +11,25 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using SRPCommon.Logging;
+using ShaderEditorApp.Interfaces;
+using Splat;
+using ShaderEditorApp.Model.Editor;
 
 namespace ShaderEditorApp.ViewModel.Workspace
 {
 	// View Model class for managing the set of open documents.
 	public class OpenDocumentSetViewModel : ReactiveObject
 	{
-		public OpenDocumentSetViewModel(WorkspaceViewModel workspaceVM, ILoggerFactory loggerFactory)
+		public OpenDocumentSetViewModel(
+			WorkspaceViewModel workspaceVM,
+			ILoggerFactory loggerFactory,
+			IUserSettings userSettings = null)
 		{
 			WorkspaceVM = workspaceVM;
 			_logger = loggerFactory.CreateLogger("Log");
+			_userSettings = userSettings ?? Locator.Current.GetService<IUserSettings>();
+
+			_documentServicesFactory = new DocumentServicesFactory(WorkspaceVM.Workspace);
 
 			// Create documents list, and wrap in a read-only wrapper.
 			documents = new ObservableCollection<DocumentViewModel>();
@@ -61,8 +70,8 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			else if (File.Exists(path))
 			{
 				// Create a new document.
-				document = DocumentViewModel.CreateFromFile(this, path);
-				documents.Add(document);
+				document = DocumentViewModel.CreateFromFile(path, _documentServicesFactory, _logger);
+				AddDocument(document);
 			}
 			else
 			{
@@ -103,16 +112,16 @@ namespace ShaderEditorApp.ViewModel.Workspace
 				// Add to recent file list.
 				// Only do this for explicit open operations otherwise the list gets
 				// swamped just opening a project.
-				WorkspaceVM.Workspace.UserSettings.RecentFiles.AddFile(dialog.FileName);
-				WorkspaceVM.Workspace.UserSettings.Save();
+				_userSettings.RecentFiles.AddFile(dialog.FileName);
+				_userSettings.Save();
 			}
 		}
 
 		// Create a new document.
 		public void NewDocument()
 		{
-			var document = DocumentViewModel.CreateEmpty(this);
-			documents.Add(document);
+			var document = DocumentViewModel.CreateEmpty(_documentServicesFactory, _logger);
+			AddDocument(document);
 			WorkspaceVM.ActiveWindow = document;
 		}
 
@@ -143,6 +152,12 @@ namespace ShaderEditorApp.ViewModel.Workspace
 			return result;
 		}
 
+		private void AddDocument(DocumentViewModel document)
+		{
+			documents.Add(document);
+			document.Close.Subscribe(_ => CloseDocument(document));
+		}
+
 		private ObservableCollection<DocumentViewModel> documents;
 		public ReadOnlyObservableCollection<DocumentViewModel> Documents { get; }
 
@@ -153,6 +168,8 @@ namespace ShaderEditorApp.ViewModel.Workspace
 
 		public WorkspaceViewModel WorkspaceVM { get; }
 
-		private readonly ILogger _logger;
+		private readonly SRPCommon.Logging.ILogger _logger;
+		private readonly IUserSettings _userSettings;
+		private readonly DocumentServicesFactory _documentServicesFactory;
 	}
 }

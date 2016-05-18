@@ -181,6 +181,7 @@
     <Compile Include="Scripting\PythonScripting.cs" />
     <Compile Include="Scripting\Script.cs" />
     <Compile Include="Scripting\ScriptException.cs" />
+    <Compile Include="Scripting\WorkspaceReferenceResolver.cs" />
     <Compile Include="UserProperties\IChoiceProperty.cs" />
     <Compile Include="UserProperties\IMatrixProperty.cs" />
     <Compile Include="UserProperties\IPropertySource.cs" />
@@ -228,6 +229,7 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AssimpNet.3.3.1\build\AssimpNet.targets" Condition="Exists('..\packages\AssimpNet.3.3.1\build\AssimpNet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

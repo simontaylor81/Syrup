@@ -26,14 +26,14 @@ namespace SRPCommon.Util
 		}
 
 		// Get a value from the dictionary, or return the default if not found.
-		public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
+		public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue @default = default(TValue))
 		{
 			TValue value;
 			if (dict.TryGetValue(key, out value))
 			{
 				return value;
 			}
-			return default(TValue);
+			return @default;
 		}
 
 		// Get a value from the dictionary, or add one if not found.
