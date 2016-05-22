@@ -47,11 +47,12 @@
         </DataTemplate>
 
         <DataTemplate x:Key="MatrixPropertyValueTemplate">
-            <ItemsControl ItemsSource="{Binding Rows}">
+            <ItemsControl ItemsSource="{Binding Rows}" IsTabStop="False">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <ItemsControl ItemsSource="{Binding}"
-                                      ItemTemplate="{StaticResource ScalarPropertyValueTemplate}">
+                                      ItemTemplate="{StaticResource ScalarPropertyValueTemplate}"
+                                      IsTabStop="False">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <UniformGrid Rows="1" />
@@ -77,7 +78,9 @@
                     <ColumnDefinition Width="{Binding ElementName=column2, Path=Width}"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                <ContentControl Grid.Column="1" Content="{Binding}" ContentTemplateSelector="{StaticResource PropertyValueTemplateSelector}"/>
+                <ContentControl Grid.Column="1" Content="{Binding}"
+                                ContentTemplateSelector="{StaticResource PropertyValueTemplateSelector}"
+                                IsTabStop="False"/>
             </Grid>
         </DataTemplate>
 
@@ -118,7 +121,9 @@
 
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="2">
             <!--<ItemsControl ItemsSource="{Binding Properties}" Grid.ColumnSpan="2" ItemTemplateSelector="{StaticResource TopLevelTemplateSelector}"/>-->
-            <ItemsControl ItemsSource="{Binding Properties}" ItemTemplate="{StaticResource TwoColumnTemplate}"/>
+            <ItemsControl ItemsSource="{Binding Properties}"
+                          ItemTemplate="{StaticResource TwoColumnTemplate}"
+                          IsTabStop="False"/>
         </ScrollViewer>
 
         <!--<GridSplitter Grid.Column="0" Background="#FF303030" Width="1"
