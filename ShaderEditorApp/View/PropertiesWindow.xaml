@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ShaderEditorApp.View"
+             xmlns:dummy="clr-namespace:ShaderEditorApp.SampleData"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
 
@@ -69,6 +70,17 @@
                                              VectorTemplate="{StaticResource VectorPropertyValueTemplate}"
                                              MatrixTemplate="{StaticResource MatrixPropertyValueTemplate}"/>
 
+        <DataTemplate x:Key="TwoColumnTemplate">
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{Binding ElementName=column1, Path=Width}"/>
+                    <ColumnDefinition Width="{Binding ElementName=column2, Path=Width}"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
+                <ContentControl Grid.Column="1" Content="{Binding}" ContentTemplateSelector="{StaticResource PropertyValueTemplateSelector}"/>
+            </Grid>
+        </DataTemplate>
+
         <!-- Make items in GridView fill the entire column. -->
         <Style TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -76,7 +88,7 @@
 
     </UserControl.Resources>
 
-    <Grid d:DataContext="{d:DesignData Source=../SampleData/PropertySampleData.xaml}">
+    <!--<Grid d:DataContext="{d:DesignData Source=../SampleData/PropertySampleData.xaml}">
         <ListView Grid.Row="1" ItemsSource="{Binding Properties}" KeyboardNavigation.TabNavigation="Continue">
             <ListView.View>
                 <GridView>
@@ -85,15 +97,32 @@
                 </GridView>
             </ListView.View>
 
-            <!-- Disable tab stop on the top-level item container -->
+            --><!-- Disable tab stop on the top-level item container --><!--
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="IsTabStop" Value="False" />
 
-                    <!-- Need to override this too for some reason. -->
+                    --><!-- Need to override this too for some reason. --><!--
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
+    </Grid>-->
+
+    <Grid d:DataContext="{d:DesignInstance Type=dummy:DummyWorkspace, IsDesignTimeCreatable=True}"
+          Margin="4">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="column1" />
+            <ColumnDefinition x:Name="column2" Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="2">
+            <!--<ItemsControl ItemsSource="{Binding Properties}" Grid.ColumnSpan="2" ItemTemplateSelector="{StaticResource TopLevelTemplateSelector}"/>-->
+            <ItemsControl ItemsSource="{Binding Properties}" ItemTemplate="{StaticResource TwoColumnTemplate}"/>
+        </ScrollViewer>
+
+        <!--<GridSplitter Grid.Column="0" Background="#FF303030" Width="1"
+                HorizontalAlignment="Right" VerticalAlignment="Stretch"/>-->
     </Grid>
+
 </UserControl>
