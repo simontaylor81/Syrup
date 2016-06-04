@@ -25,4 +25,24 @@ namespace ShaderEditorApp.ViewModel.Properties
 
 		private readonly IScalarProperty<T> _property;
 	}
+
+	// Factory for choice property view models.
+	class ScalarPropertyViewModelFactory : IPropertyViewModelFactory
+	{
+		public int Priority => 20;
+
+		public bool SupportsProperty(IUserProperty property) => property is IScalarProperty;
+
+		public PropertyViewModel CreateInstance(IUserProperty property)
+		{
+			var scalarProperty = (IScalarProperty)property;
+
+			// Construct the type of the view model with the same type as the property.
+			var viewModelType = typeof(ScalarPropertyViewModel<object>).GetGenericTypeDefinition().MakeGenericType(scalarProperty.Type);
+
+			// Create an instance of the view model type.
+			return (PropertyViewModel)Activator.CreateInstance(viewModelType, property);
+		}
+	}
+
 }

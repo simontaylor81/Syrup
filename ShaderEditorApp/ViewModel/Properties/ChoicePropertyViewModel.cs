@@ -21,4 +21,12 @@ namespace ShaderEditorApp.ViewModel.Properties
 
 		public IEnumerable<object> Choices => _choiceProperty.Choices;
 	}
+
+	// Factory for choice property view models.
+	class ChoicePropertyViewModelFactory : IPropertyViewModelFactory
+	{
+		public int Priority => 10;
+		public bool SupportsProperty(IUserProperty property) => property is IChoiceProperty;
+		public PropertyViewModel CreateInstance(IUserProperty property) => new ChoicePropertyViewModel((IChoiceProperty)property);
+	}
 }

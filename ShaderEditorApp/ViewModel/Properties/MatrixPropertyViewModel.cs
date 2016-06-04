@@ -24,4 +24,12 @@ namespace ShaderEditorApp.ViewModel.Properties
 
 		public PropertyViewModel[][] Rows { get; }
 	}
+
+	// Factory for choice property view models.
+	class MatrixPropertyViewModelFactory : IPropertyViewModelFactory
+	{
+		public int Priority => 10;
+		public bool SupportsProperty(IUserProperty property) => property is IMatrixProperty;
+		public PropertyViewModel CreateInstance(IUserProperty property) => new MatrixPropertyViewModel((IMatrixProperty)property);
+	}
 }

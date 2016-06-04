@@ -20,4 +20,12 @@ namespace ShaderEditorApp.ViewModel.Properties
 
 		public PropertyViewModel[] SubProperties { get; }
 	}
+
+	// Factory for choice property view models.
+	class VectorPropertyViewModelFactory : IPropertyViewModelFactory
+	{
+		public int Priority => 20;
+		public bool SupportsProperty(IUserProperty property) => property is IVectorProperty;
+		public PropertyViewModel CreateInstance(IUserProperty property) => new VectorPropertyViewModel((IVectorProperty)property);
+	}
 }
