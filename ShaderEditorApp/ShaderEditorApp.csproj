@@ -307,6 +307,7 @@
       <DependentUpon>ProjectBrowser.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\Project\ProjectViewModel.cs" />
+    <Compile Include="View\Properties\PropertyTemplateSelectors.cs" />
     <Compile Include="View\Selectors.cs" />
     <Compile Include="ViewModel\IHierarchicalBrowserNodeViewModel.cs" />
     <Compile Include="ViewModel\Properties\PropertyViewModel.cs" />
@@ -322,7 +323,7 @@
     <Compile Include="ViewModel\Properties\VectorPropertyViewModel.cs" />
     <Compile Include="ViewModel\ViewportViewModel.cs" />
     <Compile Include="View\Camera.cs" />
-    <Compile Include="View\PropertiesWindow.xaml.cs">
+    <Compile Include="View\Properties\PropertiesWindow.xaml.cs">
       <DependentUpon>PropertiesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\RenderWindow.cs">
@@ -360,7 +361,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\PropertiesWindow.xaml">
+    <Page Include="View\Properties\PropertiesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,88 +1,75 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
+using ShaderEditorApp.ViewModel.Properties;
+using SRPCommon.UserProperties;
 
 namespace ShaderEditorApp.SampleData
 {
 	public class DummyWorkspace
 	{
-		public List<DummyPropertyBase> Properties { get; set; } = new List<DummyPropertyBase>();
+		public List<object> Properties { get; set; } = new List<object>();
 
 		public DummyWorkspace()
 		{
-			Properties.Add(new DummyPropertyFloat { DisplayName = "Property 1", IsReadOnly = false, Value = 12.0f });
-			Properties.Add(new DummyPropertyFloat { DisplayName = "Property 2", IsReadOnly = true, Value = -7.0f });
-			Properties.Add(new DummyPropertyBool { DisplayName = "Bool prop", IsReadOnly = false, Value = true });
-			Properties.Add(new DummyChoiceProperty
-			{
-				DisplayName = "Choice prop",
-				IsReadOnly = false,
-				Value = "Choice 1",
-				Choices = { "Hello", "World", }
-			});
-			Properties.Add(new DummyVectorProperty
-			{
-				DisplayName = "Vec prop",
-				IsReadOnly = true,
-				SubProperties =
-				{
-					new DummyPropertyFloat { DisplayName="X", IsReadOnly=false, Value=1.00001f },
-					new DummyPropertyFloat { DisplayName="Y", IsReadOnly=false, Value=2.0f },
-					new DummyPropertyFloat { DisplayName="Z", IsReadOnly=false, Value=3.0f },
-					new DummyPropertyFloat { DisplayName="W", IsReadOnly=false, Value=4.0f },
-				}
-			});
-			Properties.Add(new DummyMatrixProperty
-			{
-				DisplayName = "Mat prop",
-				IsReadOnly = true,
-				Rows =
-				{
-					new DummyPropertyList
-					{
-						new DummyPropertyFloat { DisplayName="X", IsReadOnly=false, Value=1.00001f },
-						new DummyPropertyFloat { DisplayName="Y", IsReadOnly=false, Value=2.0f },
-					},
-					new DummyPropertyList
-					{
-						new DummyPropertyFloat { DisplayName="Z", IsReadOnly=false, Value=3.0f },
-						new DummyPropertyFloat { DisplayName="W", IsReadOnly=false, Value=4.0f },
-					}
-				}
-			});
+			AddProperty(new MutableScalarProperty<float>("Property 1", 12.0f));
+			AddProperty(new ReadOnlyScalarProperty<float>("Property 2", -7.0f));
+			AddProperty(new MutableScalarProperty<bool>("Bool prop", true));
+
+			AddProperty(new DesignTimeChoiceProperty("Choice prop", "Hello", new[] { "Hello", "World" }));
+
+			var vec = new System.Numerics.Vector4(1.00001f, 2.0f, 3.0f, 4.0f);
+			AddProperty(new StructUserProperty("Vec prop", () => vec, _ => { }));
+
+			AddProperty(new DesignTimeMatrixProperty("Mat prop", new[] { 1.00001f, 2.0f, 3.0f, 4.0f }, 2));
+		}
+
+		// Save typing.
+		private void AddProperty(IUserProperty property)
+		{
+			Properties.Add(PropertyViewModelFactory.CreateViewModel(property));
 		}
 	}
 
-	public class DummyPropertyBase
+	internal class DesignTimeChoiceProperty : MutableScalarProperty<object>, IChoiceProperty
 	{
-		public string DisplayName { get; set; }
-		public bool IsReadOnly { get; set; }
+		public IEnumerable<object> Choices { get; set; }
+
+		public DesignTimeChoiceProperty(string name, object value, IEnumerable<object> choices)
+			: base(name, value)
+		{
+			Choices = choices;
+		}
 	}
 
-	public class DummyPropertyFloat : DummyPropertyBase
+	internal class DesignTimeMatrixProperty : IMatrixProperty
 	{
-		public float Value { get; set; }
-	}
-	public class DummyPropertyBool : DummyPropertyBase
-	{
-		public bool Value { get; set; }
-	}
-	public class DummyVectorProperty : DummyPropertyBase
-	{
-		public List<DummyPropertyBase> SubProperties { get; set; } = new List<DummyPropertyBase>();
-	}
-	public class DummyMatrixProperty : DummyPropertyBase
-	{
-		public List<DummyPropertyList> Rows { get; set; } = new List<DummyPropertyList>();
-	}
-	public class DummyChoiceProperty : DummyPropertyBase
-	{
-		public string Value { get; set; }
-		public List<string> Choices { get; set; } = new List<string>();
-	}
+		private readonly MutableScalarProperty<float>[] _components;
 
-	public class DummyPropertyList : List<DummyPropertyBase>
-	{ }
+		public bool IsReadOnly => true;
+		public string Name { get; set; }
+		public int NumColumns { get; }
+		public int NumRows { get; }
+		public bool RequiresReExecute => false;
+
+		public DesignTimeMatrixProperty(string name, float[] elements, int numColumns)
+		{
+			Name = name;
+			NumColumns = numColumns;
+			NumRows = elements.Length / numColumns;
+			_components = elements
+				.Select((value, index) => new MutableScalarProperty<float>($"M{index}", value))
+				.ToArray();
+		}
+
+		public IUserProperty GetComponent(int row, int col) => _components[row * NumColumns + col];
+
+		public IDisposable Subscribe(IObserver<Unit> observer)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

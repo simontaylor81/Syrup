@@ -5,6 +5,7 @@
         xmlns:avalondock="http://schemas.xceed.com/wpf/xaml/avalondock"
         xmlns:winforms="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:srpview="clr-namespace:ShaderEditorApp.View"
+        xmlns:properties="clr-namespace:ShaderEditorApp.View.Properties"
         xmlns:menuvm="clr-namespace:ShaderEditorApp.ViewModel.Menu"
         mc:Ignorable="d"
         x:Class="ShaderEditorApp.MainWindow"
@@ -118,7 +119,7 @@
                                 <avalondock:LayoutAnchorablePane>
                                     <!-- Properties window -->
                                     <avalondock:LayoutAnchorable ContentId="PropertiesWindow" Title="Properties">
-                                        <srpview:PropertiesWindow x:Name="propertiesWindow" DataContext="{Binding}"/>   <!-- Bind to Workspace itself. -->
+                                        <properties:PropertiesWindow x:Name="propertiesWindow" DataContext="{Binding}"/>   <!-- Bind to Workspace itself. -->
                                     </avalondock:LayoutAnchorable>
                                 </avalondock:LayoutAnchorablePane>
                                 
