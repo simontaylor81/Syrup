@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ShaderEditorApp.ViewModel.Properties;
 
 namespace ShaderEditorApp.View.Properties
 {
@@ -24,5 +25,12 @@ namespace ShaderEditorApp.View.Properties
 		{
 			InitializeComponent();
 		}
+	}
+
+	internal class VectorPropertyViewFactory : IPropertyViewFactory
+	{
+		public int Priority => 20;
+		public bool SupportsProperty(PropertyViewModel property) => property is VectorPropertyViewModel;
+		public FrameworkElement CreateView(PropertyViewModel property) => new VectorPropertyView();
 	}
 }

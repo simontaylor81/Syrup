@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using ReactiveUI;
 using ShaderEditorApp.ViewModel.Properties;
 
 namespace ShaderEditorApp.View.Properties
@@ -50,5 +39,19 @@ namespace ShaderEditorApp.View.Properties
 			// Select contents of the text box when it gets focus (via keyboard).
 			((TextBox)sender).SelectAll();
 		}
+	}
+
+	internal class SimpleScalarPropertyViewFactory : IPropertyViewFactory
+	{
+		public int Priority => 20;
+
+		public bool SupportsProperty(PropertyViewModel property)
+		{
+			// Support any type of scalar property.
+			return property.GetType().IsGenericType &&
+				property.GetType().GetGenericTypeDefinition() == typeof(ScalarPropertyViewModel<float>).GetGenericTypeDefinition();
+		}
+
+		public FrameworkElement CreateView(PropertyViewModel property) => new SimpleScalarPropertyView();
 	}
 }

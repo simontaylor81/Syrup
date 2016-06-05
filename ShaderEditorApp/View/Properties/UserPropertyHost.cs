@@ -1,44 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using ShaderEditorApp.ViewModel.Properties;
 
 namespace ShaderEditorApp.View.Properties
 {
+	internal interface IPropertyViewFactory
+	{
+		bool SupportsProperty(PropertyViewModel property);
+		FrameworkElement CreateView(PropertyViewModel property);
+
+		// Priority to allow selection order to be controlled. Lower numbers run first.
+		int Priority { get; }
+	}
+
 	// ContentControl for hosting the appropriate view for a user property.
 	class UserPropertyHost : ContentControl
 	{
+		private static Lazy<IEnumerable<IPropertyViewFactory>> _factories = new Lazy<IEnumerable<IPropertyViewFactory>>(FindFactories);
+
 		public UserPropertyHost()
 		{
 			DataContextChanged += OnDataContextChanged;
 		}
 
-		private void OnDataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+		private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
 		{
-			// TEMP: Select manually
-			if (DataContext is ScalarPropertyViewModel<float> || DataContext is ScalarPropertyViewModel<string> || DataContext is ScalarPropertyViewModel<int>)
+			var property = DataContext as PropertyViewModel;
+			if (property == null)
 			{
-				Content = new SimpleScalarPropertyView();
+				throw new Exception("UserPropertyHost.DataContext must be an instance of PropertyViewMode. Got " + DataContext.GetType().Name);
 			}
-			else if (DataContext is ScalarPropertyViewModel<bool>)
+
+			// Find the first factory that accepts the property.
+			var factory = _factories.Value.FirstOrDefault(x => x.SupportsProperty(property));
+			if (factory != null)
 			{
-				Content = new BoolPropertyView();
+				Content = factory.CreateView(property);
 			}
-			else if (DataContext is ChoicePropertyViewModel)
+			else
 			{
-				Content = new ChoicePropertyView();
+				throw new ArgumentException($"Could not find view for property '{property.DisplayName}' type = '{property.GetType().Name}'");
 			}
-			else if (DataContext is VectorPropertyViewModel)
-			{
-				Content = new VectorPropertyView();
-			}
-			else if (DataContext is MatrixPropertyViewModel)
-			{
-				Content = new MatrixPropertyView();
-			}
+		}
+
+		private static IEnumerable<IPropertyViewFactory> FindFactories()
+		{
+			// Find all types that implement the factory interface in this assembly.
+			return typeof(UserPropertyHost).Assembly.GetTypes()
+				.Where(type => !type.IsAbstract && type.GetInterfaces().Any(i => i == typeof(IPropertyViewFactory)))
+				.Select(type => (IPropertyViewFactory)Activator.CreateInstance(type))
+				.OrderBy(factory => factory.Priority)
+				.ToList();
 		}
 	}
 }
