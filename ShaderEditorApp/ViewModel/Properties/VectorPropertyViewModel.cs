@@ -19,6 +19,8 @@ namespace ShaderEditorApp.ViewModel.Properties
 		}
 
 		public PropertyViewModel[] SubProperties { get; }
+
+		//public override bool IsFullWidth => true;
 	}
 
 	// Factory for choice property view models.

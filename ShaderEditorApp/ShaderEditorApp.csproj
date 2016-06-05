@@ -307,7 +307,23 @@
       <DependentUpon>ProjectBrowser.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\Project\ProjectViewModel.cs" />
-    <Compile Include="View\Properties\PropertyTemplateSelectors.cs" />
+    <Compile Include="View\Properties\BoolPropertyView.xaml.cs">
+      <DependentUpon>BoolPropertyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Properties\ChoicePropertyView.xaml.cs">
+      <DependentUpon>ChoicePropertyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Properties\MatrixPropertyView.xaml.cs">
+      <DependentUpon>MatrixPropertyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Properties\FullWidthPropertyTemplateSelector.cs" />
+    <Compile Include="View\Properties\SimpleScalarPropertyView.xaml.cs">
+      <DependentUpon>SimpleScalarPropertyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Properties\UserPropertyHost.cs" />
+    <Compile Include="View\Properties\VectorPropertyView.xaml.cs">
+      <DependentUpon>VectorPropertyView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Selectors.cs" />
     <Compile Include="ViewModel\IHierarchicalBrowserNodeViewModel.cs" />
     <Compile Include="ViewModel\Properties\PropertyViewModel.cs" />
@@ -361,7 +377,27 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\Properties\BoolPropertyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Properties\ChoicePropertyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Properties\MatrixPropertyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Properties\PropertiesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Properties\SimpleScalarPropertyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Properties\VectorPropertyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -20,57 +20,6 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Template for the different property types. -->
-        <DataTemplate x:Key="ScalarPropertyValueTemplate">
-            <TextBox Text="{Binding Value, Mode=TwoWay}"
-                     KeyDown="ScalarPropertyValue_KeyDown"
-                     GotFocus="ScalarPropertyValue_GotFocus"/>
-        </DataTemplate>
-
-        <DataTemplate x:Key="BoolPropertyValueTemplate">
-            <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"/>
-        </DataTemplate>
-
-        <DataTemplate x:Key="ChoicePropertyValueTemplate">
-            <ComboBox ItemsSource="{Binding Choices}" SelectedItem="{Binding Value}" />
-        </DataTemplate>
-
-        <DataTemplate x:Key="VectorPropertyValueTemplate">
-            <ItemsControl ItemsSource="{Binding SubProperties}"
-                          ItemTemplate="{StaticResource ScalarPropertyValueTemplate}" IsTabStop="False">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Rows="1" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </DataTemplate>
-
-        <DataTemplate x:Key="MatrixPropertyValueTemplate">
-            <ItemsControl ItemsSource="{Binding Rows}" IsTabStop="False">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <ItemsControl ItemsSource="{Binding}"
-                                      ItemTemplate="{StaticResource ScalarPropertyValueTemplate}"
-                                      IsTabStop="False">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid Rows="1" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </DataTemplate>
-
-        <local:PropertyValueTemplateSelector x:Key="PropertyValueTemplateSelector"
-                                             ScalarTemplate="{StaticResource ScalarPropertyValueTemplate}"
-                                             BoolTemplate="{StaticResource BoolPropertyValueTemplate}"
-                                             ChoiceTemplate="{StaticResource ChoicePropertyValueTemplate}"
-                                             VectorTemplate="{StaticResource VectorPropertyValueTemplate}"
-                                             MatrixTemplate="{StaticResource MatrixPropertyValueTemplate}"/>
-
         <DataTemplate x:Key="TwoColumnTemplate">
             <Grid Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
@@ -79,11 +28,17 @@
                     <ColumnDefinition Width="{Binding ElementName=column2, Path=Width}"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                <ContentControl Grid.Column="2" Content="{Binding}"
-                                ContentTemplateSelector="{StaticResource PropertyValueTemplateSelector}"
-                                IsTabStop="False"/>
+                <local:UserPropertyHost Grid.Column="2" IsTabStop="False"/>
             </Grid>
         </DataTemplate>
+        
+        <DataTemplate x:Key="FullWidthTemplate">
+            <local:UserPropertyHost Grid.ColumnSpan="2" IsTabStop="False" Margin="0,0,0,8"/>
+        </DataTemplate>
+
+        <local:FullWidthPropertyTemplateSelector x:Key="FullWidthPropertyTemplateSelector"
+                                                 TwoColumnTemplate="{StaticResource TwoColumnTemplate}"
+                                                 FullWidthTemplate="{StaticResource FullWidthTemplate}"/>
 
     </UserControl.Resources>
 
@@ -97,7 +52,7 @@
 
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="3">
             <ItemsControl ItemsSource="{Binding Properties}"
-                          ItemTemplate="{StaticResource TwoColumnTemplate}"
+                          ItemTemplateSelector="{StaticResource FullWidthPropertyTemplateSelector}"
                           IsTabStop="False"/>
         </ScrollViewer>
 

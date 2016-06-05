@@ -20,5 +20,6 @@ namespace ShaderEditorApp.ViewModel.Properties
 
 		public string DisplayName { get; }
 		public bool IsReadOnly { get; }
+		public virtual bool IsFullWidth => false;
 	}
 }
