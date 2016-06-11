@@ -37,6 +37,7 @@ psTex.FindResourceVariable("DiffuseTex").Set(tex);
 
 
 var dummyVar = ri.AddUserVar_Float4("FloatUserVar", new [] { 0,1,2,45 });
+var vec3Var = ri.AddUserVar_Float3("Vec3Var", new [] { 0,1,2 });
 
 var choiceVar = ri.AddUserVar_Choice("A choice", new object [] {"A", "B", "C"}, "A");
 

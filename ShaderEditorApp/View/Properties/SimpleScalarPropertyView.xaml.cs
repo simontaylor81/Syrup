@@ -44,12 +44,13 @@ namespace ShaderEditorApp.View.Properties
 	internal class SimpleScalarPropertyViewFactory : IPropertyViewFactory
 	{
 		public int Priority => 20;
+		public bool IsFullWidth => false;
 
 		public bool SupportsProperty(PropertyViewModel property)
 		{
 			// Support any type of scalar property.
 			return property.GetType().IsGenericType &&
-				property.GetType().GetGenericTypeDefinition() == typeof(ScalarPropertyViewModel<float>).GetGenericTypeDefinition();
+				property.GetType().GetGenericTypeDefinition() == typeof(ScalarPropertyViewModel<>);
 		}
 
 		public FrameworkElement CreateView(PropertyViewModel property) => new SimpleScalarPropertyView();

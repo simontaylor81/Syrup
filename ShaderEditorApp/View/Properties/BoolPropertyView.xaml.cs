@@ -18,6 +18,7 @@ namespace ShaderEditorApp.View.Properties
 	internal class BoolPropertyViewFactory : IPropertyViewFactory
 	{
 		public int Priority => 10;
+		public bool IsFullWidth => false;
 		public bool SupportsProperty(PropertyViewModel property) => property is ScalarPropertyViewModel<bool>;
 		public FrameworkElement CreateView(PropertyViewModel property) => new BoolPropertyView();
 	}

@@ -19,11 +19,9 @@ namespace ShaderEditorApp.ViewModel.Properties
 		}
 
 		public PropertyViewModel[] SubProperties { get; }
-
-		//public override bool IsFullWidth => true;
 	}
 
-	// Factory for choice property view models.
+	// Factory for vector property view models.
 	class VectorPropertyViewModelFactory : IPropertyViewModelFactory
 	{
 		public int Priority => 20;

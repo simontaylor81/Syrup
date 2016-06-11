@@ -14,4 +14,15 @@ namespace SRPCommon.UserProperties
 		// The number of components in the vector.
 		int NumComponents { get; }
 	}
+
+	public static class VectorPropertyExtensions
+	{
+		public static IEnumerable<IUserProperty> GetComponents(this IVectorProperty property)
+		{
+			for (int i = 0; i < property.NumComponents; i++)
+			{
+				yield return property.GetComponent(i);
+			}
+		}
+	}
 }

@@ -18,6 +18,7 @@ namespace ShaderEditorApp.View.Properties
 	internal class MatrixPropertyViewFactory : IPropertyViewFactory
 	{
 		public int Priority => 20;
+		public bool IsFullWidth => false;
 		public bool SupportsProperty(PropertyViewModel property) => property is MatrixPropertyViewModel;
 		public FrameworkElement CreateView(PropertyViewModel property) => new MatrixPropertyView();
 	}

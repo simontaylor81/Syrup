@@ -38,7 +38,7 @@ namespace ShaderEditorApp.ViewModel.Properties
 			var scalarProperty = (IScalarProperty)property;
 
 			// Construct the type of the view model with the same type as the property.
-			var viewModelType = typeof(ScalarPropertyViewModel<object>).GetGenericTypeDefinition().MakeGenericType(scalarProperty.Type);
+			var viewModelType = typeof(ScalarPropertyViewModel<>).MakeGenericType(scalarProperty.Type);
 
 			// Create an instance of the view model type.
 			return (PropertyViewModel)Activator.CreateInstance(viewModelType, property);

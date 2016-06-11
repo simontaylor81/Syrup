@@ -24,6 +24,8 @@ namespace ShaderEditorApp.SampleData
 			var vec = new System.Numerics.Vector4(1.00001f, 2.0f, 3.0f, 4.0f);
 			AddProperty(new StructUserProperty("Vec prop", () => vec, _ => { }));
 
+			AddProperty(new StructUserProperty("Vec3 prop", () => new System.Numerics.Vector3(1.00001f, 2.0f, 3.0f), _ => { }));
+
 			AddProperty(new DesignTimeMatrixProperty("Mat prop", new[] { 1.00001f, 2.0f, 3.0f, 4.0f }, 2));
 		}
 
@@ -42,6 +44,14 @@ namespace ShaderEditorApp.SampleData
 			: base(name, value)
 		{
 			Choices = choices;
+		}
+	}
+
+	internal class DesignTimeVec3Property : Vec3PropertyViewModel
+	{
+		public DesignTimeVec3Property()
+			: base(new StructUserProperty("Vec3 prop", () => new System.Numerics.Vector3(1.00001f, 2.0f, 3.0f), _ => { }))
+		{
 		}
 	}
 

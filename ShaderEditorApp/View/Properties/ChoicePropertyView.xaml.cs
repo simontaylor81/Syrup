@@ -18,6 +18,7 @@ namespace ShaderEditorApp.View.Properties
 	internal class ChoicePropertyViewFactory : IPropertyViewFactory
 	{
 		public int Priority => 10;
+		public bool IsFullWidth => false;
 		public bool SupportsProperty(PropertyViewModel property) => property is ChoicePropertyViewModel;
 		public FrameworkElement CreateView(PropertyViewModel property) => new ChoicePropertyView();
 	}

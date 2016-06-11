@@ -14,6 +14,10 @@ namespace ShaderEditorApp.View.Properties
 
 		// Priority to allow selection order to be controlled. Lower numbers run first.
 		int Priority { get; }
+
+		// Whether the view should be full-width in the properties window, or just in the right column.
+		// Full-width views should display the property name themselves.
+		bool IsFullWidth { get; }
 	}
 
 	// ContentControl for hosting the appropriate view for a user property.
@@ -34,16 +38,22 @@ namespace ShaderEditorApp.View.Properties
 				throw new Exception("UserPropertyHost.DataContext must be an instance of PropertyViewMode. Got " + DataContext.GetType().Name);
 			}
 
+			Content = GetFactory(property).CreateView(property);
+		}
+
+		// Helper for determining if a view model should be rendered as full-width.
+		public static bool IsPropertyFullWidth(PropertyViewModel property) => GetFactory(property).IsFullWidth;
+
+		private static IPropertyViewFactory GetFactory(PropertyViewModel property)
+		{
 			// Find the first factory that accepts the property.
 			var factory = _factories.Value.FirstOrDefault(x => x.SupportsProperty(property));
 			if (factory != null)
 			{
-				Content = factory.CreateView(property);
+				return factory;
 			}
-			else
-			{
-				throw new ArgumentException($"Could not find view for property '{property.DisplayName}' type = '{property.GetType().Name}'");
-			}
+
+			throw new ArgumentException($"Could not find view for property '{property.DisplayName}' type = '{property.GetType().Name}'");
 		}
 
 		private static IEnumerable<IPropertyViewFactory> FindFactories()

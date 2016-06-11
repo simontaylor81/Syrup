@@ -30,6 +30,7 @@ namespace ShaderEditorApp.View.Properties
 	internal class VectorPropertyViewFactory : IPropertyViewFactory
 	{
 		public int Priority => 20;
+		public bool IsFullWidth => false;
 		public bool SupportsProperty(PropertyViewModel property) => property is VectorPropertyViewModel;
 		public FrameworkElement CreateView(PropertyViewModel property) => new VectorPropertyView();
 	}
