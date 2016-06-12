@@ -12,6 +12,7 @@ namespace ShaderEditorApp.View.Properties
 	class FullWidthPropertyTemplateSelector : DataTemplateSelector
 	{
 		public DataTemplate TwoColumnTemplate { get; set; }
+		public DataTemplate TwoColumnCompositeTemplate { get; set; }
 		public DataTemplate FullWidthTemplate { get; set; }
 
 		public override DataTemplate SelectTemplate(object item, DependencyObject container)
@@ -19,7 +20,15 @@ namespace ShaderEditorApp.View.Properties
 			var property = item as PropertyViewModel;
 			if (property != null)
 			{
-				return property.IsFullWidth ? FullWidthTemplate : TwoColumnTemplate;
+				if (property.IsFullWidth)
+				{
+					return FullWidthTemplate;
+				}
+				else if (property is CompositePropertyViewModel)
+				{
+					return TwoColumnCompositeTemplate;
+				}
+				return TwoColumnTemplate;
 			}
 
 			return base.SelectTemplate(item, container);

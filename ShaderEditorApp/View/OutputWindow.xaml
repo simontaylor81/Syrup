@@ -18,8 +18,6 @@
             <Setter Property="HorizontalScrollBarVisibility" Value="Visible"/>
             <Setter Property="VerticalScrollBarVisibility" Value="Visible"/>
         </Style>
-
-        <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
     </UserControl.Resources>
     
     <Grid x:Name="grid">
@@ -50,7 +48,7 @@
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <view:LogTextBox Visibility="{Binding IsVisible, Converter={StaticResource booleanToVisibilityConverter}}"
+                    <view:LogTextBox Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                                      MouseDoubleClick="LogTextBox_MouseDoubleClick"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

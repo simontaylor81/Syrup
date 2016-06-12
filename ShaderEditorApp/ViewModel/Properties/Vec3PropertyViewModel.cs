@@ -11,25 +11,12 @@ namespace ShaderEditorApp.ViewModel.Properties
 {
 	class Vec3PropertyViewModel : VectorPropertyViewModel
 	{
-		private bool _isExpanded = false;
-		public bool IsExpanded
-		{
-			get { return _isExpanded; }
-			set { this.RaiseAndSetIfChanged(ref _isExpanded, value); }
-		}
-
-		private ObservableAsPropertyHelper<bool> _isCollapsed;
-		public bool IsCollapsed => _isCollapsed.Value;
-
 		public override bool IsFullWidth => true;
 
 		public Vec3PropertyViewModel(IVectorProperty property)
 			: base(property)
 		{
 			Trace.Assert(property.NumComponents == 3);
-
-			this.WhenAnyValue(x => x.IsExpanded, expanded => !expanded)
-				.ToProperty(this, x => x.IsCollapsed, out _isCollapsed, initialValue: true);
 		}
 	}
 

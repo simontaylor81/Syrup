@@ -20,16 +20,67 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="ExpandCollapseToggleStyle" TargetType="ToggleButton">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid Width="15"
+                              Height="13"
+                              Background="Transparent">
+                            <Path x:Name="ExpandPath"
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Center" 
+                                  Margin="1,1,1,1"
+                                  Fill="Transparent"
+                                  Stroke="#444"
+                                  Data="M 4 0 L 8 4 L 4 8 Z"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Data" TargetName="ExpandPath"
+                                        Value="M 8 2 L 8 8 L 2 8 Z"/>
+                                <Setter Property="Fill" TargetName="ExpandPath" Value="#444"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <DataTemplate x:Key="TwoColumnTemplate">
             <Grid Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{Binding ElementName=expanderColumn, Path=Width}"/>
                     <ColumnDefinition Width="{Binding ElementName=column1, Path=Width}"/>
                     <ColumnDefinition Width="{Binding ElementName=splitterColumn, Path=ActualWidth}"/>
                     <ColumnDefinition Width="{Binding ElementName=column2, Path=Width}"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"/>
-                <local:UserPropertyHost Grid.Column="2" IsTabStop="False"/>
+                <TextBlock Grid.Column="1" Text="{Binding DisplayName}"/>
+                <local:UserPropertyHost Grid.Column="3" IsTabStop="False"/>
             </Grid>
+        </DataTemplate>
+        
+        <DataTemplate x:Key="TwoColumnCompositeTemplate">
+            <StackPanel>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{Binding ElementName=expanderColumn, Path=Width}"/>
+                        <ColumnDefinition Width="{Binding ElementName=column1, Path=Width}"/>
+                        <ColumnDefinition Width="{Binding ElementName=splitterColumn, Path=ActualWidth}"/>
+                        <ColumnDefinition Width="{Binding ElementName=column2, Path=Width}"/>
+                    </Grid.ColumnDefinitions>
+                    <ToggleButton Grid.Column="0"
+                              Style="{StaticResource ExpandCollapseToggleStyle}"
+                              IsChecked="{Binding IsExpanded}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding DisplayName}"/>
+                    <local:UserPropertyHost Grid.Column="3" IsTabStop="False"/>
+                </Grid>
+                <ItemsControl Grid.ColumnSpan="4"
+                              ItemsSource="{Binding SubProperties}"
+                              ItemTemplateSelector="{DynamicResource FullWidthPropertyTemplateSelector}"
+                              IsTabStop="False"/>
+            </StackPanel>
         </DataTemplate>
         
         <DataTemplate x:Key="FullWidthTemplate">
@@ -38,6 +89,7 @@
 
         <local:FullWidthPropertyTemplateSelector x:Key="FullWidthPropertyTemplateSelector"
                                                  TwoColumnTemplate="{StaticResource TwoColumnTemplate}"
+                                                 TwoColumnCompositeTemplate="{StaticResource TwoColumnCompositeTemplate}"
                                                  FullWidthTemplate="{StaticResource FullWidthTemplate}"/>
 
     </UserControl.Resources>
@@ -45,18 +97,19 @@
     <Grid d:DataContext="{d:DesignInstance Type=dummy:DummyWorkspace, IsDesignTimeCreatable=True}"
           Margin="4">
         <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="expanderColumn" Width="15" />
             <ColumnDefinition x:Name="column1" />
             <ColumnDefinition x:Name="splitterColumn" Width="auto"/>
             <ColumnDefinition x:Name="column2" Width="2*"/>
         </Grid.ColumnDefinitions>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="3">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="4">
             <ItemsControl ItemsSource="{Binding Properties}"
                           ItemTemplateSelector="{StaticResource FullWidthPropertyTemplateSelector}"
                           IsTabStop="False"/>
         </ScrollViewer>
 
-        <GridSplitter Grid.Column="1" Background="#FFACACAC" Width="1"
+        <GridSplitter Grid.Column="2" Background="#FFACACAC" Width="1"
                       Margin="4,0"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch"
                       IsTabStop="False"/>

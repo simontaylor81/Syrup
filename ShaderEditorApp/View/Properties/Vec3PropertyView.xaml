@@ -49,8 +49,6 @@
                 <ContentPresenter Content="{TemplateBinding Content}"/>
             </Border>
         </ControlTemplate>
-
-        <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
     </UserControl.Resources>
 
     <StackPanel>
@@ -60,9 +58,9 @@
             <TextBlock Grid.Row="0" Grid.ColumnSpan="6" Text="{Binding DisplayName}"/>
         </StackPanel>
 
-        <Rectangle Fill="Lime" Height="30" Grid.Row="1" Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVisConverter}}"/>
+        <Rectangle Fill="Lime" Height="30" Grid.Row="1" Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-        <Grid Visibility="{Binding IsCollapsed, Converter={StaticResource BoolToVisConverter}}">
+        <Grid Visibility="{Binding IsCollapsed, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
