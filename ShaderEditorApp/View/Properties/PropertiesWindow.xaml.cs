@@ -21,6 +21,19 @@ namespace ShaderEditorApp.View.Properties
 		public PropertiesWindow()
 		{
 			InitializeComponent();
+
+			// TEMP
+			//StringBuilder sb = new StringBuilder();
+			//var xmlSettings = new System.Xml.XmlWriterSettings
+			//{
+			//	Indent = true,
+			//	IndentChars = "    ",
+			//	NewLineOnAttributes = true
+			//};
+			//var writer = System.Xml.XmlWriter.Create(sb, xmlSettings);
+
+			//var xaml = System.Windows.Markup.XamlWriter.Save(headerItemsControl.Template);
+			//Console.WriteLine(xaml);
 		}
 
 		private void ScalarPropertyValue_KeyDown(object sender, KeyEventArgs e)

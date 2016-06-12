@@ -32,6 +32,13 @@ namespace ShaderEditorApp.View.Properties
 
 		private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
 		{
+			// TODO: Should this ever happen?!
+			if (DataContext == null)
+			{
+				Content = null;
+				return;
+			}
+
 			var property = DataContext as PropertyViewModel;
 			if (property == null)
 			{

@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ShaderEditorApp.View.Properties"
              xmlns:dummy="clr-namespace:ShaderEditorApp.SampleData"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="500" d:DesignWidth="300">
 
     <UserControl.Resources>
 
@@ -51,37 +51,39 @@
         <DataTemplate x:Key="TwoColumnTemplate">
             <Grid Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding ElementName=expanderColumn, Path=Width}"/>
-                    <ColumnDefinition Width="{Binding ElementName=column1, Path=Width}"/>
+                    <ColumnDefinition Width="{Binding ElementName=expanderColumn, Path=ActualWidth}"/>
+                    <ColumnDefinition Width="{Binding ElementName=nameColumn, Path=ActualWidth}"/>
                     <ColumnDefinition Width="{Binding ElementName=splitterColumn, Path=ActualWidth}"/>
-                    <ColumnDefinition Width="{Binding ElementName=column2, Path=Width}"/>
+                    <ColumnDefinition Width="{Binding ElementName=valueColumn, Path=ActualWidth}"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="1" Text="{Binding DisplayName}"/>
                 <local:UserPropertyHost Grid.Column="3" IsTabStop="False"/>
             </Grid>
         </DataTemplate>
         
-        <DataTemplate x:Key="TwoColumnCompositeTemplate">
+        <HierarchicalDataTemplate x:Key="TwoColumnCompositeTemplate"
+                                  ItemsSource="{Binding SubProperties}">
             <StackPanel>
                 <Grid Margin="0,0,0,8">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{Binding ElementName=expanderColumn, Path=Width}"/>
-                        <ColumnDefinition Width="{Binding ElementName=column1, Path=Width}"/>
+                        <ColumnDefinition Width="{Binding ElementName=expanderColumn, Path=ActualWidth}"/>
+                        <ColumnDefinition Width="{Binding ElementName=nameColumn, Path=ActualWidth}"/>
                         <ColumnDefinition Width="{Binding ElementName=splitterColumn, Path=ActualWidth}"/>
-                        <ColumnDefinition Width="{Binding ElementName=column2, Path=Width}"/>
+                        <ColumnDefinition Width="{Binding ElementName=valueColumn, Path=ActualWidth}"/>
                     </Grid.ColumnDefinitions>
                     <ToggleButton Grid.Column="0"
-                              Style="{StaticResource ExpandCollapseToggleStyle}"
-                              IsChecked="{Binding IsExpanded}"/>
+                                  Style="{StaticResource ExpandCollapseToggleStyle}"
+                                  IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource AncestorType=TreeViewItem}}"/>
+                                  <!--IsChecked="{Binding IsExpanded}"/>-->
                     <TextBlock Grid.Column="1" Text="{Binding DisplayName}"/>
                     <local:UserPropertyHost Grid.Column="3" IsTabStop="False"/>
                 </Grid>
-                <ItemsControl Grid.ColumnSpan="4"
+                <!--<ItemsControl Grid.ColumnSpan="4"
                               ItemsSource="{Binding SubProperties}"
                               ItemTemplateSelector="{DynamicResource FullWidthPropertyTemplateSelector}"
-                              IsTabStop="False"/>
+                              IsTabStop="False"/>-->
             </StackPanel>
-        </DataTemplate>
+        </HierarchicalDataTemplate>
         
         <DataTemplate x:Key="FullWidthTemplate">
             <local:UserPropertyHost Grid.ColumnSpan="2" IsTabStop="False" Margin="0,0,0,8"/>
@@ -92,27 +94,81 @@
                                                  TwoColumnCompositeTemplate="{StaticResource TwoColumnCompositeTemplate}"
                                                  FullWidthTemplate="{StaticResource FullWidthTemplate}"/>
 
+        <HierarchicalDataTemplate x:Key="TestHierarchicalTemplate"
+                                  ItemsSource="{Binding SubProperties}">
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{Binding ElementName=expanderColumn, Path=Width}"/>
+                    <ColumnDefinition Width="{Binding ElementName=nameColumn, Path=Width}"/>
+                    <ColumnDefinition Width="{Binding ElementName=splitterColumn, Path=ActualWidth}"/>
+                    <ColumnDefinition Width="{Binding ElementName=valueColumn, Path=Width}"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="1" Text="{Binding DisplayName}"/>
+                <local:UserPropertyHost Grid.Column="3" IsTabStop="False"/>
+            </Grid>
+        </HierarchicalDataTemplate>
+
+        <Style TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TreeViewItem">
+                        <StackPanel>
+                            <ContentPresenter Content="{TemplateBinding Header}"
+                                              ContentTemplate="{TemplateBinding ItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
+                            <ItemsPresenter x:Name="ItemsHost"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="False">
+                                <Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <ControlTemplate x:Key="HeaderedItemsControlTemplate">
+            <ItemsPresenter/>
+        </ControlTemplate>
+
     </UserControl.Resources>
 
-    <Grid d:DataContext="{d:DesignInstance Type=dummy:DummyWorkspace, IsDesignTimeCreatable=True}"
-          Margin="4">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="expanderColumn" Width="15" />
-            <ColumnDefinition x:Name="column1" />
-            <ColumnDefinition x:Name="splitterColumn" Width="auto"/>
-            <ColumnDefinition x:Name="column2" Width="2*"/>
-        </Grid.ColumnDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid d:DataContext="{d:DesignInstance Type=dummy:DummyWorkspace, IsDesignTimeCreatable=True}"
+          Margin="4" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="expanderColumn" Width="15" />
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition x:Name="splitterColumn" Width="auto"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="4">
-            <ItemsControl ItemsSource="{Binding Properties}"
+            <!-- Dirty hack to workaround inability to bind to column definition ActualWidth -->
+            <FrameworkElement x:Name="nameColumn" Grid.Column="1" HorizontalAlignment="Stretch" Visibility="Hidden"/>
+            <FrameworkElement x:Name="valueColumn" Grid.Column="3" HorizontalAlignment="Stretch" Visibility="Hidden"/>
+
+            <!--<ScrollViewer VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="4">-->
+            <!--<ItemsControl ItemsSource="{Binding Properties}"
                           ItemTemplateSelector="{StaticResource FullWidthPropertyTemplateSelector}"
-                          IsTabStop="False"/>
-        </ScrollViewer>
+                          IsTabStop="False"/>-->
+            <!--<HeaderedItemsControl ItemsSource="{Binding Properties}"
+                                  x:Name="headerItemsControl"
+                                  Template="{StaticResource HeaderedItemsControlTemplate}"
+                                  ItemTemplateSelector="{StaticResource FullWidthPropertyTemplateSelector}"
+                                  IsTabStop="False"/>-->
+            <!--</ScrollViewer>-->
 
-        <GridSplitter Grid.Column="2" Background="#FFACACAC" Width="1"
+            <TreeView Grid.ColumnSpan="4" ItemsSource="{Binding Properties}"
+                  ItemTemplateSelector="{StaticResource FullWidthPropertyTemplateSelector}"
+                  IsTabStop="False"
+                  BorderThickness="0" Padding="0"/>
+
+            <GridSplitter Grid.Column="2" Background="#FFACACAC" Width="1"
                       Margin="4,0"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch"
                       IsTabStop="False"/>
-    </Grid>
-
+        </Grid>
+    </ScrollViewer>
 </UserControl>
