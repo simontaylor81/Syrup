@@ -25,33 +25,18 @@ namespace ShaderEditorApp.ViewModel.Properties
 			set { this.RaiseAndSetIfChanged(ref _isExpanded, value); }
 		}
 
-		// Inverse of IsExpanded for easier binding.
-		private ObservableAsPropertyHelper<bool> _isCollapsed;
-		public bool IsCollapsed => _isCollapsed.Value;
+		// Sub-properties for composite properties.
+		// Immutable.
+		public virtual IEnumerable<PropertyViewModel> SubProperties => Enumerable.Empty<PropertyViewModel>();
 
-		public virtual bool CanExpand => false;
+		// Can the property be expanded. Defaults to whether it has sub-properties,
+		// but virtual in case property types want to handle it themselves.
+		public virtual bool CanExpand => SubProperties.Any();
 
 		protected PropertyViewModel(IUserProperty property)
 		{
 			DisplayName = property.Name;
 			IsReadOnly = property.IsReadOnly;
-
-			this.WhenAnyValue(x => x.IsExpanded, expanded => !expanded)
-				.ToProperty(this, x => x.IsCollapsed, out _isCollapsed, initialValue: true);
-		}
-	}
-
-	// View model base class for properties made up of other properties.
-	public abstract class CompositePropertyViewModel : PropertyViewModel
-	{
-		public override bool CanExpand => true;
-
-		// Immutable
-		public abstract IEnumerable<PropertyViewModel> SubProperties { get; }
-
-		public CompositePropertyViewModel(IUserProperty property)
-			: base(property)
-		{
 		}
 	}
 }

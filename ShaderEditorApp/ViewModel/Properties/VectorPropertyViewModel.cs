@@ -8,10 +8,8 @@ using System.Threading.Tasks;
 namespace ShaderEditorApp.ViewModel.Properties
 {
 	// View-model class for vector properties. I.e. those with multiple values of a particular type.
-	class VectorPropertyViewModel : CompositePropertyViewModel
+	class VectorPropertyViewModel : PropertyViewModel
 	{
-		public override bool CanExpand => true;
-
 		public VectorPropertyViewModel(IVectorProperty property)
 			: base(property)
 		{

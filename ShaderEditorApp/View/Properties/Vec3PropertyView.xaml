@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ShaderEditorApp.View.Properties"
+             xmlns:qc="http://QuickConverter.CodePlex.com/"
              xmlns:designdata="clr-namespace:ShaderEditorApp.SampleData"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d" 
@@ -16,34 +17,6 @@
             <!--<Setter Property="Grid.Row" Value="1"/>-->
         </Style>
 
-        <Style x:Key="ExpandCollapseToggleStyle" TargetType="ToggleButton">
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Grid Width="15"
-                              Height="13"
-                              Background="Transparent">
-                            <Path x:Name="ExpandPath"
-                                  HorizontalAlignment="Left"
-                                  VerticalAlignment="Center" 
-                                  Margin="1,1,1,1"
-                                  Fill="Transparent"
-                                  Stroke="#444"
-                                  Data="M 4 0 L 8 4 L 4 8 Z"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter Property="Data" TargetName="ExpandPath"
-                                        Value="M 8 2 L 8 8 L 2 8 Z"/>
-                                <Setter Property="Fill" TargetName="ExpandPath" Value="#444"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
         <ControlTemplate x:Key="ExpanderButtonTemplate" TargetType="ToggleButton">
             <Border>
                 <ContentPresenter Content="{TemplateBinding Content}"/>
@@ -52,15 +25,13 @@
     </UserControl.Resources>
 
     <StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <ToggleButton x:Name="expanderButton2" Style="{StaticResource ExpandCollapseToggleStyle}"
-                          IsChecked="{Binding IsExpanded}"/>
-            <TextBlock Grid.Row="0" Grid.ColumnSpan="6" Text="{Binding DisplayName}"/>
-        </StackPanel>
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="6" Text="{Binding DisplayName}"/>
 
-        <Rectangle Fill="Lime" Height="30" Grid.Row="1" Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVisibilityConverter}}"/>
+        <!-- Expanded representation -->
+        <!--<Rectangle Fill="Lime" Height="30" Grid.Row="1" Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVisibilityConverter}}"/>-->
 
-        <Grid Visibility="{Binding IsCollapsed, Converter={StaticResource BoolToVisibilityConverter}}">
+        <!-- Compact representation for when collapsed. -->
+        <Grid Visibility="{qc:Binding '$P ? Visibility.Collapsed : Visibility.Visible', P={Binding IsExpanded}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
