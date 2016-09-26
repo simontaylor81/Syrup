@@ -21,6 +21,10 @@ namespace ShaderEditorApp
 			// Register services.
 			Locator.CurrentMutable.RegisterLazySingleton(() => new WpfUserPrompt(), typeof(IUserPrompt));
 			Locator.CurrentMutable.RegisterConstant(new WpfIsForegroundService(), typeof(IIsForegroundService));
+
+			// Register namespaces for QuickConverter.
+			QuickConverter.EquationTokenizer.AddNamespace(typeof(object));
+			QuickConverter.EquationTokenizer.AddNamespace(typeof(System.Windows.Visibility));
 		}
 	}
 }
